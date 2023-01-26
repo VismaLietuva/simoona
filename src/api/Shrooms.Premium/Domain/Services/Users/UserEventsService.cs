@@ -74,14 +74,14 @@ namespace Shrooms.Premium.Domain.Services.Users
 
         private Expression<Func<EventReminder, bool>> FilterReadyStartReminders()
         {
-            return reminder => reminder.Type == EventRemindType.Start &&
+            return reminder => reminder.Type == EventReminderType.Start &&
                                DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
                                reminder.Event.StartDate > _systemClock.UtcNow;
         }
 
         private Expression<Func<EventReminder, bool>> FilterReadyDeadlineReminders()
         {
-            return reminder => reminder.Type == EventRemindType.Deadline &&
+            return reminder => reminder.Type == EventReminderType.Deadline &&
                                DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
                                reminder.Event.RegistrationDeadline > _systemClock.UtcNow;
         }

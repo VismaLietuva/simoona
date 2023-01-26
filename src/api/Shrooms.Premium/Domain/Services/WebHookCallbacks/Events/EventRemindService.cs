@@ -41,11 +41,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             var organization = await GetOrganizationAsync(organizationName);
             var reminders = await _userEventsService.GetReadyNotCompletedRemindersAsync(organization);
 
-            var startEmailDtos = reminders.Where(reminder => reminder.Type == EventRemindType.Start)
+            var startEmailDtos = reminders.Where(reminder => reminder.Type == EventReminderType.Start)
                 .Select(MapRemindStartEvent())
                 .ToList();
             await _eventNotificationService.RemindUsersAboutStartDateOfJoinedEventsAsync(startEmailDtos, organization);
-            var deadlineEmailDtos = reminders.Where(reminder => reminder.Type == EventRemindType.Deadline)
+            var deadlineEmailDtos = reminders.Where(reminder => reminder.Type == EventReminderType.Deadline)
                 .Select(MapRemindDeadlineEvent())
                 .ToList();
             await _eventNotificationService.RemindUsersAboutDeadlineDateOfJoinedEventsAsync(deadlineEmailDtos, organization);

@@ -520,7 +520,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var newReminders = createEventDto.Reminders.Where(reminder => 
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
-                (createEventDto.StartDate != createEventDto.RegistrationDeadlineDate || reminder.Type != EventRemindType.Deadline));
+                (createEventDto.StartDate != createEventDto.RegistrationDeadlineDate || reminder.Type != EventReminderType.Deadline));
             AddEventReminders(eventToUpdate, createEventDto, newReminders, createEventDto.UserId);
 
             var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>
@@ -584,11 +584,11 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             switch (reminder.Type)
             {
-                case EventRemindType.Start:
+                case EventReminderType.Start:
                     UpdateEventReminderStart(reminderToUpdate, createDto, @event);
                     break;
 
-                case EventRemindType.Deadline:
+                case EventReminderType.Deadline:
                     UpdateEventReminderDeadline(reminderToUpdate, createDto, @event);
                     break;
             }

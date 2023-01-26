@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start,
+                    Type = EventReminderType.Start,
                     RemindBeforeInDays = 1
                 }
             };
@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start,
+                    Type = EventReminderType.Start,
                     RemindBeforeInDays = 0
                 }
             };
@@ -52,7 +52,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start,
+                    Type = EventReminderType.Start,
                     RemindBeforeInDays = -10
                 }
             };
@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = (EventRemindType)int.MaxValue
+                    Type = (EventReminderType)int.MaxValue
                 },
             };
 
@@ -83,15 +83,15 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start
+                    Type = EventReminderType.Start
                 },
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Deadline
+                    Type = EventReminderType.Deadline
                 },
                 new EventReminderViewModel
                 {
-                    Type = (EventRemindType)int.MaxValue
+                    Type = (EventReminderType)int.MaxValue
                 },
             };
 
@@ -106,11 +106,11 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start
+                    Type = EventReminderType.Start
                 },
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start
+                    Type = EventReminderType.Start
                 }
             };
 
@@ -125,12 +125,12 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Deadline,
+                    Type = EventReminderType.Deadline,
                     RemindBeforeInDays = 1,
                 },
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start,
+                    Type = EventReminderType.Start,
                     RemindBeforeInDays = 1
                 }
             };

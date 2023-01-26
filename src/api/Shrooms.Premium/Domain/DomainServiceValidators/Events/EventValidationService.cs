@@ -352,18 +352,18 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        private bool IsEventDateForReminderExpired(CreateEventDto createEventDto, EventRemindType type)
+        private bool IsEventDateForReminderExpired(CreateEventDto createEventDto, EventReminderType type)
         {
             var date = GetDateFromEvent(createEventDto, type);
             return date <= _systemClock.UtcNow;
         }
 
-        private static DateTime GetDateFromEvent(CreateEventDto createEventDto, EventRemindType type)
+        private static DateTime GetDateFromEvent(CreateEventDto createEventDto, EventReminderType type)
         {
             return type switch
             {
-                EventRemindType.Start => createEventDto.StartDate,
-                EventRemindType.Deadline => createEventDto.RegistrationDeadlineDate,
+                EventReminderType.Start => createEventDto.StartDate,
+                EventReminderType.Deadline => createEventDto.RegistrationDeadlineDate,
                 _ => throw new NotSupportedException($"Unable to get date for reminder of type {type}")
             };
         }

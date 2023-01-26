@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Contracts.Enums
 {
-    public enum EventRemindType
+    public enum EventReminderType
     {
         Start,
         Deadline

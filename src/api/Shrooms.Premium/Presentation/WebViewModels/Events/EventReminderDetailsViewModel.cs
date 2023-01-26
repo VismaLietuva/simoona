@@ -6,7 +6,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
     {
         public int RemindBeforeInDays { get; set; }
 
-        public EventRemindType Type { get; set; }
+        public EventReminderType Type { get; set; }
 
         public bool IsDisabled { get; set; }
     }

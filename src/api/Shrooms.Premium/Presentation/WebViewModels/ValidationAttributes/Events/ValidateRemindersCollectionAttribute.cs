@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
             }
 
             var reminders = ((IEnumerable<EventReminderViewModel>)value).ToList();
-            var remindTypes = Enum.GetValues(typeof(EventRemindType));
+            var remindTypes = Enum.GetValues(typeof(EventReminderType));
             if (remindTypes.Length < reminders.Count)
             {
                 return new ValidationResult($"Expected reminders count to be less than or equal to {remindTypes.Length}." +
@@ -52,11 +52,11 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
             return ValidationResult.Success;
         }
 
-        private static bool ContainsType(Array array, EventRemindType type)
+        private static bool ContainsType(Array array, EventReminderType type)
         {
             foreach (var item in array)
             {
-                if ((EventRemindType)item == type)
+                if ((EventReminderType)item == type)
                 {
                     return true;
                 }

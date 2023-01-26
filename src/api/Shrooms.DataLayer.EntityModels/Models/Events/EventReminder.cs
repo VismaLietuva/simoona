@@ -14,7 +14,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         [Range(ValidationConstants.EventReminderRemindBeforeInDaysMin, ValidationConstants.EventReminderRemindBeforeInDaysMax)]
         public int RemindBeforeInDays { get; set; }
 
-        public EventRemindType Type { get; set; }
+        public EventReminderType Type { get; set; }
         
         public bool IsReminded { get; set; }
 

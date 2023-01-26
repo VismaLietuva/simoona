@@ -6,7 +6,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events.Reminders
     {
         public int RemindBeforeInDays { get; set; }
 
-        public EventRemindType Type { get; set; }
+        public EventReminderType Type { get; set; }
 
         public int RemindedCount { get; set; }
     }
