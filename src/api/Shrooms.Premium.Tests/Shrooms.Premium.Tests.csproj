@@ -199,6 +199,7 @@
     <Compile Include="ValidationAttributes\DateTimeLessThanDateTimeAttributeTests.cs" />
     <Compile Include="ValidationAttributes\NoDuplicatesInCollectionAttributeTests.cs" />
     <Compile Include="ValidationAttributes\RequireOneTimeEventAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\ValidateRemindersCollectionAttributeTests.cs" />
     <Compile Include="ValidationAttributes\ValidLotteryCreationStatusAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
