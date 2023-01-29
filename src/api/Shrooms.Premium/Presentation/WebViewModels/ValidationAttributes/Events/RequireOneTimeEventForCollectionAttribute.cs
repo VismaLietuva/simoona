@@ -1,7 +1,6 @@
 ﻿using Shrooms.DataLayer.EntityModels.Models.Events;
 using System;
 using System.Collections;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events

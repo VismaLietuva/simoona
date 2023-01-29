@@ -64,6 +64,11 @@ namespace Shrooms.Premium.Domain.Services.Users
 
         public async Task SetRemindersAsCompleteAsync(IEnumerable<EventReminder> reminders)
         {
+            if (!reminders.Any())
+            {
+                return;
+            }
+
             foreach (var reminder in reminders)
             {
                 reminder.IsReminded = true;

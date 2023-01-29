@@ -42,8 +42,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
                 return new ValidationResult($"Invalid remind type found");
             }
 
-            if (reminders.Any(reminder => reminder.RemindBeforeInDays < ValidationConstants.EventReminderRemindBeforeInDaysMin || 
-                              reminder.RemindBeforeInDays > ValidationConstants.EventReminderRemindBeforeInDaysMax))
+            if (reminders.Any(reminder => reminder.RemindBeforeInDays < ValidationConstants.EventReminderRemindBeforeInDaysMin ||
+                                          reminder.RemindBeforeInDays > ValidationConstants.EventReminderRemindBeforeInDaysMax))
             {
                 return new ValidationResult($"Specified reminder in days cannot be less than {ValidationConstants.EventReminderRemindBeforeInDaysMin} " +
                     $"and more than {ValidationConstants.EventReminderRemindBeforeInDaysMax}");
