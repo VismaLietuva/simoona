@@ -662,7 +662,12 @@
             if (vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;
             }
-            vm.reminders[reminderTypes.deadline].isVisible = !vm.reminders[reminderTypes.deadline].isVisible;
+
+            var deadlineReminder = vm.reminders[reminderTypes.deadline];
+            if (deadlineReminder.isDisabled) {
+                return;
+            }
+            deadlineReminder.isVisible = !deadlineReminder.isVisible;
         }
 
         function openDatePicker($event, datePicker) {
