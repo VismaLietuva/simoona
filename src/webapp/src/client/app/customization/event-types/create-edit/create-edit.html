@@ -78,13 +78,24 @@
                     </div>
 
                     <!--is shown will all events in a list -->
-                    <div class="form-group">
+                    <div class="form-group pb-0">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-4 text-nowrap">
                             <input id="shownWithAll" type="checkbox" class="event-form-checkbox"
                                 ng-model="vm.eventType.isShownWithMainEvents" />
                             <label for="shownWithAll" class="control-label"
                                 translate="customization.isShownWithMainEvents"></label>
+                        </div>
+                    </div>
+
+                    <!--is shown in upcoming events -->
+                    <div class="form-group pt-0">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-4 text-nowrap">
+                            <input id="shownInUpcomingEvents" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.eventType.isShownInUpcomingEvents" />
+                            <label for="shownInUpcomingEvents" class="control-label"
+                                translate="customization.isShownInUpcomingEvents"></label>
                         </div>
                     </div>
 

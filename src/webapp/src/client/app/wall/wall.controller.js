@@ -20,8 +20,8 @@
         vm.widgetsInfo = {};
 
         wallRepository.getWidgetsInfo()
-            .then(function(widgetsInfo) { 
+            .then(function(widgetsInfo) {
                 vm.widgetsInfo = widgetsInfo;
-            }); 
+            });
     }
 }());

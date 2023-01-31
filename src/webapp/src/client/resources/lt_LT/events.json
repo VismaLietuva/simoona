@@ -240,5 +240,7 @@
   "virtualParticipantCountLabel": "Virtualūs dalyviai",
   "reminders": "Priminimai",
   "remindDaysBeforeEventStart": "dienos iki renginio pradžios",
-  "remindDaysBeforeEventDeadline": "dienos iki registracijos pabaigos"
+  "remindDaysBeforeEventDeadline": "dienos iki registracijos pabaigos",
+  "noUpcomingEvents": "Nėra artimiausių renginių",
+  "upcomingEvents": "Artimiausi renginiai"
 }

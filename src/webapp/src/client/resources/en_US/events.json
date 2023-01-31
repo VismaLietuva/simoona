@@ -240,5 +240,7 @@
   "virtualParticipantCountLabel": "Virtual participants",
   "reminders": "Reminders",
   "remindDaysBeforeEventStart": "days before event starts",
-  "remindDaysBeforeEventDeadline": "days before registration ends"
+  "remindDaysBeforeEventDeadline": "days before registration ends",
+  "noUpcomingEvents": "There are no upcoming events...",
+  "upcomingEvents": "Upcoming events"
 }
