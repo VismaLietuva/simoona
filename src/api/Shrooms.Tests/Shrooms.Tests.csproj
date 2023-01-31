@@ -194,6 +194,7 @@
     <Compile Include="DomainService\ApplicationUserTests.cs" />
     <Compile Include="DomainService\BlacklistServiceTests.cs" />
     <Compile Include="DomainService\EmployeeListingServiceTests.cs" />
+    <Compile Include="DomainService\EventWidgetServiceTests.cs" />
     <Compile Include="DomainService\ExternalLinkServiceTests.cs" />
     <Compile Include="DomainService\AdministrationUsersServiceTests.cs" />
     <Compile Include="DomainService\MonitorServiceTests.cs" />
