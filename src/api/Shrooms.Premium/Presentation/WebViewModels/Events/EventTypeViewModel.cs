@@ -16,6 +16,8 @@
 
         public bool SendEmailToManager { get; set; }
 
+        public bool IsShownInUpcomingEvents { get; set; }
+
         public bool HasActiveEvents { get; set; }
     }
 }

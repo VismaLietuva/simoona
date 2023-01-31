@@ -156,6 +156,8 @@
     <Compile Include="Services\Email\Posting\ICommentNotificationService.cs" />
     <Compile Include="Services\Employees\EmployeeListingService.cs" />
     <Compile Include="Services\Employees\IEmployeeListingService.cs" />
+    <Compile Include="Services\Events\EventWidgetService.cs" />
+    <Compile Include="Services\Events\IEventWidgetService.cs" />
     <Compile Include="Services\ExternalLinks\ExternalLinkService.cs" />
     <Compile Include="Services\ExternalLinks\IExternalLinkService.cs" />
     <Compile Include="Services\FilterPresets\FilterPresetService.cs" />

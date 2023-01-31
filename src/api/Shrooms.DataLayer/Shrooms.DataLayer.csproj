@@ -919,6 +919,10 @@
     <Compile Include="Migrations\202301250746018_AddRemindedCountToEventReminder.Designer.cs">
       <DependentUpon>202301250746018_AddRemindedCountToEventReminder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202301310745513_AddIsShownInUpcomingEventsToEventType.cs" />
+    <Compile Include="Migrations\202301310745513_AddIsShownInUpcomingEventsToEventType.Designer.cs">
+      <DependentUpon>202301310745513_AddIsShownInUpcomingEventsToEventType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1533,6 +1537,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202301250746018_AddRemindedCountToEventReminder.resx">
       <DependentUpon>202301250746018_AddRemindedCountToEventReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301310745513_AddIsShownInUpcomingEventsToEventType.resx">
+      <DependentUpon>202301310745513_AddIsShownInUpcomingEventsToEventType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

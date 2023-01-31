@@ -130,6 +130,7 @@
     <Compile Include="Models\Wall\WallMemberViewModel.cs" />
     <Compile Include="Models\Wall\Widgets\GetWidgetsViewModel.cs" />
     <Compile Include="Models\Wall\Widgets\KudosBasketWidgetViewModel.cs" />
+    <Compile Include="Models\Events\UpcomingEventWidgetViewModel.cs" />
     <Compile Include="Models\Wall\Widgets\WidgetsViewModel.cs" />
     <Compile Include="ValidationAttributes\DateTimeNotExpiredAttribute.cs" />
     <Compile Include="ValidationAttributes\Walls\HasImageOrMessageBodyAttribute.cs" />

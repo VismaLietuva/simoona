@@ -14,6 +14,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool IsShownWithMainEvents { get; set; }
 
+        public bool IsShownInUpcomingEvents { get; set; }
+
         public bool SendEmailToManager { get; set; }
     }
 }

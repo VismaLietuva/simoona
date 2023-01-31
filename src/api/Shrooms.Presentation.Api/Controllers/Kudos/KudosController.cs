@@ -14,7 +14,6 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions;
-using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Controllers.Wall;

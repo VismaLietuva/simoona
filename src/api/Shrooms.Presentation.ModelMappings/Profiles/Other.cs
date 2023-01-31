@@ -2,6 +2,7 @@
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
+using Shrooms.Contracts.DataTransferObjects.Models.Events;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
 using Shrooms.Contracts.ViewModels;
@@ -13,6 +14,7 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using Shrooms.Presentation.WebViewModels.Models.ChangeProfile;
 using Shrooms.Presentation.WebViewModels.Models.Employees;
+using Shrooms.Presentation.WebViewModels.Models.Events;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
@@ -35,6 +37,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateKudosLogDtoMappings();
             CreateWelcomeKudosMappings();
             CreateMiscDtoMappings();
+            CreateEventWidgetMappings();
         }
 
         /// <summary>
@@ -56,6 +59,11 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             CreateMap<WelcomeKudosDto, WelcomeKudosViewModel>();
             CreateMap<WelcomeKudosViewModel, WelcomeKudosDto>();
+        }
+
+        private void CreateEventWidgetMappings()
+        {
+            CreateMap<UpcomingEventWidgetDto, UpcomingEventWidgetViewModel>();
         }
 
         private void CreateAdministrationMappings()

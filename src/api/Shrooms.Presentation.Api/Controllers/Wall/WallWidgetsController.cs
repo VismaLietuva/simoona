@@ -9,12 +9,14 @@ using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Birthday;
+using Shrooms.Domain.Services.Events;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
 using Shrooms.Presentation.WebViewModels.Models.Birthday;
+using Shrooms.Presentation.WebViewModels.Models.Events;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Widgets;
 
@@ -29,22 +31,25 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         private readonly IPermissionService _permissionService;
         private readonly IKudosBasketService _kudosBasketService;
         private readonly IBirthdayService _birthdayService;
+        private readonly IEventWidgetService _eventWidgetService;
 
         public WallWidgetsController(IMapper mapper,
             IKudosService kudosService,
             IPermissionService permissionService,
             IKudosBasketService kudosBasketService,
-            IBirthdayService birthdayService)
+            IBirthdayService birthdayService,
+            IEventWidgetService eventWidgetService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
             _permissionService = permissionService;
             _kudosBasketService = kudosBasketService;
             _birthdayService = birthdayService;
+            _eventWidgetService = eventWidgetService;
         }
 
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, ServerTimeSpan = WebApiConstants.OneHour)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<WidgetsViewModel> Get([FromUri] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
@@ -56,13 +61,20 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                         getWidgetsViewModel.KudosTabTwoAmount)),
                 LastKudosLogRecords = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecordsAsync),
                 WeeklyBirthdays = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdaysAsync),
-                KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidgetAsync)
+                KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidgetAsync),
+                UpcomingEvents = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Event, GetUpcomingEventsAsync)
             };
         }
 
         private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDto userAndOrganization, string permission, Func<Task<T>> valueFactory)
         {
             return await _permissionService.UserHasPermissionAsync(userAndOrganization, permission) ? await valueFactory() : default;
+        }
+
+        private async Task<IEnumerable<UpcomingEventWidgetViewModel>> GetUpcomingEventsAsync()
+        {
+            var events = await _eventWidgetService.GetUpcomingEventsAsync(GetOrganizationId());
+            return _mapper.Map<IEnumerable<UpcomingEventWidgetViewModel>>(events);
         }
 
         private async Task<IEnumerable<WallKudosLogViewModel>> GetLastKudosLogRecordsAsync()

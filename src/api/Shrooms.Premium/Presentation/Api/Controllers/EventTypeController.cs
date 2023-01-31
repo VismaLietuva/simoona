@@ -10,7 +10,9 @@ using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.Api.Filters;
+using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -92,6 +94,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
         public async Task<IHttpActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
