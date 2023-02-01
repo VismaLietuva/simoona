@@ -1,12 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Mocks
 {
+    public static class MockDbFunctions
+    {
+        public static DateTime? AddDays(DateTime? date, int? days)
+        {
+            return date.Value.AddDays(days.Value);
+        }
+    }
+
     public class MockDbAsyncQueryProvider<TEntity> : IDbAsyncQueryProvider
     {
         private readonly IQueryProvider _inner;
@@ -18,12 +29,14 @@ namespace Shrooms.Tests.Mocks
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return new MockDbAsyncEnumerable<TEntity>(expression);
+            var convertedExpression = MockQueryExpressionDbFunctionsReplacer.Replace(expression);
+            return new MockDbAsyncEnumerable<TEntity>(convertedExpression);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new MockDbAsyncEnumerable<TElement>(expression);
+            var convertedExpression = MockQueryExpressionDbFunctionsReplacer.Replace(expression);
+            return new MockDbAsyncEnumerable<TElement>(convertedExpression);
         }
 
         public object Execute(Expression expression)
@@ -44,6 +57,47 @@ namespace Shrooms.Tests.Mocks
         public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
             return Task.FromResult(Execute<TResult>(expression));
+        }
+    }
+
+    public static class MockQueryExpressionDbFunctionsReplacer
+    {
+        public static Expression Replace(Expression general)
+        {
+            var visitor = new ReplaceDbFunctionsVisitor();
+            return visitor.Visit(general);
+        }
+    }
+
+    public class ReplaceDbFunctionsVisitor : ExpressionVisitor
+    {
+        private static (MethodInfo, MethodInfo) GetDbFunctionsAddDaysMethodReplacement()
+        {
+            var methodToReplace = typeof(DbFunctions).GetMethod(nameof(DbFunctions.AddDays), new[] { typeof(DateTime?), typeof(int?) });
+            var newMethod = typeof(MockDbFunctions).GetMethod(nameof(MockDbFunctions.AddDays), new[] { typeof(DateTime?), typeof(int?) });
+            return (methodToReplace, newMethod);
+        }
+
+        private static List<(MethodInfo MethodToReplace, MethodInfo NewMethod)> GetReplacableMethods()
+        {
+            return new List<(MethodInfo MethodToReplace, MethodInfo NewMethod)>
+            {
+                GetDbFunctionsAddDaysMethodReplacement()
+            };
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            var replacableMethods = GetReplacableMethods();
+            foreach (var replacableMethod in replacableMethods)
+            {
+                if (node.Method == replacableMethod.MethodToReplace)
+                {
+                    return Expression.Call(replacableMethod.NewMethod, node.Arguments);
+                }
+            }
+
+            return base.VisitMethodCall(node);
         }
     }
 

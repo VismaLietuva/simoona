@@ -9,6 +9,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
@@ -320,6 +321,51 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             {
                 throw new EventException(PremiumErrorCodes.EventIsFullCode);
             }
+        }
+
+        public void CheckIfEventReminderCanBeRemoved(CreateEventDto createEventDto, EventReminder reminder, EventRecurrenceOptions newOption)
+        {
+            if (!CanReminderBeChangedForEvent(createEventDto, reminder) && newOption == EventRecurrenceOptions.None)
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeRemoved);
+            }
+        }
+
+        public void CheckIfEventReminderCanBeUpdated(CreateEventDto createEventDto, EventReminder reminder)
+        {
+            if (!CanReminderBeChangedForEvent(createEventDto, reminder))
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeUpdated);
+            }
+        }
+
+        private bool CanReminderBeChangedForEvent(CreateEventDto createEventDto, EventReminder reminder)
+        {
+            return reminder.RemindedCount <= 0 && !IsEventDateForReminderExpired(createEventDto, reminder.Type);
+        }
+
+        public void CheckIfEventReminderCanBeAdded(CreateEventDto createEventDto, EventReminderDto reminder)
+        {
+            if (IsEventDateForReminderExpired(createEventDto, reminder.Type))
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeAdded);
+            }
+        }
+
+        private bool IsEventDateForReminderExpired(CreateEventDto createEventDto, EventReminderType type)
+        {
+            var date = GetDateFromEvent(createEventDto, type);
+            return date <= _systemClock.UtcNow;
+        }
+
+        private static DateTime GetDateFromEvent(CreateEventDto createEventDto, EventReminderType type)
+        {
+            return type switch
+            {
+                EventReminderType.Start => createEventDto.StartDate,
+                EventReminderType.Deadline => createEventDto.RegistrationDeadlineDate,
+                _ => throw new NotSupportedException($"Unable to get date for reminder of type {type}")
+            };
         }
     }
 }

@@ -164,6 +164,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ViewModels\CreateEventViewModelTests.cs" />
     <Compile Include="Controllers\WebApi\EventControllerTests.cs" />
     <Compile Include="Controllers\WebApi\LotteryControllerTests.cs" />
     <Compile Include="DomainService\BadgesServiceTests.cs" />
@@ -172,7 +173,9 @@
     <Compile Include="DomainService\EventCrudServiceTests.cs" />
     <Compile Include="DomainService\EventListingServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\EventNotificationServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventParticipantServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\UserEventsServiceTests.cs" />
     <Compile Include="DomainService\EventServiceTests.cs" />
     <Compile Include="DomainService\EventUtilitiesServiceTests.cs" />
     <Compile Include="DomainService\LotteryServices\LotteryAbortJobTests.cs" />
@@ -195,6 +198,8 @@
     <Compile Include="ValidationAttributes\DateTimeLessThanPresentDateAttributeTests.cs" />
     <Compile Include="ValidationAttributes\DateTimeLessThanDateTimeAttributeTests.cs" />
     <Compile Include="ValidationAttributes\NoDuplicatesInCollectionAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\RequireOneTimeEventAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\ValidateRemindersCollectionAttributeTests.cs" />
     <Compile Include="ValidationAttributes\ValidLotteryCreationStatusAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>

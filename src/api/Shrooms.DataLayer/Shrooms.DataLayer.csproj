@@ -110,6 +110,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookOfficeEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\EventOptionEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventReminderEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\EventTypeEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\ExternalLinkConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\IdentityUserClaimEntityConfig.cs" />
@@ -906,6 +907,18 @@
     <Compile Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.Designer.cs">
       <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202301041040284_AddEventReminder.cs" />
+    <Compile Include="Migrations\202301041040284_AddEventReminder.Designer.cs">
+      <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202301240755238_AddBaseModelToEventReminder.cs" />
+    <Compile Include="Migrations\202301240755238_AddBaseModelToEventReminder.Designer.cs">
+      <DependentUpon>202301240755238_AddBaseModelToEventReminder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202301250746018_AddRemindedCountToEventReminder.cs" />
+    <Compile Include="Migrations\202301250746018_AddRemindedCountToEventReminder.Designer.cs">
+      <DependentUpon>202301250746018_AddRemindedCountToEventReminder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1511,6 +1524,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.resx">
       <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301041040284_AddEventReminder.resx">
+      <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301240755238_AddBaseModelToEventReminder.resx">
+      <DependentUpon>202301240755238_AddBaseModelToEventReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301250746018_AddRemindedCountToEventReminder.resx">
+      <DependentUpon>202301250746018_AddRemindedCountToEventReminder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

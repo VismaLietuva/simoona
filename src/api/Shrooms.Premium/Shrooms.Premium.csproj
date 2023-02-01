@@ -275,6 +275,8 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderDeadlineEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderStartEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
@@ -317,12 +319,15 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventEditDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantAttendDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantFirstTimeJoinDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDetailsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
@@ -349,6 +354,10 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDeadlineEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\IEventReminderEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderStartEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderEmailReceiverDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDto.cs" />
@@ -461,9 +470,9 @@
     <Compile Include="Domain\Services\Vacations\VacationDomainService.cs" />
     <Compile Include="Domain\Services\Vacations\VacationHistoryService.cs" />
     <Compile Include="Domain\Services\Vacations\VacationService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\EventJoinRemindService.cs" />
+    <Compile Include="Domain\Services\WebHookCallbacks\Events\EventRemindService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\Events\EventsWebHookService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventJoinRemindService.cs" />
+    <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventRemindService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventsWebHookService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\IWebHookCallbackPremiumServices.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\Lotteries\ILotteryStatusChangeService.cs" />
@@ -556,7 +565,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsParticipantViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventEditViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventEditDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventFilteredArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventJoinMultipleViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventJoinViewModel.cs" />
@@ -569,6 +578,8 @@
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantVisitedEventsListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventReminderDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventReminderViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
@@ -611,6 +622,8 @@
     <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\ValidateRemindersCollectionAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\RequireOneTimeEventForCollectionAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\NoDuplicatesInCollectionAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
@@ -636,6 +649,12 @@
     <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="EmailTemplates\Events\RemindDeadlineDate.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="EmailTemplates\Events\RemindStartDate.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="EmailTemplates\Lotteries\StartedLottery.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

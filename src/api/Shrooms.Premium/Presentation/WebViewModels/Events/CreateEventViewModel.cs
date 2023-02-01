@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Hangfire.Annotations;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
@@ -18,16 +19,17 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public string ImageName { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
+
 
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Required]
         public DateTime? RegistrationDeadlineDate { get; set; }
 
         [Required]
-        public EventRecurrenceOptions Recurrence { get; set; }
+        public EventRecurrenceOptions? Recurrence { get; set; }
 
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
@@ -59,5 +61,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public string ResponsibleUserId { get; set; }
 
         public IEnumerable<NewEventOptionViewModel> NewOptions { get; set; }
+
+        [RequireOneTimeEventForCollection(nameof(Recurrence)), ValidateRemindersCollection]
+        public IEnumerable<EventReminderViewModel> Reminders { get; set; }
     }
 }

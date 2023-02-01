@@ -11,6 +11,9 @@
         public const int KudosMultiplyByMinValue = 1;
         public const int KudosCommentMaxLength = 500;
 
+        public const int EventReminderRemindBeforeInDaysMin = 1;
+        public const int EventReminderRemindBeforeInDaysMax = 100;
+
         public const int ExamMaxTitleLength = 255;
         public const int ExamMaxNumberLength = 255;
 

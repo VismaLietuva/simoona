@@ -28,25 +28,7 @@ namespace Shrooms.DataLayer.DAL
             foreach (var entry in deletedItems)
             {
                 var e = entry.Entity;
-                var id = string.Empty;
-
-                if (e is IdentityUser || e is ApplicationRole)
-                {
-                    id = ((IdentityUser)e).Id;
-                }
-                else if (e is BaseModel model)
-                {
-                    id = model.Id.ToString();
-                }
-                else if (e is Event @event)
-                {
-                    id = @event.Id.ToString();
-                }
-
-                if (string.IsNullOrEmpty(id))
-                {
-                    throw new ArgumentException("Id not found in SoftDelete() method", id);
-                }
+                var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
                 _context.Database.ExecuteSqlCommand($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
@@ -66,25 +48,7 @@ namespace Shrooms.DataLayer.DAL
             foreach (var entry in deletedItems)
             {
                 var e = entry.Entity;
-                var id = string.Empty;
-
-                if (e is IdentityUser || e is ApplicationRole)
-                {
-                    id = ((IdentityUser)e).Id;
-                }
-                else if (e is BaseModel model)
-                {
-                    id = model.Id.ToString();
-                }
-                else if (e is Event @event)
-                {
-                    id = @event.Id.ToString();
-                }
-
-                if (string.IsNullOrEmpty(id))
-                {
-                    throw new ArgumentException("Id not found in SoftDelete() method", id);
-                }
+                var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
                 await _context.Database.ExecuteSqlCommandAsync($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
@@ -93,6 +57,28 @@ namespace Shrooms.DataLayer.DAL
                 // So does setting it to Detached and that is what EF does when it deletes an item: http://msdn.microsoft.com/en-us/data/jj592676.aspx
                 entry.State = EntityState.Detached;
             }
+        }
+
+        private static string GetEntityId(object e)
+        {
+            if (e is IdentityUser || e is ApplicationRole)
+            {
+                return ((IdentityUser)e).Id;
+            }
+            else if (e is BaseModel model)
+            {
+                return model.Id.ToString();
+            }
+            else if (e is Event @event)
+            {
+                return @event.Id.ToString();
+            }
+            else if (e is EventReminder reminder)
+            {
+                return reminder.Id.ToString();
+            }
+
+            throw new ArgumentException("Id not found in SoftDelete() method");
         }
 
         internal static string GetTableName(Type type)

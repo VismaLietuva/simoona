@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
@@ -34,6 +35,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IPermissionService _permissionService;
         private IOfficeMapService _officeMapService;
         private IEventValidationService _eventValidationService;
+        private ISystemClock _systemClock;
 
         [SetUp]
         public void TestInitializer()
@@ -48,19 +50,22 @@ namespace Shrooms.Premium.Tests.DomainService
             _wallService = Substitute.For<IWallService>();
             _eventValidationService = Substitute.For<IEventValidationService>();
             _officeMapService = Substitute.For<IOfficeMapService>();
+            _systemClock = Substitute.For<ISystemClock>();
 
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
 
-            _eventService = new EventService(_uow,
+            _eventService = new EventService(
+                _uow,
                 _permissionService,
                 eventUtilitiesService,
                 _eventValidationService,
                 eventParticipationService,
                 _wallService,
                 markdownConverter,
-                _officeMapService);
+                _officeMapService,
+                _systemClock);
         }
 
         [TestCase(1)]

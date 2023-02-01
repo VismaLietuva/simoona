@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks
 
         IBadgesService BadgesService { get; set; }
 
-        IEventJoinRemindService EventJoinRemindService { get; set; }
+        IEventRemindService EventRemindService { get; set; }
 
         ILotteryStatusChangeService LotteryStatusChangeService { get; set; }
     }

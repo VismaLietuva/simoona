@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
@@ -17,7 +18,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public DateTime EndDate { get; set; }
 
-        public DateTime? RegistrationDeadlineDate { get; set; }
+        public DateTime RegistrationDeadlineDate { get; set; }
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
@@ -44,5 +45,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public string ResponsibleUserId { get; set; }
 
         public IEnumerable<NewEventOptionDto> NewOptions { get; set; }
+
+        public IEnumerable<EventReminderDto> Reminders { get; set; }
     }
 }

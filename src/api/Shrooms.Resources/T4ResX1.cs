@@ -3004,6 +3004,76 @@ namespace Shrooms.Resources.Models.Events {
     }
 }
 
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Registration closes soon for {0} event</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        public static string RemindEventDeadlineEmailSubjectFormatted(params object[] args) { return GetResourceString("RemindEventDeadlineEmailSubject", args); }
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Registration closes soon for {0} event</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string RemindEventDeadlineEmailSubject => GetResourceString(RemindEventDeadlineEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="RemindEventDeadlineEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string RemindEventDeadlineEmailSubjectKey = "RemindEventDeadlineEmailSubject";
+    }
+}
+
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Reminder for {0} event</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        public static string RemindEventStartEmailSubjectFormatted(params object[] args) { return GetResourceString("RemindEventStartEmailSubject", args); }
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Reminder for {0} event</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string RemindEventStartEmailSubject => GetResourceString(RemindEventStartEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="RemindEventStartEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string RemindEventStartEmailSubjectKey = "RemindEventStartEmailSubject";
+    }
+}
+
 namespace Shrooms.Resources.Models.Floor {
 [Utilities.Localized]    public partial class Floor {
 

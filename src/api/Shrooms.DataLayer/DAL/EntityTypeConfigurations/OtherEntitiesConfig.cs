@@ -2,7 +2,6 @@
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 

@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             _filterPresetService = filterPresetService;
         }
 
-        public async Task DeleteByEventAsync(Guid eventId, string userId)
+        public async Task DeleteEventOptionsAsync(Guid eventId, string userId)
         {
             var options = await _eventOptionsDbSet
                 .Where(o => o.EventId == eventId)

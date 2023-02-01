@@ -20,6 +20,14 @@
             3: 'everyTwoWeeks',
             4: 'everyMonth',
         })
+        .constant('reminderTypes', {
+            start: 0,
+            deadline: 1
+        })
+        .constant('reminderDefaultValues', {
+            remindBeforeDays: 7,
+            maxRemindBeforeDays: 100
+        })
         .controller('addNewEventController', addNewEventController);
 
     addNewEventController.$inject = [
@@ -34,12 +42,13 @@
         'pictureRepository',
         'eventSettings',
         'recurringTypesResources',
-        '$translate',
         'notifySrv',
         'localeSrv',
         'lodash',
         'errorHandler',
         'optionRules',
+        'reminderTypes',
+        'reminderDefaultValues'
     ];
 
     function addNewEventController(
@@ -54,15 +63,19 @@
         pictureRepository,
         eventSettings,
         recurringTypesResources,
-        $translate,
         notifySrv,
         localeSrv,
         lodash,
         errorHandler,
-        optionRules
+        optionRules,
+        reminderTypes,
+        reminderDefaultValues
     ) {
         /* jshint validthis: true */
         var vm = this;
+
+        vm.maxRemindBeforeDays = reminderDefaultValues.maxRemindBeforeDays;
+        vm.reminders = createReminders();
 
         vm.states = {
             isAdd: $state.includes('Root.WithOrg.Client.Events.AddEvents'),
@@ -116,6 +129,9 @@
         vm.isStartDateValid = isStartDateValid;
         vm.isEndDateValid = isEndDateValid;
         vm.isDeadlineDateValid = isDeadlineDateValid;
+        vm.isOneTimeEvent = isOneTimeEvent;
+        vm.resetReminder = resetReminder;
+        vm.isReminderDisabled = isReminderDisabled;
 
         init();
 
@@ -172,7 +188,7 @@
                             fullName: vm.event.hostUserFullName,
                         };
 
-                        vm.minParticipants = vm.event.maxParticipants; // ? how did i thought that this is correct
+                        vm.minParticipants = vm.event.maxParticipants;
                         vm.minVirtualParticipants = vm.event.maxVirtualParticipants;
 
                         if (
@@ -180,6 +196,7 @@
                             vm.event.registrationDeadlineDate
                         ) {
                             vm.isRegistrationDeadlineEnabled = true;
+                            vm.reminders[reminderTypes.deadline].isVisible = true;
                         }
                         vm.event.offices = [];
                         vm.event.officeIds.forEach(function (value) {
@@ -190,11 +207,13 @@
                             .local()
                             .startOf('minute')
                             .toDate();
+
                         vm.event.startDate = moment
                             .utc(vm.event.startDate)
                             .local()
                             .startOf('minute')
                             .toDate();
+
                         vm.event.endDate = moment
                             .utc(vm.event.endDate)
                             .local()
@@ -210,6 +229,7 @@
                         }
 
                         validateOfficeSelection();
+                        updateReminders();
                     },
                     function (error) {
                         errorHandler.handleErrorMessage(error);
@@ -269,6 +289,17 @@
                 },
                 true
             );
+        }
+
+        function updateReminders() {
+            for (var reminder of vm.event.reminders) {
+                var localReminder = vm.reminders[reminder.type];
+                localReminder.isVisible = true;
+                localReminder.isEnabled = true;
+                localReminder.value = reminder.remindBeforeInDays;
+                localReminder.isDisabled = reminder.isDisabled;
+                localReminder.isCreated = true;
+            }
         }
 
         function toggleOfficeSelection(office) {
@@ -354,6 +385,10 @@
             handleOptions();
         }
 
+        function resetReminder(type) {
+            vm.reminders[type].value = reminderDefaultValues.remindBeforeDays;
+        }
+
         function handleOptions() {
             var optionsSum = countOptions();
 
@@ -429,6 +464,54 @@
                         errorHandler.handleErrorMessage(error);
                     }
                 );
+            }
+        }
+
+        function createReminders() {
+            return {
+                [reminderTypes.start]: {
+                    isVisible: true,
+                    isEnabled: false,
+                    value: reminderDefaultValues.remindBeforeDays,
+                    translation: 'events.remindDaysBeforeEventStart',
+                    isDisabled: false
+                },
+                [reminderTypes.deadline]: {
+                    isVisible: false,
+                    isEnabled: false,
+                    value: reminderDefaultValues.remindBeforeDays,
+                    translation: 'events.remindDaysBeforeEventDeadline',
+                    isDisabled: false
+                }
+            }
+        }
+
+        function isReminderDisabled(reminderType) {
+            if (vm.reminders[reminderType].isDisabled) {
+                return true;
+            }
+
+            return !canReminderBeModified(reminderType);
+        }
+
+        function canReminderBeModified(reminderType) {
+            var eventDate = getDateFromEventBasedOnReminderType(reminderType);
+            var currentDate = moment()
+                .local()
+                .startOf('minute')
+                .toDate();
+            return eventDate > currentDate;
+        }
+
+        function getDateFromEventBasedOnReminderType(reminderType) {
+            reminderType = parseInt(reminderType);
+            switch (reminderType) {
+                case reminderTypes.start:
+                    return vm.event.startDate;
+                case reminderTypes.deadline:
+                    return vm.event.registrationDeadlineDate ?? vm.event.startDate;
+                default:
+                    console.error('Reminder type ' + reminderType + ' is not supported');
             }
         }
 
@@ -530,10 +613,31 @@
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;
+
             vm.event.endDate = moment(vm.event.endDate)
                 .local()
                 .startOf('minute')
                 .toDate();
+
+            vm.event.reminders = mapRemindersToRequestParameters();
+        }
+
+        function mapRemindersToRequestParameters() {
+            if (!isOneTimeEvent()) {
+                return [];
+            }
+
+            return Object.keys(vm.reminders)
+                .filter(key => (vm.reminders[key].isEnabled &&
+                                vm.reminders[key].isVisible &&
+                                (canReminderBeModified(key) ||
+                                vm.reminders[key].isCreated)) ||
+                                vm.reminders[key].isDisabled)
+                .map(key => ({ remindBeforeInDays:  vm.reminders[key].value, type: key }));
+        }
+
+        function isOneTimeEvent() {
+            return vm.recurringTypesResources[vm.event.recurrence] === 'none';
         }
 
         function manageParticipantResets() {
@@ -558,6 +662,12 @@
             if (vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;
             }
+
+            var deadlineReminder = vm.reminders[reminderTypes.deadline];
+            if (deadlineReminder.isDisabled) {
+                return;
+            }
+            deadlineReminder.isVisible = !deadlineReminder.isVisible;
         }
 
         function openDatePicker($event, datePicker) {

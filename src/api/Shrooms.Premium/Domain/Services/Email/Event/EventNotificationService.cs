@@ -9,10 +9,12 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -25,7 +27,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        public EventNotificationService(IUnitOfWork2 uow,
+        public EventNotificationService(
+            IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,
@@ -54,6 +57,26 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
 
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
+        }
+        
+        public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<EventReminderDeadlineEmailDto> deadlineEmailDtos, Organization organization)
+        {
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var emailsToSend = deadlineEmailDtos.Select(MapRemindEventToEmailContent(
+                    Resources.Models.Events.Events.RemindEventDeadlineEmailSubject,
+                    MapToEventRemindDeadlineEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl)))
+                .ToList();
+            await SendEmailsAsync(emailsToSend);
+        }
+
+        public async Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<EventReminderStartEmailDto> startEmailDtos, Organization organization)
+        {
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var emailsToSend = startEmailDtos.Select(MapRemindEventToEmailContent(
+                    Resources.Models.Events.Events.RemindEventStartEmailSubject,
+                    MapToEventRemindStartEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl)))
+                .ToList();
+            await SendEmailsAsync(emailsToSend);
         }
 
         public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventTypes, IEnumerable<string> emails, int orgId)
@@ -115,6 +138,62 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
                     emailJoinSubject,
                     emailJoinBody);
+        }
+
+        private Func<TDto, (List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)>
+            MapRemindEventToEmailContent<TDto, TEmailTemplate>(string subjectResource, Func<string, TDto, (TEmailTemplate, string)> mapToViewModelFunc) 
+            where TEmailTemplate : BaseEmailTemplateViewModel
+            where TDto : IEventReminderEmailDto
+        {
+            return reminder =>
+            {
+                var subject = string.Format(subjectResource, reminder.EventName);
+                var emails = reminder.Receivers.GroupBy(receiver => receiver.TimeZone, receiver => receiver.Email)
+                    .Select(timeZoneGroup =>
+                    {
+                        var eventEmailTemplateWithCacheKey = mapToViewModelFunc(timeZoneGroup.Key, reminder);
+                        return (
+                            EmailBody: _mailTemplate.Generate(eventEmailTemplateWithCacheKey.Item1, eventEmailTemplateWithCacheKey.Item2),
+                            UserEmails: timeZoneGroup.ToList());
+                    }).ToList();
+                return (emails, subject);
+            };
+        }
+
+        private Func<string, EventReminderStartEmailDto, (EventReminderStartEmailTemplateViewModel, string)>
+            MapToEventRemindStartEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
+        {
+            return (timeZoneKey, reminder) =>
+                (new EventReminderStartEmailTemplateViewModel(
+                    userNotificationSettingsUrl,
+                    reminder.EventName,
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),
+                    reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey)),
+                EmailPremiumTemplateCacheKeys.EventStartRemind);
+        }
+
+        private Func<string, EventReminderDeadlineEmailDto, (EventReminderDeadlineEmailTemplateViewModel, string)>
+            MapToEventRemindDeadlineEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
+        {
+            return (timeZoneKey, reminder) =>
+                (new EventReminderDeadlineEmailTemplateViewModel(
+                    userNotificationSettingsUrl,
+                    reminder.EventName,
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),
+                    reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey),
+                    reminder.DeadlineDate.ConvertUtcToTimeZone(timeZoneKey)),
+                EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
+        }
+
+        private async Task SendEmailsAsync(List<(List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)> emailsToSend)
+        {
+            foreach (var email in emailsToSend)
+            {
+                foreach (var content in email.EmailContents)
+                {
+                    await _mailingService.SendEmailAsync(new EmailDto(content.UserEmails, email.Subject, content.EmailBody));
+                }
+            }
         }
     }
 }

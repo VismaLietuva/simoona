@@ -10,6 +10,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Shrooms.Domain.Extensions;
 using Shrooms.Resources.Models.Lotteries;
 using System;
 
@@ -63,12 +64,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 
             foreach (var emailGroup in userEmailsGroupedByTimeZone)
             {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(emailGroup.Key);
-                var zonedDate = TimeZoneInfo.ConvertTimeFromUtc(startedDto.EndDate, timeZone);
-
-                var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, zonedDate, userNotificationSettingsUrl);
+                var localEndDate = startedDto.EndDate.ConvertUtcToTimeZone(emailGroup.Key);
+                var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, localEndDate, userNotificationSettingsUrl);
                 var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
-                
                 var userEmails = emailGroup.Select(info => info.Email);
 
                 await _mailingService.SendEmailAsync(new EmailDto(userEmails, emailSubject, emailBody));

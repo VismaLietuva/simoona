@@ -39,6 +39,11 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .WithRequired(e => e.Event)
                 .HasForeignKey(e => e.EventId)
                 .WillCascadeOnDelete(false);
+
+            HasMany(e => e.Reminders)
+                .WithRequired(e => e.Event)
+                .HasForeignKey(e => e.EventId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

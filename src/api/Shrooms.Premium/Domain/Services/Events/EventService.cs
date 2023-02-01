@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
@@ -18,6 +19,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
@@ -36,11 +38,13 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IWallService _wallService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
+        private readonly ISystemClock _systemClock;
+
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
-
+        private readonly DbSet<EventReminder> _eventRemindersDbSet;
         private readonly IDbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
@@ -50,7 +54,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IEventParticipationService eventParticipationService,
             IWallService wallService,
             IMarkdownConverter markdownConverter,
-            IOfficeMapService officeMapService)
+            IOfficeMapService officeMapService,
+            ISystemClock systemClock)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -58,6 +63,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
             _officeDbSet = uow.GetDbSet<Office>();
+            _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -66,12 +72,14 @@ namespace Shrooms.Premium.Domain.Services.Events
             _wallService = wallService;
             _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
+            _systemClock = systemClock;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.EventOptions)
+                .Include(e => e.Reminders)
                 .Include(e => e.EventParticipants)
                 .SingleOrDefaultAsync(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId);
 
@@ -86,7 +94,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.ModifiedBy = userOrg.UserId;
 
             await _eventParticipationService.DeleteByEventAsync(id, userOrg.UserId);
-            await _eventUtilitiesService.DeleteByEventAsync(id, userOrg.UserId);
+            await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
+            await RemoveEventRemindersAsync(@event.Reminders, userOrg.UserId);
 
             _eventsDbSet.Remove(@event);
 
@@ -94,12 +103,13 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _wallService.DeleteWallAsync(@event.WallId, userOrg, WallType.Events);
         }
 
-        public async Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg)
+        public async Task<EventEditDetailsDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
+                .Include(e => e.Reminders)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
-                .Select(MapToEventEditDto())
+                .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(@event);
@@ -114,7 +124,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
-
             _eventValidationService.CheckIfEventExists(@event);
 
             // ReSharper disable once PossibleNullReferenceException
@@ -154,17 +163,17 @@ namespace Shrooms.Premium.Domain.Services.Events
         public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
         {
             newEventDto.MaxOptions = FindOutMaxChoices(newEventDto.NewOptions.Count(), newEventDto.MaxOptions);
-            newEventDto.RegistrationDeadlineDate = SetRegistrationDeadline(newEventDto);
+            newEventDto.RegistrationDeadlineDate = newEventDto.RegistrationDeadlineDate;
 
             var hasPermissionToPin = await _permissionService.UserHasPermissionAsync(newEventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
-            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
+            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate);
             await ValidateEvent(newEventDto);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
-            var newEvent = await MapNewEvent(newEventDto);
+            var newEvent = await MapNewEventAsync(newEventDto);
 
             _eventsDbSet.Add(newEvent);
 
@@ -186,11 +195,12 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.EventType)
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
+                .Include(e => e.Reminders)
                 .SingleOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
-            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
+            eventDto.RegistrationDeadlineDate = eventDto.RegistrationDeadlineDate;
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
             
@@ -204,9 +214,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             await ValidateEvent(eventDto);
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
-            UpdateEventInfo(eventDto, eventToUpdate);
+            await UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
-            
+
             await _uow.SaveChangesAsync(false);
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
@@ -282,14 +292,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             return eventOptionsCount == NoOptions ? NoOptions : maxOptions;
         }
 
-        private static DateTime SetRegistrationDeadline(CreateEventDto newEventDto)
+        private static Expression<Func<Event, EventEditDetailsDto>> MapToEventEditDetailsDto()
         {
-            return newEventDto.RegistrationDeadlineDate ?? newEventDto.StartDate;
-        }
-
-        private static Expression<Func<Event, EventEditDto>> MapToEventEditDto()
-        {
-            return e => new EventEditDto
+            return e => new EventEditDetailsDto
             {
                 Id = e.Id,
                 Description = e.Description,
@@ -311,6 +316,12 @@ namespace Shrooms.Premium.Domain.Services.Events
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
+                Reminders = e.Reminders.Select(reminder => new EventReminderDetailsDto
+                {
+                    RemindBeforeInDays = reminder.RemindBeforeInDays,
+                    Type = reminder.Type,
+                    RemindedCount = reminder.RemindedCount
+                }),
                 Options = e.EventOptions.Select(o => new EventOptionDto
                 {
                     Id = o.Id,
@@ -364,7 +375,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _eventValidationService.CheckIfEndDateIsGreaterThanStartDate(eventDto.StartDate, eventDto.EndDate);
             // ReSharper disable once PossibleInvalidOperationException
-            _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate.Value, eventDto.StartDate);
+            _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate, eventDto.StartDate);
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
@@ -431,7 +442,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private async Task<Event> MapNewEvent(CreateEventDto newEventDto)
+        private async Task<Event> MapNewEventAsync(CreateEventDto newEventDto)
         {
             var newEvent = new Event
             {
@@ -439,7 +450,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 CreatedBy = newEventDto.UserId,
                 OrganizationId = newEventDto.OrganizationId,
                 OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
-                IsPinned = newEventDto.IsPinned
+                IsPinned = newEventDto.IsPinned,
+                Reminders = new List<EventReminder>()
             };
 
             var newWall = new CreateWallDto
@@ -456,12 +468,18 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var wallId = await _wallService.CreateNewWallAsync(newWall);
             newEvent.WallId = wallId;
-            UpdateEventInfo(newEventDto, newEvent);
+            await UpdateEventInfoAsync(newEventDto, newEvent);
 
             return newEvent;
         }
 
-        private static void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
+        private async Task UpdateEventInfoAsync(CreateEventDto newEventDto, Event newEvent)
+        {
+            await SetEventRemindersAsync(newEventDto, newEvent);
+            SetEventInfo(newEventDto, newEvent);
+        }
+
+        private static void SetEventInfo(CreateEventDto newEventDto, Event newEvent)
         {
             newEvent.Modified = DateTime.UtcNow;
             newEvent.ModifiedBy = newEventDto.UserId;
@@ -480,11 +498,134 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.Name = newEventDto.Name;
 
             // ReSharper disable once PossibleInvalidOperationException
-            newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
+            newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate;
 
             newEvent.IsPinned = newEventDto.IsPinned;
             newEvent.AllowMaybeGoing = newEventDto.AllowMaybeGoing;
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
+        }
+
+        private async Task SetEventRemindersAsync(CreateEventDto createEventDto, Event eventToUpdate)
+        {
+            var updateReminders = eventToUpdate.Reminders.Join(
+                createEventDto.Reminders,
+                oldReminder => oldReminder.Type,
+                reminder => reminder.Type,
+                (oldReminder, reminder) => new { OldReminder = oldReminder, Reminder = reminder })
+                .ToList();
+            foreach (var updateReminder in updateReminders)
+            {
+                UpdateEventReminder(updateReminder.Reminder, updateReminder.OldReminder, createEventDto, eventToUpdate);
+            }
+
+            var newReminders = createEventDto.Reminders.Where(reminder => 
+                !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
+                (createEventDto.StartDate != createEventDto.RegistrationDeadlineDate || reminder.Type != EventReminderType.Deadline));
+            AddEventReminders(eventToUpdate, createEventDto, newReminders, createEventDto.UserId);
+
+            var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>
+                !newReminders.Any(newReminder => newReminder.Type == reminder.Type) &&
+                !updateReminders.Any(updateReminder => updateReminder.OldReminder.Type == reminder.Type));
+            await RemoveEventRemindersAsync(
+                remindersToDelete,
+                createEventDto.UserId,
+                reminder => _eventValidationService.CheckIfEventReminderCanBeRemoved(createEventDto, reminder, createEventDto.Recurrence));
+        }
+
+        private async Task RemoveEventRemindersAsync(
+            IEnumerable<EventReminder> remindersToDelete,
+            string userId,
+            Action<EventReminder> validateReminderBeforeRemoval = null)
+        {
+            if (!remindersToDelete.Any())
+            {
+                return;
+            }
+
+            var timestamp = _systemClock.UtcNow;
+            foreach (var reminder in remindersToDelete)
+            {
+                validateReminderBeforeRemoval?.Invoke(reminder);
+                reminder.Modified = timestamp;
+                reminder.ModifiedBy = userId;
+            }
+            await _uow.SaveChangesAsync(false);
+            _eventRemindersDbSet.RemoveRange(remindersToDelete);
+        }
+
+        private void AddEventReminders(
+            Event eventToUpdate,
+            CreateEventDto createEventDto,
+            IEnumerable<EventReminderDto> newReminders,
+            string userId)
+        {
+            var timestamp = _systemClock.UtcNow;
+            foreach (var newReminder in newReminders)
+            {
+                _eventValidationService.CheckIfEventReminderCanBeAdded(createEventDto, newReminder);
+                eventToUpdate.Reminders.Add(new EventReminder
+                {
+                    RemindBeforeInDays = newReminder.RemindBeforeInDays,
+                    Type = newReminder.Type,
+                    IsReminded = false,
+                    Created = timestamp,
+                    CreatedBy = userId,
+                    Modified = timestamp,
+                    ModifiedBy = userId
+                });
+            }
+        }
+
+        private void UpdateEventReminder(
+            EventReminderDto reminder,
+            EventReminder reminderToUpdate,
+            CreateEventDto createDto,
+            Event @event)
+        {
+            switch (reminder.Type)
+            {
+                case EventReminderType.Start:
+                    UpdateEventReminderStart(reminderToUpdate, createDto, @event);
+                    break;
+
+                case EventReminderType.Deadline:
+                    UpdateEventReminderDeadline(reminderToUpdate, createDto, @event);
+                    break;
+            }
+            
+            if (reminderToUpdate.RemindBeforeInDays != reminder.RemindBeforeInDays)
+            {
+                _eventValidationService.CheckIfEventReminderCanBeUpdated(createDto, reminderToUpdate);
+                reminderToUpdate.RemindBeforeInDays = reminder.RemindBeforeInDays;
+            }
+
+            reminderToUpdate.Modified = _systemClock.UtcNow;
+            reminderToUpdate.ModifiedBy = createDto.UserId;
+        }
+
+        private static void UpdateEventReminderStart(EventReminder reminderToUpdate, CreateEventDto createDto, Event @event)
+        {
+            if (createDto.StartDate != @event.StartDate)
+            {
+                reminderToUpdate.IsReminded = false;
+            }
+        }
+
+        private static void UpdateEventReminderDeadline(EventReminder reminderToUpdate, CreateEventDto createDto, Event @event)
+        {
+            if (createDto.RegistrationDeadlineDate < @event.RegistrationDeadline)
+            {
+                reminderToUpdate.IsReminded = false;
+            }
+            else if (IsRegistrationDeadlineBeingRemoved(createDto, @event))
+            {
+                reminderToUpdate.IsReminded = true;
+            }
+        }
+
+        private static bool IsRegistrationDeadlineBeingRemoved(CreateEventDto eventDto, Event eventToUpdate)
+        {
+            return eventDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
         }
 
         private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId)

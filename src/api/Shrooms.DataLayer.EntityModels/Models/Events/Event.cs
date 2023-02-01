@@ -30,6 +30,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
 
+        public ICollection<EventReminder> Reminders { get; set; }
+
         [ForeignKey("Office")]
         public int? OfficeId { get; set; }
 

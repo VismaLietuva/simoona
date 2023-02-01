@@ -50,11 +50,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpPost]
+        [Route("RemindJoinedEvents")]
+        public async Task RemindJoinedEvents()
+        {
+            await _webHookService.EventRemindService.SendJoinedNotificationsAsync(GetOrganizationName());
+        }
+
+        [HttpPost]
         [Route("RemindEvents")]
         public async Task RemindEvents()
         {
             var organizationName = GetOrganizationName();
-            await _webHookService.EventJoinRemindService.SendNotificationsAsync(organizationName);
+            await _webHookService.EventRemindService.SendNotificationsAsync(organizationName);
         }
 
         [HttpPost]

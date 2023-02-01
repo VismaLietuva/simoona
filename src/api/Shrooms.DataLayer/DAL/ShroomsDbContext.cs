@@ -82,6 +82,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<EventType> EventTypes { get; set; }
 
+        public virtual DbSet<EventReminder> EventReminders { get; set; }
+
         public virtual DbSet<EventParticipant> EventsParticipants { get; set; }
 
         public virtual DbSet<EventOption> EventOptions { get; set; }
@@ -224,6 +226,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new VacationEntityConfig());
             modelBuilder.Configurations.Add(new FilterPresetEntityConfig());
             modelBuilder.Configurations.Add(new BlacklistUserEntityConfig());
+            modelBuilder.Configurations.Add(new EventReminderEntityConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);
