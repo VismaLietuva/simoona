@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.Contracts.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -22,7 +21,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<Event> _eventsDbSet;
         private ISystemClock _systemClock;
         
-        private EventWidgetService _sut;//TODO: Add tests that checks bool
+        private EventWidgetService _sut;
 
         [SetUp]
         public void TestInitializer()
@@ -72,6 +71,50 @@ namespace Shrooms.Tests.DomainService
             var currentDate = DateTime.UtcNow;
             CreateEventsForGetUpcomingEventsAsyncTest(currentDate, currentDate, eventsWithUpcomingTypeSet: eventCount, eventCount: eventCount);
             _systemClock.UtcNow.Returns(currentDate.AddDays(10));
+
+            // Act
+            var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
+
+            // Assert
+            Assert.IsFalse(result.Any());
+        }
+
+        [Test]
+        public async Task GetUpcomingEventsAsync_WhenEventTypeDoesNotAllowEventToBeShownButInverseEventTypeUpcomingEventsWidgetDisplaySettingIsSetOnEvent_ReturnsEvents()
+        {
+            // Arrange
+            const int eventCount = 5;
+            var currentDate = DateTime.UtcNow;
+            var events = CreateEventsForGetUpcomingEventsAsyncTest(
+                currentDate,
+                currentDate,
+                eventsWithUpcomingTypeSet: 0,
+                eventCount: eventCount);
+            events[0].InverseEventTypeUpcomingEventsWidgetDisplaySetting = true;
+            _eventsDbSet.SetDbSetDataForAsync(events);
+            _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
+
+            // Act
+            var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
+
+            // Assert
+            Assert.AreEqual(1, result.Count());
+        }
+
+        [Test]
+        public async Task GetUpcomingEventsAsync_WhenEventTypeAllowsEventToBeShownButInverseEventTypeUpcomingEventsWidgetDisplaySettingIsSetOnEvent_ReturnsEmptyCollection()
+        {
+            // Arrange
+            const int eventCount = 1;
+            var currentDate = DateTime.UtcNow;
+            var events = CreateEventsForGetUpcomingEventsAsyncTest(
+                currentDate,
+                currentDate,
+                eventsWithUpcomingTypeSet: eventCount,
+                eventCount: eventCount);
+            events[0].InverseEventTypeUpcomingEventsWidgetDisplaySetting = true;
+            _eventsDbSet.SetDbSetDataForAsync(events);
+            _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
 
             // Act
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
@@ -133,7 +176,7 @@ namespace Shrooms.Tests.DomainService
             Assert.AreEqual(eventsWithUpcomingTypeSet, result.Count());
         }
 
-        public void CreateEventsForGetUpcomingEventsAsyncTest(
+        public List<Event> CreateEventsForGetUpcomingEventsAsyncTest(
             DateTime eventStartDate,
             DateTime eventDeadlineDate,
             int eventsWithUpcomingTypeSet = 3,
@@ -163,6 +206,7 @@ namespace Shrooms.Tests.DomainService
             }
 
             _eventsDbSet.SetDbSetDataForAsync(events);
+            return events;
         }
     }
 }
