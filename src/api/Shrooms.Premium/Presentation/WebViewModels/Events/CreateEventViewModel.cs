@@ -33,6 +33,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
+        public bool InverseEventTypeUpcomingEventsWidgetDisplaySetting { get; set; }
 
         [Required]
         public List<int> Offices { get; set; }

@@ -496,6 +496,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
+            newEvent.InverseEventTypeUpcomingEventsWidgetDisplaySetting = newEventDto.InverseEventTypeUpcomingEventsWidgetDisplaySetting;
 
             // ReSharper disable once PossibleInvalidOperationException
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate;

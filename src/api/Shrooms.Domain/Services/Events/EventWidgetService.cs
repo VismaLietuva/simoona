@@ -27,7 +27,7 @@ namespace Shrooms.Domain.Services.Events
             return await _eventsDbSet.Include(e => e.EventType)
                 .Where(e => e.OrganizationId == organizationId &&
                             e.StartDate > _systemClock.UtcNow &&
-                            e.EventType.IsShownInUpcomingEvents)
+                            e.EventType.IsShownInUpcomingEvents != e.InverseEventTypeUpcomingEventsWidgetDisplaySetting)
                 .OrderByDescending(e => e.RegistrationDeadline)
                 .ThenByDescending(e => e.StartDate)
                 .Take(eventCount)
