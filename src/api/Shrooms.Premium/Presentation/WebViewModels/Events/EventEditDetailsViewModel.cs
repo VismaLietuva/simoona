@@ -46,6 +46,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool ResetParticipantList { get; set; }
 
+        public bool InverseEventTypeUpcomingEventsWidgetDisplaySetting { get; set; }
+
         public IEnumerable<EventOptionViewModel> Options { get; set; }
 
         public IEnumerable<EventReminderDetailsViewModel> Reminders { get; set; }

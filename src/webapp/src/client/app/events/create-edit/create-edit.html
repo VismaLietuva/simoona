@@ -38,12 +38,23 @@
                             translate="events.eventType"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedType"
-                                ng-change="vm.event.typeId=vm.selectedType.id"
+                                ng-change="vm.event.typeId=vm.selectedType.id; vm.event.inverseEventTypeUpcomingEventsWidgetDisplaySetting = false;"
                                 ng-options="type as type.name for type in vm.eventTypes"
                                 data-test-id="event-form-event-type-input" required translate-cloak></select>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
+                        </div>
+                    </div>
+                    <!-- event force show/hide from the upcoming events widget -->
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <input id="inverseEventTypeUpcomingEventsWidgetDisplaySetting" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.event.inverseEventTypeUpcomingEventsWidgetDisplaySetting">
+                            <label for="inverseEventTypeUpcomingEventsWidgetDisplaySetting" class="control-label">
+                                {{ (vm.selectedType.isShownInUpcomingEvents ? 'events.forceEventConcealmentInUpcomingEvents' : 'events.forceEventDisplayInUpcomingEvents') | translate }}
+                            </label>
                         </div>
                     </div>
                     <!-- event start date -->
@@ -186,19 +197,19 @@
                     </div>
 
                     <!-- event reminders -->
-                    <div ng-if="vm.isOneTimeEvent() && (reminder.isVisible || $index === 0)"
-                        class="form-group required"
+                    <div ng-if="vm.isOneTimeEvent() && (reminder.isVisible || $index === 0)" class="form-group required"
                         ng-repeat="reminder in vm.reminders track by $index"
                         ng-class="{'has-error': eventForm['reminder' + $index].$invalid && eventForm['reminder' + $index].$dirty}">
                         <label ng-if="$index === 0" class="control-label col-xs-12 col-sm-4"
                             translate="events.reminders"></label>
                         <div class="event-reminder-item col-xs-12 col-sm-6 col-md-4"
                             ng-class="{ 'col-sm-offset-4' : $index !== 0 }">
-                            <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled" ng-click="vm.resetReminder($index)" ng-disabled="vm.isReminderDisabled($index)">
+                            <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled"
+                                ng-click="vm.resetReminder($index)" ng-disabled="vm.isReminderDisabled($index)">
                             <input class="mr-5 event-reminder-item-days-input" type="number" name="reminder{{$index}}"
                                 ng-model="reminder.value" ng-pattern="/^(0|\-?[1-9][0-9]*)$/"
-                                ng-disabled="vm.isReminderDisabled($index) || !reminder.isEnabled" min="1" steps="1" max="{{:: vm.maxRemindBeforeDays}}"
-                                ignore-mouse-wheel required>
+                                ng-disabled="vm.isReminderDisabled($index) || !reminder.isEnabled" min="1" steps="1"
+                                max="{{:: vm.maxRemindBeforeDays}}" ignore-mouse-wheel required>
                             <label class="mb-0" translate="{{reminder.translation}}"></label>
                         </div>
                         <div class="col-xs-12 col-sm-6 col-sm-offset-4">
@@ -243,7 +254,8 @@
                             </div>
 
                             <div class="col-sm-2">
-                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox" ng-model="vm.allowJoiningVirtually">
+                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.allowJoiningVirtually">
                                 <label for="allowJoiningVirtually" class="control-label"
                                     translate="events.eventAttendOptions_JoiningVirtually"></label>
                             </div>

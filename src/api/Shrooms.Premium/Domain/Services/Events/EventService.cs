@@ -313,6 +313,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 HostUserId = e.ResponsibleUserId,
+                InverseEventTypeUpcomingEventsWidgetDisplaySetting = e.InverseEventTypeUpcomingEventsWidgetDisplaySetting,
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,

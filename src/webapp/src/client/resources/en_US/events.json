@@ -242,5 +242,7 @@
   "remindDaysBeforeEventStart": "days before event starts",
   "remindDaysBeforeEventDeadline": "days before registration ends",
   "noUpcomingEvents": "There are no upcoming events...",
-  "upcomingEvents": "Upcoming events"
+  "upcomingEvents": "Upcoming events",
+  "forceEventDisplayInUpcomingEvents": "Display in the upcoming events widget",
+  "forceEventConcealmentInUpcomingEvents": "Hide from the upcoming events widget"
 }

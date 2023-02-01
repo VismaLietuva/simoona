@@ -71,7 +71,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     IsSingleJoin = type.IsSingleJoin,
                     Name = type.Name,
                     IsShownWithMainEvents = type.IsShownWithMainEvents,
-                    IsShownInUpcomingEvents = type.IsShownInUpcomingEvents
+                    IsShownInUpcomingEvents = type.IsShownInUpcomingEvents,
                 })
                 .OrderByDescending(t => t.Name)
                 .ToListAsync();
