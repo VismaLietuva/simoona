@@ -47,7 +47,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool ResetParticipantList { get; set; }
 
-        public bool InverseEventTypeUpcomingEventsWidgetDisplaySetting { get; set; }
+        public bool HideFromUpcomingEventsWidget { get; set; }
 
         public IEnumerable<EventOptionDto> Options { get; set; }
 

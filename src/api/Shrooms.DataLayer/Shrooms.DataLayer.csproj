@@ -923,9 +923,9 @@
     <Compile Include="Migrations\202301310745513_AddIsShownInUpcomingEventsToEventType.Designer.cs">
       <DependentUpon>202301310745513_AddIsShownInUpcomingEventsToEventType.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent.cs" />
-    <Compile Include="Migrations\202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent.Designer.cs">
-      <DependentUpon>202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent.cs</DependentUpon>
+    <Compile Include="Migrations\202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.cs" />
+    <Compile Include="Migrations\202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.Designer.cs">
+      <DependentUpon>202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1545,8 +1545,8 @@
     <EmbeddedResource Include="Migrations\202301310745513_AddIsShownInUpcomingEventsToEventType.resx">
       <DependentUpon>202301310745513_AddIsShownInUpcomingEventsToEventType.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent.resx">
-      <DependentUpon>202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.resx">
+      <DependentUpon>202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

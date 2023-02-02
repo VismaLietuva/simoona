@@ -151,12 +151,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
             orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
             orgEventType.SendEmailToManager = eventType.SendEmailToManager;
-
-            if (orgEventType.IsShownInUpcomingEvents != eventType.IsShownInUpcomingEvents)
-            {
-                orgEventType.IsShownInUpcomingEvents = eventType.IsShownInUpcomingEvents;
-                await ResetInverseWidgetDisplaySettingForEvents(orgEventType);
-            }
+            orgEventType.IsShownInUpcomingEvents = eventType.IsShownInUpcomingEvents;
 
             await _uow.SaveChangesAsync(eventType.UserId);
         }
@@ -231,16 +226,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .Select(x => x.SingleJoinGroupName)
                 .Distinct()
                 .ToListAsync();
-        }
-
-        private async Task ResetInverseWidgetDisplaySettingForEvents(EventType orgEventType)
-        {
-            var events = await _eventsDbSet.Where(e =>
-                                e.EventTypeId == orgEventType.Id &&
-                                e.OrganizationId == orgEventType.OrganizationId &&
-                                e.InverseEventTypeUpcomingEventsWidgetDisplaySetting)
-                                .ToListAsync();
-            events.ForEach(e => e.InverseEventTypeUpcomingEventsWidgetDisplaySetting = false);
         }
 
         private async Task ValidateEventTypeNameAsync(string eventTypeName, int organizationId)

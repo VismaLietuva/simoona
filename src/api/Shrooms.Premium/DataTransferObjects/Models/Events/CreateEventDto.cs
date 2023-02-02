@@ -26,7 +26,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool AllowNotGoing { get; set; }
 
-        public bool InverseEventTypeUpcomingEventsWidgetDisplaySetting { get; set; }
+        public bool HideFromUpcomingEventsWidget { get; set; }
 
         public EventOfficesDto Offices { get; set; }
 

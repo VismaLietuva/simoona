@@ -243,6 +243,5 @@
   "remindDaysBeforeEventDeadline": "dienos iki registracijos pabaigos",
   "noUpcomingEvents": "Nėra artimiausių renginių...",
   "upcomingEvents": "Artimiausi renginiai",
-  "forceEventDisplayInUpcomingEvents": "Rodyti artimiausių renginių valdiklyje",
-  "forceEventConcealmentInUpcomingEvents": "Nerodyti artimiausių renginių valdiklyje"
+  "forceEventDisplayInUpcomingEvents": "Rodyti artimiausių renginių valdiklyje"
 }

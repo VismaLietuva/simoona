@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent : IMigrationMetadata
+    public sealed partial class AddHideFromUpcomingEventsWidgetPropertyToEvent : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddHideFromUpcomingEventsWidgetPropertyToEvent));
         
         string IMigrationMetadata.Id
         {
-            get { return "202302010916112_AddInverseEventTypeUpcomingEventsWidgetDisplaySettingToEvent"; }
+            get { return "202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent"; }
         }
         
         string IMigrationMetadata.Source

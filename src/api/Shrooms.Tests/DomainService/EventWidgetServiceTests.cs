@@ -90,7 +90,7 @@ namespace Shrooms.Tests.DomainService
                 currentDate,
                 eventsWithUpcomingTypeSet: 0,
                 eventCount: eventCount);
-            events[0].InverseEventTypeUpcomingEventsWidgetDisplaySetting = true;
+            events[0].HideFromUpcomingEventsWidget = true;
             _eventsDbSet.SetDbSetDataForAsync(events);
             _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
 
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
                 currentDate,
                 eventsWithUpcomingTypeSet: eventCount,
                 eventCount: eventCount);
-            events[0].InverseEventTypeUpcomingEventsWidgetDisplaySetting = true;
+            events[0].HideFromUpcomingEventsWidget = true;
             _eventsDbSet.SetDbSetDataForAsync(events);
             _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
 
