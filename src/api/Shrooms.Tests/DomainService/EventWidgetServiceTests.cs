@@ -80,7 +80,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetUpcomingEventsAsync_WhenEventTypeDoesNotAllowEventToBeShownButInverseEventTypeUpcomingEventsWidgetDisplaySettingIsSetOnEvent_ReturnsEvents()
+        public async Task GetUpcomingEventsAsync_WhenEventTypeDoesNotAllowEventToBeShownButAllEventsHaveHideFromUpcomingEventsWidgetSetToTrue_ReturnsEmptyCollection()
         {
             // Arrange
             const int eventCount = 5;
@@ -98,11 +98,11 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            Assert.IsFalse(result.Any());
         }
 
         [Test]
-        public async Task GetUpcomingEventsAsync_WhenEventTypeAllowsEventToBeShownButInverseEventTypeUpcomingEventsWidgetDisplaySettingIsSetOnEvent_ReturnsEmptyCollection()
+        public async Task GetUpcomingEventsAsync_WhenEventTypeAllowsEventToBeShownButAllEventsHaveHideFromUpcomingEventsWidgetSetToTrue_ReturnsEmptyCollection()
         {
             // Arrange
             const int eventCount = 1;
