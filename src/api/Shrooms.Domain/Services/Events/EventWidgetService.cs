@@ -29,8 +29,8 @@ namespace Shrooms.Domain.Services.Events
                             e.StartDate > _systemClock.UtcNow &&
                             e.EventType.CanBeDisplayedInUpcomingEventsWidget &&
                             e.IsShownInUpcomingEventsWidget)
-                .OrderByDescending(e => e.RegistrationDeadline)
-                .ThenByDescending(e => e.StartDate)
+                .OrderBy(e => e.RegistrationDeadline)
+                .ThenBy(e => e.StartDate)
                 .Take(eventCount)
                 .Select(e => new UpcomingEventWidgetDto
                 {

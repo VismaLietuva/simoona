@@ -124,7 +124,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetUpcomingEventsAsync_WhenEventsAreNotStarted_ReturnsEventsOrderedInDescendingOrderByDeadlineDateThenByStartDate()
+        public async Task GetUpcomingEventsAsync_WhenEventsAreNotStarted_ReturnsEventsOrderedInAscendingOrderByDeadlineDateThenByStartDate()
         {
             // Arrange
             const int eventCount = 5;
@@ -157,7 +157,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            CollectionAssert.AreEqual(result.OrderByDescending(x => x.RegistrationDeadlineDate).ThenByDescending(x => x.StartDate), result);
+            CollectionAssert.AreEqual(result.OrderBy(x => x.RegistrationDeadlineDate).ThenBy(x => x.StartDate), result);
         }
 
         [Test]
