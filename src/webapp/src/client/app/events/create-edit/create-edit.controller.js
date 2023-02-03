@@ -188,7 +188,6 @@
                             id: vm.event.hostUserId,
                             fullName: vm.event.hostUserFullName,
                         };
-                        vm.showEventInUpcomingEventsWidget = !vm.event.hideFromUpcomingEventsWidget;
 
                         vm.minParticipants = vm.event.maxParticipants;
                         vm.minVirtualParticipants = vm.event.maxVirtualParticipants;
@@ -618,8 +617,6 @@
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;
-            vm.event.hideFromUpcomingEventsWidget = !vm.showEventInUpcomingEventsWidget;
-
             vm.event.endDate = moment(vm.event.endDate)
                 .local()
                 .startOf('minute')
