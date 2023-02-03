@@ -564,7 +564,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(e.Message);
             }
 
-            var postModel = _mapper.Map<ShareEventViewModel, NewPostDto>(shareEventViewModel);
+            var postModel = _mapper.Map<NewPostDto>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
 

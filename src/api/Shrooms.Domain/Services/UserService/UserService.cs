@@ -368,6 +368,11 @@ namespace Shrooms.Domain.Services.UserService
 
         public async Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUserIds)
         {
+            if (!mentionedUserIds.Any())
+            {
+                return new List<ApplicationUser>();
+            }
+
             return await _usersDbSet
                 .Include(x => x.NotificationsSettings)
                 .Where(u => (u.NotificationsSettings == null || u.NotificationsSettings.MentionEmailNotifications) && mentionedUserIds.Contains(u.Id))
