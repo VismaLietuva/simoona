@@ -94,7 +94,6 @@
         };
         vm.endDateHoursAddition = eventSettings.endDateHoursAddition;
         vm.recurringTypesResources = recurringTypesResources;
-        vm.showEventInUpcomingEventsWidget = false;
 
         $rootScope.pageTitle = vm.states.isAdd
             ? 'events.addTitle'
@@ -740,7 +739,7 @@
 
         function updateEventType() {
             vm.event.typeId = vm.selectedType.id;
-            vm.showEventInUpcomingEventsWidget = vm.selectedType.isShownInUpcomingEvents;
+            vm.event.isShownInUpcomingEventsWidget = vm.selectedType.canBeDisplayedInUpcomingEventsWidget;
         }
     }
 })();

@@ -927,6 +927,10 @@
     <Compile Include="Migrations\202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.Designer.cs">
       <DependentUpon>202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202302021928179_ChangeEventTypeAndEventWidgetPropertyNames.cs" />
+    <Compile Include="Migrations\202302021928179_ChangeEventTypeAndEventWidgetPropertyNames.Designer.cs">
+      <DependentUpon>202302021928179_ChangeEventTypeAndEventWidgetPropertyNames.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1547,6 +1551,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.resx">
       <DependentUpon>202302020722386_AddHideFromUpcomingEventsWidgetPropertyToEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302021928179_ChangeEventTypeAndEventWidgetPropertyNames.resx">
+      <DependentUpon>202302021928179_ChangeEventTypeAndEventWidgetPropertyNames.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

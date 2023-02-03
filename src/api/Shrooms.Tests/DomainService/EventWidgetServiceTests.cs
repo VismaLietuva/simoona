@@ -80,7 +80,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetUpcomingEventsAsync_WhenEventTypeDoesNotAllowEventToBeShownButAllEventsHaveHideFromUpcomingEventsWidgetSetToTrue_ReturnsEmptyCollection()
+        public async Task GetUpcomingEventsAsync_WhenEventTypeDoesNotAllowEventToBeShownButAllEventsHaveIsShownInUpcomingEventsWidgetSetToTrue_ReturnsEmptyCollection()
         {
             // Arrange
             const int eventCount = 5;
@@ -90,7 +90,7 @@ namespace Shrooms.Tests.DomainService
                 currentDate,
                 eventsWithUpcomingTypeSet: 0,
                 eventCount: eventCount);
-            events[0].HideFromUpcomingEventsWidget = true;
+            events[0].IsShownInUpcomingEventsWidget = true;
             _eventsDbSet.SetDbSetDataForAsync(events);
             _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
 
@@ -102,7 +102,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetUpcomingEventsAsync_WhenEventTypeAllowsEventToBeShownButAllEventsHaveHideFromUpcomingEventsWidgetSetToTrue_ReturnsEmptyCollection()
+        public async Task GetUpcomingEventsAsync_WhenEventTypeAllowsEventToBeShownButAllEventsHaveIsShownInUpcomingEventsWidgetSetToFalse_ReturnsEmptyCollection()
         {
             // Arrange
             const int eventCount = 1;
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
                 currentDate,
                 eventsWithUpcomingTypeSet: eventCount,
                 eventCount: eventCount);
-            events[0].HideFromUpcomingEventsWidget = true;
+            events[0].IsShownInUpcomingEventsWidget = false;
             _eventsDbSet.SetDbSetDataForAsync(events);
             _systemClock.UtcNow.Returns(currentDate.AddDays(-10));
 
@@ -147,7 +147,7 @@ namespace Shrooms.Tests.DomainService
                         EventType = new EventType
                         {
                             Name = Guid.NewGuid().ToString(),
-                            IsShownInUpcomingEvents = true
+                            CanBeDisplayedInUpcomingEventsWidget = true
                         }
                     }
                 });
@@ -195,8 +195,9 @@ namespace Shrooms.Tests.DomainService
                     EventType = new EventType
                     {
                         Name = Guid.NewGuid().ToString(),
-                        IsShownInUpcomingEvents = i < eventsWithUpcomingTypeSet
-                    }
+                        CanBeDisplayedInUpcomingEventsWidget = i < eventsWithUpcomingTypeSet
+                    },
+                    IsShownInUpcomingEventsWidget = true
                 });
             }
 

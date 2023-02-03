@@ -50,10 +50,10 @@
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="hideFromUpcomingEventsWidget" type="checkbox" class="event-form-checkbox"
-                                ng-model="vm.showEventInUpcomingEventsWidget"
-                                ng-disabled="!vm.selectedType.isShownInUpcomingEvents">
-                            <label for="hideFromUpcomingEventsWidget" class="control-label" translate="events.forceEventDisplayInUpcomingEvents"></label>
+                            <input id="isShownInUpcomingEventsWidget" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.event.isShownInUpcomingEventsWidget"
+                                ng-disabled="!vm.selectedType.canBeDisplayedInUpcomingEventsWidget">
+                            <label for="isShownInUpcomingEventsWidget" class="control-label" translate="events.displayInUpcomingEvents"></label>
                         </div>
                     </div>
                     <!-- event start date -->

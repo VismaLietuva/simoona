@@ -46,6 +46,6 @@
     "assigneesPlaceHolder": "Pridėkite atsakingus asmenis...",
     "singleJoinGroupLabel": "Vieno dalyvavimo grupė",
     "isShownWithMainEvents": "Rodoma tarp pagrindinių renginių",
-    "isShownInUpcomingEvents": "Rodoma artimiausių renginių valdiklyje",
+    "canBeDisplayedInUpcomingEventsWidget": "Rodoma artimiausių renginių valdiklyje",
     "sendEmailToManager": "Informuoti coach'ą apie prisijungimą prie renginio"
 }

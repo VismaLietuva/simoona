@@ -18,6 +18,6 @@
 
         public bool HasActiveEvents { get; set; }
 
-        public bool IsShownInUpcomingEvents { get; set; }
+        public bool CanBeDisplayedInUpcomingEventsWidget { get; set; }
     }
 }

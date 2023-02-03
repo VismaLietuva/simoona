@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool ResetParticipantList { get; set; }
 
-        public bool HideFromUpcomingEventsWidget { get; set; }
+        public bool IsShownInUpcomingEventsWidget { get; set; }
 
         public IEnumerable<EventOptionViewModel> Options { get; set; }
 

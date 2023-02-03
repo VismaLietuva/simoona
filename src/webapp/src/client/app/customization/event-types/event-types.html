@@ -30,7 +30,7 @@
                                 translate="customization.isShownWithMainEvents"></th>
 
                             <th class="col-xs-3 text-center hidden-xs"
-                                translate="customization.isShownInUpcomingEvents"></th>
+                                translate="customization.canBeDisplayedInUpcomingEventsWidget"></th>
 
                             <th class="col-xs-3 text-center"
                                 translate="common.action"></th>
@@ -48,7 +48,7 @@
                                 {{eventType.isShownWithMainEvents ? ('common.yes'|translate) : ('common.no'|translate)}}
                             </td>
                             <td class="text-center hidden-xs">
-                                {{eventType.isShownInUpcomingEvents ? ('common.yes'|translate) : ('common.no'|translate)}}
+                                {{eventType.canBeDisplayedInUpcomingEventsWidget ? ('common.yes'|translate) : ('common.no'|translate)}}
                             </td>
                             <td class="text-center">
                                 <a ui-sref="Root.WithOrg.Admin.Customization.EventTypes.Edit({ id : {{eventType.id}}})"

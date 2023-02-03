@@ -16,9 +16,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public string SingleJoinGroupName { get; set; }
 
         public bool IsShownWithMainEvents { get; set; }
+        public bool CanBeDisplayedInUpcomingEventsWidget { get; set; }
 
         public bool SendEmailToManager { get; set; }
-
-        public bool IsShownInUpcomingEvents { get; set; }
     }
 }
