@@ -13,5 +13,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Events
         public DateTime RegistrationDeadlineDate { get; set; }
 
         public string TypeName { get; set; }
+
+        public string PictureId { get; set; }
     }
 }

@@ -38,7 +38,8 @@ namespace Shrooms.Domain.Services.Events
                     Name = e.Name,
                     StartDate = e.StartDate,
                     RegistrationDeadlineDate = e.RegistrationDeadline,
-                    TypeName = e.EventType.Name
+                    TypeName = e.EventType.Name,
+                    PictureId = e.ImageName
                 })
                 .ToListAsync();
         }
