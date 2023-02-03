@@ -3,6 +3,7 @@
     public static class WebApiConstants
     {
         public const int DefaultPageSize = 10;
+        public const int OneMinute = 60;
         public const int OneHour = 3600;
         public const int OneDay = 3600 * 24;
         public const int FiveMinutes = 60 * 5;
