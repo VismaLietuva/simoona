@@ -511,7 +511,10 @@
                 case reminderTypes.start:
                     return vm.event.startDate;
                 case reminderTypes.deadline:
-                    return vm.event.registrationDeadlineDate ?? vm.event.startDate;
+                    if (vm.event.registrationDeadlineDate) {
+                        return vm.event.registrationDeadlineDate;
+                    }
+                    return vm.event.startDate;
                 default:
                     console.error('Reminder type ' + reminderType + ' is not supported');
             }
