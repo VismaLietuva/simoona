@@ -17,5 +17,7 @@
         public bool SendEmailToManager { get; set; }
 
         public bool HasActiveEvents { get; set; }
+
+        public bool CanBeDisplayedInUpcomingEventsWidget { get; set; }
     }
 }

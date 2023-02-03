@@ -1162,3 +1162,48 @@
     display: block;
     margin-bottom: 5px;
 }
+
+.event-widget {
+    .panel-body {
+        padding-top: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+    }
+
+    .event-widget-header {
+        background-color: #F5F5F5;
+        color: #1e8ac7;
+        text-align: center;
+        padding: 1px 10px;
+        border-bottom: 1px solid #D0D0D0;
+    }
+
+    .event-widget-events {
+        padding-left: 0px;
+    }
+
+    .event-widget-event {
+        list-style-type: none;
+        padding-left: 5px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        font-size: 14px;
+        line-height: normal;
+        border-bottom: 1px solid #1e8ac7;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .event-picture-media {
+            vertical-align: middle !important;
+        }
+
+        .event-picture-media-object {
+            object-fit: cover;
+            height: 35px;
+            width: 35px;
+        }
+    }
+}

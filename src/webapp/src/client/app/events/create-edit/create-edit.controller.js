@@ -132,6 +132,7 @@
         vm.isOneTimeEvent = isOneTimeEvent;
         vm.resetReminder = resetReminder;
         vm.isReminderDisabled = isReminderDisabled;
+        vm.updateEventType = updateEventType;
 
         init();
 
@@ -616,7 +617,6 @@
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;
-
             vm.event.endDate = moment(vm.event.endDate)
                 .local()
                 .startOf('minute')
@@ -735,6 +735,11 @@
 
                 vm.event.options.splice(index, 1);
             }
+        }
+
+        function updateEventType() {
+            vm.event.typeId = vm.selectedType.id;
+            vm.event.isShownInUpcomingEventsWidget = vm.selectedType.canBeDisplayedInUpcomingEventsWidget;
         }
     }
 })();

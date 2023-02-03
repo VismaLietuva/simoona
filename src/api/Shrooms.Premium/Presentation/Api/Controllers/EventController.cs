@@ -30,6 +30,8 @@ using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 using X.PagedList;
 using Shrooms.Domain.Extensions;
+using WebApi.OutputCache.V2;
+using Shrooms.Presentation.Api.Controllers.Wall;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -146,6 +148,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
         public async Task<IHttpActionResult> CreateEvent(CreateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
@@ -179,6 +182,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
         public async Task<IHttpActionResult> UpdateEvent(UpdateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
@@ -434,6 +438,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
         public async Task<IHttpActionResult> Delete(Guid eventId)
         {
             try

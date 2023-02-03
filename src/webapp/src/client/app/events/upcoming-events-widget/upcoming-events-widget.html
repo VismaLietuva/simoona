@@ -1,0 +1,36 @@
+<div class="panel panel-default event-widget">
+    <div class="event-widget-header">
+        <h5 translate="events.upcomingEvents"></h5>
+    </div>
+    <div class="panel-body">
+        <ul class="event-widget-events" ng-if="vm.events.length">
+            <li class="event-widget-event" ng-repeat="event in vm.events">
+                <div class="media">
+                    <div class="media-left event-picture-media">
+                        <a ui-sref="Root.WithOrg.Client.Events.EventContent({ id: event.id })">
+                            <img class="media-object event-picture-media-object"
+                            width="{{:: vm.smallAvatarThumbSettings.width}}"
+                            height="{{:: vm.smallAvatarThumbSettings.height}}"
+                            ng-src="{{:: event.pictureId | participantThumb: vm.smallAvatarThumbSettings}}"
+                            alt="{{:: event.name}}" image-loading ng-cloak/>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <a ui-sref="Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{ event.name }}</a>
+                        <span><i>({{ event.typeName }})</i></span>
+
+                        <div ng-if="event.startDate != event.registrationDeadlineDate">
+                            <span>{{ 'events.eventRegistrationDeadline' | translate }}:</span>
+                            {{ event.registrationDeadlineDate | date:'yyyy-MM-dd, HH:mm' }}
+                        </div>
+                        <div>
+                            <span>{{ 'events.eventStartDate' | translate }}:</span>
+                            {{ event.startDate | date:'yyyy-MM-dd, HH:mm' }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <p ng-if="!vm.events.length" translate="events.noUpcomingEvents"></p>
+    </div>
+</div>

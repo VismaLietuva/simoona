@@ -14,8 +14,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public string SingleJoinGroupName { get; set; }
 
+        public bool IsShownWithMainEvents { get; set; }
+
         public bool SendEmailToManager { get; set; }
 
-        public bool IsShownWithMainEvents { get; set; }
+        public bool CanBeDisplayedInUpcomingEventsWidget { get; set; }
     }
 }

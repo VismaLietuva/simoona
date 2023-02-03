@@ -313,6 +313,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 HostUserId = e.ResponsibleUserId,
+                IsShownInUpcomingEventsWidget = e.IsShownInUpcomingEventsWidget,
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
@@ -496,6 +497,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
+            newEvent.IsShownInUpcomingEventsWidget = newEventDto.IsShownInUpcomingEventsWidget;
 
             // ReSharper disable once PossibleInvalidOperationException
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate;

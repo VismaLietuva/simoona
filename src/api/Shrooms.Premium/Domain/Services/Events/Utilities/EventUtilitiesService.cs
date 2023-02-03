@@ -70,7 +70,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     Id = type.Id,
                     IsSingleJoin = type.IsSingleJoin,
                     Name = type.Name,
-                    IsShownWithMainEvents = type.IsShownWithMainEvents
+                    IsShownWithMainEvents = type.IsShownWithMainEvents,
+                    CanBeDisplayedInUpcomingEventsWidget = type.CanBeDisplayedInUpcomingEventsWidget,
                 })
                 .OrderByDescending(t => t.Name)
                 .ToListAsync();
@@ -91,6 +92,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     Name = x.Name,
                     SingleJoinGroupName = x.SingleJoinGroupName,
                     IsShownWithMainEvents = x.IsShownWithMainEvents,
+                    CanBeDisplayedInUpcomingEventsWidget = x.CanBeDisplayedInUpcomingEventsWidget,
                     SendEmailToManager = x.SendEmailToManager,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
@@ -149,6 +151,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
             orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
             orgEventType.SendEmailToManager = eventType.SendEmailToManager;
+            orgEventType.CanBeDisplayedInUpcomingEventsWidget = eventType.CanBeDisplayedInUpcomingEventsWidget;
 
             await _uow.SaveChangesAsync(eventType.UserId);
         }
@@ -249,7 +252,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 Name = eventTypeDto.Name,
                 SingleJoinGroupName = SetSingleJoinGroupName(eventTypeDto.IsSingleJoin, eventTypeDto.SingleJoinGroupName),
                 IsShownWithMainEvents = eventTypeDto.IsShownWithMainEvents,
-                SendEmailToManager = eventTypeDto.SendEmailToManager
+                SendEmailToManager = eventTypeDto.SendEmailToManager,
+                CanBeDisplayedInUpcomingEventsWidget = eventTypeDto.CanBeDisplayedInUpcomingEventsWidget
             };
 
             return eventType;
