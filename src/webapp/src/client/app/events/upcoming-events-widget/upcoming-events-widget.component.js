@@ -24,7 +24,6 @@
     ];
 
     function upcomingEventsWidgetController(smallAvatarThumbSettings) {
-        /*jshint validthis: true */
         var vm = this;
         vm.smallAvatarThumbSettings = smallAvatarThumbSettings;
     }
