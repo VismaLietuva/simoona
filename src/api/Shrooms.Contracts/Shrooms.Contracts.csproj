@@ -90,6 +90,7 @@
     <Compile Include="DataTransferObjects\Employees\EmployeeDto.cs" />
     <Compile Include="DataTransferObjects\Employees\EmployeeListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Employees\WorkingHourslWithOutLunchDto.cs" />
+    <Compile Include="DataTransferObjects\Events\ShareEventEmailDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />
@@ -98,9 +99,11 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\Wall\WallMemberEmailReceiverDto.cs" />
     <Compile Include="Enums\EventReminderType.cs" />
     <Compile Include="Enums\ExcelBorderStylePicker.cs" />
     <Compile Include="Enums\SortDirection.cs" />
+    <Compile Include="Infrastructure\Email\IEmailReceiver.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />

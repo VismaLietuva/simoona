@@ -149,6 +149,9 @@
     <Compile Include="Services\BlacklistUsers\BlacklistService.cs" />
     <Compile Include="Services\BlacklistUsers\IBlacklistService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
+    <Compile Include="Services\Email\Converters\CompiledEmailTemplateWithReceiverEmails.cs" />
+    <Compile Include="Services\Email\Converters\IMailTemplateConverter.cs" />
+    <Compile Include="Services\Email\Converters\MailTemplateConverter.cs" />
     <Compile Include="Services\Email\Kudos\IKudosNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\KudosNotificationService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\IAdministrationNotificationService.cs" />

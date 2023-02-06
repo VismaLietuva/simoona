@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Domain.Extensions;
 using Shrooms.Resources.Models.Lotteries;
-using System;
+using Shrooms.Domain.Services.Email.Converters;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
@@ -24,52 +24,52 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         private readonly IMailTemplate _mailTemplate;
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationSettings _applicationSettings;
+        private readonly IMailTemplateConverter _mailTemplateConverter;
 
         public LotteryNotificationService(
-            IMailingService mailingService, 
+            IMailingService mailingService,
             IMailTemplate mailTemplate,
             IUnitOfWork2 uow,
             IOrganizationService organizationService,
-            IApplicationSettings applicationSettings)
+            IApplicationSettings applicationSettings,
+            IMailTemplateConverter mailTemplateConverter)
         {
             _mailingService = mailingService;
             _mailTemplate = mailTemplate;
             _organizationService = organizationService;
             _applicationSettings = applicationSettings;
+            _mailTemplateConverter = mailTemplateConverter;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
         
         public async Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto startedDto, int organizationId)
         {
-            var userEmailsGroupedByTimeZone = await _usersDbSet
+            var receivers = await _usersDbSet
                 .Include(user => user.NotificationsSettings)
                 .Where(user => user.NotificationsSettings == null || user.NotificationsSettings.CreatedLotteryEmailNotifications)
                 .Select(user => new LotteryStartedEmailUserInfoDto
                 {
                     Email = user.Email,
-                    TimeZone = user.TimeZone
+                    TimeZoneKey = user.TimeZone
                 })
-                .GroupBy(userInfo => userInfo.TimeZone)
                 .ToListAsync();
-
             var organizationShortName = (await _organizationService
                 .GetOrganizationByIdAsync(organizationId))
                 .ShortName;
-
             var userNotificationSettingsUrl = _applicationSettings.UserNotificationSettingsUrl(organizationShortName);
             var lotteryUrl = $"{_applicationSettings.FeedUrl(organizationShortName)}?lotteryId={startedDto.Id}";
-
             var emailSubject = string.Format(Lottery.StartedLotteryEmailSubject, startedDto.Title);
 
-            foreach (var emailGroup in userEmailsGroupedByTimeZone)
+            var lotteryTemplate = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, startedDto.EndDate, userNotificationSettingsUrl);
+            var compiledTemplates = await _mailTemplateConverter.ConvertEmailTemplateToReceiversTimeZoneSettingsAsync(
+                lotteryTemplate,
+                EmailPremiumTemplateCacheKeys.StartedLottery,
+                receivers,
+                template => template.ZonedEndDate);
+            foreach (var compiledTemplate in compiledTemplates)
             {
-                var localEndDate = startedDto.EndDate.ConvertUtcToTimeZone(emailGroup.Key);
-                var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, localEndDate, userNotificationSettingsUrl);
-                var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
-                var userEmails = emailGroup.Select(info => info.Email);
-
-                await _mailingService.SendEmailAsync(new EmailDto(userEmails, emailSubject, emailBody));
+                await _mailingService.SendEmailAsync(new EmailDto(compiledTemplate.ReceiverEmails, emailSubject, compiledTemplate.Body));
             }
         }
     }

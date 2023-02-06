@@ -144,4 +144,7 @@
   <data name="RemindEventStartEmailSubject" xml:space="preserve">
     <value>Reminder for {0} event</value>
   </data>
+  <data name="ShareEventEmailSubject" xml:space="preserve">
+    <value>Event {0} shared in {1} wall</value>
+  </data>
 </root>

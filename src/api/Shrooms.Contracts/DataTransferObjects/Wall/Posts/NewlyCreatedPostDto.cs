@@ -9,6 +9,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
     {
         public int Id { get; set; }
 
+        public string WallName { get; set; }
+
         public string MessageBody { get; set; }
 
         public DateTime Created { get; set; }
@@ -24,5 +26,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
         public int WallId { get; set; }
 
         public IEnumerable<string> MentionedUsersIds { get; set; }
+
+        public string SharedEventId { get; set; }
     }
 }

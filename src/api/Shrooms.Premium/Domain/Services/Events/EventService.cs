@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
@@ -185,6 +186,13 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEventDto.Id = newEvent.Id.ToString();
 
             return newEventDto;
+        }
+
+        public async Task<string> GetEventNameAsync(Guid eventId, int organizationId)
+        {
+            var @event = await _eventsDbSet.FirstOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == organizationId);
+            _eventValidationService.CheckIfEventExists(@event);
+            return @event.Name;
         }
 
         public async Task UpdateEventAsync(EditEventDto eventDto)

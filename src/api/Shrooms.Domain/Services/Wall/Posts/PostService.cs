@@ -80,7 +80,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     SharedEventId = newPostDto.SharedEventId,
                     LastActivity = DateTime.UtcNow,
                     WallId = newPostDto.WallId,
-                    Likes = new LikesCollection()
+                    Likes = new LikesCollection(),
                 };
 
                 _postsDbSet.Add(post);
@@ -96,8 +96,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
                 var postCreator = await _usersDbSet.SingleAsync(user => user.Id == newPostDto.UserId);
                 var postCreatorDto = MapUserToDto(postCreator);
-                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds);
-
+                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds, wall);
                 return newlyCreatedPostDto;
             }
             finally
@@ -345,7 +344,12 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return userDto;
         }
 
-        private static NewlyCreatedPostDto MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
+        private static NewlyCreatedPostDto MapNewlyCreatedPostToDto(
+            Post post,
+            UserDto user,
+            WallType wallType,
+            IEnumerable<string> mentionedUserIds,
+            DataLayer.EntityModels.Models.Multiwall.Wall wall)
         {
             var newlyCreatedPostDto = new NewlyCreatedPostDto
             {
@@ -357,7 +361,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 User = user,
                 WallType = wallType,
                 WallId = post.WallId,
-                MentionedUsersIds = mentionedUserIds
+                MentionedUsersIds = mentionedUserIds,
+                SharedEventId = post.SharedEventId,
+                WallName = wall.Name
             };
 
             return newlyCreatedPostDto;
