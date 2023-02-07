@@ -113,22 +113,35 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await _mailingService.SendEmailAsync(emailDto);
         }
 
-        public async Task NotifySharedEventAsync(ShareEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto)
+        public async Task NotifySharedEventAsync(SharedEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto)
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(userOrgHubDto.OrganizationName);
-            var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
+            var postUrl = _appSettings.WallPostUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.Id);
             var subject = string.Format(
                 Resources.Models.Events.Events.ShareEventEmailSubject,
-                shareEventEmailDto.EventName,
+                shareEventEmailDto.Details.Name,
                 shareEventEmailDto.CreatedPost.WallName);
             var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
 
-            var emailTemplate = new ShareEventEmailTemplateViewModel(DateTime.UtcNow, userNotificationSettingsUrl);
+            var emailTemplate = new SharedEventEmailTemplateViewModel(
+                postUrl,
+                shareEventEmailDto.CreatedPost.User.FullName,
+                shareEventEmailDto.CreatedPost.MessageBody,
+                shareEventEmailDto.CreatedPost.WallName,
+                shareEventEmailDto.Details.Name,
+                shareEventEmailDto.Details.StartDate,
+                shareEventEmailDto.Details.EndDate,
+                shareEventEmailDto.Details.RegistrationDeadlineDate,
+                shareEventEmailDto.Details.TypeName,
+                shareEventEmailDto.Details.Description,
+                userNotificationSettingsUrl);
             var compiledEmailBodiesByTimeZone = await _mailTemplateConverter.ConvertEmailTemplateToReceiversTimeZoneSettingsAsync(
                 emailTemplate,
-                EmailPremiumTemplateCacheKeys.EventShare,
+                EmailPremiumTemplateCacheKeys.EventShared,
                 shareEventEmailDto.Receivers,
-                template => template.StartDate);
+                template => template.StartDate,
+                template => template.EndDate,
+                template => template.RegistrationDeadlineDate);
             await SendSameEmailWithDifferentTimeZonesAsync(compiledEmailBodiesByTimeZone, subject);
         }
 

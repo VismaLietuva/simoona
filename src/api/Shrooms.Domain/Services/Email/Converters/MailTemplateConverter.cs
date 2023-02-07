@@ -26,6 +26,11 @@ namespace Shrooms.Domain.Services.Email.Converters
             params Expression<Func<TEmailTemplate, DateTime>>[] utcDateTimePropertiesForTimeZoneChanges)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
+            if (!receivers.Any())
+            {
+                return new List<CompiledEmailTemplateWithReceiverEmails>();
+            }
+
             var templateLock = new object();
             var emailTemplateType = emailTemplate.GetType();
 

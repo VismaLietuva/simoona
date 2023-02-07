@@ -18,6 +18,6 @@
         public const string StartedLottery = nameof(StartedLottery);
         public const string EventStartRemind = nameof(EventStartRemind);
         public const string EventDeadlineRemind = nameof(EventDeadlineRemind);
-        public const string EventShare = nameof(EventShare);
+        public const string EventShared = nameof(EventShared);
     }
 }

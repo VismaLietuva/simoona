@@ -24,6 +24,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<EventReminderStartEmailDto> startEmailDtos, Organization organization);
         
-        Task NotifySharedEventAsync(ShareEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto);
+        Task NotifySharedEventAsync(SharedEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto);
     }
 }

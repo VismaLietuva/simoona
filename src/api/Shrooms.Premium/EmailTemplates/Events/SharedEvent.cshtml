@@ -1,21 +1,19 @@
 ﻿@using Shrooms.Contracts.Constants
-@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.ShareEventEmailTemplateViewModel
+@using Shrooms.Domain.Helpers
+@using RazorEngine.Templating
+@using Shrooms.Contracts.Constants
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.SharedEventEmailTemplateViewModel
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
 }
-
 <tr>
-    Hello, world!
-</tr>
-
-@*<tr>
     <td align="center">
         <table align="center" border="0" cellpadding="0" cellspacing="0">
             <tbody>
                 <tr>
                     <td align="center" style="text-align:center;padding-left: 10px;padding-right:10px;padding-top: 20px;padding-bottom: 5px;border-bottom: 2px solid #0974B3;width: 280px;">
                         <font style="font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center;font-size: 18px;color: #0974B3;">
-                            Registration closes soon for @Model.Name event
+                            @Model.WallName
                         </font>
                     </td>
                 </tr>
@@ -25,12 +23,21 @@
 </tr>
 <tr>
     <td align="center" width="100%" style="width:100%;padding-top:20px;">
+        <!--[if mso]>
+        <table style="width: 690px;">
+        <![endif]-->
         <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" style="box-shadow: 0 1px 0 rgba(0,0,0,.05);border-width: 1px;border-style: solid;border-color: #e7e7e7 #e7e7e7 #dbdbdb; min-height:90px; max-width: 690px;" width="95%">
             <tbody>
                 <tr>
                     <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
-                        <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-word; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                            We remind you that you are registered for the event, which will take place on @Model.StartDate.ToString("yyyy-MM-dd HH:mm"). The registration deadline is coming to an end (@Model.DeadlineDate.ToString("yyyy-MM-dd HH:mm")), so please update your registration in case of any changes.
+
+
+                        <!-- DYNAMIC WALL POST USER DISPLAY -->
+                        <p style="color: #337ab7;text-align: left;font-size: 18px;padding-bottom: 10px;padding-left: 10px;font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word;line-height: 15px;margin: 0 0 0 0;">@Model.SharerFullName</p>
+                        <!-- DYNAMIC WALL POST USER DISPLAY END -->
+
+                        <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
+                            @Raw(HtmlSanitizerHelper.Sanitize(Model.PostBody))
                         </p>
                     </td>
                 </tr>
@@ -40,8 +47,8 @@
                             <tbody>
                                 <tr>
                                     <td align="center" style="display:inline-block; background:#006199; ">
-                                        <a href="@Model.Url" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
-                                            Visit event page
+                                        <a href="@Model.PostUrl" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
+                                            Check out in Simoona
                                         </a>
                                     </td>
                                 </tr>
@@ -51,5 +58,8 @@
                 </tr>
             </tbody>
         </table>
+        <!--[if mso]>
+        </table>
+        <![endif]-->
     </td>
-</tr>*@
+</tr>

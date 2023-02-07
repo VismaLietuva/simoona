@@ -2,8 +2,8 @@
 {
     public interface IEmailReceiver
     {
-        public string Email { get; set; }
+        string Email { get; set; }
 
-        public string TimeZoneKey { get; set; }
+        string TimeZoneKey { get; set; }
     }
 }

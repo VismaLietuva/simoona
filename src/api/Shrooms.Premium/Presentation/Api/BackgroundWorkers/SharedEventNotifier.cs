@@ -40,16 +40,16 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
         public async Task NotifyAsync(NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
         {
             var wallMembers = await _wallService.GetWallMembersWithEnabledEmailNotificationsAsync(createdPost.WallId, userHubDto.OrganizationId);
-            var eventName = await _eventService.GetEventNameAsync(Guid.Parse(createdPost.SharedEventId), userHubDto.OrganizationId);
-            var shareEventEmailDto = new ShareEventEmailDto
+            var eventDetails = await _eventService.GetSharedEventDetailsAsync(Guid.Parse(createdPost.SharedEventId), userHubDto.OrganizationId);
+            var shareEventEmailDto = new SharedEventEmailDto
             {
                 CreatedPost = createdPost,
                 Receivers = wallMembers,
-                EventName = eventName
+                Details = eventDetails
             };
             await _eventNotificationService.NotifySharedEventAsync(shareEventEmailDto, userHubDto);
+
             var wallMemberIds = wallMembers.Select(member => member.Id).ToList();
-            
             var notificationDto = await _notificationService.CreateForPostAsync(userHubDto, createdPost, createdPost.WallId, wallMemberIds);
             var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
             await NotificationHub.SendNotificationToParticularUsersAsync(notificationViewModel, userHubDto, wallMemberIds);
