@@ -105,6 +105,7 @@
     <Compile Include="Enums\ExcelBorderStylePicker.cs" />
     <Compile Include="Enums\SortDirection.cs" />
     <Compile Include="Infrastructure\Email\IEmailReceiver.cs" />
+    <Compile Include="Infrastructure\Email\ITimeZoneEmailGroup.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />

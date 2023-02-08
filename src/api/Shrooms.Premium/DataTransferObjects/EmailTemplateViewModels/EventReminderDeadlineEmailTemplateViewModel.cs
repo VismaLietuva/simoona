@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Infrastructure.Email.Attributes;
 using System;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
@@ -9,8 +10,10 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string Url { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime StartDate { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime DeadlineDate { get; set; }
 
         public EventReminderDeadlineEmailTemplateViewModel(
@@ -18,7 +21,9 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
             string name,
             string url,
             DateTime startDate,
-            DateTime deadlineDate) : base(userNotificationSettingsUrl)
+            DateTime deadlineDate)
+            :
+            base(userNotificationSettingsUrl)
         {
             Name = name;
             Url = url;

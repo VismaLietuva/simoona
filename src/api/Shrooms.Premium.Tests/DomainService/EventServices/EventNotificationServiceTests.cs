@@ -6,7 +6,6 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.Email.Converters;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.Services.Email.Event;
@@ -34,7 +33,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var mailTemplate = Substitute.For<IMailTemplate>();
             var organizationService = Substitute.For<IOrganizationService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
-            var mailTemplateConverter = Substitute.For<IMailTemplateConverter>();
 
             _sut = new EventNotificationService(
                 uow,
@@ -42,8 +40,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _mailingService,
                 _applicationSettings,
                 organizationService,
-                markdownConverter,
-                mailTemplateConverter);
+                markdownConverter);
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Infrastructure.Email.Attributes;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System;
 
@@ -12,6 +13,7 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string LotteryUrl { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime ZonedEndDate { get; set; }
 
         public int EntryFee { get; set; }

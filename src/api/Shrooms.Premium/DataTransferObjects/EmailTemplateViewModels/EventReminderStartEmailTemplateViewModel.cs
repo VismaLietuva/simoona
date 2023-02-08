@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Infrastructure.Email.Attributes;
 using System;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
@@ -9,6 +10,7 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string Url { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime StartDate { get; set; }
 
         public EventReminderStartEmailTemplateViewModel(

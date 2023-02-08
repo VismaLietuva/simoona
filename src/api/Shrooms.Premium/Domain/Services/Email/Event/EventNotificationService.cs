@@ -11,8 +11,8 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.Email.Converters;
 using Shrooms.Domain.Services.Organizations;
+using Shrooms.Infrastructure.Email.Extensions;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -28,7 +28,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
-        private readonly IMailTemplateConverter _mailTemplateConverter;
 
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
@@ -38,15 +37,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter,
-            IMailTemplateConverter mailTemplateConverter)
+            IMarkdownConverter markdownConverter)
         {
             _appSettings = appSettings;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
-            _mailTemplateConverter = mailTemplateConverter;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
@@ -122,11 +119,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.CreatedPost.WallName);
             var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
-
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
                 shareEventEmailDto.CreatedPost.User.FullName,
-                shareEventEmailDto.CreatedPost.MessageBody,
+                body,
                 shareEventEmailDto.CreatedPost.WallName,
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.Details.StartDate,
@@ -135,14 +131,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.Details.TypeName,
                 shareEventEmailDto.Details.Description,
                 userNotificationSettingsUrl);
-            var compiledEmailBodiesByTimeZone = await _mailTemplateConverter.ConvertEmailTemplateToReceiversTimeZoneSettingsAsync(
-                emailTemplate,
-                EmailPremiumTemplateCacheKeys.EventShared,
-                shareEventEmailDto.Receivers,
-                template => template.StartDate,
-                template => template.EndDate,
-                template => template.RegistrationDeadlineDate);
-            await SendSameEmailWithDifferentTimeZonesAsync(compiledEmailBodiesByTimeZone, subject);
+
+            var receiverTimeZoneGroup = shareEventEmailDto.Receivers.CreateTimeZoneGroup();
+            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventShared, receiverTimeZoneGroup.GetTimeZoneKeys());
+            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
         }
 
         private EmailDto GetManagerNotifyEmailDto(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
@@ -179,14 +171,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     emailJoinBody);
         }
 
-        private async Task SendSameEmailWithDifferentTimeZonesAsync(IEnumerable<CompiledEmailTemplateWithReceiverEmails> compiledTemplates, string subject)
-        {
-            foreach (var compiledTemplate in compiledTemplates)
-            {
-                await _mailingService.SendEmailAsync(new EmailDto(compiledTemplate.ReceiverEmails, subject, compiledTemplate.Body));
-            }
-        }
-
         private async Task RemindUsersAboutDeadlineDateOfJoinedEventAsync(EventReminderDeadlineEmailDto deadlineEmailDto, Organization organization, string userNotificationSettingsUrl)
         {
             var subject = string.Format(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, deadlineEmailDto.EventName);
@@ -198,13 +182,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 deadlineEmailDto.StartDate,
                 deadlineEmailDto.DeadlineDate);
 
-            var compiledEmailBodiesByTimeZone = await _mailTemplateConverter.ConvertEmailTemplateToReceiversTimeZoneSettingsAsync(
-                emailTemplate,
-                EmailPremiumTemplateCacheKeys.EventDeadlineRemind,
-                deadlineEmailDto.Receivers,
-                template => template.StartDate,
-                template => template.DeadlineDate);
-            await SendSameEmailWithDifferentTimeZonesAsync(compiledEmailBodiesByTimeZone, subject);
+            var receiverTimeZoneGroup = deadlineEmailDto.Receivers.CreateTimeZoneGroup();
+            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind, receiverTimeZoneGroup.GetTimeZoneKeys());
+            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
         }
 
         private async Task RemindUsersAboutStartDateOfJoinedEventAsync(EventReminderStartEmailDto startEmailDto, Organization organization, string userNotificationSettingsUrl)
@@ -217,12 +197,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 eventUrl,
                 startEmailDto.StartDate);
 
-            var compiledEmailBodiesByTimeZone = await _mailTemplateConverter.ConvertEmailTemplateToReceiversTimeZoneSettingsAsync(
-                emailTemplate,
-                EmailPremiumTemplateCacheKeys.EventStartRemind,
-                startEmailDto.Receivers,
-                template => template.StartDate);
-            await SendSameEmailWithDifferentTimeZonesAsync(compiledEmailBodiesByTimeZone, subject);
+            var receiverTimeZoneGroup = startEmailDto.Receivers.CreateTimeZoneGroup();
+            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind, receiverTimeZoneGroup.GetTimeZoneKeys());
+            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
         }
     }
 }

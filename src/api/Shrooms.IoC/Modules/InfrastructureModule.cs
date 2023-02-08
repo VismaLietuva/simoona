@@ -8,7 +8,6 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
-using Shrooms.Domain.Services.Email.Converters;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Infrastructure.Email;
@@ -42,7 +41,6 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<SystemClock>().As<ISystemClock>().SingleInstance();
             builder.RegisterType<ExcelBuilderFactory>().As<IExcelBuilderFactory>().InstancePerRequest();
             builder.RegisterType<MailTemplate>().As<IMailTemplate>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<MailTemplateConverter>().As<IMailTemplateConverter>().InstancePerRequest();
             builder.RegisterType<DailyMailingService>().As<IDailyMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<HangFireScheduler>().As<IJobScheduler>().InstancePerRequest();
             builder.Register(_ => ReallySimpleFeature.Toggles.GetFeatureConfiguration()).As<IFeatureConfiguration>().SingleInstance();

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Configuration;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -86,6 +88,14 @@ namespace Shrooms.Infrastructure.Email
                 {
                     LogSendFailure(ex);
                 }
+            }
+        }
+
+        public async Task SendEmailsAsync(IEnumerable<EmailDto> emails, bool skipDomainChange = false)
+        {
+            foreach (var email in emails)
+            {
+                await SendEmailAsync(email, skipDomainChange);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Infrastructure.Email.Attributes;
 using System;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
@@ -15,10 +16,13 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string EventName { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime StartDate { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime EndDate { get; set; }
 
+        [ApplyTimeZoneChanges]
         public DateTime RegistrationDeadlineDate { get; set; }
 
         public string TypeName { get; set; }
