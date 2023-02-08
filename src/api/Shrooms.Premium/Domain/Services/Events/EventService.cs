@@ -199,10 +199,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             {
                 Name = @event.Name,
                 StartDate = @event.StartDate,
-                EndDate = @event.EndDate,
-                RegistrationDeadlineDate = @event.RegistrationDeadline,
                 TypeName = @event.EventType.Name,
-                Description = @event.Description
+                Description = @event.Description,
+                Location = @event.Place
             };
         }
 

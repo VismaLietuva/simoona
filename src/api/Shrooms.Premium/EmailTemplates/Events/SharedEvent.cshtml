@@ -13,7 +13,7 @@
                 <tr>
                     <td align="center" style="text-align:center;padding-left: 10px;padding-right:10px;padding-top: 20px;padding-bottom: 5px;border-bottom: 2px solid #0974B3;width: 280px;">
                         <font style="font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center;font-size: 18px;color: #0974B3;">
-                            @Model.WallName
+                            @HtmlSanitizerHelper.Sanitize(Model.WallName)
                         </font>
                     </td>
                 </tr>
@@ -22,7 +22,7 @@
     </td>
 </tr>
 <tr>
-    <td align="center" width="100%" style="width:100%;padding-top:20px;">
+    <td align="center" width="100%" style="width:100%;padding-top:20px;" max-width="95%">
         <!--[if mso]>
         <table style="width: 690px;">
         <![endif]-->
@@ -30,10 +30,38 @@
             <tbody>
                 <tr>
                     <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
-                        <p style="color: #337ab7;text-align: left;font-size: 18px;padding-bottom: 10px;padding-left: 10px;font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word;line-height: 15px;margin: 0 0 0 0;">@Model.SharerFullName</p>
+                        <p style="color: #337ab7;text-align: left;font-size: 18px;padding-bottom: 10px;padding-left: 10px;font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word;line-height: 15px;margin: 0 0 0 0;">@HtmlSanitizerHelper.Sanitize(Model.SharerFullName)</p>
                         <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
                             @Raw(HtmlSanitizerHelper.Sanitize(Model.PostBody))
                         </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 30px; padding-left: 30px; max-width: 600px;">
+                        <table>
+                            <tbody style="border: 1px solid #787878;" border="1">
+                                <tr>
+                                    <td>
+                                        <span style="font-size: 128px;">📆</span>
+                                    </td>
+                                    <td style="width: 400px; padding: 10px;">
+                                        <a href="@Model.EventUrl" style="color: #0974B3; text-decoration: none; font-size: 20px; font-weight: bold;">@HtmlSanitizerHelper.Sanitize(Model.EventName)</a>
+                                        <br />
+                                        <span style="line-height: 1; color: #787878;">@HtmlSanitizerHelper.Sanitize(Model.Location), </span>
+                                        <span style="color: #4D8400; font-weight: bold; font-size: 16px;">@Model.StartDate.ToString("yyyy-MM-dd HH:mm")</span>
+
+                                        @if (string.IsNullOrEmpty(Model.Description))
+                                        {
+                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>No description provided</i></p>
+                                        }
+                                        else
+                                        {
+                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@HtmlSanitizerHelper.Sanitize(Model.Description.Substring(50))...</i></p>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
                 </tr>
                 <tr>

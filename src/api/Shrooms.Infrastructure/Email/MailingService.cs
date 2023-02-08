@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Configuration;
 using System.Net.Mail;
@@ -47,25 +46,23 @@ namespace Shrooms.Infrastructure.Email
 
         public async Task SendAsync(IdentityMessage message)
         {
-            if (!HasSmtpServerConfigured(HttpRuntime.AppDomainAppVirtualPath))
-            {
-                return;
-            }
-
-            using (var client = new SmtpClient())
-            {
-                try
-                {
-                    await client.SendMailAsync(BuildMessage(new EmailDto(message.Destination, message.Subject, message.Body)));
-                }
-                catch (SmtpException ex)
-                {
-                    LogSendFailure(ex);
-                }
-            }
+            await SendEmailInternalAsync(new EmailDto(message.Destination, message.Subject, message.Body));
         }
 
         public async Task SendEmailAsync(EmailDto email, bool skipDomainChange = false)
+        {
+            await SendEmailInternalAsync(email, skipDomainChange);
+        }
+
+        public async Task SendEmailsAsync(IEnumerable<EmailDto> emails, bool skipDomainChange = false)
+        {
+            foreach (var email in emails)
+            {
+                await SendEmailAsync(email, skipDomainChange);
+            }
+        }
+
+        private async Task SendEmailInternalAsync(EmailDto email, bool skipDomainChange = false)
         {
             if (!HasSmtpServerConfigured(HttpRuntime.AppDomainAppVirtualPath))
             {
@@ -88,14 +85,6 @@ namespace Shrooms.Infrastructure.Email
                 {
                     LogSendFailure(ex);
                 }
-            }
-        }
-
-        public async Task SendEmailsAsync(IEnumerable<EmailDto> emails, bool skipDomainChange = false)
-        {
-            foreach (var email in emails)
-            {
-                await SendEmailAsync(email, skipDomainChange);
             }
         }
 

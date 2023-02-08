@@ -8,12 +8,10 @@ namespace Shrooms.Contracts.DataTransferObjects.Events
 
         public DateTime StartDate { get; set; }
 
-        public DateTime EndDate { get; set; }
-
-        public DateTime RegistrationDeadlineDate { get; set; }
-
         public string TypeName { get; set; }
 
         public string Description { get; set; }
+
+        public string Location { get; set; }
     }
 }

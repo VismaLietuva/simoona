@@ -8,6 +8,8 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
     {
         public string PostUrl { get; set; }
 
+        public string EventUrl { get; set; }
+
         public string SharerFullName { get; set; }
 
         public string PostBody { get; set; }
@@ -19,27 +21,20 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
         [ApplyTimeZoneChanges]
         public DateTime StartDate { get; set; }
 
-        [ApplyTimeZoneChanges]
-        public DateTime EndDate { get; set; }
-
-        [ApplyTimeZoneChanges]
-        public DateTime RegistrationDeadlineDate { get; set; }
-
-        public string TypeName { get; set; }
-
         public string Description { get; set; }
+
+        public string Location { get; set; }
 
         public SharedEventEmailTemplateViewModel(
             string postUrl,
+            string eventUrl,
             string sharerFullName,
             string postBody,
             string wallName,
             string eventName,
             DateTime startDate,
-            DateTime endDate,
-            DateTime registrationDeadlineDate,
-            string typeName,
             string description,
+            string location,
             string userNotificationSettingsUrl)
             :
             base(userNotificationSettingsUrl)
@@ -50,10 +45,9 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
             WallName = wallName;
             EventName = eventName;
             StartDate = startDate;
-            EndDate = endDate;
-            RegistrationDeadlineDate = registrationDeadlineDate;
-            TypeName = typeName;
             Description = description;
+            Location = location;
+            EventUrl = eventUrl;
         }
     }
 }

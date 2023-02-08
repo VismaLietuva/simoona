@@ -55,13 +55,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 .Where(u => users.Contains(u.Id))
                 .Select(u => u.Email)
                 .ToListAsync();
-
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, eventId.ToString());
-
             var emailTemplateViewModel = new EventParticipantExpelledEmailTemplateViewModel(userNotificationSettingsUrl, eventName, eventUrl);
+            
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
-
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
         
@@ -114,6 +112,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(userOrgHubDto.OrganizationName);
             var postUrl = _appSettings.WallPostUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.Id);
+            var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
             var subject = string.Format(
                 Resources.Models.Events.Events.ShareEventEmailSubject,
                 shareEventEmailDto.Details.Name,
@@ -121,15 +120,14 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
+                eventUrl,
                 shareEventEmailDto.CreatedPost.User.FullName,
                 body,
                 shareEventEmailDto.CreatedPost.WallName,
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.Details.StartDate,
-                shareEventEmailDto.Details.EndDate,
-                shareEventEmailDto.Details.RegistrationDeadlineDate,
-                shareEventEmailDto.Details.TypeName,
                 shareEventEmailDto.Details.Description,
+                shareEventEmailDto.Details.Location,
                 userNotificationSettingsUrl);
 
             var receiverTimeZoneGroup = shareEventEmailDto.Receivers.CreateTimeZoneGroup();

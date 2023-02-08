@@ -17,7 +17,7 @@ namespace Shrooms.Infrastructure.Email.Templating
         public string Generate<TEmailTemplate>(TEmailTemplate viewModel, string key, string timeZoneKey = null)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            if (timeZoneKey == null)
+            if (string.IsNullOrEmpty(timeZoneKey))
             {
                 return GenerateInternal(viewModel, key);
             }
