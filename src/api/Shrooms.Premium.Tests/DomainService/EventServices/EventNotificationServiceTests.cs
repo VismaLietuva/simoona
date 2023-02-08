@@ -77,7 +77,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await _sut.RemindUsersAboutDeadlineDateOfJoinedEventsAsync(deadlineEmailDtos, organization);
 
             // Assert
-            await _mailingService.Received().SendEmailAsync(Arg.Any<EmailDto>());
+            await _mailingService.Received().SendEmailsAsync(Arg.Any<IEnumerable<EmailDto>>());
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await _sut.RemindUsersAboutStartDateOfJoinedEventsAsync(startEmailDtos, organization);
 
             // Assert
-            await _mailingService.Received().SendEmailAsync(Arg.Any<EmailDto>());
+            await _mailingService.Received().SendEmailsAsync(Arg.Any<IEnumerable<EmailDto>>());
         }
     }
 }
