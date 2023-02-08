@@ -56,7 +56,7 @@
                                         }
                                         else
                                         {
-                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@HtmlSanitizerHelper.Sanitize(Model.Description.Substring(50))...</i></p>
+                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</i></p>
                                         }
                                     </td>
                                 </tr>

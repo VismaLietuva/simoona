@@ -126,7 +126,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.CreatedPost.WallName,
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.Details.StartDate,
-                shareEventEmailDto.Details.Description,
+                RemoveMarkdownTextOverflow(shareEventEmailDto.Details.Description),
                 shareEventEmailDto.Details.Location,
                 userNotificationSettingsUrl);
 
@@ -198,6 +198,16 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var receiverTimeZoneGroup = startEmailDto.Receivers.CreateTimeZoneGroup();
             var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind, receiverTimeZoneGroup.GetTimeZoneKeys());
             await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
+        }
+
+        private string RemoveMarkdownTextOverflow(string text, int maxCharacterCount = 150)
+        {
+            if (text.Length <= maxCharacterCount)
+            {
+                return _markdownConverter.ConvertToHtml(text);
+            }
+
+            return _markdownConverter.ConvertToHtml($"{string.Join("", text.Take(maxCharacterCount))}..."); 
         }
     }
 }
