@@ -164,9 +164,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var emailJoinSubject = string.Format(Resources.Models.Events.Events.CoacheeJoinedEventEmailSubject,
                 userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
-            return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
-                    emailJoinSubject,
-                    emailJoinBody);
+            return new EmailDto(
+                new List<string> { userAttendStatusDto.ManagerEmail },
+                emailJoinSubject,
+                emailJoinBody);
         }
 
         private async Task RemindUsersAboutDeadlineDateOfJoinedEventAsync(EventReminderDeadlineEmailDto deadlineEmailDto, Organization organization, string userNotificationSettingsUrl)

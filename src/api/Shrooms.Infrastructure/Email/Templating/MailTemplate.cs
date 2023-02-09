@@ -59,13 +59,22 @@ namespace Shrooms.Infrastructure.Email.Templating
         {
             foreach (var propertyWithInitialValue in timeZonePropertiesWithInitialValues)
             {
-                var zonedDate = propertyWithInitialValue.Item2.ConvertUtcToTimeZone(timeZoneKey);
-                propertyWithInitialValue.Item1.SetValue(viewModel, zonedDate);
+                ApplyTimeZoneChangesToProperty(viewModel, timeZoneKey, propertyWithInitialValue);
             }
             var compiledTemplate = GenerateInternal(viewModel, key);
             RestoreInitialValuesToTemplate(viewModel, timeZonePropertiesWithInitialValues);
 
             return compiledTemplate;
+        }
+
+        private static void ApplyTimeZoneChangesToProperty<TEmailTemplate>(
+            TEmailTemplate viewModel,
+            string timeZoneKey,
+            (PropertyInfo, DateTime) propertyWithInitialValue)
+            where TEmailTemplate : BaseEmailTemplateViewModel
+        {
+            var zonedDate = propertyWithInitialValue.Item2.ConvertUtcToTimeZone(timeZoneKey);
+            propertyWithInitialValue.Item1.SetValue(viewModel, zonedDate);
         }
 
         private static void RestoreInitialValuesToTemplate<TEmailTemplate>(
@@ -91,8 +100,7 @@ namespace Shrooms.Infrastructure.Email.Templating
             {
                 foreach (var propertyWithInitialValue in timeZonePropertiesWithInitialValues)
                 {
-                    var zonedDate = propertyWithInitialValue.Item2.ConvertUtcToTimeZone(timeZoneKey);
-                    propertyWithInitialValue.Item1.SetValue(viewModel, zonedDate);
+                    ApplyTimeZoneChangesToProperty(viewModel, timeZoneKey, propertyWithInitialValue);
                 }
                 compiledTemplates[timeZoneKey] = GenerateInternal(viewModel, key);
             }
