@@ -202,6 +202,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         private string RemoveMarkdownTextOverflow(string text, int maxCharacterCount = 150)
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
+
             if (text.Length <= maxCharacterCount)
             {
                 return _markdownConverter.ConvertToHtml(text);
