@@ -10,16 +10,14 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Resources.Models.Lotteries;
-using Shrooms.Infrastructure.Email.Extensions;
+using Shrooms.Domain.Services.Email;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
-    public class LotteryNotificationService : ILotteryNotificationService
+    public class LotteryNotificationService : NotificationServiceBase, ILotteryNotificationService
     {
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        private readonly IMailingService _mailingService;
-        private readonly IMailTemplate _mailTemplate;
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationSettings _applicationSettings;
 
@@ -29,9 +27,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
             IUnitOfWork2 uow,
             IOrganizationService organizationService,
             IApplicationSettings applicationSettings)
+            :
+            base(applicationSettings, mailTemplate, mailingService)
         {
-            _mailingService = mailingService;
-            _mailTemplate = mailTemplate;
             _organizationService = organizationService;
             _applicationSettings = applicationSettings;
 
@@ -49,17 +47,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
                     TimeZoneKey = user.TimeZone
                 })
                 .ToListAsync();
-            var organizationShortName = (await _organizationService
-                .GetOrganizationByIdAsync(organizationId))
-                .ShortName;
-            var userNotificationSettingsUrl = _applicationSettings.UserNotificationSettingsUrl(organizationShortName);
-            var lotteryUrl = $"{_applicationSettings.FeedUrl(organizationShortName)}?lotteryId={startedDto.Id}";
-            var emailSubject = string.Format(Lottery.StartedLotteryEmailSubject, startedDto.Title);
+            var organization = await _organizationService.GetOrganizationByIdAsync(organizationId);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var lotteryUrl = $"{_applicationSettings.FeedUrl(organization.ShortName)}?lotteryId={startedDto.Id}";
+            var subject = CreateSubject(Lottery.StartedLotteryEmailSubject, startedDto.Title);
             var lotteryTemplate = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, startedDto.EndDate, userNotificationSettingsUrl);
-            
-            var receiverTimeZoneGroup = receivers.CreateTimeZoneGroup();
-            var emailTimeZoneGroup = _mailTemplate.Generate(lotteryTemplate, EmailPremiumTemplateCacheKeys.StartedLottery, receiverTimeZoneGroup.GetTimeZoneKeys());
-            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, emailSubject));
+
+            await SendMultipleEmailsAsync(receivers, subject, lotteryTemplate, EmailPremiumTemplateCacheKeys.StartedLottery);
         }
     }
 }

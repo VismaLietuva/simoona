@@ -2,30 +2,32 @@
 using System.Data.Entity;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.Email;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Premium.Domain.Services.Email.Kudos
 {
-    public class KudosPremiumNotificationService : IKudosPremiumNotificationService
+    public class KudosPremiumNotificationService : NotificationServiceBase, IKudosPremiumNotificationService
     {
-        private readonly IMailTemplate _mailTemplate;
-        private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
 
         private readonly IDbSet<Organization> _organizationsDbSet;
         private readonly IDbSet<ApplicationUser> _employeeDbSet;
 
-        public KudosPremiumNotificationService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IMailTemplate mailTemplate)
+        public KudosPremiumNotificationService(
+            IUnitOfWork2 uow,
+            IMailingService mailingService,
+            IApplicationSettings appSettings,
+            IMailTemplate mailTemplate)
+            :
+            base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
-            _mailTemplate = mailTemplate;
-            _mailingService = mailingService;
 
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _employeeDbSet = uow.GetDbSet<ApplicationUser>();
@@ -35,9 +37,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
         {
             var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
             var employee = await _employeeDbSet.SingleAsync(s => s.Id == kudosLog.EmployeeId);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
-            var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
             var emailTemplateViewModel = new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
@@ -46,9 +47,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived);
-
-            await _mailingService.SendEmailAsync(new EmailDto(employee.Email, subject, body));
+            await SendSingleEmailAsync(
+                employee.Email,
+                Resources.Models.Kudos.Kudos.EmailSubject,
+                emailTemplateViewModel,
+                EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived);
         }
 
         private async Task<Organization> GetOrganizationAsync(int orgId)

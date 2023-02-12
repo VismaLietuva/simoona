@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
@@ -23,12 +22,10 @@ using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
-    public class PostNotificationService : IPostNotificationService
+    public class PostNotificationService : NotificationServiceBase, IPostNotificationService
     {
         private readonly IUserService _userService;
         private readonly IPostService _postService;
-        private readonly IMailTemplate _mailTemplate;
-        private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
@@ -46,12 +43,12 @@ namespace Shrooms.Domain.Services.Email.Posting
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
             IMarkdownConverter markdownConverter)
+            :
+            base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
             _userService = userService;
             _postService = postService;
-            _mailTemplate = mailTemplate;
-            _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
 
@@ -98,22 +95,25 @@ namespace Shrooms.Domain.Services.Email.Posting
             var postBody = await _postService.GetPostBodyAsync(postId);
             var convertedPostBody = _markdownConverter.ConvertToHtml(postBody);
 
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationShortName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
+            var subject = Posts.NewMentionEmailSubject;
 
             foreach (var mentionedUser in mentionedUsers)
             {
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
-                    Posts.NewMentionEmailSubject,
+                    subject,
                     mentionedUser.FullName,
                     postAuthorFullName,
                     postUrl,
                     userNotificationSettingsUrl,
                     convertedPostBody);
 
-                var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
-
-                await _mailingService.SendEmailAsync(new EmailDto(mentionedUser.Email, Posts.NewMentionEmailSubject, content));
+                await SendSingleEmailAsync(
+                    mentionedUser.Email,
+                    subject,
+                    newMentionTemplateViewModel,
+                    EmailTemplateCacheKeys.NewMention);
             }
         }
 
@@ -126,8 +126,8 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var postLink = await GetPostLinkAsync(post.WallType, post.WallId, organization.ShortName, post.Id);
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var subject = string.Format(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var subject = CreateSubject(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
             var body = _markdownConverter.ConvertToHtml(post.MessageBody);
 
             var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(GetWallTitle(wall),
@@ -138,10 +138,11 @@ namespace Shrooms.Domain.Services.Email.Posting
                 userNotificationSettingsUrl,
                 GetActionButtonTitle(wall));
 
-            var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewWallPost);
-
-            var emailData = new EmailDto(destinationEmails, subject, content);
-            await _mailingService.SendEmailAsync(emailData);
+            await SendMultipleEmailsAsync(
+                destinationEmails,
+                subject,
+                emailTemplateViewModel,
+                EmailTemplateCacheKeys.NewWallPost);
         }
 
         private static string GetActionButtonTitle(MultiwallWall wall)

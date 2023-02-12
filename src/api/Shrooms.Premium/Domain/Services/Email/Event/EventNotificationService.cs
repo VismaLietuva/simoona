@@ -11,8 +11,8 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.Infrastructure.Email.Extensions;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -21,10 +21,8 @@ using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
-    public class EventNotificationService : IEventNotificationService
+    public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
-        private readonly IMailTemplate _mailTemplate;
-        private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
@@ -38,10 +36,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
             IMarkdownConverter markdownConverter)
+            :
+            base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
-            _mailTemplate = mailTemplate;
-            _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
 
@@ -55,17 +53,18 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 .Where(u => users.Contains(u.Id))
                 .Select(u => u.Email)
                 .ToListAsync();
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, eventId.ToString());
-            var emailTemplateViewModel = new EventParticipantExpelledEmailTemplateViewModel(userNotificationSettingsUrl, eventName, eventUrl);
-            
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
-            await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
+            var emailTemplateViewModel = new EventParticipantExpelledEmailTemplateViewModel(GetNotificationSettingsUrl(organization), eventName, eventUrl);
+
+            await SendMultipleEmailsAsync(emails,
+                Resources.Models.Events.Events.ResetParticipantListEmailSubject,
+                emailTemplateViewModel,
+                EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
         }
         
         public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<EventReminderDeadlineEmailDto> deadlineEmailDtos, Organization organization)
         {
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             foreach (var deadlineEmailDto in deadlineEmailDtos)
             {
                 await RemindUsersAboutDeadlineDateOfJoinedEventAsync(deadlineEmailDto, organization, userNotificationSettingsUrl);
@@ -74,7 +73,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         public async Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<EventReminderStartEmailDto> startEmailDtos, Organization organization)
         {
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             foreach (var startEmailDto in startEmailDtos)
             {
                 await RemindUsersAboutStartDateOfJoinedEventAsync(startEmailDto, organization, userNotificationSettingsUrl);
@@ -84,39 +83,28 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventTypes, IEnumerable<string> emails, int orgId)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(orgId);
-
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(userNotificationSettingsUrl);
-
+            var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(GetNotificationSettingsUrl(organization));
             foreach (var eventType in eventTypes)
             {
                 emailTemplateViewModel.EventTypes.Add(eventType.Name, _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString()));
             }
 
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventJoinRemind);
-            await _mailingService.SendEmailAsync(new EmailDto(emails, $"Join weekly event now", emailBody));
+            await SendMultipleEmailsAsync(emails, "Join weekly event now", emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventJoinRemind);
         }
 
         public async Task NotifyManagerAboutEventAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, bool isJoiningEvent)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(userAttendStatusDto.OrganizationId);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, userAttendStatusDto.EventId.ToString());
-
-            var emailDto = GetManagerNotifyEmailDto(userAttendStatusDto, userNotificationSettingsUrl, eventUrl, isJoiningEvent);
-
-            await _mailingService.SendEmailAsync(emailDto);
+            await SendManagerNotifyEmailAsync(userAttendStatusDto, userNotificationSettingsUrl, eventUrl, isJoiningEvent);
         }
 
         public async Task NotifySharedEventAsync(SharedEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto)
         {
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(userOrgHubDto.OrganizationName);
             var postUrl = _appSettings.WallPostUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.Id);
             var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
-            var subject = string.Format(
-                Resources.Models.Events.Events.ShareEventEmailSubject,
-                shareEventEmailDto.Details.Name,
-                shareEventEmailDto.CreatedPost.WallName);
+            var subject = CreateSubject(Resources.Models.Events.Events.ShareEventEmailSubject, shareEventEmailDto.Details.Name, shareEventEmailDto.CreatedPost.WallName);
             var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
@@ -128,50 +116,62 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.Details.StartDate,
                 RemoveMarkdownTextOverflow(shareEventEmailDto.Details.Description),
                 shareEventEmailDto.Details.Location,
-                userNotificationSettingsUrl);
+                GetNotificationSettingsUrl(userOrgHubDto));
 
-            var receiverTimeZoneGroup = shareEventEmailDto.Receivers.CreateTimeZoneGroup();
-            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventShared, receiverTimeZoneGroup.GetTimeZoneKeys());
-            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
+            await SendMultipleEmailsAsync(shareEventEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventShared);
         }
 
-        private EmailDto GetManagerNotifyEmailDto(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
+        private async Task SendManagerNotifyEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
         {
             if (!isJoiningEvent)
             {
-                var emailTemplateLeaveViewModel = new CoacheeLeftEventEmailTemplateViewModel(
-                    userNotificationSettingsUrl,
-                    userAttendStatusDto,
-                    eventUrl);
-
-                var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.CoacheeLeftEvent);
-
-                var emailLeaveSubject = string.Format(Resources.Models.Events.Events.CoacheeLeftEventEmailSubject,
-                    userAttendStatusDto.FullName, userAttendStatusDto.EventName);
-
-                return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
-                    emailLeaveSubject,
-                    emailLeaveBody);
+                await SendCoacheeLeftManagerEmailAsync(userAttendStatusDto, userNotificationSettingsUrl, eventUrl);
             }
+            else
+            {
+                await SendCoacheeJoinedManagerEmailAsync(userAttendStatusDto, userNotificationSettingsUrl, eventUrl);
+            }
+        }
 
+        private async Task SendCoacheeJoinedManagerEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl)
+        {
             var emailTemplateJoinViewModel = new CoacheeJoinedEventEmailTemplateViewModel(
                 userNotificationSettingsUrl,
                 userAttendStatusDto,
                 eventUrl);
+            var emailJoinSubject = CreateSubject(
+                Resources.Models.Events.Events.CoacheeJoinedEventEmailSubject,
+                userAttendStatusDto.FullName,
+                userAttendStatusDto.EventName);
 
-            var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.CoacheeJoinedEvent);
+            await SendMultipleEmailsAsync(
+                new List<string> { userAttendStatusDto.ManagerEmail },
+                emailJoinSubject,
+                emailTemplateJoinViewModel,
+                EmailPremiumTemplateCacheKeys.CoacheeJoinedEvent);
+        }
 
-            var emailJoinSubject = string.Format(Resources.Models.Events.Events.CoacheeJoinedEventEmailSubject,
-                userAttendStatusDto.FullName, userAttendStatusDto.EventName);
+        private async Task SendCoacheeLeftManagerEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl)
+        {
+            var emailTemplateLeaveViewModel = new CoacheeLeftEventEmailTemplateViewModel(
+                userNotificationSettingsUrl,
+                userAttendStatusDto,
+                eventUrl);
+            var emailLeaveSubject = CreateSubject(
+                Resources.Models.Events.Events.CoacheeLeftEventEmailSubject,
+                userAttendStatusDto.FullName,
+                userAttendStatusDto.EventName);
 
-            return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
-                    emailJoinSubject,
-                    emailJoinBody);
+            await SendMultipleEmailsAsync(
+                new List<string> { userAttendStatusDto.ManagerEmail },
+                emailLeaveSubject,
+                emailTemplateLeaveViewModel,
+                EmailPremiumTemplateCacheKeys.CoacheeLeftEvent);
         }
 
         private async Task RemindUsersAboutDeadlineDateOfJoinedEventAsync(EventReminderDeadlineEmailDto deadlineEmailDto, Organization organization, string userNotificationSettingsUrl)
         {
-            var subject = string.Format(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, deadlineEmailDto.EventName);
+            var subject = CreateSubject(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, deadlineEmailDto.EventName);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, deadlineEmailDto.EventId.ToString());
             var emailTemplate = new EventReminderDeadlineEmailTemplateViewModel(
                 userNotificationSettingsUrl,
@@ -179,15 +179,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 eventUrl,
                 deadlineEmailDto.StartDate,
                 deadlineEmailDto.DeadlineDate);
-
-            var receiverTimeZoneGroup = deadlineEmailDto.Receivers.CreateTimeZoneGroup();
-            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind, receiverTimeZoneGroup.GetTimeZoneKeys());
-            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
+            
+            await SendMultipleEmailsAsync(deadlineEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
         }
 
         private async Task RemindUsersAboutStartDateOfJoinedEventAsync(EventReminderStartEmailDto startEmailDto, Organization organization, string userNotificationSettingsUrl)
         {
-            var subject = string.Format(Resources.Models.Events.Events.RemindEventStartEmailSubject, startEmailDto.EventName);
+            var subject = CreateSubject(Resources.Models.Events.Events.RemindEventStartEmailSubject, startEmailDto.EventName);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, startEmailDto.EventId.ToString());
             var emailTemplate = new EventReminderStartEmailTemplateViewModel(
                 userNotificationSettingsUrl,
@@ -195,9 +193,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 eventUrl,
                 startEmailDto.StartDate);
 
-            var receiverTimeZoneGroup = startEmailDto.Receivers.CreateTimeZoneGroup();
-            var emailTimeZoneGroup = _mailTemplate.Generate(emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind, receiverTimeZoneGroup.GetTimeZoneKeys());
-            await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
+            await SendMultipleEmailsAsync(startEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
         private string RemoveMarkdownTextOverflow(string text, int maxCharacterCount = 150)

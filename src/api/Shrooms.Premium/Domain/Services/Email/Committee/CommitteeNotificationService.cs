@@ -9,6 +9,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Domain.ServiceExceptions;
+using Shrooms.Domain.Services.Email;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
@@ -16,24 +17,24 @@ using CommitteeEntity = Shrooms.DataLayer.EntityModels.Models.Committee.Committe
 
 namespace Shrooms.Premium.Domain.Services.Email.Committee
 {
-    public class CommitteeNotificationService : ICommitteeNotificationService
+    public class CommitteeNotificationService : NotificationServiceBase, ICommitteeNotificationService
     {
-        private readonly IDbSet<Organization> _organizationDbSet;
-        private readonly IMailTemplate _mailTemplate;
         private readonly IApplicationSettings _appSettings;
-        private readonly IMailingService _mailingService;
-        private readonly IDbSet<CommitteeEntity> _committeeDbSet;
+
+        private readonly DbSet<Organization> _organizationDbSet;
+        private readonly DbSet<CommitteeEntity> _committeeDbSet;
         private readonly DbSet<CommitteeSuggestion> _suggestionDbSet;
 
-        public CommitteeNotificationService(IUnitOfWork2 uow,
+        public CommitteeNotificationService(
+            IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IApplicationSettings appSettings,
             IMailingService mailingService)
+            :
+            base(appSettings, mailTemplate, mailingService)
         {
             _organizationDbSet = uow.GetDbSet<Organization>();
-            _mailTemplate = mailTemplate;
             _appSettings = appSettings;
-            _mailingService = mailingService;
             _committeeDbSet = uow.GetDbSet<CommitteeEntity>();
             _suggestionDbSet = uow.GetDbSet<CommitteeSuggestion>();
         }
@@ -70,8 +71,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
                 .FirstOrDefaultAsync();
 
             var committeesListUrl = _appSettings.CommitteeSugestionUrl(organizationName);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var subject = string.Format(Resources.Common.CommitteeSuggestionEmailSubject, committee.Name);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationName);
+            var subject = CreateSubject(Resources.Common.CommitteeSuggestionEmailSubject, committee.Name);
 
             var emailTemplateViewModel = new CommitteeSuggestionEmailTemplateViewModel(userNotificationSettingsUrl,
                 committee.Name,
@@ -79,9 +80,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
                 suggestion.Description,
                 committeesListUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
-
-            await _mailingService.SendEmailAsync(new EmailDto(membersEmails, subject, body));
+            await SendMultipleEmailsAsync(
+                membersEmails,
+                subject,
+                emailTemplateViewModel,
+                EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
         }
     }
 }

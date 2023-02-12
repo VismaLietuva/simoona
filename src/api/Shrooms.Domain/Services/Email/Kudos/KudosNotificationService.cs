@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Infrastructure;
@@ -13,20 +12,22 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.Domain.Services.Email.Kudos
 {
-    public class KudosNotificationService : IKudosNotificationService
+    public class KudosNotificationService : NotificationServiceBase, IKudosNotificationService
     {
-        private readonly IMailTemplate _mailTemplate;
-        private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
 
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<Organization> _organizationsDbSet;
 
-        public KudosNotificationService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IMailTemplate mailTemplate)
+        public KudosNotificationService(
+            IUnitOfWork2 uow,
+            IMailingService mailingService,
+            IApplicationSettings appSettings,
+            IMailTemplate mailTemplate)
+            :
+            base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
-            _mailTemplate = mailTemplate;
-            _mailingService = mailingService;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
@@ -40,11 +41,9 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 return;
             }
 
-            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
-            var subject = Resources.Models.Kudos.Kudos.RejectedKudosEmailSubject;
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.CreatedBy);
-
+            var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.CreatedBy);
             var emailTemplateViewModel = new KudosRejectedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Employee.FullName,
                 kudosLog.Points,
@@ -53,40 +52,42 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.RejectionMessage,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosRejected);
-            await _mailingService.SendEmailAsync(new EmailDto(emailRecipient.Email, subject, body));
+            await SendSingleEmailAsync(
+                emailRecipient.Email,
+                Resources.Models.Kudos.Kudos.RejectedKudosEmailSubject,
+                emailTemplateViewModel,
+                EmailTemplateCacheKeys.KudosRejected);
         }
 
         public async Task NotifyAboutKudosSentAsync(AddKudosDto kudosDto)
         {
-            var organizationName = (await GetOrganizationNameAsync(kudosDto.KudosLog.OrganizationId)).ShortName;
-
+            var organization = await GetOrganizationAsync(kudosDto.KudosLog.OrganizationId);
             var recipient = _usersDbSet
                 .Where(u => kudosDto.ReceivingUser.Id.Contains(u.Id))
                 .Select(u => u.Email);
 
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosDto.ReceivingUser.Id);
-            var subject = Resources.Models.Kudos.Kudos.EmailSubject;
-
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosDto.ReceivingUser.Id);
             var emailTemplateViewModel = new KudosSentEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosDto.SendingUser.FullName,
                 kudosDto.TotalKudosPointsInLog,
                 kudosDto.KudosLog.Comment,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosSent);
-            await _mailingService.SendEmailAsync(new EmailDto(recipient, subject, body));
+            await SendMultipleEmailsAsync(
+                recipient,
+                Resources.Models.Kudos.Kudos.EmailSubject,
+                emailTemplateViewModel,
+                EmailTemplateCacheKeys.KudosSent);
         }
 
         public async Task NotifyApprovedKudosRecipientAsync(KudosLog kudosLog)
         {
-            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
+            var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
             var sendingUserFullName = await GetUserFullNameAsync(kudosLog.CreatedBy);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
-            var subject = Resources.Models.Kudos.Kudos.EmailSubject;
-
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
+            
             var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
@@ -94,17 +95,19 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
-            await _mailingService.SendEmailAsync(new EmailDto(kudosLog.Employee.Email, subject, body));
+            await SendSingleEmailAsync(
+                kudosLog.Employee.Email,
+                Resources.Models.Kudos.Kudos.EmailSubject,
+                emailTemplateViewModel,
+                EmailTemplateCacheKeys.KudosReceived);
         }
 
         public async Task NotifyApprovedKudosDecreaseRecipientAsync(KudosLog kudosLog)
         {
-            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
+            var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
             var sendingUserFullName = await GetUserFullNameAsync(kudosLog.CreatedBy);
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
-            var subject = Resources.Models.Kudos.Kudos.MinusKudosEmailSubject;
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
 
             var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
@@ -113,12 +116,14 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosDecreased);
-
-            await _mailingService.SendEmailAsync(new EmailDto(kudosLog.Employee.Email, subject, body));
+            await SendSingleEmailAsync(
+                kudosLog.Employee.Email,
+                Resources.Models.Kudos.Kudos.MinusKudosEmailSubject,
+                emailTemplateViewModel,
+                EmailTemplateCacheKeys.KudosDecreased);
         }
 
-        private async Task<Organization> GetOrganizationNameAsync(int orgId)
+        private async Task<Organization> GetOrganizationAsync(int orgId)
         {
             return await _organizationsDbSet.SingleAsync(x => x.Id == orgId);
         }

@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Contracts.DataTransferObjects.Users;
-using Shrooms.Contracts.DataTransferObjects.Wall;
-using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
