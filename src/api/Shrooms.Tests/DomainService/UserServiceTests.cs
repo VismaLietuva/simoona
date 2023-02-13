@@ -17,6 +17,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Tests.Extensions;
@@ -265,8 +266,103 @@ namespace Shrooms.Tests.DomainService
             Assert.That(emails.First().Contains("test3@shrooms.com"), Is.True);
         }
 
-        #region Mocks
+        [Test]
+        public async Task Should_Return_Receivers_With_EmailNotifications_Set()
+        {
+            // Arrange
+            const int organizationId = 1;
+            var users = new List<ApplicationUser>
+            {
+                new ApplicationUser
+                {
+                    OrganizationId = organizationId,
+                    NotificationsSettings = new NotificationsSettings
+                    {
+                        EventsEmailNotifications = true
+                    }
+                },
+                new ApplicationUser
+                {
+                    OrganizationId = organizationId,
+                    NotificationsSettings = new NotificationsSettings
+                    {
+                        EventsEmailNotifications = false
+                    }
+                }
+            };
+            _usersDbSet.SetDbSetDataForAsync(users);
 
+            // Act
+            var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
+
+            // Assert
+            Assert.AreEqual(1, result.Count());
+        }
+
+        [Test]
+        public async Task Should_Return_Receivers_Without_NotificationSettings_Set()
+        {
+            // Arrange
+            const int organizationId = 1;
+            var users = new List<ApplicationUser>
+            {
+                new ApplicationUser
+                {
+                    OrganizationId = organizationId,
+                    NotificationsSettings = null
+                },
+                new ApplicationUser
+                {
+                    OrganizationId = organizationId,
+                    NotificationsSettings = new NotificationsSettings
+                    {
+                        EventsEmailNotifications = false
+                    }
+                }
+            };
+            _usersDbSet.SetDbSetDataForAsync(users);
+
+            // Act
+            var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
+
+            // Assert
+            Assert.AreEqual(1, result.Count());
+        }
+
+        [Test]
+        public async Task Should_Return_Receivers_From_Given_Organization_Only()
+        {
+            // Arrange
+            const int organizationId = 1;
+            var users = new List<ApplicationUser>
+            {
+                new ApplicationUser
+                {
+                    OrganizationId = organizationId,
+                    NotificationsSettings = new NotificationsSettings
+                    {
+                        EventsEmailNotifications = true
+                    }
+                },
+                new ApplicationUser
+                {
+                    OrganizationId = 2,
+                    NotificationsSettings = new NotificationsSettings
+                    {
+                        EventsEmailNotifications = true
+                    }
+                }
+            };
+            _usersDbSet.SetDbSetDataForAsync(users);
+
+            // Act
+            var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
+
+            // Assert
+            Assert.AreEqual(1, result.Count());
+        }
+
+        #region Mocks
         private void MockRolesAndUsersForPermissionValidation()
         {
             var roles = new List<ApplicationRole>
