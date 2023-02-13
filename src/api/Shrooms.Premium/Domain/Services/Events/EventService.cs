@@ -182,8 +182,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             MapNewOptions(newEventDto, newEvent);
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
-            newEvent.Description = _markdownConverter.ConvertToHtml(newEvent.Description);
-
             newEventDto.Id = newEvent.Id.ToString();
 
             return newEventDto;

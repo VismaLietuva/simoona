@@ -128,7 +128,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var template = new NewEventEmailTemplateViewModel(
                 eventUrl,
                 eventArgsDto.Name,
-                eventArgsDto.Description,
+                RemoveMarkdownTextOverflow(eventArgsDto.Description),
                 eventArgsDto.Location,
                 eventArgsDto.StartDate,
                 GetNotificationSettingsUrl(userOrgHubDto));

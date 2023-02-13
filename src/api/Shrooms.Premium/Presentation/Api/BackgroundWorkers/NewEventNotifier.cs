@@ -21,10 +21,12 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
         public NewEventNotifier(
             IUserService userService,
             INotificationService notificationService,
+            IEventNotificationService eventNotificationService,
             IMapper mapper)
         {
             _userService = userService;
             _notificationService = notificationService;
+            _eventNotificationService = eventNotificationService;
             _mapper = mapper;
         }
 
