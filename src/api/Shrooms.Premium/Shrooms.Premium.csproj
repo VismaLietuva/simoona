@@ -277,6 +277,7 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderDeadlineEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderStartEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\NewEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\SharedEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
@@ -651,6 +652,9 @@
     <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="EmailTemplates\Events\NewEvent.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="EmailTemplates\Events\SharedEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -19,5 +19,6 @@
         public const string EventStartRemind = nameof(EventStartRemind);
         public const string EventDeadlineRemind = nameof(EventDeadlineRemind);
         public const string EventShared = nameof(EventShared);
+        public const string EventNew = nameof(EventNew);
     }
 }

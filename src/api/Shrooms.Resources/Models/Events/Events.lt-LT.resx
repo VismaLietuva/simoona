@@ -147,4 +147,7 @@
   <data name="ShareEventEmailSubject" xml:space="preserve">
     <value>Renginys {0} pasidalintas {1} sienoje</value>
   </data>
+  <data name="NewEventEmailSubject" xml:space="preserve">
+    <value>Sukurtas naujas reginys: {0}</value>
+  </data>
 </root>

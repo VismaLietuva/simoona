@@ -50,6 +50,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<EventReminderDto> Reminders { get; set; }
 
-        public bool NotifyUsersAfterCreation { get; set; }
+        public bool NotifyUsers { get; set; }
     }
 }

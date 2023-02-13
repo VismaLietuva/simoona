@@ -147,4 +147,7 @@
   <data name="ShareEventEmailSubject" xml:space="preserve">
     <value>Event {0} shared in {1} wall</value>
   </data>
+  <data name="NewEventEmailSubject" xml:space="preserve">
+    <value>New event created: {0}</value>
+  </data>
 </root>
