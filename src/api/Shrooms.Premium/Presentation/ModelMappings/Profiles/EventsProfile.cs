@@ -66,6 +66,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();
             CreateMap<UpdateEventViewModel, EditEventDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(u => u.Id.Value.ToString()))
                 .IgnoreUserOrgDto()
                 .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>();

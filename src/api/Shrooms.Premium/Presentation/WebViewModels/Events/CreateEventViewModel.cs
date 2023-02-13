@@ -66,5 +66,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         [RequireOneTimeEventForCollection(nameof(Recurrence)), ValidateRemindersCollection]
         public IEnumerable<EventReminderViewModel> Reminders { get; set; }
+
+        public bool NotifyUsersAfterCreation { get; set; }
     }
 }

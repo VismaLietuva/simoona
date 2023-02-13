@@ -327,6 +327,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\IEventArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />

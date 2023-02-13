@@ -481,7 +481,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockEventsListTest();
             var newEvent = new EditEventDto
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 ResetParticipantList = false,
                 EndDate = DateTime.UtcNow.AddHours(3),
                 StartDate = DateTime.UtcNow.AddHours(2),
@@ -522,7 +522,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventsGuids = MockEventsListTest();
             var newEvent = new EditEventDto
             {
-                Id = eventsGuids[0],
+                Id = eventsGuids[0].ToString(),
                 UserId = "2",
                 ResetParticipantList = false,
                 EndDate = DateTime.UtcNow.AddHours(3),
@@ -566,7 +566,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var newEvent = new EditEventDto
             {
-                Id = eventsGuids[0],
+                Id = eventsGuids[0].ToString(),
                 UserId = "1",
                 ResetParticipantList = false,
                 EndDate = DateTime.UtcNow.AddHours(3),
@@ -743,7 +743,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var editDto = new EditEventDto
             {
-                Id = @event.Id,
+                Id = @event.Id.ToString(),
                 StartDate = @event.StartDate,
                 EndDate = @event.EndDate,
                 ImageName = "imageUrl",
@@ -801,7 +801,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var editDto = new EditEventDto
             {
-                Id = @event.Id,
+                Id = @event.Id.ToString(),
                 StartDate = @event.StartDate.AddDays(4),
                 EndDate = @event.EndDate.AddDays(4),
                 ImageName = "imageUrl",
@@ -859,7 +859,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var editDto = new EditEventDto
             {
-                Id = @event.Id,
+                Id = @event.Id.ToString(),
                 StartDate = @event.StartDate,
                 EndDate = @event.EndDate,
                 ImageName = "imageUrl",

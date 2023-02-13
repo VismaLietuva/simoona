@@ -6,7 +6,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class CreateEventDto : UserAndOrganizationDto
+    public class CreateEventDto : UserAndOrganizationDto, IEventArgsDto
     {
         public string Id { get; set; }
 
@@ -49,5 +49,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public IEnumerable<NewEventOptionDto> NewOptions { get; set; }
 
         public IEnumerable<EventReminderDto> Reminders { get; set; }
+
+        public bool NotifyUsersAfterCreation { get; set; }
     }
 }
