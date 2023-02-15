@@ -1,5 +1,4 @@
 ﻿using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using System;
 using System.Collections.Generic;
 

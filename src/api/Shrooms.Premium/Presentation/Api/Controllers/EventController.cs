@@ -571,7 +571,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var createdPost = await _postService.CreateNewPostAsync(postModel);
-                _asyncRunner.Run<SharedEventNotifier>(async notifier => { await notifier.NotifyAsync(postModel, createdPost, userHubDto); }, GetOrganizationName());
+                _asyncRunner.Run<SharedEventNotifier>(async notifier =>
+                    await notifier.NotifyAsync(createdPost, userHubDto),
+                    GetOrganizationName());
 
                 var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
 

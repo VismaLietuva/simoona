@@ -129,6 +129,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ApplicationSettings.cs" />
+    <Compile Include="Email\Attributes\ApplyTimeZoneChangesAttribute.cs" />
+    <Compile Include="Email\Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Email\Extensions\EmailReceiverExtensions.cs" />
+    <Compile Include="Email\Extensions\TimeZoneEmailGroupExtensions.cs" />
+    <Compile Include="Email\Models\TimeZoneEmailGroup.cs" />
+    <Compile Include="Email\Models\TimeZoneGroup.cs" />
     <Compile Include="Email\Templating\EmailTemplatesCompiler.cs" />
     <Compile Include="Email\MailingService.cs" />
     <Compile Include="Email\Templating\MailTemplate.cs" />

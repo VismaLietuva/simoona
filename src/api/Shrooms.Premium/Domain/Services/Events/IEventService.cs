@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Events
@@ -15,5 +16,6 @@ namespace Shrooms.Premium.Domain.Services.Events
         Task<EventReportDetailsDto> GetReportEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
         Task<EventEditDetailsDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);
+        Task<SharedEventEmailDetailsDto> GetSharedEventDetailsAsync(Guid eventId, int organizationId);
     }
 }

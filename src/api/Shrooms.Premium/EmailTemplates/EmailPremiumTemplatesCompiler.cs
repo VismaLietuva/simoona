@@ -32,6 +32,7 @@ namespace Shrooms.Premium.EmailTemplates
             AddAndCompile(EmailPremiumTemplateCacheKeys.ServiceRequest, @"EmailTemplates\ServiceRequests\NewServiceRequest.cshtml", typeof(ServiceRequestEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.ServiceRequestUpdate, @"EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml", typeof(ServiceRequestUpdateEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.StartedLottery, @"EmailTemplates\Lotteries\StartedLottery.cshtml", typeof(StartedLotteryEmailTemplateViewModel));
+            AddAndCompile(EmailPremiumTemplateCacheKeys.EventShared, @"EmailTemplates\Events\SharedEvent.cshtml", typeof(SharedEventEmailTemplateViewModel));
         }
 
         private static void AddAndCompile(string templateKey, string relativePath, Type templateViewModel)

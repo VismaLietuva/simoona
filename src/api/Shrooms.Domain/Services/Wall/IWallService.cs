@@ -56,5 +56,6 @@ namespace Shrooms.Domain.Services.Wall
             string permission,
             UserAndOrganizationDto userOrg,
             bool checkForAdministrationEventPermission = true);
+        Task<IEnumerable<WallMemberEmailReceiverDto>> GetWallMembersWithEnabledEmailNotificationsAsync(int wallId, int organizationId);
     }
 }

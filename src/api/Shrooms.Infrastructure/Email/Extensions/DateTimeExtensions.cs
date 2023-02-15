@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.Domain.Extensions
+namespace Shrooms.Infrastructure.Email.Extensions
 {
     public static class DateTimeExtensions
     {

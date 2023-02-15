@@ -144,4 +144,7 @@
   <data name="RemindEventStartEmailSubject" xml:space="preserve">
     <value>Renginio {0} priminimas</value>
   </data>
+  <data name="ShareEventEmailSubject" xml:space="preserve">
+    <value>Renginys {0} pasidalintas {1} sienoje</value>
+  </data>
 </root>

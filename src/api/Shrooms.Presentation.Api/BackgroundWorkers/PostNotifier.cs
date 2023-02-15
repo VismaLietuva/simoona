@@ -23,7 +23,11 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
         private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
 
-        public PostNotifier(IPostNotificationService postNotificationService, IUserService userService, INotificationService notificationService, IMapper mapper)
+        public PostNotifier(
+            IPostNotificationService postNotificationService,
+            IUserService userService,
+            INotificationService notificationService,
+            IMapper mapper)
         {
             _postNotificationService = postNotificationService;
             _userService = userService;

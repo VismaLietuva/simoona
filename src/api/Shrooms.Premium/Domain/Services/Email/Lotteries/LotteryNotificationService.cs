@@ -1,5 +1,4 @@
 ﻿using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -10,30 +9,27 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Domain.Extensions;
 using Shrooms.Resources.Models.Lotteries;
-using System;
+using Shrooms.Domain.Services.Email;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
-    public class LotteryNotificationService : ILotteryNotificationService
+    public class LotteryNotificationService : NotificationServiceBase, ILotteryNotificationService
     {
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        private readonly IMailingService _mailingService;
-        private readonly IMailTemplate _mailTemplate;
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationSettings _applicationSettings;
 
         public LotteryNotificationService(
-            IMailingService mailingService, 
+            IMailingService mailingService,
             IMailTemplate mailTemplate,
             IUnitOfWork2 uow,
             IOrganizationService organizationService,
             IApplicationSettings applicationSettings)
+            :
+            base(applicationSettings, mailTemplate, mailingService)
         {
-            _mailingService = mailingService;
-            _mailTemplate = mailTemplate;
             _organizationService = organizationService;
             _applicationSettings = applicationSettings;
 
@@ -42,35 +38,22 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         
         public async Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto startedDto, int organizationId)
         {
-            var userEmailsGroupedByTimeZone = await _usersDbSet
+            var receivers = await _usersDbSet
                 .Include(user => user.NotificationsSettings)
                 .Where(user => user.NotificationsSettings == null || user.NotificationsSettings.CreatedLotteryEmailNotifications)
                 .Select(user => new LotteryStartedEmailUserInfoDto
                 {
                     Email = user.Email,
-                    TimeZone = user.TimeZone
+                    TimeZoneKey = user.TimeZone
                 })
-                .GroupBy(userInfo => userInfo.TimeZone)
                 .ToListAsync();
+            var organization = await _organizationService.GetOrganizationByIdAsync(organizationId);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
+            var lotteryUrl = $"{_applicationSettings.FeedUrl(organization.ShortName)}?lotteryId={startedDto.Id}";
+            var subject = CreateSubject(Lottery.StartedLotteryEmailSubject, startedDto.Title);
+            var lotteryTemplate = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, startedDto.EndDate, userNotificationSettingsUrl);
 
-            var organizationShortName = (await _organizationService
-                .GetOrganizationByIdAsync(organizationId))
-                .ShortName;
-
-            var userNotificationSettingsUrl = _applicationSettings.UserNotificationSettingsUrl(organizationShortName);
-            var lotteryUrl = $"{_applicationSettings.FeedUrl(organizationShortName)}?lotteryId={startedDto.Id}";
-
-            var emailSubject = string.Format(Lottery.StartedLotteryEmailSubject, startedDto.Title);
-
-            foreach (var emailGroup in userEmailsGroupedByTimeZone)
-            {
-                var localEndDate = startedDto.EndDate.ConvertUtcToTimeZone(emailGroup.Key);
-                var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, localEndDate, userNotificationSettingsUrl);
-                var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
-                var userEmails = emailGroup.Select(info => info.Email);
-
-                await _mailingService.SendEmailAsync(new EmailDto(userEmails, emailSubject, emailBody));
-            }
+            await SendMultipleEmailsAsync(receivers, subject, lotteryTemplate, EmailPremiumTemplateCacheKeys.StartedLottery);
         }
     }
 }

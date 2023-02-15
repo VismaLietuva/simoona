@@ -3074,6 +3074,41 @@ namespace Shrooms.Resources.Models.Events {
     }
 }
 
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Event {0} shared in {1} wall</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        public static string ShareEventEmailSubjectFormatted(params object[] args) { return GetResourceString("ShareEventEmailSubject", args); }
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>Event {0} shared in {1} wall</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string ShareEventEmailSubject => GetResourceString(ShareEventEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="ShareEventEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string ShareEventEmailSubjectKey = "ShareEventEmailSubject";
+    }
+}
+
 namespace Shrooms.Resources.Models.Floor {
 [Utilities.Localized]    public partial class Floor {
 

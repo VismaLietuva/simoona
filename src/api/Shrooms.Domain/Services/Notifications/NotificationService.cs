@@ -48,7 +48,11 @@ namespace Shrooms.Domain.Services.Notifications
             _wallService = wallService;
         }
 
-        public async Task<NotificationDto> CreateForPostAsync(UserAndOrganizationDto userOrg, NewlyCreatedPostDto post, int wallId, IEnumerable<string> membersToNotify)
+        public async Task<NotificationDto> CreateForPostAsync(
+            UserAndOrganizationDto userOrg,
+            NewlyCreatedPostDto post,
+            int wallId,
+            IEnumerable<string> membersToNotify)
         {
             var postType = NotificationType.WallPost;
             var sources = new Sources { PostId = post.Id };

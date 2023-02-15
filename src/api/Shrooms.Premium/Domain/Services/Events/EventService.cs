@@ -4,11 +4,13 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -185,6 +187,22 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEventDto.Id = newEvent.Id.ToString();
 
             return newEventDto;
+        }
+
+        public async Task<SharedEventEmailDetailsDto> GetSharedEventDetailsAsync(Guid eventId, int organizationId)
+        {
+            var @event = await _eventsDbSet.Include(e => e.EventType)
+                .FirstOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == organizationId);
+            _eventValidationService.CheckIfEventExists(@event);
+
+            return new SharedEventEmailDetailsDto
+            {
+                Name = @event.Name,
+                StartDate = @event.StartDate,
+                TypeName = @event.EventType.Name,
+                Description = @event.Description,
+                Location = @event.Place
+            };
         }
 
         public async Task UpdateEventAsync(EditEventDto eventDto)

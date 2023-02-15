@@ -1,30 +1,59 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Infrastructure;
-using Shrooms.Domain.Services.Email.Posting;
+using Shrooms.Contracts.ViewModels.Notifications;
+using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.Premium.Domain.Services.Email.Event;
+using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
 {
     public class SharedEventNotifier : IBackgroundWorker
     {
+        private readonly IMapper _mapper;
         private readonly IWallService _wallService;
-        private readonly IPostNotificationService _postNotificationService;
+        private readonly INotificationService _notificationService;
+        private readonly IEventNotificationService _eventNotificationService;
+        private readonly IEventService _eventService;
 
-        public SharedEventNotifier(IWallService wallService, IPostNotificationService postNotificationService)
+        public SharedEventNotifier(
+            IMapper mapper,
+            IWallService wallService,
+            INotificationService notificationService,
+            IEventNotificationService eventNotificationService,
+            IEventService eventService)
         {
+            _mapper = mapper;
             _wallService = wallService;
-            _postNotificationService = postNotificationService;
+            _notificationService = notificationService;
+            _eventNotificationService = eventNotificationService;
+            _eventService = eventService;
         }
 
-        public async Task NotifyAsync(NewPostDto postModel, NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
+        public async Task NotifyAsync(NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
         {
-            await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
+            var wallMembers = await _wallService.GetWallMembersWithEnabledEmailNotificationsAsync(createdPost.WallId, userHubDto.OrganizationId);
+            var eventDetails = await _eventService.GetSharedEventDetailsAsync(Guid.Parse(createdPost.SharedEventId), userHubDto.OrganizationId);
+            var shareEventEmailDto = new SharedEventEmailDto
+            {
+                CreatedPost = createdPost,
+                Receivers = wallMembers,
+                Details = eventDetails
+            };
+            await _eventNotificationService.NotifySharedEventAsync(shareEventEmailDto, userHubDto);
 
-            var membersToNotify = await _wallService.GetWallMembersIdsAsync(postModel.WallId, postModel);
-            await NotificationHub.SendWallNotificationAsync(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
+            var wallMemberIds = wallMembers.Select(member => member.Id).ToList();
+            var notificationDto = await _notificationService.CreateForPostAsync(userHubDto, createdPost, createdPost.WallId, wallMemberIds);
+            var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
+            await NotificationHub.SendNotificationToParticularUsersAsync(notificationViewModel, userHubDto, wallMemberIds);
+            await NotificationHub.SendWallNotificationAsync(createdPost.WallId, wallMemberIds, createdPost.WallType, userHubDto);
         }
     }
 }

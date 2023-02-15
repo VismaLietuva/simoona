@@ -46,7 +46,10 @@ namespace Shrooms.Presentation.Api.Hubs
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
-        public static async Task SendNotificationToParticularUsersAsync(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
+        public static async Task SendNotificationToParticularUsersAsync(
+            NotificationViewModel notification,
+            UserAndOrganizationHubDto userOrg,
+            IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 

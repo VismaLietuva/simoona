@@ -572,6 +572,21 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
+        public async Task<IEnumerable<WallMemberEmailReceiverDto>> GetWallMembersWithEnabledEmailNotificationsAsync(int wallId, int organizationId)
+        {
+            return await _wallUsersDbSet
+                .Where(member => 
+                    member.WallId == wallId &&
+                    member.EmailNotificationsEnabled)
+                .Select(member => new WallMemberEmailReceiverDto
+                {
+                    Id = member.UserId,
+                    Email = member.User.Email,
+                    TimeZoneKey = member.User.TimeZone
+                })
+                .ToListAsync();
+        }
+
         public async Task CheckIfUserIsAllowedToModifyWallContentAsync(
             MultiwallWall wall,
             string createdBy,
