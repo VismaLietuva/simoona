@@ -531,6 +531,16 @@
                             </div>
                         </div>
                     </div>
+                                        <!-- notify users checkbox -->
+                                        <div class="form-group pt-0" ng-if="!vm.states.isEdit">
+                                            <label class="control-label col-xs-12 col-sm-4"></label>
+                                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                                <input id="notifyUsers" type="checkbox" class="event-form-checkbox"
+                                                    ng-model="vm.notifyUsers">
+                                                <label for="notifyUsers" class="control-label"
+                                                    translate="events.notifyUsers"></label>
+                                            </div>
+                                        </div>
                     <!-- event buttons left -->
                     <div class="pull-left">
                         <button ng-if="vm.states.isEdit" class="btn btn-danger"

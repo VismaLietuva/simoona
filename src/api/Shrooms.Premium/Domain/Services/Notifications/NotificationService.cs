@@ -10,6 +10,7 @@ using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
+using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
@@ -23,10 +24,14 @@ namespace Shrooms.Premium.Domain.Services.Notifications
         private readonly IDbSet<Wall> _wallDbSet;
 
         private readonly IWallService _wallService;
-
+        private readonly IMarkdownConverter _markdownConverter;
         private readonly IMapper _mapper;
 
-        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService)
+        public NotificationService(
+            IUnitOfWork2 uow,
+            IMapper mapper,
+            IWallService wallService,
+            IMarkdownConverter markdownConverter)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _wallDbSet = uow.GetDbSet<Wall>();
@@ -34,6 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             _uow = uow;
             _mapper = mapper;
             _wallService = wallService;
+            _markdownConverter = markdownConverter;
         }
 
         public async Task<NotificationDto> CreateForEventAsync(UserAndOrganizationDto userOrg, CreateEventDto eventDto)
@@ -43,7 +49,8 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             var membersToNotify = await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg);
 
             var sourceIds = new Sources { EventId = eventDto.Id };
-            var newNotification = Notification.Create(eventDto.Name, eventDto.Description, eventDto.ImageName, sourceIds, NotificationType.NewEvent, userOrg.OrganizationId, membersToNotify);
+            var htmlDescription = _markdownConverter.ConvertToHtml(eventDto.Description);
+            var newNotification = Notification.Create(eventDto.Name, htmlDescription, eventDto.ImageName, sourceIds, NotificationType.NewEvent, userOrg.OrganizationId, membersToNotify);
 
             _notificationDbSet.Add(newNotification);
 

@@ -121,6 +121,25 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await SendMultipleEmailsAsync(shareEventEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventShared);
         }
 
+        public async Task NotifyNewEventAsync(CreateEventDto eventArgsDto, IEnumerable<IEmailReceiver> receivers, UserAndOrganizationHubDto userOrgHubDto)
+        {
+            var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, eventArgsDto.Id);
+            var subject = CreateSubject(Resources.Models.Events.Events.NewEventEmailSubject, eventArgsDto.Name);
+            var template = new NewEventEmailTemplateViewModel(
+                eventUrl,
+                eventArgsDto.Name,
+                RemoveMarkdownTextOverflow(eventArgsDto.Description),
+                eventArgsDto.Location,
+                eventArgsDto.StartDate,
+                GetNotificationSettingsUrl(userOrgHubDto));
+
+            await SendMultipleEmailsAsync(
+                receivers,
+                subject,
+                template,
+                EmailPremiumTemplateCacheKeys.EventNew);
+        }
+
         private async Task SendManagerNotifyEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
         {
             if (!isJoiningEvent)

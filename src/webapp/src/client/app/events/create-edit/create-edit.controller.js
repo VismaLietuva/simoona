@@ -82,6 +82,7 @@
             isEdit: $state.includes('Root.WithOrg.Client.Events.EditEvent'),
         };
 
+        vm.notifyUsers = false;
         vm.resetParticipantList = false;
         vm.resetVirtualParticipantList = false;
         vm.isRegistrationDeadlineEnabled = false;
@@ -547,6 +548,10 @@
 
         function setEvent() {
             manageParticipantResets();
+
+            if (!vm.states.isEdit) {
+                vm.event.notifyUsers = vm.notifyUsers;
+            }
 
             if (!vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;

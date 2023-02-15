@@ -8,6 +8,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
@@ -359,6 +360,21 @@ namespace Shrooms.Domain.Services.UserService
             }
 
             await _uow.SaveChangesAsync(id);
+        }
+
+        public async Task<IEnumerable<IEmailReceiver>> GetReceiversWithEventEmailNotificationAsync(int organizationId)
+        {
+            return await _usersDbSet
+                .Include(user => user.NotificationsSettings)
+                .Where(user => 
+                    user.OrganizationId == organizationId &&
+                    (user.NotificationsSettings == null || user.NotificationsSettings.EventsEmailNotifications))
+                .Select(user => new UserEmailReceiverDto
+                {
+                    Email = user.Email,
+                    TimeZoneKey = user.TimeZone
+                })
+                .ToListAsync();
         }
 
         public async Task<ApplicationUser> GetApplicationUserAsync(string id)

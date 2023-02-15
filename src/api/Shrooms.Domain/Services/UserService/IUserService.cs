@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,5 +40,7 @@ namespace Shrooms.Domain.Services.UserService
 
         Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id);
         Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg);
+
+        Task<IEnumerable<IEmailReceiver>> GetReceiversWithEventEmailNotificationAsync(int organizationId);
     }
 }
