@@ -97,12 +97,15 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Where(FilterAttendingParticipants())
-                .Select(participant => new EventReminderEmailReceiverDto
-                {
-                    Email = participant.ApplicationUser.Email,
-                    TimeZoneKey = participant.ApplicationUser.TimeZone,
-                }).ToList()
+                Receivers = reminder.Event.EventParticipants
+                    .Where(FilterByEventWeeklyNotificationSetting())
+                    .Where(FilterAttendingParticipants())
+                    .Select(participant => new EventReminderEmailReceiverDto
+                    {
+                        Email = participant.ApplicationUser.Email,
+                        TimeZoneKey = participant.ApplicationUser.TimeZone,
+                    })
+                    .ToList()
             };
         }
 
@@ -114,13 +117,23 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Where(FilterAttendingParticipants())
-                .Select(participant => new EventReminderEmailReceiverDto
-                {
-                    Email = participant.ApplicationUser.Email,
-                    TimeZoneKey = participant.ApplicationUser.TimeZone
-                }).ToList()
+                Receivers = reminder.Event.EventParticipants
+                    .Where(FilterByEventWeeklyNotificationSetting())
+                    .Where(FilterAttendingParticipants())
+                    .Select(participant => new EventReminderEmailReceiverDto
+                    {
+                        Email = participant.ApplicationUser.Email,
+                        TimeZoneKey = participant.ApplicationUser.TimeZone
+                    })
+                    .ToList()
             };
+        }
+
+        private static Func<EventParticipant, bool> FilterByEventWeeklyNotificationSetting()
+        {
+            return participant =>
+                participant.ApplicationUser.NotificationsSettings == null ||
+                participant.ApplicationUser.NotificationsSettings.EventWeeklyReminderEmailNotifications;
         }
 
         private static Func<EventParticipant, bool> FilterAttendingParticipants()
