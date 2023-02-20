@@ -4,6 +4,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.Email.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.Email
@@ -51,6 +52,11 @@ namespace Shrooms.Domain.Services.Email
             string templateCacheKey)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
+            if (!receivers.Any())
+            {
+                return;
+            }
+
             var receiverTimeZoneGroup = receivers.CreateTimeZoneGroup();
             var emailTimeZoneGroup = _mailTemplate.Generate(template, templateCacheKey, receiverTimeZoneGroup.GetTimeZoneKeys());
             await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
@@ -83,6 +89,11 @@ namespace Shrooms.Domain.Services.Email
             string templateCacheKey)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
+            if (!emails.Any())
+            {
+                return;
+            }
+
             var body = _mailTemplate.Generate(template, templateCacheKey);
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
