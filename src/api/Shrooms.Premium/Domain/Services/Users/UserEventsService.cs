@@ -43,6 +43,7 @@ namespace Shrooms.Premium.Domain.Services.Users
             return await _eventRemindersDbSet.Include(reminder => reminder.Event)
                 .Include(reminder => reminder.Event.EventParticipants)
                 .Include(reminder => reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser))
+                .Include(reminder => reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser.NotificationsSettings))
                 .Where(reminder => !reminder.IsReminded && reminder.Event.OrganizationId == organization.Id)
                 .Where(readyRemindersPredicate)
                 .ToListAsync();
