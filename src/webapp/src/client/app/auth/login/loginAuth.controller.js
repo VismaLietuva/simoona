@@ -32,6 +32,7 @@
         $rootScope.pageTitle = 'account.login';
         vm.isGoogle = false;
         vm.isFacebook = false;
+        vm.isMicrosoft = false;
         vm.isInternal = false;
         vm.providerName;
 
@@ -68,6 +69,9 @@
                     }
                     if (authService.getExternalProvider(vm.externalProviders, 'Facebook')){
                         vm.isFacebook = true;
+                    }
+                    if (authService.getExternalProvider(vm.externalProviders, 'Microsoft')){
+                        vm.isMicrosoft = true;
                     }
                 }, function(error) {
                     vm.isLoading = false;

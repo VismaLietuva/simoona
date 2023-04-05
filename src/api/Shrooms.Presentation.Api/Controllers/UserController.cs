@@ -194,6 +194,11 @@ namespace Shrooms.Presentation.Api.Controllers
                 return user.FacebookEmail;
             }
 
+            if (provider == AuthenticationConstants.MicrosoftLoginProvider)
+            {
+                return user.MicrosoftEmail;
+            }
+
             if (provider == AuthenticationConstants.InternalLoginProvider)
             {
                 return user.UserName;

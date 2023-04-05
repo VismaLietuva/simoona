@@ -75,6 +75,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
             user.UserName = randomString;
             user.FacebookEmail = randomString;
             user.GoogleEmail = randomString;
+            user.MicrosoftEmail = randomString;
             user.Bio = string.Empty;
             user.PictureId = string.Empty;
             user.BirthDay = DateTime.UtcNow;

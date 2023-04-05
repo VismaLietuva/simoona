@@ -163,6 +163,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public string FacebookEmail { get; set; }
 
+        public string MicrosoftEmail { get; set; }
+
         [NotMapped]
         public int YearsEmployed
         {
@@ -180,6 +182,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
                 return employmentYears;
             }
         }
+
 
         public void ReceiveKudos(KudosLog log)
         {

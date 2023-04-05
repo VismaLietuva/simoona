@@ -20,7 +20,7 @@ namespace Shrooms.Presentation.Api.Middlewares
         {
             var request = context.Request;
 
-            if (request.Path.ToString().StartsWith("/signin-google") || request.Path.ToString().StartsWith("/signin-facebook") || request.Path.ToString().StartsWith("/swagger"))
+            if (request.Path.ToString().StartsWith("/signin-google") || request.Path.ToString().StartsWith("/signin-facebook") || request.Path.ToString().StartsWith("/signin-microsoft") || request.Path.ToString().StartsWith("/swagger"))
             {
                 await Next.Invoke(context);
             }

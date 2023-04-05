@@ -338,6 +338,10 @@ namespace Shrooms.Domain.Services.Administration
             {
                 user.FacebookEmail = email;
             }
+            if (provider == AuthenticationConstants.MicrosoftLoginProvider)
+            {
+                user.MicrosoftEmail = email;
+            }
 
             await _uow.SaveChangesAsync(userId);
         }
