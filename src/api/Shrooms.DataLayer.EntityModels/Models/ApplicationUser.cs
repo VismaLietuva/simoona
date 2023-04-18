@@ -183,7 +183,6 @@ namespace Shrooms.DataLayer.EntityModels.Models
             }
         }
 
-
         public void ReceiveKudos(KudosLog log)
         {
             RemainingKudos += log.Points;
