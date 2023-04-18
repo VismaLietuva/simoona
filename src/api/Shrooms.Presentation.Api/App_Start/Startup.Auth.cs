@@ -89,13 +89,17 @@ namespace Shrooms.Presentation.Api
 
             if (HasProviderSettings("MicrosoftAccountClientId", "MicrosoftAccountClientSecret"))
             {
+                var authorizationEndpoint = ConfigurationManager.AppSettings["MicrosoftAuthorizationEndpoint"];
+                var tokenEndpoint = ConfigurationManager.AppSettings["MicrosoftTokenEndpoint"];
+                var clientId = ConfigurationManager.AppSettings["MicrosoftAccountClientId"];
+                var clientSecret = ConfigurationManager.AppSettings["MicrosoftAccountClientSecret"];
                 var microsoftOAuthOptions = new MicrosoftAccountAuthenticationOptions
                 {
-                    AuthorizationEndpoint = "https://login.microsoftonline.com/856ea157-bf1d-43df-af37-bbfbc0072578/oauth2/authorize",
-                    TokenEndpoint = "https://login.microsoftonline.com/856ea157-bf1d-43df-af37-bbfbc0072578/oauth2/v2.0/token",
+                    AuthorizationEndpoint = authorizationEndpoint,
+                    TokenEndpoint = tokenEndpoint,
                     Provider = new CustomMicrosoftAccountAuthProvider(container),
-                    ClientId = ConfigurationManager.AppSettings["MicrosoftAccountClientId"],
-                    ClientSecret = ConfigurationManager.AppSettings["MicrosoftAccountClientSecret"]
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
                 };
 
                 app.UseMicrosoftAccountAuthentication(microsoftOAuthOptions);

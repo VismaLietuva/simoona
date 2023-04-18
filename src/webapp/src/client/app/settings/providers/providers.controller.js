@@ -168,7 +168,7 @@
                 vm.isMicrosoftLinked = res.linked;
                 if (res.email != null){
                     vm.showMicrosoftEmail = true;
-                    vm.showMicrosoftEmail = res.email;
+                    vm.microsoftEmail = res.email;
                 }
             } else {
                 vm.isMicrosoftLinked = false;
