@@ -3,7 +3,7 @@
     <div ng-show="!vm.externalProviders.length" ng-if="!vm.isLoading" class="text-center">
         <h2>{{ vm.noExternalProviders }}</h2>
     </div>
-    
+
     <table ng-show="vm.externalProviders.length" ng-if="!vm.isLoading" class="nc-table nc-table-active">
         <thead>
             <tr>
@@ -66,6 +66,27 @@
                     <span ng-show="vm.isFacebookLinked && !vm.showFacebookEmail" translate="settings.linked"/>
                 </td>
                 <td><a ng-if="vm.isFacebookLinked && vm.unlinkEnabled" data-test-id="facebook-unlink-button" ng-click="vm.providerUnlink('Facebook')" translate="settings.removeProvider"/></td>
+            </tr>
+            <tr ng-show="vm.isMicrosoftProvider">
+                <td class="col-xs-3 word-break"
+                    title="Microsoft"
+                    data-test-id="microsoft-provider"
+                    ng-cloak>
+                    <label>Microsoft</label>
+                    <span ng-show="vm.isMicrosoftLinked && !vm.unlinkEnabled" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'linkedProviderTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-providers-status-tooltip"></span>
+                </td>
+                <td>
+                    <button type="submit"
+                            ng-if="!vm.isMicrosoftLinked"
+                            class="nc-btn nc-btn-default providers-btn"
+                            data-test-id="microsoft-sign-in-button"
+                            ng-click=vm.providerSignIn('Microsoft')>
+                        <span class="vismaicon vismaicon-microsoft"></span><span translate="applicationUser.signInWithMicrosoft"></span>
+                    </button>
+                    <span ng-show="vm.showMicrosoftEmail">{{vm.microsoftEmail}}</span>
+                    <span ng-show="vm.isMicrosoftLinked && !vm.showMicrosoftEmail" translate="settings.linked"/>
+                </td>
+                <td><a ng-if="vm.isMicrosoftLinked && vm.unlinkEnabled" data-test-id="facebook-unlink-button" ng-click="vm.providerUnlink('Microsoft')" translate="settings.removeProvider"/></td>
             </tr>
             <script type="text/ng-template" id="linkedProviderTemplate.html">
 				<p class="col-xs-12"><strong>{{vm.activeProvider}}</strong> <span translate="settings.onlyProvider"></span></p>

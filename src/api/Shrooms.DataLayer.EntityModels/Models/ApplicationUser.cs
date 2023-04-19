@@ -163,6 +163,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public string FacebookEmail { get; set; }
 
+        public string MicrosoftEmail { get; set; }
+
         [NotMapped]
         public int YearsEmployed
         {

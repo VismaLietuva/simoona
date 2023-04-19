@@ -368,6 +368,7 @@ namespace Shrooms.Presentation.Api.Controllers
         // ReSharper disable once InconsistentNaming
         public async Task<IHttpActionResult> GetExternalLogin(string provider, string client_Id = null, string userId = null, bool isRegistration = false, string error = null)
         {
+            
             if (string.IsNullOrEmpty(client_Id) || error != null)
             {
                 var uri = CreateErrorUri("error");
@@ -620,7 +621,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
             var properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
 
-            if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null))
+            if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null) || (externalLogin.LoginProvider == "Microsoft" && user.MicrosoftEmail == null))
             {
                 await _administrationService.AddProviderEmailAsync(user.Id, externalLogin.LoginProvider, externalLogin.Email);
             }

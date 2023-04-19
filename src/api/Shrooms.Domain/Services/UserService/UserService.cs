@@ -359,6 +359,11 @@ namespace Shrooms.Domain.Services.UserService
                 user.FacebookEmail = null;
             }
 
+            if (loginInfo.LoginProvider == "Microsoft")
+            {
+                user.MicrosoftEmail = null;
+            }
+
             await _uow.SaveChangesAsync(id);
         }
 

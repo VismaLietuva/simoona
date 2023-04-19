@@ -7,6 +7,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.MicrosoftAccount;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 using Shrooms.Contracts.Infrastructure;
@@ -72,21 +73,37 @@ namespace Shrooms.Presentation.Api
                 app.UseGoogleAuthentication(googleOAuthOptions);
             }
 
-            if (!HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
+            if (HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
             {
-                return;
+                var facebookOAuthOptions = new FacebookAuthenticationOptions
+                {
+                    Provider = new CustomFacebookAuthProvider(container),
+                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
+                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
+                    Scope = { "public_profile", "email" },
+                    Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
+                };
+
+                app.UseFacebookAuthentication(facebookOAuthOptions);
             }
 
-            var facebookOAuthOptions = new FacebookAuthenticationOptions
+            if (HasProviderSettings("MicrosoftAccountClientId", "MicrosoftAccountClientSecret"))
             {
-                Provider = new CustomFacebookAuthProvider(container),
-                AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
-                AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
-                Scope = { "public_profile", "email" },
-                Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
-            };
+                var authorizationEndpoint = ConfigurationManager.AppSettings["MicrosoftAuthorizationEndpoint"];
+                var tokenEndpoint = ConfigurationManager.AppSettings["MicrosoftTokenEndpoint"];
+                var clientId = ConfigurationManager.AppSettings["MicrosoftAccountClientId"];
+                var clientSecret = ConfigurationManager.AppSettings["MicrosoftAccountClientSecret"];
+                var microsoftOAuthOptions = new MicrosoftAccountAuthenticationOptions
+                {
+                    AuthorizationEndpoint = authorizationEndpoint,
+                    TokenEndpoint = tokenEndpoint,
+                    Provider = new CustomMicrosoftAccountAuthProvider(container),
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
+                };
 
-            app.UseFacebookAuthentication(facebookOAuthOptions);
+                app.UseMicrosoftAccountAuthentication(microsoftOAuthOptions);
+            }
         }
 
         private static bool HasProviderSettings(string idKey, string secretKey)

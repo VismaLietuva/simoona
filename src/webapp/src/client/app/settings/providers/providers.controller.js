@@ -15,11 +15,11 @@
         'errorHandler'
     ];
 
-    function settingsProvidersController($window, authService, notifySrv, settingsRepository, 
+    function settingsProvidersController($window, authService, notifySrv, settingsRepository,
         endPoint, $location, localeSrv, errorHandler) {
 
         var vm = this;
-    
+
         vm.isLoading = true;
         vm.organizationName = authService.getOrganizationNameFromUrl() || '';
         vm.endPoint = endPoint;
@@ -28,14 +28,17 @@
 
         vm.isGoogleLinked = false;
         vm.isFacebookLinked = false;
+        vm.isMicrosoftLinked = false;
         vm.isInternalLinked = false;
         vm.googleEmail = null;
         vm.showGoogleEmail = false;
         vm.facebookEmail = null;
         vm.showFacebookEmail = false;
+        vm.microsoftEmail = null;
+        vm.showMicrosoftEmail = false;
         vm.internalEmail = null;
         vm.showInternalEmail = false;
-    
+
         vm.providerSignIn = providerSignIn;
         vm.providerUnlink = providerUnlink;
 
@@ -43,15 +46,16 @@
 
         vm.isGoogleProvider = false;
         vm.isFacebookProvider = false;
+        vm.isMicrosoftProvider = false;
         vm.isInternalProvider = false;
         vm.activeProvider = null;
 
         vm.noExternalProviders = localeSrv.formatTranslation("applicationUser.noExternalProviders");
 
         init();
-    
+
         ///////
-    
+
         function init() {
             if (vm.internalProviders == null && vm.organizationName){
                 authService.getInternalLogins().then(function(result) {
@@ -74,6 +78,9 @@
                     if (authService.getExternalProvider(vm.externalProviders, 'Facebook')){
                         vm.isFacebookProvider = true;
                     }
+                    if (authService.getExternalProvider(vm.externalProviders, 'Microsoft')){
+                        vm.isMicrosoftProvider = true;
+                    }
                 }, function(error) {
                     errorHandler.handleErrorMessage(error);
                 });
@@ -87,7 +94,7 @@
                 errorHandler.handleErrorMessage(error);
             });
         }
-    
+
         function providerSignIn(providerName) {
             vm.activeProvider = providerName;
             var provider = authService.getExternalProvider(vm.externalProviders, providerName);
@@ -119,12 +126,12 @@
                 notifySrv.success(localeSrv.formatTranslation('settings.providerLinked', {one: providerName}));
                 $location.url($location.path());
             }
-        } 
+        }
 
         function getUserLogins(){
             settingsRepository.getUserLogins().then(function (response) {
                 setLoginsData(response);
-            }, onError); 
+            }, onError);
         }
 
         function setLoginsData(data){
@@ -156,6 +163,19 @@
                 vm.facebookEmail = null;
             }
 
+            res = checkIfLoginExists(vm.logins, 'Microsoft');
+            if (res != null){
+                vm.isMicrosoftLinked = res.linked;
+                if (res.email != null){
+                    vm.showMicrosoftEmail = true;
+                    vm.microsoftEmail = res.email;
+                }
+            } else {
+                vm.isMicrosoftLinked = false;
+                vm.showMicrosoftEmail = false;
+                vm.microsoftEmail = null;
+            }
+
             res = checkIfLoginExists(vm.logins, 'Internal');
             if (res != null){
                 vm.isInternalLinked = res.linked;
@@ -175,8 +195,10 @@
                     vm.activeProvider = "Internal";
                 } else if(vm.isGoogleLinked){
                     vm.activeProvider = 'Google';
-                } else {
+                } else if(vm.isFacebookLinked) {
                     vm.activeProvider = 'Facebook';
+                } else if(vm.isMicrosoftLinked) {
+                    vm.activeProvider = 'Microsoft';
                 }
             }
         }
@@ -189,10 +211,12 @@
             if (vm.isFacebookLinked) {
                 links++;
             }
+            if (vm.isMicrosoftLinked) {
+                links++;
+            }
             if (vm.isInternalLinked) {
                 links++;
             }
-
             var providers = 0;
             if (vm.isGoogleLinked) {
                 providers++;
@@ -200,10 +224,12 @@
             if (vm.isFacebookLinked) {
                 providers++;
             }
+            if(vm.isMicrosoftLinked) {
+                providers++;
+            }
             if (vm.isInternalLinked) {
                 providers++;
             }
-
             return (links > 1) && (providers > 1);
         }
 

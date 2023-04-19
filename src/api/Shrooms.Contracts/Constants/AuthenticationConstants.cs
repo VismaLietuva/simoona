@@ -5,5 +5,6 @@
         public const string InternalLoginProvider = "Internal";
         public const string GoogleLoginProvider = "Google";
         public const string FacebookLoginProvider = "Facebook";
+        public const string MicrosoftLoginProvider = "Microsoft";
     }
 }

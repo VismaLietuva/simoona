@@ -60,6 +60,16 @@
 						<span class="vismaicon vismaicon-facebook"></span><span translate="applicationUser.signInWithFacebook"><span>
 				</button>
 			</div>
+            <div class="col-xs-12" ng-show="vm.isMicrosoft">
+				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+				<button type="submit"
+						ng-if="!vm.isLoading"
+						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
+						data-test-id="microsoft-sign-in-button"
+						ng-click=vm.setProviderName('Microsoft')>
+						<span class="vismaicon vismaicon-microsoft"></span><span translate="applicationUser.signInWithMicrosoft"><span>
+				</button>
+			</div>
 		</form>
     </div>
 

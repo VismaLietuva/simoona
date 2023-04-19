@@ -134,6 +134,7 @@
   "signInTo": "Sign in to",
   "signInWithGoogle": "Sign in with Google",
   "signInWithFacebook": "Sign in with Facebook",
+  "signInWithMicrosoft": "Sign in with Microsoft",
   "continueLogin": "Continue",
   "newEmployeeText": "New employee in {{ one }} and don't have an account?",
   "registerWith": "Register",
