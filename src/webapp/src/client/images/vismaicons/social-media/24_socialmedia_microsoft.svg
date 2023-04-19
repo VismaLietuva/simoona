@@ -1,3 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-microsoft" viewBox="0 0 16 16">
-  <path d="M7.462 0H0v7.19h7.462V0zM16 0H8.538v7.19H16V0zM7.462 8.211H0V16h7.462V8.211zm8.538 0H8.538V16H16V8.211z"/>
+<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="82px" height="24px" viewBox="0 0 82 24">
+  <g>
+    <rect x="0" y="0" width="11" height="11" fill="#f25022"/>
+    <rect x="0" y="13" width="11" height="11" fill="#00a4ef"/>
+    <rect x="13" y="0" width="11" height="11" fill="#7fba00"/>
+    <rect x="13" y="13" width="11" height="11" fill="#ffb900"/>
+  </g>
+
+  <g transform="translate(28, 0)">
+    <rect x="0" y="0" width="11" height="11" fill="#C8C8C8"/>
+    <rect x="0" y="13" width="11" height="11" fill="#C8C8C8"/>
+    <rect x="13" y="0" width="11" height="11" fill="#C8C8C8"/>
+    <rect x="13" y="13" width="11" height="11" fill="#C8C8C8"/>
+  </g>
+
+  <g transform="translate(58, 0)">
+    <rect x="0" y="0" width="11" height="11" fill="#f25022"/>
+    <rect x="0" y="13" width="11" height="11" fill="#00a4ef"/>
+    <rect x="13" y="0" width="11" height="11" fill="#7fba00"/>
+    <rect x="13" y="13" width="11" height="11" fill="#ffb900"/>
+  </g>
 </svg>
