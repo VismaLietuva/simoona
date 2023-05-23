@@ -1,12 +1,32 @@
 ﻿using Autofac;
 using Microsoft.Owin.Security.MicrosoftAccount;
 using Shrooms.Domain.Services.Organizations;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 namespace Shrooms.Presentation.Api.Providers
 {
     public class CustomMicrosoftAccountAuthProvider : MicrosoftAccountAuthenticationProvider
     {
+        private static readonly Dictionary<string, string> _claimsToAdd = new ()
+        {
+            { "givenName", ClaimTypes.GivenName },
+            { "surname", ClaimTypes.Surname }
+        };
         public CustomMicrosoftAccountAuthProvider(ILifetimeScope container)
         {
+            OnAuthenticated = async context =>
+            {
+                foreach (var keyValuePair in context.User)
+                {
+                    if (_claimsToAdd.TryGetValue(keyValuePair.Key, out var value))
+                    {
+                        context.Identity.AddClaim(new Claim(value, keyValuePair.Value.ToString()));
+                    }
+                }
+
+                await Task.CompletedTask;
+            };
             OnApplyRedirect = context =>
             {
                 using var request = container.BeginLifetimeScope("AutofacWebRequest");
