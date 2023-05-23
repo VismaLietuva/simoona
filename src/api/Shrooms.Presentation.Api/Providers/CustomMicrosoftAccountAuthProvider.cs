@@ -19,9 +19,9 @@ namespace Shrooms.Presentation.Api.Providers
             {
                 foreach (var keyValuePair in context.User)
                 {
-                    if (_claimsToAdd.TryGetValue(keyValuePair.Key, out var value))
+                    if (_claimsToAdd.TryGetValue(keyValuePair.Key, out var type))
                     {
-                        context.Identity.AddClaim(new Claim(value, keyValuePair.Value.ToString()));
+                        context.Identity.AddClaim(new Claim(type, keyValuePair.Value.ToString()));
                     }
                 }
 
