@@ -30,11 +30,9 @@
         vm.internalProviders = null;
         vm.isLoggingIn = !!access_token || authService.identity.isAuthenticated;
         $rootScope.pageTitle = 'account.login';
-        vm.isGoogle = false;
-        vm.isFacebook = false;
-        vm.isMicrosoft = false;
         vm.isInternal = false;
         vm.providerName;
+        vm.availableProviders = [];
 
         vm.email = '';
         vm.password = '';
@@ -65,13 +63,13 @@
                 authService.getExternalLogins(getUrl()).then(function(result) {
                     vm.externalProviders = result;
                     if (authService.getExternalProvider(vm.externalProviders, 'Google')){
-                        vm.isGoogle = true;
+                        vm.availableProviders.push({name: 'Google', registerName: 'GoogleRegistration', singInTranslation: 'applicationUser.signInWithGoogle'});
                     }
                     if (authService.getExternalProvider(vm.externalProviders, 'Facebook')){
-                        vm.isFacebook = true;
+                        vm.availableProviders.push({name: 'Facebook', registerName: 'FacebookRegistration', singInTranslation: 'applicationUser.signInWithFacebook'});
                     }
                     if (authService.getExternalProvider(vm.externalProviders, 'Microsoft')){
-                        vm.isMicrosoft = true;
+                        vm.availableProviders.push({name: 'Microsoft', registerName: 'MicrosoftRegistration', singInTranslation: 'applicationUser.signInWithMicrosoft'});
                     }
                 }, function(error) {
                     vm.isLoading = false;
