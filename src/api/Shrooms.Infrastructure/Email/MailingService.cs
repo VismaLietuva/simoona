@@ -105,7 +105,7 @@ namespace Shrooms.Infrastructure.Email
             mailMessage.From = new MailAddress(sender);
             foreach (var receiver in email.Receivers)
             {
-                mailMessage.To.Add(receiver);
+                mailMessage.Bcc.Add(receiver);
             }
 
             if (email.Attachment != null)
