@@ -21,11 +21,11 @@
 
                         <div ng-if="event.startDate != event.registrationDeadlineDate">
                             <span>{{ 'events.eventRegistrationDeadline' | translate }}:</span>
-                            {{ event.registrationDeadlineDate | date:'yyyy-MM-dd, HH:mm' }}
+                            {{ event.registrationDeadlineDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm' }}
                         </div>
                         <div>
                             <span>{{ 'events.eventStartDate' | translate }}:</span>
-                            {{ event.startDate | date:'yyyy-MM-dd, HH:mm' }}
+                            {{ event.startDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm' }}
                         </div>
                     </div>
                 </div>
