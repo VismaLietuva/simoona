@@ -40,36 +40,16 @@
 		</form>
 
 		<form name="login-form" ng-submit="vm.providerSignIn()">
-			<div class="col-xs-12" ng-show="vm.isGoogle" >
-				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
-				<button type="submit"
-						ng-if="!vm.isLoading"
-						class="nc-btn nc-btn-default  auth-btn auth-provider-login-btn"
-						data-test-id="google-sign-in-button"
-						ng-click=vm.setProviderName('Google')>
-					<span class="vismaicon vismaicon-google"></span><span translate="applicationUser.signInWithGoogle"></span>
-				</button>
-			</div>
-			<div class="col-xs-12" ng-show="vm.isFacebook">
-				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+            <div class="col-xs-12" data-ng-repeat="provider in vm.availableProviders">
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
 				<button type="submit"
 						ng-if="!vm.isLoading"
 						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
-						data-test-id="facebook-sign-in-button"
-						ng-click=vm.setProviderName('Facebook')>
-						<span class="vismaicon vismaicon-facebook"></span><span translate="applicationUser.signInWithFacebook"><span>
+						data-test-id="{{provider.name.toLowerCase()+'-sign-in-button'}}"
+						ng-click="{{vm.setProviderName(provider.name)}}">
+					<span class="{{'vismaicon vismaicon-'+ provider.name.toLowerCase()}}"></span><span translate="{{provider.singInTranslation}}"></span>
 				</button>
-			</div>
-            <div class="col-xs-12" ng-show="vm.isMicrosoft">
-				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
-				<button type="submit"
-						ng-if="!vm.isLoading"
-						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
-						data-test-id="microsoft-sign-in-button"
-						ng-click=vm.setProviderName('Microsoft')>
-						<span class="vismaicon vismaicon-microsoft"></span><span translate="applicationUser.signInWithMicrosoft"><span>
-				</button>
-			</div>
+            </div>
 		</form>
     </div>
 
@@ -80,11 +60,12 @@
                 <span>
 					{{ vm.registerWith }}
 					<button ng-show="vm.isInternal" class="auth-link" ng-click="vm.register()">{{ vm.here }}</button>
-					<span ng-show="vm.isInternal && (vm.isGoogle || vm.isFacebook)">{{ vm.or }}</span>
-					<span ng-show="vm.isGoogle || vm.isFacebook">{{ vm.with }}</span>
-					<button ng-show="vm.isGoogle" class="auth-link" ng-click="vm.providerRegister('GoogleRegistration')">Google</button>
-					<span ng-show="vm.isGoogle && vm.isFacebook">{{ vm.or }}</span>
-					<button ng-show="vm.isFacebook" class="auth-link" ng-click="vm.providerRegister('FacebookRegistration')">Facebook</button>
+					<span ng-show="vm.isInternal && vm.availableProviders.length > 0">{{ vm.or }}</span>
+					<span ng-show="vm.availableProviders.length > 0">{{ vm.with }}</span>
+                    <span data-ng-repeat="provider in vm.availableProviders">
+                        <span ng-show="vm.availableProviders[0].name !== provider.name">{{ vm.or }}</span>
+                        <button class="auth-link" ng-click="vm.providerRegister(provider.registerName)">{{ provider.name }}</button>
+                    </span>
 				</span>
 			</div>
 		</div>
