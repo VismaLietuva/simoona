@@ -35,7 +35,8 @@
                         context: function () {
                             return attrs.kudosifyType;
                         }
-                    }
+                    },
+                    backdrop: 'static'
                 });
             });
         }
