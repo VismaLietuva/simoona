@@ -16,7 +16,10 @@
         .component('aceEventsListDateFilter', {
             templateUrl: 'app/events/list/date-filter/list-date-filter.html',
             controller: eventsListDateFilterController,
-            controllerAs: 'vm'
+            controllerAs: 'vm',
+            bindings: {
+                onChange: '&',
+            }
         });
 
     eventsListDateFilterController.$inject = [
@@ -35,7 +38,6 @@
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
         vm.buttonTitle = $translate.instant('events.selectDate');
         vm.isPopoverOpen = false;
-
         vm.getFilteredEvents = getFilteredEvents;
         vm.clearFilter = clearFilter;
         vm.openDatePicker = openDatePicker;
@@ -44,6 +46,9 @@
         vm.isCustomRangeInvalid = isCustomRangeInvalid;
 
         vm.dateRanges = dateRanges;
+
+        vm.startDate = null;
+        vm.endDate = null;
 
         init();
 
@@ -55,6 +60,7 @@
                 endDate: false
             }
             vm.selectedRange = vm.dateRanges.none;
+
         }
 
         function getFilteredEvents() {
@@ -66,25 +72,21 @@
 
             var options = getSelectedOptions();
 
-            $state.go('Root.WithOrg.Client.Events.List.Type', {
-                type: $stateParams.type,
-                office: $stateParams.office,
-                startDate: options.startDate,
-                endDate: options.endDate
-            });
+            vm.startDate = options.startDate;
+            vm.endDate = options.endDate;
+
+            vm.onChange({startDate: vm.startDate, endDate: vm.endDate});
 
             vm.buttonTitle = options.title;
             vm.isPopoverOpen = false;
         }
 
         function clearFilter() {
-            if ($stateParams.endDate || $stateParams.endDate) {
-                $state.go('Root.WithOrg.Client.Events.List.Type', {
-                    type: $stateParams.type,
-                    office: $stateParams.office,
-                    startDate: null,
-                    endDate: null
-                });
+            if (vm.startDate || vm.endDate) {
+                vm.startDate = null;
+                vm.endDate = null;
+
+                vm.onChange({startDate: null, endDate: null});
 
                 vm.buttonTitle = $translate.instant('events.selectDate');
                 vm.selectedRange = vm.dateRanges.none;
@@ -113,8 +115,8 @@
                     options.title = $translate.instant('events.pastThreeMonths');
                     break;
                 case vm.dateRanges.custom:
-                    var startDate = vm.dateFilterStart;
-                    var endDate = vm.dateFilterEnd;
+                    let startDate = vm.dateFilterStart;
+                    let endDate = vm.dateFilterEnd;
                     if (startDate && endDate && startDate.getTime() === endDate.getTime()) {
                         // To get range from 0:00 to 23:59
                         endDate = new Date(endDate.setDate(endDate.getDate() + 1));
@@ -131,7 +133,7 @@
         }
 
         function isDateFilterSelected() {
-            return $stateParams.startDate && $stateParams.endDate;
+            return vm.startDate && vm.endDate;
         }
 
         function isDateFilterDisabled() {

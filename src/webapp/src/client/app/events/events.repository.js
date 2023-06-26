@@ -232,13 +232,16 @@
             }).$promise;
         }
 
-        function getEventsByTitle(searchString, page, typeIds, officeIds, sortByProperties) {
+        function getEventsByTitle(searchString, page, typeIds, officeIds, sortByProperties, startdate, endDate, excludeEmptyEvents) {
             return $resource(`${eventUrl}GetEventsByTitle`).get({
                 searchString: searchString,
                 eventTypeIds: typeIds,
                 page: page,
                 officeTypeIds: officeIds,
-                sortByProperties: sortByProperties
+                sortByProperties: sortByProperties,
+                startDate: startdate,
+                endDate: endDate,
+                excludeEmptyEvents: excludeEmptyEvents
             }).$promise;
         }
 

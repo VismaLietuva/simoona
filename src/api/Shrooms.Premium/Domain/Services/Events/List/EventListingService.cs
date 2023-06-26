@@ -99,15 +99,27 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var typeIdsLength = reportArgsDto.EventTypeIds.Count();
             var officeIdsLength = reportArgsDto.OfficeTypeIds.Count();
 
-            var events = await _eventsDbSet
+            var query = _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.EventType)
-                .Where(FilterBySearchArguments(reportArgsDto, userAndOrganization, typeIdsLength, officeIdsLength))
-                .Where(e => e.StartDate > DateTime.UtcNow)
+                .Include(e => e.ResponsibleUser)
+                .Where(FilterBySearchArguments(reportArgsDto, userAndOrganization, typeIdsLength, officeIdsLength));
+
+            if (reportArgsDto.StartDate is null || reportArgsDto.EndDate is null)
+            {
+                query = query.Where(e => e.StartDate > DateTime.UtcNow);
+            }
+            else
+            {
+                _eventValidationService.CheckIfDateRangeExceededLimitOrNull(reportArgsDto.StartDate, reportArgsDto.EndDate);
+                query = query.Where(FilterByDateInterval(reportArgsDto));
+            }
+
+            var events = await query
                 .OrderByPropertyNames(reportArgsDto)
                 .Select(MapEventToReportListEvent())
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
-            
+
             SetOfficeValuesForEventReportItems(allOffices, officesCount, events);
 
             return events;
@@ -372,13 +384,15 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 MaxVirtualParticipants = e.MaxVirtualParticipants,
                 GoingCount = e.EventParticipants.Count(participant => participant.AttendStatus == (int)AttendingStatus.Attending),
                 VirtuallyGoingCount = e.EventParticipants.Count(participant => participant.AttendStatus == (int)AttendingStatus.AttendingVirtually),
-                Offices = e.Offices
+                Offices = e.Offices,
+                ResponsiblePerson = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName
             };
         }
 
         private static Expression<Func<Event, bool>> FilterBySearchArguments(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization, int typeIdsLength, int officeIdsLength)
         {
-            return e => (e.OrganizationId == userAndOrganization.OrganizationId) &&
+            return e => (!reportArgsDto.ExcludeEmptyEvents || e.EventParticipants.Any()) &&
+                (e.OrganizationId == userAndOrganization.OrganizationId) &&
                         (reportArgsDto.SearchString == null || e.Name.Contains(reportArgsDto.SearchString)) &&
                         (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
                         (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c)));

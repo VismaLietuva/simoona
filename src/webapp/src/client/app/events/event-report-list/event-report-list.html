@@ -18,7 +18,7 @@
             <div class="panel-body">
                 <!-- Search bar -->
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <div class="flex form-group search-group search-group-lg padding-bot-10">
                             <input type="text" class="form-control event-search-bar"
                                 ng-model-options="{ debounce: 350 }" ng-change="vm.loadEventsOnPage(1)"
@@ -27,18 +27,34 @@
                     </div>
 
                     <!-- Filters -->
-                    <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3"
+                    <ace-dropdown-checkbox is-expanded="false" class="col-md-3 mt-3"
                         translation="events.eventTypesDropdownButtonTitle" types="vm.filter.filterTypes.events.filters"
                         on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'events')"
                         applied-types="vm.filter.dropdown.events">
                     </ace-dropdown-checkbox>
 
-                    <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3 mb-10"
+                    <ace-dropdown-checkbox is-expanded="false" class="col-md-3 mt-3 mb-10"
                         translation="events.eventOfficesDropdownButtonTitle"
                         types="vm.filter.filterTypes.offices.filters"
                         on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'offices')"
                         applied-types="vm.filter.dropdown.offices">
                     </ace-dropdown-checkbox>
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <ace-events-list-date-filter  on-change="vm.onDateFilterChange(startDate, endDate)"></ace-events-list-date-filter>
+                    </div>
+
+                    <div class="col-md-3 event-search-checkbox">
+                        <div class="checkbox">
+                            <label class="control-label">
+                                <input name="excludeEmptyEvents" ng-model="vm.excludeEmptyEvents" ng-change="vm.loadEventsOnPage(1)"  id="excludeEmptyEvents" type="checkbox"> {{"events.excludeEmptyEvents" | translate}}
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <wave-spinner ng-if="vm.isLoading.filters && !vm.isLoading.events"></wave-spinner>
@@ -53,33 +69,39 @@
                                     <span translate="events.tableTitle"></span>
                                 </ace-sort-multiple-link>
                             </th>
-                            <th class="hidden-xs hidden-sm">
-                                <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[1]"
-                                    sort-field="vm.filter.sortValues.sortBy[1]" position="1" sort-value="startDate">
-                                    <span translate="events.tableStartDate"></span>
-                                </ace-sort-multiple-link>
-                            </th>
-                            <th class="hidden-xs hidden-sm">
+                            <th>
                                 <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[2]"
-                                    sort-field="vm.filter.sortValues.sortBy[2]" position="2" sort-value="endDate">
-                                    <span translate="events.tableEndDate"></span>
+                                    sort-field="vm.filter.sortValues.sortBy[1]" position="1" sort-value="name">
+                                    <span translate="events.responsiblePerson"></span>
                                 </ace-sort-multiple-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
                                 <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[3]"
-                                    sort-field="vm.filter.sortValues.sortBy[3]" position="3" sort-value="eventType.name">
-                                    <span translate="events.tableType"></span>
+                                    sort-field="vm.filter.sortValues.sortBy[2]" position="2" sort-value="startDate">
+                                    <span translate="events.tableStartDate"></span>
                                 </ace-sort-multiple-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
                                 <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[4]"
-                                    sort-field="vm.filter.sortValues.sortBy[4]" position="4" sort-value="offices">
+                                    sort-field="vm.filter.sortValues.sortBy[3]" position="3" sort-value="endDate">
+                                    <span translate="events.tableEndDate"></span>
+                                </ace-sort-multiple-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[5]"
+                                    sort-field="vm.filter.sortValues.sortBy[4]" position="4" sort-value="eventType.name">
+                                    <span translate="events.tableType"></span>
+                                </ace-sort-multiple-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[6]"
+                                    sort-field="vm.filter.sortValues.sortBy[5]" position="5" sort-value="offices">
                                     <span translate="events.tableOffices"></span>
                                 </ace-sort-multiple-link>
                             </th>
                             <th>
-                                <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[5]"
-                                    sort-field="vm.filter.sortValues.sortBy[5]" position="5" sort-value="eventParticipants.Count">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortValues.sortOrders[7]"
+                                    sort-field="vm.filter.sortValues.sortBy[6]" position="6" sort-value="eventParticipants.Count">
                                     <span translate="events.tableParticipants"></span>
                                 </ace-sort-multiple-link>
                             </th>
@@ -90,6 +112,9 @@
                             ng-click="vm.viewDetails(event.id)">
                             <td class="col-xs-3 word-break" ng-cloak>
                                 {{event.name}}
+                            </td>
+                            <td class="col-xs-2 word-break" ng-cloak>
+                                {{event.responsiblePerson}}
                             </td>
                             <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
                                 {{event.startDate | amUtc | amLocal |
