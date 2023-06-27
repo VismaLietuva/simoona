@@ -20,6 +20,7 @@
         });
 
     eventsListTabsController.$inject = [
+        '$state',
         '$stateParams',
         '$translate',
         '$timeout',
@@ -29,15 +30,16 @@
         'eventOfficeFactory'
     ];
 
-    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
+    function eventsListTabsController($state, $stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
         /* jshint validthis: true */
         var vm = this;
         vm.eventsTabs = [];
         vm.isLoading = true;
-        
+
         vm.stateParams = $stateParams;
+        vm.onDateChange = onDateChange;
         eventOfficeFactory.getOffices = eventOfficeFactory.getOffices;
-        
+
         init();
 
         ///////////
@@ -82,6 +84,15 @@
             }
 
             vm.isLoading = false;
+        }
+
+        function onDateChange(startDate, endDate) {
+            $state.go('Root.WithOrg.Client.Events.List.Type', {
+                type: $stateParams.type,
+                office: $stateParams.office,
+                startDate: startDate,
+                endDate: endDate
+            });
         }
     }
 })();

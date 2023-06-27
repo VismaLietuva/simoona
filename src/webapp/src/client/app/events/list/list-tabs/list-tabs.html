@@ -16,5 +16,5 @@
     </label>
 </div>
 <div>
-    <ace-events-list-date-filter ng-if="!vm.isLoading"></ace-events-list-date-filter>
+    <ace-events-list-date-filter on-change="vm.onDateChange(startDate, endDate)" ng-if="!vm.isLoading"></ace-events-list-date-filter>
 </div>

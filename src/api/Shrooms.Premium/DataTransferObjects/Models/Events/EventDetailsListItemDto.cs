@@ -35,5 +35,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
             get => Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices);
             set => Offices = JsonConvert.SerializeObject(value);
         }
+
+        public string ResponsiblePerson { get; set; }
     }
 }
