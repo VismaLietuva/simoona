@@ -116,8 +116,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             var events = await query
-                .OrderByPropertyNames(reportArgsDto)
                 .Select(MapEventToReportListEvent())
+                .OrderByPropertyNames(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
 
             SetOfficeValuesForEventReportItems(allOffices, officesCount, events);
