@@ -43,6 +43,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
+        private readonly IApplicationSettings _settings;
 
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != KudosTypeEnum.Send &&
                                                                                      x.Type != KudosTypeEnum.Minus &&
@@ -59,7 +60,8 @@ namespace Shrooms.Domain.Services.Kudos
             IPermissionService permissionService,
             IKudosServiceValidator kudosServiceValidator,
             IAsyncRunner asyncRunner,
-            IFilterPresetService filterPresetService)
+            IFilterPresetService filterPresetService,
+            IApplicationSettings settings)
         {
             _uow = uow;
             _mapper = mapper;
@@ -67,6 +69,7 @@ namespace Shrooms.Domain.Services.Kudos
             _kudosServiceValidator = kudosServiceValidator;
             _asyncRunner = asyncRunner;
             _filterPresetService = filterPresetService;
+            _settings = settings;
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -452,7 +455,6 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             var now = DateTime.UtcNow;
-            decimal available = 0;
 
             var currentMonthLogs = await _kudosLogRepository
                 .Get(l => l.CreatedBy == id &&
@@ -463,15 +465,11 @@ namespace Shrooms.Domain.Services.Kudos
 
             var sentThisMonth = currentMonthLogs.Sum(log => log.Points);
             var remaining = (await _applicationUserRepository.GetByIdAsync(id)).RemainingKudos;
+            var maxAvailableToSend = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
 
-            if (sentThisMonth < BusinessLayerConstants.KudosAvailableToSendThisMonth)
-            {
-                available = BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth < remaining
-                    ? BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth
-                    : remaining;
-            }
+            var availableToSendThisMonth = Math.Max(0, Math.Min(remaining, maxAvailableToSend - sentThisMonth));
 
-            return new[] { sentThisMonth, available < 0 ? 0 : available };
+            return new[] { sentThisMonth, availableToSendThisMonth };
         }
 
         public async Task AddKudosLogAsync(AddKudosLogDto kudosDto, decimal? points = null)
@@ -854,7 +852,8 @@ namespace Shrooms.Domain.Services.Kudos
 
             currentMonthSum += kudos.TotalPointsSent;
 
-            _kudosServiceValidator.ValidateUserAvailableKudosToSendPerMonth(totalKudosPointsInLog, BusinessLayerConstants.KudosAvailableToSendThisMonth - currentMonthSum);
+            int availableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
+            _kudosServiceValidator.ValidateUserAvailableKudosToSendPerMonth(totalKudosPointsInLog, availableToSendPerMonth - currentMonthSum);
         }
 
         private void InsertKudosLog(AddKudosDto kudos, KudosStatus status)

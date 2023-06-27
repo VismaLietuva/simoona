@@ -16,6 +16,10 @@ namespace Shrooms.Infrastructure.Configuration
 
         public int AccessTokenLifeTimeInHours => int.Parse(ConfigurationManager.AppSettings["AccessTokenLifeTimeInHours"]);
 
+        public int? KudosAvailableToSendPerMonth => ConfigurationManager.AppSettings["KudosAvailableToSendPerMonth"] is { } kudosPerMonth
+            ? int.Parse(kudosPerMonth)
+            : null;
+
         public bool IsProductionBuild => bool.TryParse(ConfigurationManager.AppSettings["IsProductionBuild"], out var result) && result;
 
         public IEnumerable<string> OAuthRedirectUris => ConfigurationManager.AppSettings["OAuthRedirectUri"].Split(',');
