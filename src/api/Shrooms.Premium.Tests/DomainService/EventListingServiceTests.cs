@@ -85,7 +85,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
-                UserId = "responsibleUserId2"
+                UserId = "responsibleUserId4"
             };
 
             var myEventsOptions = new MyEventsOptionsDto
@@ -1544,7 +1544,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(4),
                     Created = DateTime.UtcNow,
                     EventTypeId = 1,
-                    ResponsibleUserId = "responsibleUserId",
+                    ResponsibleUserId = "responsibleUserId1",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId1",
+                        FirstName = "Responsible1",
+                        LastName = "User1"
+                    },
                     ImageName = "imageUrl",
                     Name = "Drinking event",
                     Place = "City",
@@ -1566,7 +1572,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(2),
                     Created = DateTime.UtcNow,
                     EventTypeId = 2,
-                    ResponsibleUserId = "responsibleUserId",
+                    ResponsibleUserId = "responsibleUserId2",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId2",
+                        FirstName = "Responsible2",
+                        LastName = "User2"
+                    },
                     ImageName = "imageUrl",
                     Name = "Drinking event",
                     Place = "City",
@@ -1588,7 +1600,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(3),
                     Created = DateTime.UtcNow,
                     EventTypeId = 3,
-                    ResponsibleUserId = "responsibleUserId",
+                    ResponsibleUserId = "responsibleUserId3",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId3",
+                        FirstName = "Responsible3",
+                        LastName = "User3"
+                    },
                     ImageName = "imageUrl",
                     Name = "Some event",
                     Place = "Some place",
@@ -1610,7 +1628,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(-3),
                     Created = DateTime.UtcNow,
                     EventTypeId = 3,
-                    ResponsibleUserId = "responsibleUserId2",
+                    ResponsibleUserId = "responsibleUserId4",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId4",
+                        FirstName = "Responsible4",
+                        LastName = "User4"
+                    },
                     ImageName = "imageUrl",
                     Name = "Some event",
                     Place = "Some place",
@@ -1632,7 +1656,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(21),
                     Created = DateTime.UtcNow,
                     EventTypeId = 3,
-                    ResponsibleUserId = "responsibleUserId3",
+                    ResponsibleUserId = "responsibleUserId5",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId5",
+                        FirstName = "Responsible5",
+                        LastName = "User5"
+                    },
                     ImageName = "imageUrl",
                     Name = "Cool event",
                     Place = "Cool place",
@@ -1654,7 +1684,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     EndDate = DateTime.UtcNow.AddDays(21),
                     Created = DateTime.UtcNow,
                     EventTypeId = 3,
-                    ResponsibleUserId = "responsibleUserId3",
+                    ResponsibleUserId = "responsibleUserId6",
+                    ResponsibleUser = new ApplicationUser
+                    {
+                        Id = "responsibleUserId6",
+                        FirstName = "Responsible6",
+                        LastName = "User6"
+                    },
                     ImageName = "imageUrl",
                     Name = "Cool event",
                     Place = "Cool place",

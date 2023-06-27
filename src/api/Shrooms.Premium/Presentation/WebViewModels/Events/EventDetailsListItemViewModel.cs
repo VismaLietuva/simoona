@@ -26,5 +26,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+        public string ResponsiblePerson { get; set; }
     }
 }

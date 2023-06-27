@@ -41,12 +41,15 @@
         );
 
         vm.page = 1;
+        vm.startDate = null;
+        vm.endDate = null;
 
         vm.loadEventsOnPage = loadEventsOnPage;
         vm.viewDetails = viewDetails;
         vm.loadEventsWithNewlyAppliedFilter = loadEventsWithNewlyAppliedFilter;
         vm.applyFilterPreset = applyFilterPreset;
         vm.sortByColumn = sortByColumn;
+        vm.onDateFilterChange = onDateFilterChange;
 
         init();
 
@@ -73,14 +76,16 @@
 
         function loadEvents() {
             vm.isLoading.events = true;
-
             eventRepository
                 .getEventsByTitle(
                     vm.filterText || '',
                     vm.page,
                     vm.filter.appliedFilters.events,
                     vm.filter.appliedFilters.offices,
-                    vm.filter.getSortString()
+                    vm.filter.getSortString(),
+                    vm.startDate,
+                    vm.endDate,
+                    vm.excludeEmptyEvents
                 )
                 .then(
                     function (result) {
@@ -122,6 +127,13 @@
             });
         }
 
+        function onDateFilterChange(startDate, endDate){
+            vm.startDate = startDate;
+            vm.endDate = endDate;
+
+            loadEventsOnPage(1);
+        }
+
         function sortByColumn(sortBy, sortOrder, position) {
             onCompleteLoadFirstPage(function () {
                 vm.filter.setSortValues(sortBy, sortOrder, position);
@@ -135,7 +147,6 @@
 
         function loadEventsOnPage(page) {
             vm.page = page;
-
             loadEvents();
         }
     }

@@ -244,5 +244,6 @@
   "noUpcomingEvents": "There are no upcoming events...",
   "upcomingEvents": "Upcoming events",
   "displayInUpcomingEvents": "Display in the upcoming events widget",
-  "notifyUsers": "Notify users about the new event"
+  "notifyUsers": "Notify users about the new event",
+  "excludeEmptyEvents": "Exclude empty events"
 }
