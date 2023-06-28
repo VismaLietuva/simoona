@@ -5,7 +5,6 @@ using System.Data.Entity.Infrastructure;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
@@ -42,12 +41,15 @@ namespace Shrooms.Tests.DomainService
         private IFilterPresetService _filterPresetService;
         private IUnitOfWork2 _uow;
         private IMapper _mapper;
+        private IApplicationSettings _settings;
 
         [SetUp]
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
             _mapper = ModelMapper.Create();
+            _settings = Substitute.For<IApplicationSettings>();
+            _settings.KudosAvailableToSendPerMonth.Returns((int?)50);
 
             _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
             _kudosLogsDbSet.SetDbSetDataForAsync(MockKudosLogs());
@@ -86,7 +88,8 @@ namespace Shrooms.Tests.DomainService
                 permissionService,
                 kudosServiceValidation,
                 asyncRunner,
-                _filterPresetService);
+                _filterPresetService,
+                _settings);
         }
 
         #region GetKudosLogs
@@ -794,6 +797,7 @@ namespace Shrooms.Tests.DomainService
 
         private IQueryable<KudosLog> MockKudosLogs()
         {
+            int kudosAvailableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
             var kudosLogs = new List<KudosLog>
             {
                 new KudosLog
@@ -861,9 +865,9 @@ namespace Shrooms.Tests.DomainService
                     },
                     OrganizationId = 2,
                     CreatedBy = "testUserId5",
-                    MultiplyBy = BusinessLayerConstants.KudosAvailableToSendThisMonth - 2,
+                    MultiplyBy = kudosAvailableToSendPerMonth - 2,
                     Created = DateTime.UtcNow,
-                    Points = BusinessLayerConstants.KudosAvailableToSendThisMonth - 2,
+                    Points = kudosAvailableToSendPerMonth - 2,
                     Comments = "Hello"
                 }
             };
