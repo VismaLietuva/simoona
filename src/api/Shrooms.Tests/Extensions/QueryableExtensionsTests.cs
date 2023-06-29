@@ -2,14 +2,12 @@
 using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
 using System.Data.Entity;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Dynamic;
 using Shrooms.Infrastructure.Sorting;
 
 namespace Shrooms.Tests.Extensions
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
     public class QueryableExtensionsTests
     {
         private DbSet<MockModel> _mockDbSet;

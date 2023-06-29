@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Shrooms.Contracts.Enums;
-using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 {

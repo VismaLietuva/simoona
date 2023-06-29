@@ -28,7 +28,6 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
-using X.PagedList;
 using Shrooms.Domain.Extensions;
 using WebApi.OutputCache.V2;
 using Shrooms.Presentation.Api.Controllers.Wall;
@@ -409,7 +408,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 var visitedArgsDto = _mapper.Map<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>(visitedArgsViewModel);
                 var pagedVisitedEventsDto = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(visitedArgsDto, GetUserAndOrganization());
                 var visitedEventsViewModels = _mapper.Map<IEnumerable<EventVisitedReportDto>, IEnumerable<EventVisitedReportViewModel>>(pagedVisitedEventsDto);
-                
+
                 return Ok(pagedVisitedEventsDto.ToPagedViewModel(visitedEventsViewModels, visitedArgsDto));
             }
             catch (EventException e)

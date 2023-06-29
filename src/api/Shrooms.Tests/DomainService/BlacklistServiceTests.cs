@@ -6,7 +6,6 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 using System;
 using System.Threading.Tasks;
 using Shrooms.Tests.Extensions;
@@ -17,6 +16,7 @@ using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Contracts.Constants;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -102,7 +102,7 @@ namespace Shrooms.Tests.DomainService
         public void CancelAsync_BlacklistEntryDoesNotExists_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var blacklistEntryToDelete = new BlacklistUser
             {
                 UserId = userId,
@@ -119,7 +119,7 @@ namespace Shrooms.Tests.DomainService
             _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistEntryToDelete });
             _validator
                 .When(validator => validator.CheckIfBlacklistUserExists(Arg.Any<BlacklistUser>()))
-                .Do(validator => { throw new ValidationException(0); });
+                .Do(_ => throw new ValidationException(0));
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () => await _blacklistService.CancelAsync(userId, userOrg));
@@ -129,7 +129,7 @@ namespace Shrooms.Tests.DomainService
         public void CancelAsync_WhenAllBlacklistEntriesAreExpired_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var blacklistEntryToDelete = new BlacklistUser
             {
                 UserId = userId,
@@ -147,7 +147,7 @@ namespace Shrooms.Tests.DomainService
             _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistEntryToDelete });
             _validator
                 .When(validator => validator.CheckIfBlacklistUserExists(Arg.Is((BlacklistUser)null)))
-                .Do(validator => { throw new ValidationException(0); });
+                .Do(_ => throw new ValidationException(0));
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () => await _blacklistService.CancelAsync(userId, userOrg));
@@ -157,7 +157,7 @@ namespace Shrooms.Tests.DomainService
         public async Task CancelAsync_WithValidValues_CancelsBlacklistEntry()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var blacklistEntryToCancel = new BlacklistUser
             {
                 UserId = userId,
@@ -185,7 +185,7 @@ namespace Shrooms.Tests.DomainService
         public async Task GetAsync_WhenMoreThanOneBlacklistUserEntryIsPresent_FindsActiveBlacklistEntry()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1
@@ -197,25 +197,21 @@ namespace Shrooms.Tests.DomainService
                 EndDate = DateTime.UtcNow.AddDays(10),
                 OrganizationId = 1,
                 Status = BlacklistStatus.Active,
-                CreatedByUser = new ApplicationUser
-                {
-                },
-                ModifiedByUser = new ApplicationUser
-                {
-                }
+                CreatedByUser = new ApplicationUser(),
+                ModifiedByUser = new ApplicationUser()
             };
 
             var blacklistUsers = new List<BlacklistUser>
             {
                 shouldFindThis,
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = "Id2",
                     EndDate = DateTime.UtcNow.AddYears(20),
@@ -237,7 +233,7 @@ namespace Shrooms.Tests.DomainService
         public async Task GetAsync_WhenAllBlacklistEntriesAreExpired_ReturnsNull()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1
@@ -254,14 +250,14 @@ namespace Shrooms.Tests.DomainService
             var blacklistUsers = new List<BlacklistUser>
             {
                 shouldFindThis,
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = "Id2",
                     EndDate = DateTime.UtcNow.AddYears(20),
@@ -283,13 +279,13 @@ namespace Shrooms.Tests.DomainService
         public void UpdateAsync_WhenAllBlacklistEntriesAreExpired_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var updateDto = new UpdateBlacklistUserDto
             {
                 UserId = userId,
                 Reason = "Reason",
-                EndDate = DateTime.UtcNow.AddYears(10),
+                EndDate = DateTime.UtcNow.AddYears(10)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -299,21 +295,21 @@ namespace Shrooms.Tests.DomainService
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = "Id2",
                     EndDate = DateTime.UtcNow.AddYears(20),
@@ -324,7 +320,7 @@ namespace Shrooms.Tests.DomainService
 
             _validator
                .When(validator => validator.CheckIfBlacklistUserExists(Arg.Is((BlacklistUser)null)))
-               .Do(validator => { throw new ValidationException(0); });
+               .Do(_ => throw new ValidationException(0));
 
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
@@ -336,13 +332,13 @@ namespace Shrooms.Tests.DomainService
         public void UpdateAsync_WhenBlacklistEntryIsNotFound_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var updateDto = new UpdateBlacklistUserDto
             {
                 UserId = userId,
                 Reason = "Reason",
-                EndDate = DateTime.UtcNow.AddYears(10),
+                EndDate = DateTime.UtcNow.AddYears(10)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -350,13 +346,12 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 1
             };
 
-            var blacklistUsers = new List<BlacklistUser>
-            {
-            };
+            // ReSharper disable once CollectionNeverUpdated.Local
+            var blacklistUsers = new List<BlacklistUser>();
 
             _validator
                .When(validator => validator.CheckIfBlacklistUserExists(Arg.Is((BlacklistUser)null)))
-               .Do(validator => { throw new ValidationException(0); });
+               .Do(_ => throw new ValidationException(0));
 
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
@@ -368,13 +363,13 @@ namespace Shrooms.Tests.DomainService
         public async Task UpdateAsync_WithValidValues_UpdatesBlacklistEntry()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var updateDto = new UpdateBlacklistUserDto
             {
                 UserId = userId,
                 Reason = "Reason",
-                EndDate = DateTime.UtcNow.AddYears(10),
+                EndDate = DateTime.UtcNow.AddYears(10)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -393,14 +388,14 @@ namespace Shrooms.Tests.DomainService
             var blacklistUsers = new List<BlacklistUser>
             {
                 updatedBlacklistEntry,
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = "Id2",
                     EndDate = DateTime.UtcNow.AddYears(20),
@@ -436,13 +431,13 @@ namespace Shrooms.Tests.DomainService
             var blacklistUsers = new List<BlacklistUser>
             {
                 foundEntry,
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddYears(20),
                     OrganizationId = 1,
@@ -450,7 +445,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            // Act 
+            // Act
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
@@ -475,13 +470,13 @@ namespace Shrooms.Tests.DomainService
             var blacklistUsers = new List<BlacklistUser>
             {
                 foundEntry,
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddYears(20),
                     OrganizationId = 1,
@@ -489,7 +484,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            // Act 
+            // Act
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
@@ -502,7 +497,7 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var blacklistUsers = new List<BlacklistUser>();
 
-            // Act 
+            // Act
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
@@ -515,7 +510,7 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var blacklistUsers = new List<BlacklistUser>();
 
-            // Act 
+            // Act
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
@@ -528,19 +523,19 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-20),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Canceled
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddYears(-20),
                     OrganizationId = 1,
@@ -548,7 +543,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            // Act 
+            // Act
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
@@ -561,19 +556,19 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-20),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Canceled
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-10),
                     OrganizationId = 1,
                     Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddYears(-20),
                     OrganizationId = 1,
@@ -581,7 +576,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            // Act 
+            // Act
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
@@ -592,7 +587,7 @@ namespace Shrooms.Tests.DomainService
         public async Task GetAllExceptActiveAsync_ValidValues_DoesNotReturnActiveBlacklistEntries()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var userOrg = new UserAndOrganizationDto
             {
@@ -601,7 +596,7 @@ namespace Shrooms.Tests.DomainService
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(10),
@@ -610,7 +605,7 @@ namespace Shrooms.Tests.DomainService
                     ModifiedByUser = new ApplicationUser(),
                     CreatedByUser = new ApplicationUser()
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddDays(-10),
@@ -619,7 +614,7 @@ namespace Shrooms.Tests.DomainService
                     ModifiedByUser = new ApplicationUser(),
                     CreatedByUser = new ApplicationUser()
                 },
-                new BlacklistUser
+                new()
                 {
                     UserId = "Id2",
                     EndDate = DateTime.UtcNow.AddYears(20),
@@ -647,7 +642,7 @@ namespace Shrooms.Tests.DomainService
         public void GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionButRequestUserAndUserIdMatches_DoesNotThrow()
         {
             // Arrange
-            var userId = "Same id";
+            const string userId = "Same id";
 
             var userOrg = new UserAndOrganizationDto
             {
@@ -666,7 +661,7 @@ namespace Shrooms.Tests.DomainService
         public void GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionButRequestUserAndUserIdDoesNotMatch_DoesNotThrow()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var userOrg = new UserAndOrganizationDto
             {
@@ -685,7 +680,7 @@ namespace Shrooms.Tests.DomainService
         public void GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionAndRequestUserAndUserIdMatches_DoesNotThrow()
         {
             // Arrange
-            var userId = "Same id";
+            const string userId = "Same id";
 
             var userOrg = new UserAndOrganizationDto
             {
@@ -704,7 +699,7 @@ namespace Shrooms.Tests.DomainService
         public void GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionAndRequestUserAndUserIdDoesNotMatch_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
             var userOrg = new UserAndOrganizationDto
             {

@@ -12,7 +12,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers
     {
         private readonly ISystemClock _systemClock;
         private readonly IUnitOfWork2 _uow;
-        
+
         private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
 
         public BlacklistUserStatusChangeWebHookService(IUnitOfWork2 uow, ISystemClock systemClock)

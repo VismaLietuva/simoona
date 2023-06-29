@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -9,7 +8,6 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -68,55 +66,55 @@ namespace Shrooms.Domain.Services.Kudos
         {
             return log => new ExcelRow
             {
-                new ExcelColumn 
-                { 
-                    Value = log.Sender.FullName 
+                new ExcelColumn
+                {
+                    Value = log.Sender.FullName
                 },
 
-                new ExcelColumn 
-                { 
-                    Value = log.Receiver.FullName 
+                new ExcelColumn
+                {
+                    Value = log.Receiver.FullName
                 },
-                
-                new ExcelColumn 
-                { 
-                    Value = log.Type.Name 
+
+                new ExcelColumn
+                {
+                    Value = log.Type.Name
                 },
-                
-                new ExcelColumn 
+
+                new ExcelColumn
                 {
                     Value = log.Multiplier, Format = ExcelWorksheetBuilderConstants.DecimalFormat
                 },
 
-                new ExcelColumn 
+                new ExcelColumn
                 {
-                    Value = log.Points, Format = ExcelWorksheetBuilderConstants.DecimalFormat 
+                    Value = log.Points, Format = ExcelWorksheetBuilderConstants.DecimalFormat
                 },
-                
-                new ExcelColumn 
+
+                new ExcelColumn
                 {
-                    Value = log.Created, Format = ExcelWorksheetBuilderConstants.DateFormat 
+                    Value = log.Created, Format = ExcelWorksheetBuilderConstants.DateFormat
                 },
-                
-                new ExcelColumn 
-                { 
-                    Value = log.Comment 
-                },
-                
-                new ExcelColumn 
+
+                new ExcelColumn
                 {
-                    Value = log.Status 
+                    Value = log.Comment
                 },
-                
-                new ExcelColumn 
-                { 
-                    Value = log.Type.Value 
-                },
-                
-                new ExcelColumn 
+
+                new ExcelColumn
                 {
-                    Value = log.RejectionMessage 
+                    Value = log.Status
                 },
+
+                new ExcelColumn
+                {
+                    Value = log.Type.Value
+                },
+
+                new ExcelColumn
+                {
+                    Value = log.RejectionMessage
+                }
             };
         }
     }

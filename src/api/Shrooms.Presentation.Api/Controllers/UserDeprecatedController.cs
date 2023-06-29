@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Script.Serialization;
@@ -319,8 +318,8 @@ namespace Shrooms.Presentation.Api.Controllers
         private async Task InfoWithAdditionalPermissionsAsync(ApplicationUser user, ApplicationUserDetailsViewModel model)
         {
             var userOrg = GetUserAndOrganization();
-            var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
-            
+            var permissions = (await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId)).ToList();
+
             var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
             var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
 

@@ -118,7 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 await _postService.EditPostAsync(editPostDto);
-                
+
                 _asyncRunner.Run<PostNotifier>(async notifier =>
                     await notifier.NotifyUpdatedPostMentionsAsync(editPostDto), GetOrganizationName());
 

@@ -87,7 +87,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             await _uow.SaveChangesAsync(false);
 
             var srqDto = new CreatedServiceRequestDto { ServiceRequestId = serviceRequest.Id };
-            
+
             _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutNewServiceRequestAsync(srqDto), _uow.ConnectionName);
         }
 

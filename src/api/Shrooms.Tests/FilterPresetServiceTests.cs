@@ -50,7 +50,7 @@ namespace Shrooms.Tests
             // Arrange
             var mockData = new List<FilterPreset>
             {
-                new FilterPreset
+                new()
                 {
                     Id = 1,
                     OrganizationId = 1,
@@ -58,7 +58,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 2,
                     OrganizationId = 1,
@@ -66,7 +66,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 3,
                     OrganizationId = 1,
@@ -107,13 +107,13 @@ namespace Shrooms.Tests
             // Arrange
             var mockEventTypes = new List<EventType>
             {
-                new EventType
+                new()
                 {
                     Id = 1,
                     Name = "First event type"
                 },
 
-                new EventType
+                new()
                 {
                     Id = 2,
                     Name = "Second event type"
@@ -122,13 +122,13 @@ namespace Shrooms.Tests
 
             var mockOffices = new List<Office>
             {
-                new Office
+                new()
                 {
                     Id = 1,
                     Name = "First office"
                 },
 
-                new Office
+                new()
                 {
                     Id = 2,
                     Name = "Second office"
@@ -137,13 +137,13 @@ namespace Shrooms.Tests
 
             var mockKudosTypes = new List<KudosType>
             {
-                new KudosType
+                new()
                 {
                     Id = 1,
                     Name = "First kudos type"
                 },
 
-                new KudosType
+                new()
                 {
                     Id = 2,
                     Name = "Second kudos type"
@@ -177,7 +177,7 @@ namespace Shrooms.Tests
             // Arrange
             _eventTypeDbSet.SetDbSetDataForAsync(new List<EventType>
             {
-                new EventType
+                new()
                 {
                     Id = 3,
                     OrganizationId = 1
@@ -186,15 +186,15 @@ namespace Shrooms.Tests
 
             _kudosTypeDbSet.SetDbSetDataForAsync(new List<KudosType>
             {
-                new KudosType
+                new()
                 {
-                    Id = 1,
+                    Id = 1
                 }
             });
 
             _officeDbSet.SetDbSetDataForAsync(new List<Office>
             {
-                new Office
+                new()
                 {
                     Id = 2,
                     OrganizationId = 2
@@ -203,13 +203,13 @@ namespace Shrooms.Tests
 
             var presets = new List<FilterPreset>
             {
-                new FilterPreset
+                new()
                 {
                     OrganizationId = 1,
                     Preset = "[{\"FilterType\":1,\"Types\":[\"1\"]},{\"FilterType\":0,\"Types\":[\"3\"]}]"
                 },
 
-                new FilterPreset
+                new()
                 {
                     OrganizationId = 2,
                     Preset = "[{\"FilterType\":1,\"Types\":[\"1\"]},{\"FilterType\":2,\"Types\":[\"2\"]}]"
@@ -232,7 +232,7 @@ namespace Shrooms.Tests
             // Arrange
             var mockFilterPresets = new List<FilterPreset>
             {
-                new FilterPreset
+                new()
                 {
                     Id = 1,
                     OrganizationId = 0,
@@ -240,7 +240,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 2,
                     OrganizationId = 0,
@@ -248,7 +248,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 3,
                     OrganizationId = 0,
@@ -256,14 +256,14 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 4,
                     OrganizationId = 0,
                     ForPage = PageType.EventReport,
                     Preset = string.Empty
                 },
-                new FilterPreset
+                new()
                 {
                     Id = 5,
                     OrganizationId = 1,
@@ -271,7 +271,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 6,
                     OrganizationId = 1,
@@ -279,7 +279,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 7,
                     OrganizationId = 1,
@@ -287,7 +287,7 @@ namespace Shrooms.Tests
                     Preset = string.Empty
                 },
 
-                new FilterPreset
+                new()
                 {
                     Id = 8,
                     OrganizationId = 1,

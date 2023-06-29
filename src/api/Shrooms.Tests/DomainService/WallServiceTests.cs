@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -24,7 +23,6 @@ using Shrooms.Tests.ModelMappings;
 namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class WallServiceTests
     {
         private DbSet<Wall> _wallsDbSet;
@@ -59,11 +57,20 @@ namespace Shrooms.Tests.DomainService
         public async Task Moderator_Can_Update_Wall()
         {
             // Arrange
-            var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user" } };
-            var members = new List<WallMember> { new WallMember { Id = 1, UserId = "user1" } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 1, UserId = "user" }
+            };
+            var members = new List<WallMember>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
             };
 
             var updateWallDto = new UpdateWallDto
@@ -96,11 +103,20 @@ namespace Shrooms.Tests.DomainService
         public async Task Administrator_Can_Update_Wall()
         {
             // Arrange
-            var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user1" } };
-            var members = new List<WallMember> { new WallMember { Id = 1, UserId = "user1" } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
+            var members = new List<WallMember>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
             };
 
             var updateWallDto = new UpdateWallDto
@@ -133,11 +149,20 @@ namespace Shrooms.Tests.DomainService
         public async Task Wall_Administrator_And_Moderator_Can_Update_Wall()
         {
             // Arrange
-            var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user" } };
-            var members = new List<WallMember> { new WallMember { Id = 1, UserId = "user1" } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 1, UserId = "user" }
+            };
+            var members = new List<WallMember>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators, Members = members }
             };
 
             var updateWallDto = new UpdateWallDto
@@ -170,10 +195,15 @@ namespace Shrooms.Tests.DomainService
         public void User_Can_Not_Update_Wall()
         {
             // Arrange
-            var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user1" } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators }
             };
 
             var updateWallDto = new UpdateWallDto
@@ -199,10 +229,15 @@ namespace Shrooms.Tests.DomainService
         public void Throw_If_Wall_Does_Not_Exist_During_Update()
         {
             // Arrange
-            var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user1" } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 1, UserId = "user1" }
+            };
             var walls = new List<Wall>
             {
-                new Wall { Id = 2, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators }
+                new()
+                    { Id = 2, OrganizationId = 2, Type = WallType.UserCreated, Name = "testname", Description = "testdesc", Logo = "testlogo", Moderators = moderators }
             };
 
             var updateWallDto = new UpdateWallDto
@@ -229,7 +264,11 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_Validation_Exception_If_Wall_Name_Already_Exists_In_UserCreated_Walls()
         {
             // Arrange
-            _wallsDbSet.SetDbSetDataForAsync(new List<Wall> { new Wall { Id = 1, Name = "wall1", OrganizationId = 2, Type = WallType.UserCreated } }.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(new List<Wall>
+            {
+                new()
+                    { Id = 1, Name = "wall1", OrganizationId = 2, Type = WallType.UserCreated }
+            }.AsQueryable());
             var newWallDto = new CreateWallDto
             {
                 Name = "wall1",
@@ -252,12 +291,14 @@ namespace Shrooms.Tests.DomainService
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 2, Members = new List<WallMember> { member }, OrganizationId = 1, Type = WallType.UserCreated, Moderators = new List<WallModerator>() }
+                new()
+                    { Id = 2, Members = new List<WallMember> { member }, OrganizationId = 1, Type = WallType.UserCreated, Moderators = new List<WallModerator>() }
             };
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1, JobPosition = jobPosition }
+                new()
+                    { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1, JobPosition = jobPosition }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -304,12 +345,14 @@ namespace Shrooms.Tests.DomainService
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 4, Members = new List<WallMember> { member4 }, OrganizationId = 2, Type = WallType.Events, Moderators = new List<WallModerator>() }
+                new()
+                    { Id = 4, Members = new List<WallMember> { member4 }, OrganizationId = 2, Type = WallType.Events, Moderators = new List<WallModerator>() }
             };
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
+                new()
+                    { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -344,12 +387,14 @@ namespace Shrooms.Tests.DomainService
             var jobPosition = new JobPosition { Title = "jobpos" };
             var walls = new List<Wall>
             {
-                new Wall { Id = 4, Members = new List<WallMember>(), OrganizationId = 2, Type = WallType.Events, Moderators = new List<WallModerator>() }
+                new()
+                    { Id = 4, Members = new List<WallMember>(), OrganizationId = 2, Type = WallType.Events, Moderators = new List<WallModerator>() }
             };
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user3", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
+                new()
+                    { Id = "user3", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -376,18 +421,21 @@ namespace Shrooms.Tests.DomainService
             var jobPosition = new JobPosition { Title = "jobpos" };
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = attendingUserId, OrganizationId = tenantId, JobPosition = jobPosition }
+                new()
+                    { Id = attendingUserId, OrganizationId = tenantId, JobPosition = jobPosition }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, UserId = "moderator1", WallId = 1 }
+                new()
+                    { Id = 1, UserId = "moderator1", WallId = 1 }
             };
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls);
 
@@ -409,23 +457,27 @@ namespace Shrooms.Tests.DomainService
             var jobPosition = new JobPosition { Title = "jobpos" };
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = userToRemoveId, OrganizationId = tenantId, FirstName = "fname", LastName = "lname", PictureId = "pic", JobPosition = jobPosition }
+                new()
+                    { Id = userToRemoveId, OrganizationId = tenantId, FirstName = "fname", LastName = "lname", PictureId = "pic", JobPosition = jobPosition }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, UserId = "moderator1", WallId = 1 }
+                new()
+                    { Id = 1, UserId = "moderator1", WallId = 1 }
             };
 
             var members = new List<WallMember>
             {
-                new WallMember { Id = 1, UserId = userToRemoveId, WallId = 1 }
+                new()
+                    { Id = 1, UserId = userToRemoveId, WallId = 1 }
             };
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls);
 
@@ -448,12 +500,14 @@ namespace Shrooms.Tests.DomainService
 
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, UserId = "moderator1", WallId = 1 }
+                new()
+                    { Id = 1, UserId = "moderator1", WallId = 1 }
             };
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls);
 
@@ -467,12 +521,14 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, UserId = "moderator1", WallId = 1 }
+                new()
+                    { Id = 1, UserId = "moderator1", WallId = 1 }
             };
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls);
 
@@ -494,17 +550,20 @@ namespace Shrooms.Tests.DomainService
 
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, UserId = "moderator1", WallId = 1 }
+                new()
+                    { Id = 1, UserId = "moderator1", WallId = 1 }
             };
 
             var members = new List<WallMember>
             {
-                new WallMember { Id = 1, UserId = userToRemoveId, WallId = 1 }
+                new()
+                    { Id = 1, UserId = userToRemoveId, WallId = 1 }
             };
 
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
+                new()
+                    { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls);
 
@@ -690,7 +749,7 @@ namespace Shrooms.Tests.DomainService
                 .Returns(false);
 
             // Assert
-            Assert.ThrowsAsync<UnauthorizedException>(async () => 
+            Assert.ThrowsAsync<UnauthorizedException>(async () =>
                 await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
                     wall,
                     createdBy,
@@ -866,14 +925,14 @@ namespace Shrooms.Tests.DomainService
         {
             var walls = new List<Wall>
             {
-                new Wall
+                new()
                 {
                     Id = 1,
                     Type = WallType.Main,
                     OrganizationId = 2,
                     Moderators = new List<WallModerator>
                     {
-                        new WallModerator
+                        new()
                         {
                             Id = 2,
                             UserId = "userId",
@@ -881,14 +940,14 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new Wall
+                new()
                 {
                     Id = 2,
                     Type = WallType.UserCreated,
                     OrganizationId = 2,
                     Moderators = new List<WallModerator>
                     {
-                        new WallModerator
+                        new()
                         {
                             Id = 2,
                             UserId = "userId",
@@ -896,14 +955,14 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new Wall
+                new()
                 {
                     Id = 3,
                     Type = WallType.Events,
                     OrganizationId = 2,
                     Moderators = new List<WallModerator>
                     {
-                        new WallModerator
+                        new()
                         {
                             Id = 3,
                             UserId = "userId",
@@ -918,14 +977,26 @@ namespace Shrooms.Tests.DomainService
 
         private void MockWallsForDetails()
         {
-            var members = new List<WallMember> { new WallMember { UserId = "userId" } };
-            var members1 = new List<WallMember> { new WallMember { Id = 2, UserId = "user1", WallId = 2 } };
+            var members = new List<WallMember>
+            {
+                new()
+                    { UserId = "userId" }
+            };
+            var members1 = new List<WallMember>
+            {
+                new()
+                    { Id = 2, UserId = "user1", WallId = 2 }
+            };
 
-            var moderators = new List<WallModerator> { new WallModerator { Id = 2, UserId = "userId", WallId = 2 } };
+            var moderators = new List<WallModerator>
+            {
+                new()
+                    { Id = 2, UserId = "userId", WallId = 2 }
+            };
 
             var walls = new List<Wall>
             {
-                new Wall
+                new()
                 {
                     Id = 1,
                     Name = "Wall",
@@ -935,7 +1006,7 @@ namespace Shrooms.Tests.DomainService
                     Members = members,
                     OrganizationId = 2
                 },
-                new Wall
+                new()
                 {
                     Id = 2,
                     Name = "Wall2",
@@ -952,14 +1023,14 @@ namespace Shrooms.Tests.DomainService
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator
+                new()
                 {
                     Id = 1,
                     UserId = "user1",
                     WallId = 1,
                     User = user
                 },
-                new WallModerator
+                new()
                 {
                     Id = 2,
                     UserId = "user1",
@@ -976,13 +1047,13 @@ namespace Shrooms.Tests.DomainService
         {
             var walls = new List<Wall>
             {
-                new Wall
+                new()
                 {
                     Name = "Wall",
                     Id = 1,
                     Moderators = new List<WallModerator>
                     {
-                        new WallModerator
+                        new()
                         {
                             Id = 1,
                             UserId = "user1",
@@ -1006,7 +1077,7 @@ namespace Shrooms.Tests.DomainService
 
             var walls = new List<Wall>
             {
-                new Wall
+                new()
                 {
                     Name = "defaultWall",
                     Id = 1,
@@ -1015,7 +1086,7 @@ namespace Shrooms.Tests.DomainService
                     Type = WallType.Main,
                     Moderators = new List<WallModerator>()
                 },
-                new Wall
+                new()
                 {
                     Name = "wall1",
                     Id = 2,
@@ -1024,7 +1095,7 @@ namespace Shrooms.Tests.DomainService
                     Type = WallType.UserCreated,
                     Moderators = new List<WallModerator>()
                 },
-                new Wall
+                new()
                 {
                     Name = "wall2",
                     Id = 3,
@@ -1033,14 +1104,14 @@ namespace Shrooms.Tests.DomainService
                     Type = WallType.UserCreated,
                     Moderators = new List<WallModerator>
                     {
-                        new WallModerator
+                        new()
                         {
                             UserId = "user1",
                             WallId = 3
                         }
                     }
                 },
-                new Wall
+                new()
                 {
                     Name = "EventWall",
                     Id = 4,
@@ -1053,7 +1124,8 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1 }
+                new()
+                    { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1 }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);

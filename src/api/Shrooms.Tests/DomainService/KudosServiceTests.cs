@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +29,6 @@ using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.DomainService
 {
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration", Justification = "Acceptable for tests")]
     public class KudosServiceTests
     {
         private IKudosService _kudosService;
@@ -609,7 +607,7 @@ namespace Shrooms.Tests.DomainService
 
             _kudosTypesDbSet.SetDbSetDataForAsync(new List<KudosType>
             {
-                new KudosType
+                new()
                 {
                     Id = id,
                     Name = "Test"
@@ -688,7 +686,7 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<Organization>
             {
-                new Organization
+                new()
                 {
                     ShortName = "Visma",
                     Id = 2
@@ -700,7 +698,7 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId",
                     FirstName = "name",
@@ -708,7 +706,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CultureCode = "en-US"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId2",
                     TotalKudos = 4,
@@ -717,7 +715,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CultureCode = "en-US"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId3",
                     TotalKudos = 10,
@@ -725,7 +723,7 @@ namespace Shrooms.Tests.DomainService
                     RemainingKudos = 8,
                     OrganizationId = 2
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId4",
                     TotalKudos = 2,
@@ -733,7 +731,7 @@ namespace Shrooms.Tests.DomainService
                     RemainingKudos = 2,
                     OrganizationId = 2
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId5",
                     TotalKudos = 12,
@@ -741,7 +739,7 @@ namespace Shrooms.Tests.DomainService
                     RemainingKudos = 10,
                     OrganizationId = 2
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "CreatedUserId",
                     OrganizationId = 2
@@ -753,7 +751,7 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<KudosType>
             {
-                new KudosType
+                new()
                 {
                     Id = 1,
                     Name = "Minus",
@@ -761,7 +759,7 @@ namespace Shrooms.Tests.DomainService
                     Type = KudosTypeEnum.Minus,
                     IsActive = true
                 },
-                new KudosType
+                new()
                 {
                     Id = 2,
                     Name = "Send",
@@ -769,7 +767,7 @@ namespace Shrooms.Tests.DomainService
                     Type = KudosTypeEnum.Send,
                     IsActive = true
                 },
-                new KudosType
+                new()
                 {
                     Id = 3,
                     Name = "AnythingElse",
@@ -777,14 +775,14 @@ namespace Shrooms.Tests.DomainService
                     Type = KudosTypeEnum.Ordinary,
                     IsActive = true
                 },
-                new KudosType
+                new()
                 {
                     Id = 4,
                     Name = "Other",
                     Value = 3,
                     Type = KudosTypeEnum.Other
                 },
-                new KudosType
+                new()
                 {
                     Id = 5,
                     Name = "Active",
@@ -797,10 +795,10 @@ namespace Shrooms.Tests.DomainService
 
         private IQueryable<KudosLog> MockKudosLogs()
         {
-            int kudosAvailableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
+            var kudosAvailableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Pending,
                     Id = 1,
@@ -816,7 +814,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Pending,
                     Id = 2,
@@ -832,7 +830,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 3,
@@ -850,7 +848,7 @@ namespace Shrooms.Tests.DomainService
                     Points = 0,
                     Comments = "Hello"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 4,
@@ -878,7 +876,7 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     Id = 1,
                     KudosTypeName = "Type1",
@@ -898,7 +896,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog
+                new()
                 {
                     Id = 2,
                     KudosTypeName = "Type1",
@@ -922,7 +920,7 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "CreatedUserId"
                 }
@@ -936,7 +934,7 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
@@ -946,7 +944,7 @@ namespace Shrooms.Tests.DomainService
                     Points = 2,
                     Status = KudosStatus.Approved
                 },
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
@@ -955,7 +953,7 @@ namespace Shrooms.Tests.DomainService
                     Points = 3,
                     Status = KudosStatus.Approved
                 },
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -972,7 +970,7 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
@@ -984,7 +982,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     CreatedBy = "CreatedUserId"
                 },
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
@@ -995,7 +993,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     CreatedBy = "CreatedUserId"
                 },
-                new KudosLog
+                new()
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1010,7 +1008,7 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "CreatedUserId"
                 }
@@ -1024,7 +1022,7 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     Id = 1,
                     KudosTypeName = "Type1",
@@ -1049,7 +1047,7 @@ namespace Shrooms.Tests.DomainService
 
             var organizations = new List<Organization>
             {
-                new Organization
+                new()
                 {
                     Id = 2,
                     ShortName = "VismaShortName"
@@ -1058,7 +1056,7 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "CreatedUserId",
                     FirstName = "Name",
@@ -1080,8 +1078,9 @@ namespace Shrooms.Tests.DomainService
             // USer3 has 33
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog// +2
+                new()
                 {
+                    // +2
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
                     KudosSystemType = KudosTypeEnum.Ordinary,
@@ -1099,8 +1098,9 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// +30
+                new()
                 {
+                    // +30
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
                     KudosSystemType = KudosTypeEnum.Ordinary,
@@ -1118,8 +1118,9 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// 0 (OrgID = 2)
+                new()
                 {
+                    // 0 (OrgID = 2)
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
                     KudosSystemType = KudosTypeEnum.Ordinary,
@@ -1137,8 +1138,9 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// 0 (KudosType = Minus)
+                new()
                 {
+                    // 0 (KudosType = Minus)
                     KudosTypeName = "Minus",
                     KudosTypeValue = 2,
                     KudosSystemType = KudosTypeEnum.Minus,
@@ -1156,7 +1158,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// 0 (Status = Pending)
+                new() // 0 (Status = Pending)
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1175,7 +1177,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Pending,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// +242.4
+                new() // +242.4
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1196,7 +1198,7 @@ namespace Shrooms.Tests.DomainService
                 },
 
                 // User2
-                new KudosLog// +20
+                new() // +20
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1215,7 +1217,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
-                new KudosLog// 0 (OrgID = 1)
+                new() // 0 (OrgID = 1)
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1236,7 +1238,7 @@ namespace Shrooms.Tests.DomainService
                 },
 
                 // User3
-                new KudosLog// +34
+                new() // +34
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1257,7 +1259,7 @@ namespace Shrooms.Tests.DomainService
                 },
 
                 // User 4 - to test DateTime dimension.
-                new KudosLog// 0 (DateTime out of range)
+                new() // 0 (DateTime out of range)
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1276,7 +1278,7 @@ namespace Shrooms.Tests.DomainService
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow.AddMonths(-4)
                 },
-                new KudosLog// +10
+                new() // +10
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
@@ -1299,28 +1301,28 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "User1",
                     FirstName = "User",
                     LastName = "1",
                     EmploymentDate = DateTime.UtcNow
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "User2",
                     FirstName = "User",
                     LastName = "2",
                     EmploymentDate = DateTime.UtcNow
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "User3",
                     FirstName = "User",
                     LastName = "3",
                     EmploymentDate = DateTime.UtcNow
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "User4",
                     FirstName = "User",
@@ -1338,7 +1340,7 @@ namespace Shrooms.Tests.DomainService
             var kudosLogs = new List<KudosLog>
             {
                 //should ingore pending
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Pending,
                     Id = 1,
@@ -1351,7 +1353,7 @@ namespace Shrooms.Tests.DomainService
                 },
 
                 //should ingore organizationId
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 2,
@@ -1364,7 +1366,7 @@ namespace Shrooms.Tests.DomainService
                 },
 
                 //Should ignore because of employment date
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 3,
@@ -1376,7 +1378,7 @@ namespace Shrooms.Tests.DomainService
                     Created = DateTime.UtcNow.AddDays(-11),
                     Points = 1
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 4,
@@ -1387,7 +1389,7 @@ namespace Shrooms.Tests.DomainService
                     Created = DateTime.UtcNow,
                     Points = 10
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 5,
@@ -1398,7 +1400,7 @@ namespace Shrooms.Tests.DomainService
                     Created = DateTime.UtcNow,
                     Points = 1
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 6,
@@ -1409,7 +1411,7 @@ namespace Shrooms.Tests.DomainService
                     Created = DateTime.UtcNow,
                     Points = 1
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 6,

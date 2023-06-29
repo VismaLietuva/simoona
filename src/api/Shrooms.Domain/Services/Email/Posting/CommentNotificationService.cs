@@ -68,7 +68,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = await _organizationService.GetOrganizationByIdAsync(commentAuthor.OrganizationId);
 
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds.Distinct());
-            
+
             var destinationEmails = (await GetPostWatchersEmailsAsync(commentAuthor.Email, commentDto.PostId, commentAuthor.Id))
                 .Except(mentionedUsers.Select(x => x.Email))
                 .ToList();
@@ -151,7 +151,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             await SendMultipleEmailsAsync(emails, subject, emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
         }
-        
+
         private async Task<IList<string>> GetPostWatchersEmailsAsync(string senderEmail, int postId, string commentAuthorId)
         {
             var postWatchers = await _postService.GetPostWatchersForEmailNotificationsAsync(postId);

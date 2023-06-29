@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
@@ -115,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                     Value = serviceRequest.Created,
                     Format = ExcelWorksheetBuilderConstants.DateFormat
                 },
-                
+
                 new ExcelColumn
                 {
                     Value = serviceRequest.Modified,

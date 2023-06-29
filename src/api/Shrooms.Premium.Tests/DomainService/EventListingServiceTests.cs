@@ -349,7 +349,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Page = 1,
                 PageSize = 10,
                 StartDate = DateTime.UtcNow.AddYears(-1),
-                EndDate = DateTime.UtcNow.AddYears(5),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -380,7 +380,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Page = 1,
                 PageSize = 10,
                 StartDate = DateTime.UtcNow.AddYears(-1),
-                EndDate = DateTime.UtcNow.AddYears(5),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -479,7 +479,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Page = 1,
                 PageSize = 10,
                 StartDate = DateTime.UtcNow.AddYears(-1),
-                EndDate = DateTime.UtcNow.AddYears(5),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto

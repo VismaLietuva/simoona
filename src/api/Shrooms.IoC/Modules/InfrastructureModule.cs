@@ -1,11 +1,11 @@
 ﻿using System.Configuration;
-using System.Web.Compilation;
 using Autofac;
 using Autofac.Core.Lifetime;
 using Hangfire;
 using ReallySimpleFeatureToggle;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
 using Shrooms.Infrastructure.Configuration;

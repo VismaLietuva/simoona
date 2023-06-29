@@ -9,7 +9,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
@@ -113,7 +113,8 @@ namespace Shrooms.Tests.DomainService
         {
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", EmploymentDate = new DateTime(2018, 5, 15) }
+                new()
+                    { Id = "user1", EmploymentDate = new DateTime(2018, 5, 15) }
             };
 
             _userDbSet.SetDbSetDataForAsync(users);

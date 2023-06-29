@@ -19,7 +19,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
         public ExcelWorksheetBuilder(
             ExcelWorksheet worksheet,
-            bool isHeaderPresent = false, 
+            bool isHeaderPresent = false,
             IExcelRowCollection excelRowCollection = null)
         {
             _worksheet = worksheet;
@@ -59,7 +59,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         {
             return AutoFitColumns(ExcelWorksheetBuilderConstants.MinimmumColumnWidth, ExcelWorksheetBuilderConstants.MaximumColumnWidth);
         }
-        
+
         public IExcelWorksheetBuilder AddRows<T>(IQueryable<T> data, Expression<Func<T, IExcelRow>> expression, bool applyAutoFit = true)
         {
             return AddRows(new ExcelRowCollection(data.Select(expression).ToList()), applyAutoFit);
@@ -127,7 +127,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
             var rowIndex = 1;
 
-            foreach (var excelRow in _excelRowCollection.Rows)
+            foreach (var unused in _excelRowCollection.Rows)
             {
                 _worksheet.Row(rowIndex++).Height += padding;
             }
@@ -198,7 +198,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             {
                 ExcelBorderStylePicker.None => ExcelBorderStyle.None,
                 ExcelBorderStylePicker.Thin => ExcelBorderStyle.Thin,
-                _ => ExcelBorderStyle.None,
+                _ => ExcelBorderStyle.None
             };
         }
 

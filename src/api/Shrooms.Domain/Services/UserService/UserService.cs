@@ -371,7 +371,7 @@ namespace Shrooms.Domain.Services.UserService
         {
             return await _usersDbSet
                 .Include(user => user.NotificationsSettings)
-                .Where(user => 
+                .Where(user =>
                     user.OrganizationId == organizationId &&
                     (user.NotificationsSettings == null || user.NotificationsSettings.EventsEmailNotifications))
                 .Select(user => new UserEmailReceiverDto

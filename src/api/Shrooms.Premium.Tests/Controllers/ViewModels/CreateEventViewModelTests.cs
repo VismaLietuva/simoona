@@ -69,7 +69,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 new EventReminderViewModel
                 {
                     Type = (EventReminderType)int.MaxValue
-                },
+                }
             };
 
             Assert.IsFalse(model.IsValid());
@@ -92,7 +92,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 new EventReminderViewModel
                 {
                     Type = (EventReminderType)int.MaxValue
-                },
+                }
             };
 
             Assert.IsFalse(model.IsValid());
@@ -126,7 +126,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 new EventReminderViewModel
                 {
                     Type = EventReminderType.Deadline,
-                    RemindBeforeInDays = 1,
+                    RemindBeforeInDays = 1
                 },
                 new EventReminderViewModel
                 {

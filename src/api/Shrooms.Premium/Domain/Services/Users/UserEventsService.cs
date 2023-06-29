@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Domain.Services.Users
         private readonly IDbSet<ApplicationUser> _usersDb;
         private readonly IDbSet<EventParticipant> _eventParticipantsDb;
         private readonly IDbSet<EventReminder> _eventRemindersDbSet;
-        
+
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
 
@@ -32,7 +32,7 @@ namespace Shrooms.Premium.Domain.Services.Users
             _eventParticipantsDb = uow.GetDbSet<EventParticipant>();
             _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
         }
-        
+
         public async Task<IEnumerable<EventReminder>> GetReadyNotCompletedRemindersAsync(Organization organization)
         {
             var readyRemindersPredicate = PredicateBuilder.False<EventReminder>()

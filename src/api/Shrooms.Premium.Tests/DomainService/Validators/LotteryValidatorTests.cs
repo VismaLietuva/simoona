@@ -48,7 +48,7 @@ namespace Shrooms.Premium.Tests.DomainService.Validators
             var user = new ApplicationUser
             {
                 Id = receiverId,
-                OrganizationId = TestConstants.DefaultOrganizationId,
+                OrganizationId = TestConstants.DefaultOrganizationId
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -73,7 +73,7 @@ namespace Shrooms.Premium.Tests.DomainService.Validators
             var user = new ApplicationUser
             {
                 Id = Guid.NewGuid().ToString(),
-                OrganizationId = TestConstants.DefaultOrganizationId,
+                OrganizationId = TestConstants.DefaultOrganizationId
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -98,7 +98,7 @@ namespace Shrooms.Premium.Tests.DomainService.Validators
             var user = new ApplicationUser
             {
                 Id = receiverId,
-                OrganizationId = TestConstants.DefaultOrganizationId,
+                OrganizationId = TestConstants.DefaultOrganizationId
             };
 
             var userOrg = new UserAndOrganizationDto

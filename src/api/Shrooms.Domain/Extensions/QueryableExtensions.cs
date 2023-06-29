@@ -28,7 +28,7 @@ namespace Shrooms.Domain.Extensions
 
             return query.OrderByPropertyNames(sortableProperties.SortByProperties);
         }
-        
+
         private static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
             this IQueryable<TEntity> query,
             string sortByProperties) where TEntity : class
@@ -91,7 +91,7 @@ namespace Shrooms.Domain.Extensions
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
         {
             var propertyNameParts = propertyName.Split(PropertyNamePartsSeparator);
-            
+
             var type = typeof(TEntity);
 
             foreach (var property in propertyNameParts)

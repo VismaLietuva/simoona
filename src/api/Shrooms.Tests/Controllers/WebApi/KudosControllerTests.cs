@@ -49,7 +49,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 UserId = "fd798623-166c-412d-a060-369d4c7b90eb"
             };
 
-            _kudosService.GetKudosTypesAsync(userAndOrganization).Returns(new List<KudosTypeDto> { new KudosTypeDto() });
+            _kudosService.GetKudosTypesAsync(userAndOrganization).Returns(new List<KudosTypeDto> { new() });
 
             var response = await _kudosController.GetKudosTypes();
 
@@ -68,7 +68,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             IEnumerable<MainKudosLogDto> kudosLogs = new List<MainKudosLogDto>
             {
-                new MainKudosLogDto
+                new()
                 {
                     Id = 1
                 }

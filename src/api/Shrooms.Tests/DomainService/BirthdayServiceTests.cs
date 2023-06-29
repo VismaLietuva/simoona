@@ -36,77 +36,77 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1993, 11, 30)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId2",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1988, 12, 05)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId3",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2000, 12, 06)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId4",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2015, 11, 28)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId5",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2015, 11, 29)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId6",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1930, 12, 11)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "christmasBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 12, 27)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "newYearBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 01, 01)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "februaryBirthdayUser1",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2012, 02, 29)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "februaryBirthdayUser2",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 02, 28)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "februaryBirthdayUser3",
                     FirstName = "Name",
@@ -114,14 +114,14 @@ namespace Shrooms.Tests.DomainService
                     BirthDay = new DateTime(1985, 03, 04)
                 },
 
-                new ApplicationUser
+                new()
                 {
                     Id = "endOfYearBirthdayUser1",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 12, 31)
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "endOfYearBirthdayUser2",
                     FirstName = "Name",

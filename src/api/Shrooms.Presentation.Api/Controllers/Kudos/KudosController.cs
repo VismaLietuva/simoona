@@ -423,9 +423,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             {
                 var content = await _kudosExportService.ExportToExcelAsync(filterDto);
 
-                var result = new HttpResponseMessage(HttpStatusCode.OK) 
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = content 
+                    Content = content
                 };
 
                 return ResponseMessage(result);

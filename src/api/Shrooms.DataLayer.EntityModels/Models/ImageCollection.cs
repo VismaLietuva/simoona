@@ -40,7 +40,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
                 var jsonData = JsonConvert.DeserializeObject<List<string>>(value);
 
                 Items.Clear();
-                
+
                 Add(jsonData);
             }
         }

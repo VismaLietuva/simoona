@@ -46,13 +46,13 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             IEnumerable<WallDto> walls = new List<WallDto>
             {
-                new WallDto
+                new()
                 {
                     Id = 0,
                     Description = "Description",
                     IsFollowing = false
                 },
-                new WallDto
+                new()
                 {
                     Id = 1,
                     Description = "Description",
@@ -126,11 +126,11 @@ namespace Shrooms.Tests.Controllers.WebApi
             var wallId = 0;
             IEnumerable<WallMemberDto> members = new List<WallMemberDto>
             {
-                new WallMemberDto
+                new()
                 {
                     Id = "1"
                 },
-                new WallMemberDto
+                new()
                 {
                     Id = "2"
                 }
@@ -162,11 +162,11 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             IEnumerable<PostDto> posts = new List<PostDto>
             {
-                new PostDto
+                new()
                 {
                     Id = 0
                 },
-                new PostDto
+                new()
                 {
                     Id = 1
                 }
@@ -246,7 +246,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             IEnumerable<ModeratorViewModel> moderators = new List<ModeratorViewModel>
             {
-                new ModeratorViewModel
+                new()
                 {
                     Id = "test",
                     FullName = "test"

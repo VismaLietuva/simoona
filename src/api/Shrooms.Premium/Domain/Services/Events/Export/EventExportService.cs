@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Constants;
@@ -35,7 +32,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         public async Task<ByteArrayContent> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
             var participants = await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg);
-            var options = await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg);
+            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg)).ToList();
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
 

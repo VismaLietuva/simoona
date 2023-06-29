@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var createDto = _mapper.Map<CreateBlacklistUserViewModel, CreateBlacklistUserDto>(createViewModel);
-                
+
                 await _blacklistService.CreateAsync(createDto, GetUserAndOrganization());
 
                 return Ok(createViewModel);

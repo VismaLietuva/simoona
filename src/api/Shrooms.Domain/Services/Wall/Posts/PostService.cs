@@ -16,42 +16,32 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
-using Shrooms.Domain.Exceptions.Exceptions;
-using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts
 {
-
     public class PostService : IPostService
     {
         private static readonly SemaphoreSlim _postDeleteLock = new SemaphoreSlim(1, 1);
 
-        private readonly IPermissionService _permissionService;
         private readonly ICommentService _commentService;
         private readonly IWallService _wallService;
 
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<Post> _postsDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<WallModerator> _moderatorsDbSet;
         private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public PostService(
-            IUnitOfWork2 uow,
-            IPermissionService permissionService,
-            ICommentService commentService,
-            IWallService wallService)
+        public PostService(IUnitOfWork2 uow, ICommentService commentService, IWallService wallService)
         {
             _uow = uow;
-            _permissionService = permissionService;
             _commentService = commentService;
             _wallService = wallService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
-            _moderatorsDbSet = uow.GetDbSet<WallModerator>();
+            uow.GetDbSet<WallModerator>();
             _wallsDbSet = uow.GetDbSet<DataLayer.EntityModels.Models.Multiwall.Wall>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
@@ -80,7 +70,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     SharedEventId = newPostDto.SharedEventId,
                     LastActivity = DateTime.UtcNow,
                     WallId = newPostDto.WallId,
-                    Likes = new LikesCollection(),
+                    Likes = new LikesCollection()
                 };
 
                 _postsDbSet.Add(post);

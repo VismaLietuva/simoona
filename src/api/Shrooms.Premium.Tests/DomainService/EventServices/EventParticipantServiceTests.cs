@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -28,7 +27,6 @@ using Shrooms.Tests.Extensions;
 namespace Shrooms.Premium.Tests.DomainService.EventServices
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class EventParticipantServiceTests
     {
         private DbSet<Event> _eventsDbSet;

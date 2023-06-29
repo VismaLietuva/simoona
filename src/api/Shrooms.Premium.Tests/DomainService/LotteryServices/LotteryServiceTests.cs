@@ -234,7 +234,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var lottery = CreateAndAddLotteryWithIdToDbSet(1);
 
             var lotteryDto = new LotteryDto
-            { 
+            {
                 Id = lottery.Id,
                 Status = LotteryStatus.Drafted,
                 Images = new List<string>()
@@ -626,10 +626,10 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             {
                 LotteryId = lotteryId,
                 TicketCount = -1,
-                Receivers = new LotteryTicketReceiverDto[0]
+                Receivers = Array.Empty<LotteryTicketReceiverDto>()
             };
 
-            var lottery = CreateAndAddLotteryWithIdToDbSet(lotteryId);
+            _ = CreateAndAddLotteryWithIdToDbSet(lotteryId);
 
             _userService
                 .GetApplicationUserAsync(Arg.Is(buyerId))

@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         {
             public List<int> Numbers { get; set; }
 
-            public List<EventReminderViewModel> Reminders { get; set; } 
+            public List<EventReminderViewModel> Reminders { get; set; }
         }
 
         [Test]

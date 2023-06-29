@@ -32,7 +32,10 @@ namespace Shrooms.Tests.DomainService
         public async Task UploadFromStream_ShouldReturnCorrectName_WhenJpg()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization>
+            {
+                new() { Id = 2, ShortName = "pictures" }
+            }.AsQueryable());
 
             // Act
             var result = await _pictureService.UploadFromStreamAsync(null, null, "test.jpg", 2);
@@ -45,7 +48,10 @@ namespace Shrooms.Tests.DomainService
         public async Task UploadFromStream_ShouldReturnCorrectName_WhenPng()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization>
+            {
+                new() { Id = 2, ShortName = "pictures" }
+            }.AsQueryable());
 
             // Act
             var result = await _pictureService.UploadFromStreamAsync(null, null, "test.png", 2);
@@ -58,7 +64,10 @@ namespace Shrooms.Tests.DomainService
         public async Task UploadFromStream_ShouldReturnCorrectName_WhenGif()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization>
+            {
+                new() { Id = 2, ShortName = "pictures" }
+            }.AsQueryable());
 
             // Act
             var result = await _pictureService.UploadFromStreamAsync(null, null, "test.gif", 2);

@@ -4,12 +4,12 @@ using Shrooms.DataLayer.EntityModels.Models;
 using System;
 using System.Data.Entity;
 using Shrooms.Tests.Extensions;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
 
 namespace Shrooms.Tests.DomainService.Validators
 {
@@ -54,7 +54,7 @@ namespace Shrooms.Tests.DomainService.Validators
             const string userId = "Id";
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = userId,
                     OrganizationId = 1
@@ -79,7 +79,7 @@ namespace Shrooms.Tests.DomainService.Validators
             var userId = "Id";
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "Other id",
                     OrganizationId = 1
@@ -105,7 +105,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddYears(1),
@@ -132,7 +132,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddYears(-1),
@@ -158,6 +158,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             const string userId = "Id";
 
+            // ReSharper disable once CollectionNeverUpdated.Local
             var blacklistUsers = new List<BlacklistUser>();
 
             var userOrg = new UserAndOrganizationDto

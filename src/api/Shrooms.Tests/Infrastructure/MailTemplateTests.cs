@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using RazorEngine;
 using RazorEngine.Templating;
 using Shrooms.Contracts.Constants;
@@ -167,6 +166,8 @@ namespace Shrooms.Tests.Infrastructure
             var viewModel = new EmailViewModelWithTimeZoneableProperties(DateTime.UtcNow);
             var template = CreateTemplate<EmailViewModelWithTimeZoneableProperties>("");
             var templateKey = CompileMockEmailTemplate<EmailViewModelWithTimeZoneableProperties>(template);
+
+            // ReSharper disable once CollectionNeverUpdated.Local
             var timeZoneKeys = new List<string>();
 
             // Assert

@@ -346,11 +346,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             AddLotteryTicketsForUser(lotteryDetailsDto.Id, buyerUser.Id, buyerUser.Id, buyTicketsDto.TicketCount);
         }
 
-        private async Task GiftLotteryTicketsAsync(
-            ApplicationUser buyerUser,
-            LotteryDetailsDto lotteryDetailsDto,
-            BuyLotteryTicketsDto buyTicketsDto,
-            UserAndOrganizationDto userOrg)
+        private async Task GiftLotteryTicketsAsync(ApplicationUser buyerUser, LotteryDetailsDto lotteryDetailsDto, BuyLotteryTicketsDto buyTicketsDto, UserAndOrganizationDto userOrg)
         {
             _lotteryValidator.CheckIfLotteryAllowsGifting(lotteryDetailsDto);
 
@@ -398,7 +394,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                     CreatedBy = buyerUserId,
                     ModifiedBy = buyerUserId,
                     Modified = _systemClock.UtcNow,
-                    Created = _systemClock.UtcNow,
+                    Created = _systemClock.UtcNow
                 });
             }
         }
@@ -491,7 +487,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 EndDate = e.EndDate,
                 Status = e.Status,
                 RefundFailed = e.IsRefundFailed,
-                GiftedTicketLimit = e.GiftedTicketLimit,
+                GiftedTicketLimit = e.GiftedTicketLimit
             };
 
         private void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto, UserAndOrganizationDto userOrg)

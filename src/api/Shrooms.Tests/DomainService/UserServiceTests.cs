@@ -61,7 +61,13 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, CultureCode = "en-US", TimeZone = "FLE Standard Time" }
+                new()
+                {
+                    Id = "user1",
+                    OrganizationId = 2,
+                    CultureCode = "en-US",
+                    TimeZone = "FLE Standard Time"
+                }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
@@ -82,7 +88,13 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, CultureCode = "en-US", TimeZone = "FLE Standard Time" }
+                new()
+                {
+                    Id = "user1",
+                    OrganizationId = 2,
+                    CultureCode = "en-US",
+                    TimeZone = "FLE Standard Time"
+                }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
@@ -102,7 +114,13 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, CultureCode = "en-US", TimeZone = "FLE Standard Time" }
+                new()
+                {
+                    Id = "user1",
+                    OrganizationId = 2,
+                    CultureCode = "en-US",
+                    TimeZone = "FLE Standard Time"
+                }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
@@ -122,7 +140,13 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, CultureCode = "en-US", TimeZone = "Pacific Standard Time" }
+                new()
+                {
+                    Id = "user1",
+                    OrganizationId = 2,
+                    CultureCode = "en-US",
+                    TimeZone = "Pacific Standard Time"
+                }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
@@ -143,20 +167,20 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { OrganizationId = 2, Id = "userToDelete", RemainingKudos = 100, SpentKudos = 100, TotalKudos = 100 },
-                new ApplicationUser { OrganizationId = 2, Id = "otherUser", RemainingKudos = 100, SpentKudos = 100, TotalKudos = 100 }
+                new() { OrganizationId = 2, Id = "userToDelete", RemainingKudos = 100, SpentKudos = 100, TotalKudos = 100 },
+                new() { OrganizationId = 2, Id = "otherUser", RemainingKudos = 100, SpentKudos = 100, TotalKudos = 100 }
             };
 
             var userWalls = new List<WallMember>
             {
-                new WallMember { WallId = 1, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } },
-                new WallMember { WallId = 2, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } },
-                new WallMember { WallId = 3, UserId = "userToDelete2", Wall = new Wall { OrganizationId = 2 } }
+                new() { WallId = 1, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } },
+                new() { WallId = 2, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } },
+                new() { WallId = 3, UserId = "userToDelete2", Wall = new Wall { OrganizationId = 2 } }
             };
 
             var moderators = new List<WallModerator>
             {
-                new WallModerator { Id = 1, WallId = 1, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } }
+                new() { Id = 1, WallId = 1, UserId = "userToDelete", Wall = new Wall { OrganizationId = 2 } }
             };
 
             var taskSource = new TaskCompletionSource<ApplicationUser>();
@@ -211,19 +235,19 @@ namespace Shrooms.Tests.DomainService
 
             var notificationSettings = new List<WallNotificationsDto>
             {
-                new WallNotificationsDto
+                new()
                 {
                     WallId = 1,
                     IsAppNotificationEnabled = false,
                     IsEmailNotificationEnabled = false
                 },
-                new WallNotificationsDto
+                new()
                 {
                     WallId = 3,
                     IsAppNotificationEnabled = true,
                     IsEmailNotificationEnabled = true
                 },
-                new WallNotificationsDto
+                new()
                 {
                     WallId = 4,
                     IsAppNotificationEnabled = false,
@@ -273,7 +297,7 @@ namespace Shrooms.Tests.DomainService
             const int organizationId = 1;
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = organizationId,
                     NotificationsSettings = new NotificationsSettings
@@ -281,7 +305,7 @@ namespace Shrooms.Tests.DomainService
                         EventsEmailNotifications = true
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = organizationId,
                     NotificationsSettings = new NotificationsSettings
@@ -306,12 +330,12 @@ namespace Shrooms.Tests.DomainService
             const int organizationId = 1;
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = organizationId,
                     NotificationsSettings = null
                 },
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = organizationId,
                     NotificationsSettings = new NotificationsSettings
@@ -336,7 +360,7 @@ namespace Shrooms.Tests.DomainService
             const int organizationId = 1;
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = organizationId,
                     NotificationsSettings = new NotificationsSettings
@@ -344,7 +368,7 @@ namespace Shrooms.Tests.DomainService
                         EventsEmailNotifications = true
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     OrganizationId = 2,
                     NotificationsSettings = new NotificationsSettings
@@ -363,41 +387,42 @@ namespace Shrooms.Tests.DomainService
         }
 
         #region Mocks
+
         private void MockRolesAndUsersForPermissionValidation()
         {
             var roles = new List<ApplicationRole>
             {
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId1",
                     OrganizationId = 2,
                     Permissions = new List<Permission>
                     {
-                        new Permission
+                        new()
                         {
                             Name = "TEST1_BASIC"
                         }
                     }
                 },
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId2",
                     OrganizationId = 2,
                     Permissions = new List<Permission>
                     {
-                        new Permission
+                        new()
                         {
                             Name = "TEST1_ADMINISTRATION"
                         }
                     }
                 },
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId3",
                     OrganizationId = 1,
                     Permissions = new List<Permission>
                     {
-                        new Permission
+                        new()
                         {
                             Name = "TEST1_BASIC"
                         }
@@ -412,7 +437,7 @@ namespace Shrooms.Tests.DomainService
             user1.Roles.Returns(
                 new List<IdentityUserRole>
                 {
-                    new IdentityUserRole
+                    new()
                     {
                         RoleId = "roleId1"
                     }
@@ -423,7 +448,7 @@ namespace Shrooms.Tests.DomainService
             user2.Roles.Returns(
                 new List<IdentityUserRole>
                 {
-                    new IdentityUserRole
+                    new()
                     {
                         RoleId = "roleId2"
                     }
@@ -434,7 +459,7 @@ namespace Shrooms.Tests.DomainService
             user3.Roles.Returns(
                 new List<IdentityUserRole>
                 {
-                    new IdentityUserRole
+                    new()
                     {
                         RoleId = "roleId3"
                     }
@@ -454,13 +479,13 @@ namespace Shrooms.Tests.DomainService
         {
             var roles = new List<ApplicationRole>
             {
-                new ApplicationRole
+                new()
                 {
                     Name = Roles.NewUser,
                     Id = "role1",
                     OrganizationId = 2
                 },
-                new ApplicationRole
+                new()
                 {
                     Name = Roles.External,
                     Id = "role2",
@@ -475,44 +500,44 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "1",
                     Email = "test1@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "1"
                         }
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "2",
                     Email = "test2@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "2"
                         }
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "3",
                     Email = "test3@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "3"
                         },
-                        new WallMember
+                        new()
                         {
                             WallId = 2,
                             UserId = "3"
@@ -526,7 +551,7 @@ namespace Shrooms.Tests.DomainService
         {
             var wallUsers = new List<WallMember>
             {
-                new WallMember
+                new()
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
@@ -538,7 +563,7 @@ namespace Shrooms.Tests.DomainService
                         Type = WallType.Main
                     }
                 },
-                new WallMember
+                new()
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
@@ -550,7 +575,7 @@ namespace Shrooms.Tests.DomainService
                         Type = WallType.UserCreated
                     }
                 },
-                new WallMember
+                new()
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = false,
@@ -562,7 +587,7 @@ namespace Shrooms.Tests.DomainService
                         Type = WallType.UserCreated
                     }
                 },
-                new WallMember
+                new()
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
@@ -583,13 +608,13 @@ namespace Shrooms.Tests.DomainService
         {
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "1",
                     Email = "test1@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "1",
@@ -597,19 +622,19 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "2",
                     Email = "test2@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "2",
                             EmailNotificationsEnabled = true
                         },
-                        new WallMember
+                        new()
                         {
                             WallId = 2,
                             UserId = "2",
@@ -617,19 +642,19 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "3",
                     Email = "test3@shrooms.com",
                     WallUsers = new List<WallMember>
                     {
-                        new WallMember
+                        new()
                         {
                             WallId = 1,
                             UserId = "3",
                             EmailNotificationsEnabled = true
                         },
-                        new WallMember
+                        new()
                         {
                             WallId = 2,
                             UserId = "3",

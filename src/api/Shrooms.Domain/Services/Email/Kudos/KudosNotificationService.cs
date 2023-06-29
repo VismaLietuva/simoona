@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var sendingUserFullName = await GetUserFullNameAsync(kudosLog.CreatedBy);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
-            
+
             var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,

@@ -852,7 +852,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             currentMonthSum += kudos.TotalPointsSent;
 
-            int availableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
+            var availableToSendPerMonth = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
             _kudosServiceValidator.ValidateUserAvailableKudosToSendPerMonth(totalKudosPointsInLog, availableToSendPerMonth - currentMonthSum);
         }
 

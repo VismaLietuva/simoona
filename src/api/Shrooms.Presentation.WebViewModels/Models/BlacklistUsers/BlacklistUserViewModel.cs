@@ -8,7 +8,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.BlacklistUsers
         public string UserId { get; set; }
 
         public DateTime EndDate { get; set; }
-        
+
         public string Reason { get; set; }
 
         public DateTime Modified { get; set; }

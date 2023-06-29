@@ -10,10 +10,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
-using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
@@ -21,24 +18,20 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
     {
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
-        private readonly IPermissionService _permissionService;
         private readonly IWallService _wallService;
 
         private readonly DbSet<Post> _postsDbSet;
         private readonly DbSet<Comment> _commentsDbSet;
-        private readonly DbSet<WallModerator> _wallModeratorsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService, IWallService wallService)
+        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IWallService wallService)
         {
             _uow = uow;
             _systemClock = systemClock;
-            _permissionService = permissionService;
             _wallService = wallService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
-            _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
@@ -79,7 +72,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             var comment = await _commentsDbSet
                 .Include(comment => comment.Author)
                 .SingleOrDefaultAsync(comment => comment.Id == commentId);
-            
+
             if (comment == null)
             {
                 return null;

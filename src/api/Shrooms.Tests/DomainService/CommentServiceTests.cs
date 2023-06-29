@@ -52,7 +52,7 @@ namespace Shrooms.Tests.DomainService
 
             _wallService = Substitute.For<IWallService>();
 
-            _commentService = new CommentService(uow, _systemClock, _permissionService, _wallService);
+            _commentService = new CommentService(uow, _systemClock, _wallService);
         }
 
         [Test]
@@ -121,13 +121,14 @@ namespace Shrooms.Tests.DomainService
             // Setup
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = new Wall { OrganizationId = 2 } }
+                new()
+                    { Id = 1, Wall = new Wall { OrganizationId = 2 } }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = _userId
                 }
@@ -164,13 +165,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -198,13 +201,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -232,13 +237,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -271,7 +278,8 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
 
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
@@ -298,7 +306,8 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
 
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
@@ -323,13 +332,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -359,13 +370,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -390,13 +403,15 @@ namespace Shrooms.Tests.DomainService
             var post = new Post { Id = 1, Wall = wall, WallId = wall.Id };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, AuthorId = "user1", Post = post }
+                new()
+                    { Id = 1, AuthorId = "user1", Post = post }
             };
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 

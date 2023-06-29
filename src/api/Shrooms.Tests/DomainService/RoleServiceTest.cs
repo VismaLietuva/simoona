@@ -88,7 +88,7 @@ namespace Shrooms.Tests.DomainService
             user1.LastName = "last1";
             user1.Roles.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     RoleId = "roleId1"
                 }
@@ -100,7 +100,7 @@ namespace Shrooms.Tests.DomainService
             user2.LastName = "last2";
             user2.Roles.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     RoleId = "roleId1"
                 }
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
             user3.LastName = "last3";
             user3.Roles.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     RoleId = "roleId2"
                 }
@@ -122,12 +122,12 @@ namespace Shrooms.Tests.DomainService
 
             var roles = new List<ApplicationRole>
             {
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId1",
                     Name = "Test1"
                 },
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId2",
                     Name = "Test2"
@@ -137,15 +137,15 @@ namespace Shrooms.Tests.DomainService
             _permissionService.GetGroupNamesAsync(1).Returns(
                 new List<PermissionGroupDto>
                 {
-                    new PermissionGroupDto
+                    new()
                     {
                         Name = "permission1"
                     },
-                    new PermissionGroupDto
+                    new()
                     {
                         Name = "permission2"
                     },
-                    new PermissionGroupDto
+                    new()
                     {
                         Name = "permission3"
                     }
@@ -154,12 +154,12 @@ namespace Shrooms.Tests.DomainService
             _permissionService.GetRolePermissionsAsync("roleId1", 1).Returns(
                 new List<PermissionDto>
                 {
-                    new PermissionDto
+                    new()
                     {
                         Name = "PERMISSION1_BASIC",
                         Scope = PermissionScopes.Basic
                     },
-                    new PermissionDto
+                    new()
                     {
                         Name = "PERMISSION2_ADMIN",
                         Scope = PermissionScopes.Administration
@@ -174,19 +174,19 @@ namespace Shrooms.Tests.DomainService
         {
             var roles = new List<ApplicationRole>
             {
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId1",
                     Name = "Test1",
                     OrganizationId = 2
                 },
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId2",
                     Name = "Test2",
                     OrganizationId = 2
                 },
-                new ApplicationRole
+                new()
                 {
                     Id = "roleId3",
                     Name = "Test12",

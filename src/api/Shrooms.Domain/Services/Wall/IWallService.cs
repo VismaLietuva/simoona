@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.Wall
         Task RemoveMemberFromWallsAsync(string userId, List<int> wallIds);
 
         Task ReplaceMembersInWallAsync(IEnumerable<ApplicationUser> newMembers, int wallId, string currentUserId);
-        
+
         Task CheckIfUserIsAllowedToModifyWallContentAsync(
             MultiwallWall wall,
             string createdBy,

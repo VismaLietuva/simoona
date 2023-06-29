@@ -53,7 +53,7 @@ namespace Shrooms.Tests.DomainService
                 LinksToDelete = new[] { 1, 2 },
                 LinksToCreate = new List<NewExternalLinkDto>
                 {
-                    new NewExternalLinkDto
+                    new()
                     {
                         Name = "newLink1",
                         Url = "newLink2"
@@ -61,7 +61,7 @@ namespace Shrooms.Tests.DomainService
                 },
                 LinksToUpdate = new List<ExternalLinkDto>
                 {
-                    new ExternalLinkDto
+                    new()
                     {
                         Id = 3,
                         Name = "modifiedLink3",
@@ -91,7 +91,7 @@ namespace Shrooms.Tests.DomainService
                 LinksToDelete = new[] { 1, 2 },
                 LinksToCreate = new List<NewExternalLinkDto>
                 {
-                    new NewExternalLinkDto
+                    new()
                     {
                         Name = "Test1",
                         Url = "UrlTest1"
@@ -116,7 +116,7 @@ namespace Shrooms.Tests.DomainService
                 LinksToCreate = new List<NewExternalLinkDto>(),
                 LinksToUpdate = new List<ExternalLinkDto>
                 {
-                    new ExternalLinkDto
+                    new()
                     {
                         Id = 3,
                         Name = "Test1",
@@ -150,7 +150,7 @@ namespace Shrooms.Tests.DomainService
         {
             var links = new List<ExternalLink>
             {
-                new ExternalLink
+                new()
                 {
                     Id = 1,
                     Modified = DateTime.UtcNow.AddHours(-2),
@@ -158,7 +158,7 @@ namespace Shrooms.Tests.DomainService
                     Url = "http://link1.com",
                     OrganizationId = 2
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 2,
                     Modified = DateTime.UtcNow.AddHours(-2),
@@ -166,7 +166,7 @@ namespace Shrooms.Tests.DomainService
                     Url = "http://link2.com",
                     OrganizationId = 2
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 3,
                     Modified = DateTime.UtcNow.AddHours(-2),
@@ -174,7 +174,7 @@ namespace Shrooms.Tests.DomainService
                     Url = "http://link3.com",
                     OrganizationId = 2
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 4,
                     Modified = DateTime.UtcNow.AddHours(-2),
@@ -191,7 +191,7 @@ namespace Shrooms.Tests.DomainService
         {
             var externalLinks = new List<ExternalLink>
             {
-                new ExternalLink
+                new()
                 {
                     Id = 1,
                     Name = "Test1",
@@ -199,7 +199,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     Priority = 10
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 2,
                     Name = "Test2",
@@ -207,7 +207,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     Priority = 0
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 3,
                     Name = "Test3",
@@ -215,7 +215,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 1,
                     Priority = 5
                 },
-                new ExternalLink
+                new()
                 {
                     Id = 4,
                     Name = "Test4",

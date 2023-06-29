@@ -7,9 +7,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public int Id { get; set; }
 
         public string Title { get; set; }
-        
+
         public DateTime EndDate { get; set; }
-        
+
         public int EntryFee { get; set; }
     }
 }

@@ -70,7 +70,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     IsReminded = true,
                     RemindBeforeInDays = 10,
                     Type = type
-                },
+                }
             };
             CreateEventWithRemindersForGetReadyNotCompletedRemindersAsyncTest(startDate, deadlineDate, reminders);
 
@@ -100,7 +100,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     IsReminded = true,
                     RemindBeforeInDays = 10,
                     Type = EventReminderType.Deadline
-                },
+                }
             };
             CreateEventWithRemindersForGetReadyNotCompletedRemindersAsyncTest(startDate, deadlineDate, reminders);
 
@@ -130,7 +130,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     IsReminded = false,
                     RemindBeforeInDays = 1,
                     Type = EventReminderType.Deadline
-                },
+                }
             };
             CreateEventWithRemindersForGetReadyNotCompletedRemindersAsyncTest(startDate, deadlineDate, reminders);
 
@@ -160,7 +160,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     IsReminded = false,
                     RemindBeforeInDays = 100,
                     Type = EventReminderType.Deadline
-                },
+                }
             };
             CreateEventWithRemindersForGetReadyNotCompletedRemindersAsyncTest(startDate, deadlineDate, reminders);
 
@@ -198,7 +198,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     IsReminded = true,
                     RemindBeforeInDays = 10,
                     Type = EventReminderType.Start
-                },
+                }
             };
             CreateEventWithRemindersForGetReadyNotCompletedRemindersAsyncTest(startDate, deadlineDate, reminders, organizationId);
 
@@ -254,7 +254,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 OrganizationId = organizationId ?? _defaultOrganization.Id,
                 EventParticipants = new List<EventParticipant>(),
                 StartDate = eventStartDate,
-                RegistrationDeadline = eventDeadlineDate,
+                RegistrationDeadline = eventDeadlineDate
             };
 
             foreach (var reminder in reminders)

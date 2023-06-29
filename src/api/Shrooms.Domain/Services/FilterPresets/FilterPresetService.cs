@@ -111,7 +111,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             try
             {
-                var presets = await _filterPresetDbSet.Where(preset => 
+                var presets = await _filterPresetDbSet.Where(preset =>
                     preset.OrganizationId == organizationId || type == FilterType.Kudos) // Kudos type does not have organization
                     .ToListAsync();
 
@@ -163,7 +163,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                     continue;
                 }
 
-                filter.Types = filter.Types.Where(type => type != typeId);
+                filter.Types = filter.Types.Where(t => t != typeId);
             }
         }
 
