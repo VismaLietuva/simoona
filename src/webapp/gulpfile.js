@@ -299,6 +299,8 @@ gulp.task('build-config', function(done) {
     }
 
     var endpoint = args['endpoint'] || build.endpoint;
+    var chatBotEndpoint = args['chatBotEndpoint'] || build.chatBotEndpoint;
+    var chatBotAgentId = args['chatBotAgentId'] || build.chatBotAgentId;
     var impersonate = args['impersonate'] || build.impersonate;
     var showMissingTranslations = args['showMissingTranslations'] || build.showMissingTranslations;
     var environment = args['environment'] || build.environment;
@@ -310,6 +312,8 @@ gulp.task('build-config', function(done) {
     var featureFlags = [config.FeatureFlag];
 
     log('Endpoint: ' + endpoint);
+    log('ChatBotEndpoint: ' + chatBotEndpoint);
+    log('chatBotAgentId: ' + chatBotAgentId);
     log('Impersonate is ' + (impersonate ? 'enabled' : 'disabled'));
     log('Show missing translations files is ' + (showMissingTranslations ? 'enabled' : 'disabled'));
     log('Environment: ' + environment);
@@ -317,6 +321,8 @@ gulp.task('build-config', function(done) {
     return file('build-config.js', '{}', { src: true})
         .pipe(jeditor({
             'endPoint': endpoint,
+            'chatBotEndpoint': chatBotEndpoint,
+            'chatBotAgentId': chatBotAgentId,
             'impersonate': impersonate,
             'showMissingTranslations': showMissingTranslations,
             'featureFlagsConstant': featureFlags,

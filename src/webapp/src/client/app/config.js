@@ -40,7 +40,8 @@
         'simoonaApp.Widget',
         'simoonaApp.Customization',
         'simoonaApp.Lotteries',
-        'simoonaApp.Settings'
+        'simoonaApp.Settings',
+        'simoonaApp.ChatBot'
     ];
 
     window.modules = modulesList;
