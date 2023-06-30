@@ -12,10 +12,11 @@
     chatBotController.$inject = [
         'chatBotRepository',
         '$timeout',
-        'localeSrv'
+        'localeSrv',
+        'errorHandler'
     ];
 
-    function chatBotController(chatBotRepository, $timeout, localeSrv) {
+    function chatBotController(chatBotRepository, $timeout, localeSrv, errorHandler) {
         const vm = this;
 
         init();
@@ -39,7 +40,7 @@
                 pushMessageToChat(messageResponse.data, true);
 
                 $timeout(scrollChatWindowToBottom);
-            });
+            }, errorHandler.handleErrorMessage);
         }
 
         function pushMessageToChat(message, isBotMessage) {

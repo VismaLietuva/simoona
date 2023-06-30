@@ -49,6 +49,7 @@
     window.lotteriesEnabled = false;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.usePostWatching = true; // Used to show/hide post watching feature
+    window.isChatBotEnabled = false;
 
     angular.module('simoonaApp', window.modules)
         .run(execute)
