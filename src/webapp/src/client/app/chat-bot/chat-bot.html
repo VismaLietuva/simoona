@@ -1,16 +1,13 @@
-<div class="container chat-bot-container">
-    <div class="row">
-        <div class="col-md-7"></div>
-        <div class="col-md-5">
-            <div class="panel panel-default">
-            <div class="panel-heading bg-primary">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#chatWindow"
-                aria-expanded="false" aria-controls="chatWindow">
-                    <span translate="chatBot.talkToAiAgent"></span>
-                </button>
-            </div>
-            <div id="chatWindow" class="panel-collapse collapse">
-                <div class="panel-body">
+<div class="chat-bot-container">
+    <div class="panel panel-default">
+        <div class="panel-heading bg-info">
+            <button class="btn btn-link btn-bg" type="button" data-toggle="collapse" data-target="#chatWindow"
+                    aria-expanded="false" aria-controls="chatWindow" ng-click="vm.toggleChatWindow()">
+                <span translate="chatBot.talkToAiAgent"></span>
+            </button>
+        </div>
+        <div id="chatWindow" class="panel-collapse collapse" >
+            <div class="panel-body chat-window" ng-class="{ 'expanded': vm.isChatWindowOpen }">
                 <div id="chatMessages" class="chat-bot-messages">
                     <div ng-repeat="message in vm.messages">
                         <p class="message"><strong translate="{{message.isBotMessage ? 'chatBot.aiAgent' : 'common.you' }}"></strong>: {{ message.text }}</p>
@@ -24,9 +21,7 @@
                         </button>
                     </span>
                 </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>
-  </div>
+</div>

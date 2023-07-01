@@ -1,52 +1,57 @@
 (function () {
     'use strict';
 
-    angular
-        .module('simoonaApp.ChatBot')
-        .component('aceChatBot', {
-            templateUrl: 'app/chat-bot/chat-bot.html',
-            controller: chatBotController,
-            controllerAs: 'vm'
-        });
+    angular.module('simoonaApp.ChatBot').component('aceChatBot', {
+        templateUrl: 'app/chat-bot/chat-bot.html',
+        controller: chatBotController,
+        controllerAs: 'vm',
+    });
 
     chatBotController.$inject = [
         'chatBotRepository',
         '$timeout',
         'localeSrv',
-        'errorHandler'
+        'errorHandler',
     ];
 
-    function chatBotController(chatBotRepository, $timeout, localeSrv, errorHandler) {
+    function chatBotController(
+        chatBotRepository,
+        $timeout,
+        localeSrv,
+        errorHandler
+    ) {
         const vm = this;
 
         init();
 
-        function init(){
+        function init() {
             vm.messages = [];
-
+            vm.isChatWindowOpen = false;
             vm.historyId = crypto.randomUUID();
 
-            vm.messages.push({
-                text: localeSrv.formatTranslation('chatBot.initialMessage'),
-                isBotMessage: true
-            })
+            pushMessageToChat(
+                localeSrv.formatTranslation('chatBot.initialMessage'),
+                true
+            );
         }
 
         function sendMessageToApiAndUpdateChat(message) {
-            chatBotRepository.message(message, vm.historyId).then(function (messageResponse) {
-                vm.isLoading = false;
-                vm.messages.pop();
+            chatBotRepository
+                .message(message, vm.historyId)
+                .then(function (messageResponse) {
+                    vm.isLoading = false;
+                    vm.messages.pop();
 
-                pushMessageToChat(messageResponse.data, true);
+                    pushMessageToChat(messageResponse.data, true);
 
-                $timeout(scrollChatWindowToBottom);
-            }, errorHandler.handleErrorMessage);
+                    $timeout(scrollChatWindowToBottom);
+                }, errorHandler.handleErrorMessage);
         }
 
         function pushMessageToChat(message, isBotMessage) {
             vm.messages.push({
                 text: message,
-                isBotMessage: isBotMessage
+                isBotMessage: isBotMessage,
             });
         }
 
@@ -65,7 +70,10 @@
 
                 $timeout(scrollChatWindowToBottom);
 
-                pushMessageToChat(localeSrv.formatTranslation('chatBot.thinking'), true);
+                pushMessageToChat(
+                    localeSrv.formatTranslation('chatBot.thinking'),
+                    true
+                );
 
                 sendMessageToApiAndUpdateChat(message);
             }
@@ -76,6 +84,10 @@
             if (event.keyCode === enterButtonCode && !vm.isLoading) {
                 vm.sendMessage();
             }
+        };
+
+        vm.toggleChatWindow = function () {
+            vm.isChatWindowOpen = !vm.isChatWindowOpen;
         };
     }
 })();
