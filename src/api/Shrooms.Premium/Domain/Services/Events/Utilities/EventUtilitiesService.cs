@@ -22,7 +22,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
-        
+
         private readonly IFilterPresetService _filterPresetService;
 
         public EventUtilitiesService(
@@ -33,7 +33,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
-            
+
             _filterPresetService = filterPresetService;
         }
 
@@ -71,7 +71,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     IsSingleJoin = type.IsSingleJoin,
                     Name = type.Name,
                     IsShownWithMainEvents = type.IsShownWithMainEvents,
-                    CanBeDisplayedInUpcomingEventsWidget = type.CanBeDisplayedInUpcomingEventsWidget,
+                    CanBeDisplayedInUpcomingEventsWidget = type.CanBeDisplayedInUpcomingEventsWidget
                 })
                 .OrderByDescending(t => t.Name)
                 .ToListAsync();

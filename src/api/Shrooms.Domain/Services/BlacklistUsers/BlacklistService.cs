@@ -4,7 +4,6 @@ using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -14,6 +13,7 @@ using System;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
 
 namespace Shrooms.Domain.Services.BlacklistUsers
 {
@@ -63,15 +63,14 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task CancelAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            var blacklistUser = await _blacklistUsersDbSet
-                .SingleOrDefaultAsync(FindActiveBlacklistEntry(userId, userOrg));
+            var blacklistUser = await _blacklistUsersDbSet.SingleOrDefaultAsync(FindActiveBlacklistEntry(userId, userOrg));
 
             _validator.CheckIfBlacklistUserExists(blacklistUser);
 
             blacklistUser.Status = BlacklistStatus.Canceled;
             blacklistUser.Modified = _systemClock.UtcNow;
             blacklistUser.ModifiedBy = userOrg.UserId;
-            
+
             await _uow.SaveChangesAsync(false);
         }
 

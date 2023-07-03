@@ -1,0 +1,27 @@
+.chat-bot-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+
+    .panel {
+        margin-right: 20px;
+    }
+}
+
+.chat-window {
+    width: 100px;
+}
+
+.chat-window.expanded {
+    width: 500px;
+}
+
+.chat-bot-messages {
+    max-height: 300px;
+    overflow-y: auto;
+
+    .message {
+        white-space: pre-wrap;
+    }
+}

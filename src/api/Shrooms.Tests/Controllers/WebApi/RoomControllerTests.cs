@@ -102,7 +102,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 FloorId = 1,
                 ApplicationUsers = new List<ApplicationUserViewModel>
                 {
-                    new ApplicationUserViewModel
+                    new()
                     {
                         Id = "1"
                     }

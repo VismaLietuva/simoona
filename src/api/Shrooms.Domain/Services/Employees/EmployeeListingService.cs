@@ -26,7 +26,7 @@ namespace Shrooms.Domain.Services.Employees
         private readonly IRoleService _roleService;
 
         public EmployeeListingService(
-            IUnitOfWork2 uow, 
+            IUnitOfWork2 uow,
             IPermissionService permissionService,
             IRoleService roleService)
         {
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.Employees
 
         public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg)
         {
-            var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
+            var permissions = (await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId)).ToList();
 
             var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
             var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
@@ -128,7 +128,7 @@ namespace Shrooms.Domain.Services.Employees
 
             return user => searchWords
                 .Count(sw => user.FirstName.Contains(sw) ||
-                             user.LastName.Contains(sw) || 
+                             user.LastName.Contains(sw) ||
                              user.JobPosition.Title.Contains(sw)) == searchWords.Count();
         }
     }

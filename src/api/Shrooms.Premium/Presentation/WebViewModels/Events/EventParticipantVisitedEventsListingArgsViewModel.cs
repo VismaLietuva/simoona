@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = EventsConstants.EventsDefaultPageSize;
-        
+
         public string SortByProperties { get; set; }
 
         public IEnumerable<int> EventTypeIds { get; set; }
@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [Required]
         [DateTimeLessThanDateTime(nameof(EndDate))]
         public DateTime? StartDate { get; set; }
-        
+
         [Required]
         [DateTimeLessThanPresentDate]
         public DateTime? EndDate { get; set; }

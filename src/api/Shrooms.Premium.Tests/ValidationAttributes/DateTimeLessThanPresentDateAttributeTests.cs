@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         public void IsValid_WhenDateTimeIsLessOrEqualThanDateTimeUtcNow_ReturnsTrue()
         {
             // Arrange
-            DateTime testValue = DateTime.UtcNow;
+            var testValue = DateTime.UtcNow;
             var attribute = new DateTimeLessThanPresentDateAttribute();
 
             // Act
@@ -25,7 +25,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         public void IsValid_WhenDateTimeIsGreaterThanDateTimeUtcNow_ReturnsFalse()
         {
             // Arrange
-            DateTime testValue = DateTime.UtcNow.AddYears(1);
+            var testValue = DateTime.UtcNow.AddYears(1);
             var attribute = new DateTimeLessThanPresentDateAttribute();
 
             // Act

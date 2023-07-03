@@ -99,7 +99,7 @@ namespace Shrooms.Presentation.Api
                     TokenEndpoint = tokenEndpoint,
                     Provider = new CustomMicrosoftAccountAuthProvider(container),
                     ClientId = clientId,
-                    ClientSecret = clientSecret,
+                    ClientSecret = clientSecret
                 };
 
                 app.UseMicrosoftAccountAuthentication(microsoftOAuthOptions);

@@ -18,7 +18,7 @@
             string mentioningUser,
             string postUrl,
             string settingsUrl,
-            string content) 
+            string content)
             : base(settingsUrl)
         {
             Subject = subject;

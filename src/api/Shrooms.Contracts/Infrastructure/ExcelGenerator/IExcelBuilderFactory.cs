@@ -1,6 +1,4 @@
-﻿using Shrooms.Contracts.Infrastructure.ExcelGenerator;
-
-namespace Shrooms.Contracts.Infrastructure
+﻿namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
 {
     public interface IExcelBuilderFactory
     {

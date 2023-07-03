@@ -59,14 +59,14 @@ namespace Shrooms.Tests.DomainService
         {
             var types = new List<KudosType>
             {
-                new KudosType
+                new()
                 {
                     Id = 1,
                     Name = "Other",
                     Type = KudosTypeEnum.Other
                 },
 
-                new KudosType
+                new()
                 {
                     Id = 2,
                     Name = "Minus",
@@ -80,7 +80,7 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosBaskets = new List<KudosBasket>
             {
-                new KudosBasket
+                new()
                 {
                     Id = 10,
                     Description = "test",
@@ -89,11 +89,14 @@ namespace Shrooms.Tests.DomainService
                     Title = "test",
                     IsActive = true
                 },
-                new KudosBasket
+                new()
                 {
                     Id = 11,
                     Description = "test",
-                    KudosLogs = new List<KudosLog> { new KudosLog { Points = 5, Employee = MockDonator().First() } },
+                    KudosLogs = new List<KudosLog>
+                    {
+                        new() { Points = 5, Employee = MockDonator().First() }
+                    },
                     OrganizationId = 2,
                     Title = "test",
                     IsActive = false
@@ -106,13 +109,13 @@ namespace Shrooms.Tests.DomainService
         {
             var kudosBasketLogs = new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     Points = 10,
                     Created = DateTime.Parse("2015-11-01"),
                     Employee = MockDonator().First()
                 },
-                new KudosLog
+                new()
                 {
                     Points = 15,
                     Created = DateTime.Parse("2015-11-02"),
@@ -126,7 +129,7 @@ namespace Shrooms.Tests.DomainService
         {
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId",
                     FirstName = "Testas",
@@ -185,11 +188,15 @@ namespace Shrooms.Tests.DomainService
 
             _kudosBasketDbSet.SetDbSetDataForAsync(new List<KudosBasket>
             {
-                new KudosBasket
+                new()
                 {
                     Id = 11,
                     Description = "test",
-                    KudosLogs = new List<KudosLog> { new KudosLog { Points = 5, Employee = null } },
+                    KudosLogs = new List<KudosLog>
+                    {
+                        new()
+                            { Points = 5, Employee = null }
+                    },
                     OrganizationId = 2,
                     Title = "test",
                     IsActive = false
@@ -225,7 +232,7 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_Exception_If_Basket_Exists()
         {
             const bool basketExists = true;
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+
             Assert.Throws<Exception>(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
 
@@ -233,7 +240,7 @@ namespace Shrooms.Tests.DomainService
         public void Should_Not_Throw_Exception_If_There_Are_No_Baskets()
         {
             const bool basketExists = false;
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
 
@@ -262,7 +269,6 @@ namespace Shrooms.Tests.DomainService
 
             // only one active and not deleted basket can be in a database
             var kudosBasket = await _kudosBasketDbSet.FirstAsync(x => x.Id == 11);
-            // ReSharper disable once AssignNullToNotNullAttribute
             _kudosBasketDbSet.Remove(kudosBasket);
 
             var result = await _kudosBasketService.GetKudosBasketAsync(userAndOrg);

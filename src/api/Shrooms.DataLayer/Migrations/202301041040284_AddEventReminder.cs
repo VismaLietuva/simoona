@@ -21,7 +21,6 @@ namespace Shrooms.DataLayer.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Events", t => t.EventId)
                 .Index(t => t.EventId);
-            
         }
         
         public override void Down()

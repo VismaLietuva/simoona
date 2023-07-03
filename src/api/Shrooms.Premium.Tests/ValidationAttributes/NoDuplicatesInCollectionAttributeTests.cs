@@ -12,7 +12,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         {
             public int Value { get; set; }
         }
-        
+
         private class Mock
         {
             public List<int> ValueTypes { get; set; }
@@ -41,7 +41,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         {
             // Arrange
             var attribute = new NoDuplicatesInCollectionAttribute(nameof(Mock.SingleValue));
-            var testValue = 10;
+            const int testValue = 10;
 
             // Assert
             Assert.Throws<ArgumentException>(() => attribute.IsValid(testValue));
@@ -81,7 +81,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
         {
             // Arrange
             var attribute = new NoDuplicatesInCollectionAttribute();
-            
+
             var testValue = new List<int> { 1, 2, 3, 1 };
 
             // Act

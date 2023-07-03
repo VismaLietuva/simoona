@@ -63,7 +63,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             {
                 UserId = group.Key.Id,
                 FullName = group.Key.FirstName + " " + group.Key.LastName,
-                Tickets = group.Distinct().Count(),
+                Tickets = group.Distinct().Count()
             };
     }
 }

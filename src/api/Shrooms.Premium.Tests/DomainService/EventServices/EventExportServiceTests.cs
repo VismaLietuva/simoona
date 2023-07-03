@@ -6,7 +6,7 @@ using Excel;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.Services.Events.Export;

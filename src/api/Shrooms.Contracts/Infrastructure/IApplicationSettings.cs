@@ -15,6 +15,8 @@ namespace Shrooms.Contracts.Infrastructure
 
         int AccessTokenLifeTimeInHours { get; }
 
+        int? KudosAvailableToSendPerMonth { get; }
+
         bool IsProductionBuild { get; }
 
         string DemoAccountDefaultPictureId { get; }

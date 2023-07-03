@@ -1,14 +1,13 @@
-﻿using Shrooms.Contracts.Constants;
+﻿using System.Data.Entity;
+using System.Threading.Tasks;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
-using System;
-using System.Data.Entity;
-using System.Threading.Tasks;
 
-namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
+namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistStates
 {
     public class BlacklistValidator : IBlacklistValidator
     {

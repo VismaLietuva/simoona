@@ -271,51 +271,52 @@ namespace Shrooms.Tests.Mocks
 
             RoomTypes = new List<RoomType>
             {
-                new RoomType
-                    {
-                        Id = 1,
-                        Name = "Room",
-                        Color = "#FFFFFF",
-                        Rooms = new List<Room> { room1, room2 },
-                        OrganizationId = TestConstants.DefaultOrganizationId
-                    },
-                new RoomType
-                    {
-                        Id = 2,
-                        Name = "Meeting Room",
-                        Color = "#FF0000",
-                        Rooms = new List<Room>(),
-                        OrganizationId = TestConstants.DefaultOrganizationId
-                    },
-                new RoomType
-                    {
-                        Id = 3,
-                        Name = "Kitchen",
-                        Color = "#00FF00",
-                        Rooms = new List<Room> { room3, room4 },
-                        OrganizationId = TestConstants.DefaultOrganizationId
-                    },
-                new RoomType
-                    {
-                        Id = 4,
-                        Name = "WC",
-                        Color = "#808080",
-                        Rooms = new List<Room> { room5 },
-                        OrganizationId = TestConstants.DefaultOrganizationId
-                    },
-                new RoomType
-                    {
-                        Id = 10,
-                        Name = "Unknown",
-                        Color = "#000000",
-                        Rooms = new List<Room>(),
-                        OrganizationId = TestConstants.DefaultOrganizationId
-                    }
+                new()
+                {
+                    Id = 1,
+                    Name = "Room",
+                    Color = "#FFFFFF",
+                    Rooms = new List<Room> { room1, room2 },
+                    OrganizationId = TestConstants.DefaultOrganizationId
+                },
+                new()
+                {
+                    Id = 2,
+                    Name = "Meeting Room",
+                    Color = "#FF0000",
+                    Rooms = new List<Room>(),
+                    OrganizationId = TestConstants.DefaultOrganizationId
+                },
+                new()
+                {
+                    Id = 3,
+                    Name = "Kitchen",
+                    Color = "#00FF00",
+                    Rooms = new List<Room> { room3, room4 },
+                    OrganizationId = TestConstants.DefaultOrganizationId
+                },
+                new()
+                {
+                    Id = 4,
+                    Name = "WC",
+                    Color = "#808080",
+                    Rooms = new List<Room> { room5 },
+                    OrganizationId = TestConstants.DefaultOrganizationId
+                },
+                new()
+                {
+                    Id = 10,
+                    Name = "Unknown",
+                    Color = "#000000",
+                    Rooms = new List<Room>(),
+                    OrganizationId = TestConstants.DefaultOrganizationId
+                }
             };
 
             #endregion RoomTypes
 
             #region QualificationLevels
+
             var qualificationLevel1 = new QualificationLevel
             {
                 Id = 1,
@@ -331,6 +332,7 @@ namespace Shrooms.Tests.Mocks
                 ApplicationUsers = new List<ApplicationUser> { ApplicationUsers[2], ApplicationUsers[3] },
                 OrganizationId = TestConstants.DefaultOrganizationId
             };
+
             #endregion
 
             Rooms = new List<Room> { room1, room2, room3, room4, room5 };
@@ -343,7 +345,7 @@ namespace Shrooms.Tests.Mocks
         {
             Roles = new List<ApplicationRole>
             {
-                new ApplicationRole
+                new()
                 {
                     Name = "Admin"
                 }
@@ -354,7 +356,7 @@ namespace Shrooms.Tests.Mocks
         {
             MockModels = new List<MockModel>
             {
-                new MockModel
+                new()
                 {
                     Id = 1,
                     Value = "Test value"

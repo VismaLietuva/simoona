@@ -31,10 +31,7 @@ namespace Shrooms.Infrastructure.Email.Templating
             return ApplyTimeZoneChangesToSingleTemplate(viewModel, key, timeZonePropertiesWithInitialValues, timeZoneKey);
         }
 
-        public ITimeZoneEmailGroup Generate<TEmailTemplate>(
-            TEmailTemplate viewModel,
-            string key,
-            IEnumerable<string> timeZoneKeys)
+        public ITimeZoneEmailGroup Generate<TEmailTemplate>(TEmailTemplate viewModel, string key, IEnumerable<string> timeZoneKeys)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
             if (!timeZoneKeys.Any())

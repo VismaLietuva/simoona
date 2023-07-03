@@ -1,9 +1,8 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
-using System;
-using System.Threading.Tasks;
 
-namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
+namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistStates
 {
     public interface IBlacklistValidator
     {

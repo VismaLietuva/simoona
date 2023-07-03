@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
@@ -87,6 +86,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _eventValidationService.CheckIfEventExists(@event);
             var isAdmin = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
+
             // ReSharper disable once PossibleNullReferenceException
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
@@ -219,7 +219,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             eventDto.RegistrationDeadlineDate = eventDto.RegistrationDeadlineDate;
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
-            
+
             _eventValidationService.CheckIfEventExists(eventToUpdate);
             _eventValidationService.CheckIfUserHasPermission(eventDto.UserId, eventToUpdate.ResponsibleUserId, hasPermission);
             _eventValidationService.CheckIfUserHasPermissionToPin(eventDto.IsPinned, eventToUpdate.IsPinned, hasPermission);
@@ -391,6 +391,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var eventTypeExists = await _eventTypesDbSet.AnyAsync(e => e.Id == eventDto.TypeId);
 
             _eventValidationService.CheckIfEndDateIsGreaterThanStartDate(eventDto.StartDate, eventDto.EndDate);
+
             // ReSharper disable once PossibleInvalidOperationException
             _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate, eventDto.StartDate);
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
@@ -536,7 +537,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 UpdateEventReminder(updateReminder.Reminder, updateReminder.OldReminder, eventArgsDto, eventToUpdate);
             }
 
-            var newReminders = eventArgsDto.Reminders.Where(reminder => 
+            var newReminders = eventArgsDto.Reminders.Where(reminder =>
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
                 (eventArgsDto.StartDate != eventArgsDto.RegistrationDeadlineDate || reminder.Type != EventReminderType.Deadline));
             AddEventReminders(eventToUpdate, eventArgsDto, newReminders, eventArgsDto.UserId);
@@ -610,7 +611,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     UpdateEventReminderDeadline(reminderToUpdate, eventArgsDto, @event);
                     break;
             }
-            
+
             if (reminderToUpdate.RemindBeforeInDays != reminder.RemindBeforeInDays)
             {
                 _eventValidationService.CheckIfEventReminderCanBeUpdated(eventArgsDto, reminderToUpdate);
@@ -674,7 +675,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Name = o.Option,
                     Participants = o.EventParticipants
                         .Where(x => x.EventId == eventId &&
-                              (x.AttendStatus == (int)AttendingStatus.Attending || 
+                              (x.AttendStatus == (int)AttendingStatus.Attending ||
                                x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
                         .Select(p => new EventDetailsParticipantDto
                         {

@@ -171,7 +171,7 @@ namespace Shrooms.Tests.DomainService
             var adminRole = Substitute.For<ApplicationRole>();
             adminRole.Users.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     UserId = "userId"
                 }
@@ -179,7 +179,7 @@ namespace Shrooms.Tests.DomainService
 
             var organizationId1 = new List<Organization>
             {
-                new Organization
+                new()
                 {
                     Id = 1
                 }
@@ -187,7 +187,7 @@ namespace Shrooms.Tests.DomainService
 
             var permissions = new List<Permission>
             {
-                new Permission
+                new()
                 {
                     Id = 1,
                     Name = "TEST1_BASIC",
@@ -213,7 +213,7 @@ namespace Shrooms.Tests.DomainService
             adminRole.Id = "AdminId";
             adminRole.Users.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     RoleId = "AdminId",
                     UserId = "UserId1"
@@ -224,7 +224,7 @@ namespace Shrooms.Tests.DomainService
             userRole.Id = "UserId";
             userRole.Users.Returns(new List<IdentityUserRole>
             {
-                new IdentityUserRole
+                new()
                 {
                     RoleId = "UserId",
                     UserId = "UserId2"
@@ -233,7 +233,7 @@ namespace Shrooms.Tests.DomainService
 
             var organizationId1 = new List<Organization>
             {
-                new Organization
+                new()
                 {
                     Id = 1
                 }
@@ -241,7 +241,7 @@ namespace Shrooms.Tests.DomainService
 
             var organizationId2 = new List<Organization>
             {
-                new Organization
+                new()
                 {
                     Id = 2
                 }
@@ -249,7 +249,7 @@ namespace Shrooms.Tests.DomainService
 
             var permissions = new List<Permission>
             {
-                new Permission
+                new()
                 {
                     Id = 1,
                     Name = "TEST1_BASIC",
@@ -265,7 +265,7 @@ namespace Shrooms.Tests.DomainService
                         userRole
                     }
                 },
-                new Permission
+                new()
                 {
                     Id = 2,
                     Name = "TEST1_ADMIN",
@@ -280,7 +280,7 @@ namespace Shrooms.Tests.DomainService
                         adminRole
                     }
                 },
-                new Permission
+                new()
                 {
                     Id = 3,
                     Name = "TEST2_BASIC",
@@ -291,7 +291,7 @@ namespace Shrooms.Tests.DomainService
                         userRole
                     }
                 },
-                new Permission
+                new()
                 {
                     Id = 4,
                     Name = "TEST2_ADMIN",
@@ -301,7 +301,7 @@ namespace Shrooms.Tests.DomainService
                         adminRole
                     }
                 },
-                new Permission
+                new()
                 {
                     Id = 5,
                     Name = "TEST3_BASIC",
@@ -317,7 +317,7 @@ namespace Shrooms.Tests.DomainService
                         userRole
                     }
                 },
-                new Permission
+                new()
                 {
                     Id = 6,
                     Name = "TEST3_ADMIN",

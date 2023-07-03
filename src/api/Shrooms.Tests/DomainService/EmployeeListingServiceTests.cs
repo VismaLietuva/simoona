@@ -1,7 +1,6 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Employees;
 using Shrooms.Domain.Services.Permissions;
@@ -277,7 +276,7 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     OrganizationId = 1,
@@ -297,7 +296,7 @@ namespace Shrooms.Tests.DomainService
                     BlacklistEntries = new List<BlacklistUser>()
                 },
 
-                new ApplicationUser
+                new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     OrganizationId = 1,
@@ -317,7 +316,7 @@ namespace Shrooms.Tests.DomainService
                     BlacklistEntries = new List<BlacklistUser>()
                 },
 
-                new ApplicationUser
+                new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     OrganizationId = 1,
@@ -336,7 +335,7 @@ namespace Shrooms.Tests.DomainService
                     },
                     BlacklistEntries = new List<BlacklistUser>
                     {
-                        new BlacklistUser
+                        new()
                         {
                             EndDate = DateTime.MaxValue
                         }

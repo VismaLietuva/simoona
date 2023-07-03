@@ -20,7 +20,7 @@ namespace Shrooms.Tests.DomainService
 
         private DbSet<Event> _eventsDbSet;
         private ISystemClock _systemClock;
-        
+
         private EventWidgetService _sut;
 
         [SetUp]
@@ -138,7 +138,7 @@ namespace Shrooms.Tests.DomainService
                 eventCount: eventCount,
                 additionalEvents: () => new List<Event>
                 {
-                    new Event
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         OrganizationId = DefaultOrganizationId,

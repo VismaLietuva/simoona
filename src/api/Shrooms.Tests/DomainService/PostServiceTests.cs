@@ -16,7 +16,6 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
-using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -32,7 +31,6 @@ namespace Shrooms.Tests.DomainService
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<WallModerator> _wallModeratorsDbSet;
         private IPostService _postService;
-        private IPermissionService _permissionService;
         private IWallService _wallService;
 
         private readonly string _userId = Guid.NewGuid().ToString();
@@ -47,12 +45,11 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
             _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
 
-            _permissionService = Substitute.For<IPermissionService>();
             _wallService = Substitute.For<IWallService>();
 
             var commentService = Substitute.For<ICommentService>();
 
-            _postService = new PostService(uow, _permissionService, commentService, _wallService);
+            _postService = new PostService(uow, commentService, _wallService);
         }
 
         [Test]
@@ -113,7 +110,8 @@ namespace Shrooms.Tests.DomainService
             // Setup
             var walls = new List<Wall>
             {
-                new Wall { Id = 1, OrganizationId = 2 }
+                new()
+                    { Id = 1, OrganizationId = 2 }
             };
             _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
@@ -123,7 +121,8 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = _userId }
+                new()
+                    { Id = _userId }
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
@@ -161,7 +160,8 @@ namespace Shrooms.Tests.DomainService
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "testUser" }
+                new()
+                    { Id = "testUser" }
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
@@ -207,24 +207,28 @@ namespace Shrooms.Tests.DomainService
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
 
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user2", IsHidden = false },
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user2", IsHidden = false }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user2", IsHidden = false },
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user2", IsHidden = false }
             };
 
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1" },
-                new ApplicationUser { Id = "user2" }
+                new()
+                    { Id = "user1" },
+                new()
+                    { Id = "user2" }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
@@ -253,23 +257,26 @@ namespace Shrooms.Tests.DomainService
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user1" }
+                new()
+                    { WallId = wall.Id, UserId = "user1" }
             };
 
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", IsHidden = false },
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", IsHidden = false }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", IsHidden = false },
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", IsHidden = false }
             };
 
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1" }
+                new()
+                    { Id = "user1" }
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
@@ -286,13 +293,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -304,8 +313,6 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2,
                 Images = new List<string>()
             };
-
-            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
@@ -319,13 +326,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -337,8 +346,6 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2,
                 Images = new List<string>()
             };
-
-            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
@@ -352,13 +359,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -432,13 +441,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -468,13 +479,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -483,8 +496,6 @@ namespace Shrooms.Tests.DomainService
                 UserId = "user3",
                 OrganizationId = 2
             };
-
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
@@ -498,13 +509,15 @@ namespace Shrooms.Tests.DomainService
             var wall = new Wall { Id = 1, OrganizationId = 2 };
             var posts = new List<Post>
             {
-                new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
+                new()
+                    { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
             };
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
-                new WallModerator { WallId = wall.Id, UserId = "user2" }
+                new()
+                    { WallId = wall.Id, UserId = "user2" }
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
@@ -513,8 +526,6 @@ namespace Shrooms.Tests.DomainService
                 UserId = "user2",
                 OrganizationId = 2
             };
-
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert

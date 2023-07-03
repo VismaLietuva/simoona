@@ -21,7 +21,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         [DateTimeLessThanDateTime(nameof(EndDate))]
         public DateTime? StartDate { get; set; }
-        
+
         public DateTime? EndDate { get; set; }
 
         public bool ExcludeEmptyEvents { get; set; }

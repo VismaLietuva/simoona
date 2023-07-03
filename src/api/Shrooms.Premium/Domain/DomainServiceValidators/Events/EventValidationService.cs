@@ -308,7 +308,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventDateFilterRangeInvalid);
             }
         }
-        
+
         public void CheckIfCanJoinEvent(EventJoinDto joinDto, EventJoinValidationDto joinValidationDto)
         {
             var newParticipantCount = joinDto.ParticipantIds.Count();

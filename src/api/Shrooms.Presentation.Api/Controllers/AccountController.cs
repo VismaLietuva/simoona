@@ -47,11 +47,11 @@ namespace Shrooms.Presentation.Api.Controllers
         private string RequestedOrganization => Request.GetRequestedTenant();
 
         public AccountController(
-            IMapper mapper, 
-            ShroomsUserManager userManager, 
+            IMapper mapper,
+            ShroomsUserManager userManager,
             IPermissionService permissionService,
-            IOrganizationService organizationService, 
-            IRefreshTokenService refreshTokenService, 
+            IOrganizationService organizationService,
+            IRefreshTokenService refreshTokenService,
             IAdministrationUsersService administrationService,
             IApplicationSettings applicationSettings)
         {
@@ -368,7 +368,6 @@ namespace Shrooms.Presentation.Api.Controllers
         // ReSharper disable once InconsistentNaming
         public async Task<IHttpActionResult> GetExternalLogin(string provider, string client_Id = null, string userId = null, bool isRegistration = false, string error = null)
         {
-            
             if (string.IsNullOrEmpty(client_Id) || error != null)
             {
                 var uri = CreateErrorUri("error");

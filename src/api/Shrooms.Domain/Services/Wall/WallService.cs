@@ -575,7 +575,7 @@ namespace Shrooms.Domain.Services.Wall
         public async Task<IEnumerable<WallMemberEmailReceiverDto>> GetWallMembersWithEnabledEmailNotificationsAsync(int wallId, int organizationId)
         {
             return await _wallUsersDbSet
-                .Where(member => 
+                .Where(member =>
                     member.WallId == wallId &&
                     member.EmailNotificationsEnabled)
                 .Select(member => new WallMemberEmailReceiverDto

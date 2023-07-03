@@ -1,5 +1,4 @@
 ﻿using Shrooms.Contracts.Enums;
-using Shrooms.DataLayer.EntityModels.Models;
 using System;
 using System.Collections.Generic;
 

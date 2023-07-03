@@ -30,12 +30,16 @@ module.exports = function () {
         build: './build/',
         defaultBuildConfig: {
             endpoint: 'http://localhost:50321/',
+            chatBotEndpoint: 'chatBotEndpointValue',
+            chatBotAgentId: 'chatBotAgentIdValue',
             impersonate: false,
             showMissingTranslations: true,
             environment: 'dev'
         },
         productionBuildConfig: {
             endpoint:  'http://localhost:50321/',
+            chatBotEndpoint: 'chatBotEndpointValue',
+            chatBotAgentId: 'chatBotAgentIdValue',
             impersonate: false,
             showMissingTranslations: false,
             environment: 'prod'

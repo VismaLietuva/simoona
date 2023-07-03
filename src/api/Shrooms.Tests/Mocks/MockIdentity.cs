@@ -87,9 +87,9 @@ namespace Shrooms.Tests.Mocks
         {
             var claims = new List<Claim>
             {
-                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", name),
-                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", id),
-                new Claim(WebApiConstants.ClaimOrganizationId, "1")
+                new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", name),
+                new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", id),
+                new(WebApiConstants.ClaimOrganizationId, "1")
             };
 
             var genericIdentity = new GenericIdentity(string.Empty);

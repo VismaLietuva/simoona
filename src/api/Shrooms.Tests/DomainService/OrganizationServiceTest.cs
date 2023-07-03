@@ -52,8 +52,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1" },
-                new Organization { Id = 2, ShortName = "Organization2" }
+                new()
+                    { Id = 1, ShortName = "Organization1" },
+                new()
+                    { Id = 2, ShortName = "Organization2" }
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
@@ -68,8 +70,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" },
-                new Organization { Id = 2, ShortName = "Organization2", HostName = "Host2" }
+                new()
+                    { Id = 1, ShortName = "Organization1", HostName = "Host1" },
+                new()
+                    { Id = 2, ShortName = "Organization2", HostName = "Host2" }
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
@@ -83,8 +87,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" },
-                new Organization { Id = 2, ShortName = "Organization2", HostName = "Host2", HasRestrictedAccess = true }
+                new()
+                    { Id = 1, ShortName = "Organization1", HostName = "Host1" },
+                new()
+                    { Id = 2, ShortName = "Organization2", HostName = "Host2", HasRestrictedAccess = true }
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
@@ -98,7 +104,8 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" }
+                new()
+                    { Id = 1, ShortName = "Organization1", HostName = "Host1" }
             };
 
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
@@ -124,8 +131,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
-                new Organization { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
+                new()
+                    { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
+                new()
+                    { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
             };
 
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
@@ -140,8 +149,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
-                new Organization { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
+                new()
+                    { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
+                new()
+                    { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
@@ -155,8 +166,10 @@ namespace Shrooms.Tests.DomainService
         {
             var organizations = new List<Organization>
             {
-                new Organization { Id = 1, ShortName = "Organization1", RequiresUserConfirmation = true },
-                new Organization { Id = 2, ShortName = "Organization2" }
+                new()
+                    { Id = 1, ShortName = "Organization1", RequiresUserConfirmation = true },
+                new()
+                    { Id = 2, ShortName = "Organization2" }
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
@@ -192,9 +205,12 @@ namespace Shrooms.Tests.DomainService
         {
             var users = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", IsManagingDirector = false, FirstName = "John", LastName = "Doe", OrganizationId = 1 },
-                new ApplicationUser { Id = "user2", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 },
-                new ApplicationUser { Id = "user3", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 }
+                new()
+                    { Id = "user1", IsManagingDirector = false, FirstName = "John", LastName = "Doe", OrganizationId = 1 },
+                new()
+                    { Id = "user2", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 },
+                new()
+                    { Id = "user3", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 }
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);

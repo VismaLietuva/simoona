@@ -64,7 +64,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             {
                 LinksToCreate = new List<NewExternalLinkViewModel>
                 {
-                    new NewExternalLinkViewModel
+                    new()
                     {
                         Priority = -10
                     }

@@ -30,7 +30,7 @@ namespace Shrooms.Contracts.Constants
         public const string KudosServiceStatusCancelled = "Cancelled";
         public const string KudosStatusAllFilter = "All";
         public const string KudosFilteringTypeAllFilter = "All";
-        public const int KudosAvailableToSendThisMonth = 20;
+        public const int DefaultKudosAvailableToSendPerMonth = 20;
         public const int MaxKudosLogsPerPage = 50;
 
         public const int MaxKudosDescriptionLength = 500;

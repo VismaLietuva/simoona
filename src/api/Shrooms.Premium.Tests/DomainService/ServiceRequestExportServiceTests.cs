@@ -11,7 +11,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Domain.Services.ServiceRequests;

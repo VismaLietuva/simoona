@@ -96,7 +96,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 var firstTimeParticipants = await AddAllFirstTimeParticipantsAsync(users, joinDto, eventDto);
                 await AddAllChangeStatusParticipantsAsync(joinDto, eventDto);
                 await _uow.SaveChangesAsync(false);
-                
+
                 NotifyJoinedUsers(joinDto, eventDto, firstTimeParticipants);
             }
             finally
@@ -739,7 +739,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             var firstTimeJoinParticipantIds = joinDto.ParticipantIds.Where(id => !eventDto.Participants.Any(participant => participant.Id == id));
             await AddParticipantsAsync(firstTimeJoinParticipantIds, eventDto, joinDto);
-            
+
             return users.Where(user => firstTimeJoinParticipantIds.Contains(user.Id))
                 .Select(ApplicationUserToEventParticipantFirstTimeJoinDto())
                 .ToList();

@@ -79,7 +79,7 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
         private bool TryGetImagesValue(object value, out IEnumerable<string> images)
         {
             images = null;
-            
+
             if (value == null) // Cannot get type when object is null
             {
                 return true;

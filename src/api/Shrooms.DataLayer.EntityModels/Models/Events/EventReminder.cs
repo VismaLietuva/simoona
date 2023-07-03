@@ -10,12 +10,12 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public Guid EventId { get; set; }
 
         public Event Event { get; set; }
-        
+
         [Range(ValidationConstants.EventReminderRemindBeforeInDaysMin, ValidationConstants.EventReminderRemindBeforeInDaysMax)]
         public int RemindBeforeInDays { get; set; }
 
         public EventReminderType Type { get; set; }
-        
+
         public bool IsReminded { get; set; }
 
         public int RemindedCount { get; set; }

@@ -7,12 +7,10 @@ using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Tests.Extensions;
-using System.Threading.Tasks;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects;
@@ -118,11 +116,11 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAddWithMoreThanOneDefault = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 },
-                new CreateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 }
@@ -144,11 +142,11 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToUpdateWithMoreThanOneDefault = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 },
-                new UpdateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 }
@@ -170,7 +168,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAddWithOneDefaultPreset = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 }
@@ -178,7 +176,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdateWithOneDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 }
@@ -200,7 +198,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAddWithOneDefaultPreset = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     IsDefault = true
                 }
@@ -208,7 +206,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdateWithoutDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     IsDefault = false
                 }
@@ -230,7 +228,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAddWithoutDefaultPreset = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     IsDefault = false
                 }
@@ -238,7 +236,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdateWithoutDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     IsDefault = false
                 }
@@ -260,20 +258,22 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var createPresets = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Filters = new List<FilterPresetItemDto>
                     {
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Events,
-                            Types = new List<string>() { "1" }
+                            Types = new List<string>
+                                { "1" }
                         },
 
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Offices,
-                            Types = new List<string>() { "1" }
+                            Types = new List<string>
+                                { "1" }
                         }
                     }
                 }
@@ -281,20 +281,22 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updatePresets = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Filters = new List<FilterPresetItemDto>
                     {
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Events,
-                            Types = new List<string>() { "1" }
+                            Types = new List<string>
+                                { "1" }
                         },
 
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Kudos,
-                            Types = new List<string>() { "1" }
+                            Types = new List<string>
+                                { "1" }
                         }
                     }
                 }
@@ -322,20 +324,22 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var createPresets = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Filters = new List<FilterPresetItemDto>
                     {
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Events,
-                            Types = new List<string>() { "121312" }
+                            Types = new List<string>
+                                { "121312" }
                         },
 
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Offices,
-                            Types = new List<string>() { "23" }
+                            Types = new List<string>
+                                { "23" }
                         }
                     }
                 }
@@ -343,20 +347,22 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updatePresets = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Filters = new List<FilterPresetItemDto>
                     {
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Events,
-                            Types = new List<string>() { "0" }
+                            Types = new List<string>
+                                { "0" }
                         },
 
-                        new FilterPresetItemDto
+                        new()
                         {
                             FilterType = FilterType.Kudos,
-                            Types = new List<string>() { "1" }
+                            Types = new List<string>
+                                { "1" }
                         }
                     }
                 }
@@ -384,7 +390,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var firstCollection = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto()
+                new()
             };
             var secondCollection = new List<UpdateFilterPresetDto>();
 
@@ -439,12 +445,12 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var collectionWithDuplicateNames = new List<FilterPresetDto>
             {
-                new FilterPresetDto
+                new()
                 {
                     Name = "Awesome filter preset"
                 },
 
-                new FilterPresetDto
+                new()
                 {
                     Name = "Awesome filter preset"
                 }
@@ -460,12 +466,12 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var collectionWithDuplicateNames = new List<FilterPresetDto>
             {
-                new FilterPresetDto
+                new()
                 {
                     Name = "Another awesome filter preset"
                 },
 
-                new FilterPresetDto
+                new()
                 {
                     Name = "Awesome filter preset"
                 }
@@ -481,7 +487,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAdd = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Name = "I love writing tests"
                 }
@@ -489,7 +495,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Name = "I love writing tests"
                 }
@@ -515,7 +521,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var presetsToAdd = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Name = "I hate writing tests"
                 }
@@ -523,7 +529,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Name = "I love writing tests"
                 }
@@ -548,7 +554,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var removedPresets = new List<FilterPresetDto>
             {
-                new FilterPresetDto
+                new()
                 {
                     Id = 1,
                     Name = "Deleted"
@@ -557,7 +563,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToAdd = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Name = "Deleted"
                 }
@@ -581,7 +587,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             var removedPresets = new List<FilterPresetDto>
             {
-                new FilterPresetDto
+                new()
                 {
                     Id = 1,
                     Name = "Deleted"
@@ -590,7 +596,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Name = "Deleted"
                 }
@@ -613,7 +619,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             _filterPresetDbSet.SetDbSetDataForAsync(new List<FilterPreset>
             {
-                new FilterPreset
+                new()
                 {
                     Name = "Name"
                 }
@@ -623,7 +629,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToAdd = new List<CreateFilterPresetDto>
             {
-                new CreateFilterPresetDto
+                new()
                 {
                     Name = "Name"
                 }
@@ -646,7 +652,7 @@ namespace Shrooms.Tests.DomainService.Validators
             // Arrange
             _filterPresetDbSet.SetDbSetDataForAsync(new List<FilterPreset>
             {
-                new FilterPreset
+                new()
                 {
                     Id = 1,
                     Name = "Name"
@@ -657,7 +663,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new UpdateFilterPresetDto
+                new()
                 {
                     Id = 2,
                     Name = "Name"
@@ -679,7 +685,7 @@ namespace Shrooms.Tests.DomainService.Validators
         {
             _eventTypeDbSet.SetDbSetDataForAsync(new List<EventType>
             {
-                new EventType
+                new()
                 {
                     Id = 1,
                     OrganizationId = 1
@@ -688,7 +694,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             _kudosTypeDbSet.SetDbSetDataForAsync(new List<KudosType>
             {
-                new KudosType
+                new()
                 {
                     Id = 1
                 }
@@ -696,7 +702,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             _officeDbSet.SetDbSetDataForAsync(new List<Office>
             {
-                new Office
+                new()
                 {
                     Id = 1,
                     OrganizationId = 1

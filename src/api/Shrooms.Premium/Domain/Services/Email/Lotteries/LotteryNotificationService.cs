@@ -35,7 +35,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
-        
+
         public async Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto startedDto, int organizationId)
         {
             var receivers = await _usersDbSet

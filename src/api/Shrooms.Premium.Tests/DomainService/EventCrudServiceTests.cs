@@ -764,10 +764,10 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                Reminders = reminders.Select(reminder => new EventReminderDto
+                Reminders = reminders.Select(r => new EventReminderDto
                 {
-                    Type = reminder.Type,
-                    RemindBeforeInDays = reminder.RemindBeforeInDays
+                    Type = r.Type,
+                    RemindBeforeInDays = r.RemindBeforeInDays
                 })
             };
 
@@ -822,10 +822,10 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                Reminders = reminders.Select(reminder => new EventReminderDto
+                Reminders = reminders.Select(r => new EventReminderDto
                 {
-                    Type = reminder.Type,
-                    RemindBeforeInDays = reminder.RemindBeforeInDays
+                    Type = r.Type,
+                    RemindBeforeInDays = r.RemindBeforeInDays
                 })
             };
 
@@ -888,8 +888,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             _eventRemindersDbSet.Received(1)
-                .RemoveRange(Arg.Is<IEnumerable<EventReminder>>(reminders =>
-                    reminders.Any(r => r.Id == reminder.Id)));
+                .RemoveRange(Arg.Is<IEnumerable<EventReminder>>(r => r.Any(rr => rr.Id == reminder.Id)));
         }
 
         private List<ApplicationUser> MockUsers()

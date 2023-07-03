@@ -107,12 +107,12 @@ namespace Shrooms.Tests.DomainService
                 excelReader.Close();
             }
         }
-        
+
         private IQueryable<KudosLog> MockKudos()
         {
             return new List<KudosLog>
             {
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Pending,
                     Id = 1,
@@ -126,7 +126,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Pending,
                     Id = 2,
@@ -140,7 +140,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId2"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 3,
@@ -154,7 +154,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
-                new KudosLog
+                new()
                 {
                     Status = KudosStatus.Approved,
                     Id = 4,
@@ -175,31 +175,31 @@ namespace Shrooms.Tests.DomainService
         {
             return new List<ApplicationUser>
             {
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId",
                     FirstName = "name",
                     LastName = "surname"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId2",
                     FirstName = "name2",
                     LastName = "surname2"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId3",
                     FirstName = "name3",
                     LastName = "surname3"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId4",
                     FirstName = "name4",
                     LastName = "surname4"
                 },
-                new ApplicationUser
+                new()
                 {
                     Id = "testUserId5",
                     FirstName = "name5",

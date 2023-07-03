@@ -40,7 +40,8 @@
         'simoonaApp.Widget',
         'simoonaApp.Customization',
         'simoonaApp.Lotteries',
-        'simoonaApp.Settings'
+        'simoonaApp.Settings',
+        'simoonaApp.ChatBot'
     ];
 
     window.modules = modulesList;
@@ -48,6 +49,7 @@
     window.lotteriesEnabled = false;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.usePostWatching = true; // Used to show/hide post watching feature
+    window.isChatBotEnabled = false;
 
     angular.module('simoonaApp', window.modules)
         .run(execute)

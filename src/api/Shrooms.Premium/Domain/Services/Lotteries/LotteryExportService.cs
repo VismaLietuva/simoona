@@ -1,7 +1,6 @@
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
 using System;

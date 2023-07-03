@@ -151,19 +151,19 @@ namespace Shrooms.Tests.DomainService
         {
             var monitors = new List<Monitor>
             {
-                new Monitor
+                new()
                 {
                     Id = 1,
                     Name = "Test1",
                     OrganizationId = 2
                 },
-                new Monitor
+                new()
                 {
                     Id = 2,
                     Name = "Test2",
                     OrganizationId = 2
                 },
-                new Monitor
+                new()
                 {
                     Id = 3,
                     Name = "Test3",

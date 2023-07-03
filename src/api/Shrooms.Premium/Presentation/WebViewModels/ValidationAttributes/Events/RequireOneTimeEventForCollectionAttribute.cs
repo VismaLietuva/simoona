@@ -37,10 +37,10 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
         {
             var property = validationContext.ObjectType.GetProperty(_comparisonProperty);
             CheckIfPropertyFound(property);
-            
+
             var propertyValue = property.GetValue(validationContext.ObjectInstance);
             CheckIfValueIsEventRecurrenceOption(propertyValue);
-            
+
             return (EventRecurrenceOptions)propertyValue;
         }
 

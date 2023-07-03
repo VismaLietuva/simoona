@@ -20,7 +20,6 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Enums;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -439,24 +438,6 @@ namespace Shrooms.Domain.Services.Administration
                 e.Room.RoomType.Name.Contains(n) ||
                 e.Room.Floor.Name.Contains(n) ||
                 e.Room.Floor.Office.Name.Contains(n)) == searchKeyWords.Count();
-        }
-
-        private static List<object> UserToUserRow(ApplicationUser user)
-        {
-            var result = new List<object>
-            {
-                user.FirstName,
-                user.LastName,
-                user.BirthDay,
-                user.JobPosition == null ? string.Empty : user.JobPosition.Title,
-                StringToLong(user.PhoneNumber),
-                user.WorkingHours != null
-                    ? $"{user.WorkingHours.StartTime}-{user.WorkingHours.EndTime}"
-                    : string.Empty,
-                user.PictureId != null ? Resources.Common.Yes : Resources.Common.No
-            };
-
-            return result;
         }
 
         private static long? StringToLong(string str)

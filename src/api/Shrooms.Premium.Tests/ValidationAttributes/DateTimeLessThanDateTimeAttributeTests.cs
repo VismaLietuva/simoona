@@ -72,7 +72,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             // Arrange
             var model = new Mock
             {
-                Date = DateTime.UtcNow.AddYears(1),
+                Date = DateTime.UtcNow.AddYears(1)
             };
 
             var validationContext = new ValidationContext(model);
@@ -93,7 +93,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             // Arrange
             var model = new Mock
             {
-                Date = DateTime.UtcNow,
+                Date = DateTime.UtcNow
             };
 
             var validationContext = new ValidationContext(model);
@@ -102,7 +102,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
 
             // Act
             var result = attribute.GetValidationResult(testValue, validationContext);
-            
+
             // Assert
             Assert.IsNotNull(result.ErrorMessage);
         }

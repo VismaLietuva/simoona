@@ -123,7 +123,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
                 Images = new List<string>
                 {
                     "image"
-                },
+                }
             };
         }
     }

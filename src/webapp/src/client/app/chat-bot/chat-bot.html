@@ -1,0 +1,27 @@
+<div class="chat-bot-container">
+    <div class="panel panel-default">
+        <div class="panel-heading bg-info">
+            <button class="btn btn-link btn-bg" type="button" data-toggle="collapse" data-target="#chatWindow"
+                    aria-expanded="false" aria-controls="chatWindow" ng-click="vm.toggleChatWindow()">
+                <span translate="chatBot.talkToAiAgent"></span>
+            </button>
+        </div>
+        <div id="chatWindow" class="panel-collapse collapse" >
+            <div class="panel-body chat-window" ng-class="{ 'expanded': vm.isChatWindowOpen }">
+                <div id="chatMessages" class="chat-bot-messages">
+                    <div ng-repeat="message in vm.messages">
+                        <p class="message"><strong translate="{{message.isBotMessage ? 'chatBot.aiAgent' : 'common.you' }}"></strong>: {{ message.text }}</p>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-model="vm.newMessage" translate-attr-placeholder="chatBot.sendAMessage" ng-keypress="vm.handleKeyPress($event)">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" ng-click="vm.sendMessage()" ng-disabled="vm.isLoading">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

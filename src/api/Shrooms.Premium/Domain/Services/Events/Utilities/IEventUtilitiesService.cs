@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Events.Utilities

@@ -7,16 +7,17 @@
 
     layoutController.$inject = [
         'authService',
-        'roles'
+        'roles',
+        '$window'
     ];
 
-    function layoutController(authService, roles) {
+    function layoutController(authService, roles, $window) {
         /* jshint validthis: true */
         var vm = this;
-
         vm.isAuthenticated = authService.isAuthenticated;
         vm.isAuthenticatedNotNewUser = authService.isAuthenticatedNotNewUser;
         vm.isExternal = authService.isInRole(roles.external);
+        vm.isChatBotEnabled = $window.isChatBotEnabled;
     }
 
 })();

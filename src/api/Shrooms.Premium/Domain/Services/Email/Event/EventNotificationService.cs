@@ -17,7 +17,6 @@ using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
-using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -61,7 +60,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 emailTemplateViewModel,
                 EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
         }
-        
+
         public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<EventReminderDeadlineEmailDto> deadlineEmailDtos, Organization organization)
         {
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
@@ -198,7 +197,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 eventUrl,
                 deadlineEmailDto.StartDate,
                 deadlineEmailDto.DeadlineDate);
-            
+
             await SendMultipleEmailsAsync(deadlineEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
         }
 
@@ -227,7 +226,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 return _markdownConverter.ConvertToHtml(text);
             }
 
-            return _markdownConverter.ConvertToHtml($"{string.Join("", text.Take(maxCharacterCount))}..."); 
+            return _markdownConverter.ConvertToHtml($"{string.Join("", text.Take(maxCharacterCount))}...");
         }
     }
 }

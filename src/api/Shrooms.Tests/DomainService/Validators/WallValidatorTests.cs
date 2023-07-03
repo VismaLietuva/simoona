@@ -65,7 +65,7 @@ namespace Shrooms.Tests.DomainService.Validators
         {
             var wallUsers = new List<WallMember>
             {
-                new WallMember
+                new()
                 {
                     WallId = 1,
                     UserId = "userId2"

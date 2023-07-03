@@ -44,23 +44,23 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-3),
-                    Status = BlacklistStatus.Active,
+                    Status = BlacklistStatus.Active
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(10),
-                    Status = BlacklistStatus.Active,
+                    Status = BlacklistStatus.Active
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-4),
-                    Status = BlacklistStatus.Active,
+                    Status = BlacklistStatus.Active
                 }
             };
-            
+
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Act
@@ -79,20 +79,20 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             var blacklistUsers = new List<BlacklistUser>
             {
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-3),
-                    Status = BlacklistStatus.Expired,
+                    Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(10),
-                    Status = BlacklistStatus.Expired,
+                    Status = BlacklistStatus.Expired
                 },
-                new BlacklistUser
+                new()
                 {
                     EndDate = DateTime.UtcNow.AddDays(-4),
-                    Status = BlacklistStatus.Canceled,
+                    Status = BlacklistStatus.Canceled
                 }
             };
 

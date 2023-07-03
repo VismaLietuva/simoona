@@ -12,7 +12,7 @@ namespace Shrooms.Domain.Extensions
             {
                 SortDirection.Ascending => SortDirectionConstants.Ascending,
                 SortDirection.Descending => SortDirectionConstants.Descending,
-                _ => throw new ArgumentException($"Sort direction {sortDirection} is invalid"),
+                _ => throw new ArgumentException($"Sort direction {sortDirection} is invalid")
             };
         }
     }

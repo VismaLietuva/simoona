@@ -208,7 +208,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             var buyViewModel = new BuyLotteryTicketsViewModel
             {
                 LotteryId = 1,
-                TicketCount = 10,
+                TicketCount = 10
             };
 
             _sut.Validate(buyViewModel);
@@ -359,7 +359,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Arrange
             LotteryListingArgsViewModel args = null;
 
-            var expectedStatus = HttpStatusCode.OK;
+            const HttpStatusCode expectedStatus = HttpStatusCode.OK;
 
             _sut.Validate(args);
 
@@ -377,7 +377,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             var args = new LotteryListingArgsViewModel();
 
-            var expectedStatus = HttpStatusCode.OK;
+            const HttpStatusCode expectedStatus = HttpStatusCode.OK;
 
             _sut.Validate(args);
 

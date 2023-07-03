@@ -56,12 +56,12 @@
                     <a class="btn btn-primary glyphicon glyphicon-ok" 
                        ng-click="closeKudosServiceRequestButtonClick(serviceRequest)" 
                        title="{{'common.close' | translate}}" 
-                       ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title !== 'Done' && serviceRequest.categoryName === 'Kudos'"></a>
+                       ng-if="(isAdmin || serviceRequest.isCloseable) && !['Done', 'Cancelled'].includes(serviceRequest.status.title) && serviceRequest.categoryName === 'Kudos'"></a>
                     <a class="btn btn-primary glyphicon glyphicon-ok" 
                        ng-click="closeServiceRequestButtonClick(serviceRequest)" 
                        title="{{'common.close' | translate}}" 
-                       ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title !== 'Done' && serviceRequest.categoryName !== 'Kudos'"></a>
-                    <div ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title === 'Done'" style="width: 44px"></div>
+                       ng-if="(isAdmin || serviceRequest.isCloseable) && !['Done', 'Cancelled'].includes(serviceRequest.status.title) && serviceRequest.categoryName !== 'Kudos'"></a>
+                    <div ng-if="(isAdmin || serviceRequest.isCloseable) && ['Done', 'Cancelled'].includes(serviceRequest.status.title)" style="width: 44px"></div>
                     <div ng-if="hasEditableServiceRequests && !serviceRequest.isCloseable" style="width: 44px"></div>
                 </div>
             </td>
