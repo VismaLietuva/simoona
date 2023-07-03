@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Configuration;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Configuration;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNet.Identity;
@@ -17,36 +14,15 @@ namespace Shrooms.Infrastructure.Email
 {
     public class MailingService : IMailingService, IIdentityMessageService
     {
-        private readonly TelemetryClient _telemetryClient;
         private readonly EmailBuildingStrategy _emailBuildingStrategy;
-        private static MailSettingsSectionGroup _mailSettings;
+        private readonly ISmtpService _smtpService;
+        private readonly TelemetryClient _telemetryClient;
 
-        public MailingService(IApplicationSettings appSettings)
+        public MailingService(ISmtpService smtpService, IApplicationSettings appSettings)
         {
+            _smtpService = smtpService;
             _telemetryClient = new TelemetryClient();
-            System.Configuration.Configuration config = WebConfigurationManager.OpenWebConfiguration(HttpRuntime.AppDomainAppVirtualPath);
-            _mailSettings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
             _emailBuildingStrategy = appSettings.EmailBuildingStrategy;
-        }
-
-        public static bool HasSmtpServerConfigured(string appPath)
-        {
-            if (_mailSettings?.Smtp == null)
-            {
-                return false;
-            }
-
-            if (_mailSettings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(_mailSettings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
-            {
-                return true;
-            }
-
-            if (_mailSettings.Smtp.Network != null && string.IsNullOrEmpty(_mailSettings.Smtp.Network.Host) == false)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public async Task SendAsync(IdentityMessage message)
@@ -61,7 +37,7 @@ namespace Shrooms.Infrastructure.Email
 
         public async Task SendEmailsAsync(IEnumerable<EmailDto> emails, bool skipDomainChange = false)
         {
-            foreach (var email in emails)
+            foreach (EmailDto email in emails)
             {
                 await SendEmailAsync(email, skipDomainChange);
             }
@@ -69,7 +45,7 @@ namespace Shrooms.Infrastructure.Email
 
         private async Task SendEmailInternalAsync(EmailDto email, bool skipDomainChange = false)
         {
-            if (!HasSmtpServerConfigured(HttpRuntime.AppDomainAppVirtualPath))
+            if (!_smtpService.HasSmtpServerConfigured())
             {
                 return;
             }
@@ -79,14 +55,10 @@ namespace Shrooms.Infrastructure.Email
                 return;
             }
 
-            using var client = new SmtpClient();
             try
             {
                 IEnumerable<MailMessage> messages = BuildMessages(email, skipDomainChange);
-                foreach (MailMessage mailMessage in messages)
-                {
-                    await client.SendMailAsync(mailMessage);
-                }
+                await _smtpService.SendAsync(messages);
             }
             catch (SmtpException ex)
             {
