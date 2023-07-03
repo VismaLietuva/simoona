@@ -1,9 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Shrooms.Contracts.Constants;
 
-namespace Shrooms.Presentation.Api.Helpers
+namespace Shrooms.Presentation.Common.Helpers
 {
     public static class ClaimsHelper
     {

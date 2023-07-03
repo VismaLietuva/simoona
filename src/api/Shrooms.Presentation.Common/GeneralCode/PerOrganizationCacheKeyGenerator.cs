@@ -1,9 +1,9 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Web.Http.Controllers;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Helpers;
 using WebApi.OutputCache.V2;
 
-namespace Shrooms.Presentation.Api.GeneralCode
+namespace Shrooms.Presentation.Common.GeneralCode
 {
     public class PerOrganizationCacheKeyGenerator : DefaultCacheKeyGenerator
     {

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using Shrooms.Contracts.Constants;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Resources;
+using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using Shrooms.Contracts.Constants;
-using Shrooms.Presentation.Api.Filters;
-using Shrooms.Resources;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -20,7 +20,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Localization)]
-        public IEnumerable<object> GetResources([FromUri]string[] resources, string language)
+        public IEnumerable<object> GetResources([FromUri] string[] resources, string language)
         {
             foreach (var resource in resources)
             {

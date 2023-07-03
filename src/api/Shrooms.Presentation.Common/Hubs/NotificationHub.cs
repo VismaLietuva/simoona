@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels.Notifications;
 using X.PagedList;
 
-namespace Shrooms.Presentation.Api.Hubs
+namespace Shrooms.Presentation.Common.Hubs
 {
     [HubName("Notification")]
     public class NotificationHub : BaseHub

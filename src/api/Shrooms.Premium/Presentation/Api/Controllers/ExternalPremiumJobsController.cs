@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Controllers.Kudos;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Controllers.Kudos;
+using Shrooms.Presentation.Common.Filters;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers

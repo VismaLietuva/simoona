@@ -1,5 +1,3 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using JetBrains.Annotations;
 using Shrooms.Contracts.DataTransferObjects;
@@ -10,7 +8,9 @@ using Shrooms.Contracts.ViewModels.Notifications;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Presentation.Api.Hubs;
+using Shrooms.Presentation.Common.Hubs;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Presentation.Api.BackgroundWorkers
 {

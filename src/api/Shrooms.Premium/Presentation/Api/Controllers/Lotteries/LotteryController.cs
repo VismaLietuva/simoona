@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Extensions;
@@ -6,8 +6,8 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;

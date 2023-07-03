@@ -1,8 +1,8 @@
-﻿using System.Security.Principal;
+using System.Security.Principal;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 
-namespace Shrooms.Presentation.Api.Helpers
+namespace Shrooms.Presentation.Common.Helpers
 {
     public static class IdentityExtensions
     {

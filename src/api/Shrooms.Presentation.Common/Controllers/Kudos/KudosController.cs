@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,14 +16,14 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Presentation.Api.Controllers.Wall;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers.Wall;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.KudosTypes;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
 using WebApi.OutputCache.V2;
 using X.PagedList;
 
-namespace Shrooms.Presentation.Api.Controllers.Kudos
+namespace Shrooms.Presentation.Common.Controllers.Kudos
 {
     [Authorize]
     [AutoInvalidateCacheOutput]
@@ -134,7 +134,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public async Task<IEnumerable<KudosPieChartSliceViewModel>> KudosPieChartData(string userId = null)
         {
-            userId ??= User.Identity.GetUserId();
+            userId = GetUserIdIfNull(userId);
 
             var pieChartDto = await _kudosService.GetKudosPieChartDataAsync(GetUserAndOrganization().OrganizationId, userId);
             var result = _mapper.Map<IEnumerable<KudosPieChartSliceDto>, IEnumerable<KudosPieChartSliceViewModel>>(pieChartDto);
@@ -343,7 +343,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public async Task<UserKudosViewModel> GetUserKudosInformationById(string id = null)
         {
-            id ??= User.Identity.GetUserId();
+            id = GetUserIdIfNull(id);
 
             var userKudosDto = await _kudosService.GetUserKudosInformationByIdAsync(id, GetUserAndOrganization().OrganizationId);
             var userKudosViewModel = _mapper.Map<UserKudosDto, UserKudosViewModel>(userKudosDto);
@@ -358,7 +358,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public async Task<IHttpActionResult> GetApprovedKudosList(string id = null)
         {
-            id ??= User.Identity.GetUserId();
+            id = GetUserIdIfNull(id);
 
             try
             {
@@ -456,6 +456,11 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 Users = stats,
                 Months = months
             };
+        }
+
+        private string GetUserIdIfNull(string userId)
+        {
+            return userId ?? User.Identity.GetUserId();
         }
     }
 }

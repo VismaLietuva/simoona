@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Helpers;
 
-namespace Shrooms.Presentation.Api.Hubs
+namespace Shrooms.Presentation.Common.Hubs
 {
     public abstract class BaseHub : Hub
     {

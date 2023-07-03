@@ -260,6 +260,10 @@
       <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
       <Name>Shrooms.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj">
+      <Project>{07a1d569-04a6-425e-8020-e7e161eccde9}</Project>
+      <Name>Shrooms.Presentation.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shrooms.Presentation.ModelMappings\Shrooms.Presentation.ModelMappings.csproj">
       <Project>{550f0c4a-34ab-49e5-83dd-19d3d77af3c5}</Project>
       <Name>Shrooms.Presentation.ModelMappings</Name>

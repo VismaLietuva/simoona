@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -26,11 +26,11 @@ using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Premium.Presentation.Api.BackgroundWorkers;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Domain.Extensions;
 using WebApi.OutputCache.V2;
-using Shrooms.Presentation.Api.Controllers.Wall;
+using Shrooms.Presentation.Common.Controllers.Wall;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
@@ -6,8 +6,9 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Presentation.Api.Controllers.Kudos;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Controllers.Kudos;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.AccountModels;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using System;

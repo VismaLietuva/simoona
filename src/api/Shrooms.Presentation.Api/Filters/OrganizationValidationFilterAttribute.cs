@@ -1,8 +1,8 @@
-﻿using System.Linq;
+using Shrooms.Domain.Exceptions.Exceptions.Organization;
+using Shrooms.Presentation.Common.Helpers;
+using System.Linq;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Shrooms.Presentation.Api.Helpers;
-using Shrooms.Domain.Exceptions.Exceptions.Organization;
 
 namespace Shrooms.Presentation.Api.Filters
 {
