@@ -9,6 +9,8 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Infrastructure.Email
@@ -16,27 +18,30 @@ namespace Shrooms.Infrastructure.Email
     public class MailingService : IMailingService, IIdentityMessageService
     {
         private readonly TelemetryClient _telemetryClient;
+        private readonly EmailBuildingStrategy _emailBuildingStrategy;
+        private static MailSettingsSectionGroup _mailSettings;
 
-        public MailingService()
+        public MailingService(IApplicationSettings appSettings)
         {
             _telemetryClient = new TelemetryClient();
+            System.Configuration.Configuration config = WebConfigurationManager.OpenWebConfiguration(HttpRuntime.AppDomainAppVirtualPath);
+            _mailSettings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
+            _emailBuildingStrategy = appSettings.EmailBuildingStrategy;
         }
 
         public static bool HasSmtpServerConfigured(string appPath)
         {
-            var config = WebConfigurationManager.OpenWebConfiguration(appPath);
-            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            if (settings?.Smtp == null)
+            if (_mailSettings?.Smtp == null)
             {
                 return false;
             }
 
-            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+            if (_mailSettings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(_mailSettings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
             {
                 return true;
             }
 
-            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
+            if (_mailSettings.Smtp.Network != null && string.IsNullOrEmpty(_mailSettings.Smtp.Network.Host) == false)
             {
                 return true;
             }
@@ -74,17 +79,18 @@ namespace Shrooms.Infrastructure.Email
                 return;
             }
 
-            using (var client = new SmtpClient())
+            using var client = new SmtpClient();
+            try
             {
-                try
+                IEnumerable<MailMessage> messages = BuildMessages(email, skipDomainChange);
+                foreach (MailMessage mailMessage in messages)
                 {
-                    var message = BuildMessage(email, skipDomainChange);
-                    await client.SendMailAsync(message);
+                    await client.SendMailAsync(mailMessage);
                 }
-                catch (SmtpException ex)
-                {
-                    LogSendFailure(ex);
-                }
+            }
+            catch (SmtpException ex)
+            {
+                LogSendFailure(ex);
             }
         }
 
@@ -94,7 +100,30 @@ namespace Shrooms.Infrastructure.Email
             return $"{senderFullName} <{mailAddress.User}@simoona.com>";
         }
 
-        private MailMessage BuildMessage(EmailDto email, bool skipDomainChange = false)
+        private IEnumerable<MailMessage> BuildMessages(EmailDto email, bool skipDomainChange = false)
+        {
+            switch (_emailBuildingStrategy)
+            {
+                case EmailBuildingStrategy.SingleTo:
+                    foreach (string emailReceiver in email.Receivers)
+                    {
+                        yield return BuildMessage(
+                            email with { Receivers = new[] { emailReceiver } },
+                            skipDomainChange,
+                            recipientsTo: true);
+                    }
+                    break;
+                default:
+                case EmailBuildingStrategy.AllTo:
+                    yield return BuildMessage(email, skipDomainChange, recipientsTo: true);
+                    break;
+                case EmailBuildingStrategy.AllBcc:
+                    yield return BuildMessage(email, skipDomainChange, recipientsTo: false);
+                    break;
+            }
+        }
+
+        private MailMessage BuildMessage(EmailDto email, bool skipDomainChange, bool recipientsTo)
         {
             var mailMessage = new MailMessage();
 
@@ -103,9 +132,21 @@ namespace Shrooms.Infrastructure.Email
                 : ChangeEmailDomain(email.SenderEmail, email.SenderFullName);
 
             mailMessage.From = new MailAddress(sender);
-            foreach (var receiver in email.Receivers)
+
+            if (recipientsTo)
             {
-                mailMessage.To.Add(receiver);
+                foreach (var receiver in email.Receivers)
+                {
+                    mailMessage.To.Add(receiver);
+                }
+            }
+            else
+            {
+                mailMessage.To.Add(sender);
+                foreach (var receiver in email.Receivers)
+                {
+                    mailMessage.Bcc.Add(receiver);
+                }
             }
 
             if (email.Attachment != null)
