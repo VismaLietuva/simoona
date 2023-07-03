@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Web;
-using System.Web.Http;
 using Autofac;
 using Autofac.Integration.SignalR;
 using Autofac.Integration.WebApi;
@@ -27,9 +20,14 @@ using Shrooms.Domain.ServiceValidators.Validators.UserAdministration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
-using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
 using Shrooms.Premium.IoC.Modules;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Web.Http;
 
 namespace Shrooms.IoC
 {
@@ -45,6 +43,8 @@ namespace Shrooms.IoC
             var modelMappings = Assembly.Load("Shrooms.Presentation.ModelMappings");
 
             builder.RegisterApiControllers(shroomsApi);
+            builder.RegisterApiControllers(premiumApi);
+            builder.RegisterApiControllers(common);
 
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new SignalRContractResolver();
@@ -60,7 +60,6 @@ namespace Shrooms.IoC
             builder.RegisterAssemblyTypes(modelMappings).AssignableTo(typeof(Profile)).As<Profile>();
 
             builder.RegisterAssemblyTypes(premiumApi).AssignableTo(typeof(Profile)).As<Profile>();
-            builder.RegisterApiControllers(premiumApi);
 
             // Interceptor
             builder.Register(_ => new TelemetryLoggingInterceptor());
@@ -86,7 +85,7 @@ namespace Shrooms.IoC
             builder.RegisterType<ProjectsService>().As<IProjectsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
             builder.RegisterModule(new IdentityModule());
-            builder.RegisterModule(new Shrooms.IoC.Modules.ServicesModule());
+            builder.RegisterModule(new Modules.ServicesModule());
             builder.RegisterModule(new InfrastructureModule());
             builder.RegisterModule(new WallModule());
             builder.RegisterModule(new KudosModule());
@@ -119,7 +118,6 @@ namespace Shrooms.IoC
             builder.RegisterModule(new VacationModule());
             builder.RegisterModule(new WebHookCallbacksPremiumModule());
 
-            RegisterExtensions(builder, new Logger());
             RegisterMapper(builder);
 
             var container = builder.Build();
@@ -128,58 +126,6 @@ namespace Shrooms.IoC
             return container;
         }
 
-        private static void RegisterExtensions(ContainerBuilder builder, ILogger logger)
-        {
-            //var extensionsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions");
-
-            //if (!Directory.Exists(extensionsPath))
-            //{
-            //    logger.Error(new DirectoryNotFoundException("Extension directory does not exist"));
-
-            //    return;
-            //}
-
-            //var files = Directory.GetFiles(extensionsPath, "*.dll", SearchOption.AllDirectories);
-
-            //foreach (var dll in files)
-            //{
-            //    try
-            //    {
-            //        var assembly = Assembly.LoadFrom(dll);
-
-            //        builder.RegisterAssemblyTypes(assembly);
-            //        builder.RegisterAssemblyTypes(assembly).AssignableTo(typeof(Profile)).As<Profile>();
-            //        builder.RegisterAssemblyModules(assembly);
-            //        builder.RegisterApiControllers(assembly);
-            //    }
-            //    catch (FileLoadException loadException)
-            //    {
-            //        logger.Error(loadException);
-            //    }
-            //    catch (BadImageFormatException formatException)
-            //    {
-            //        logger.Error(formatException);
-            //    }
-            //    catch (ArgumentNullException nullException)
-            //    {
-            //        logger.Error(nullException);
-            //    }
-            //}
-
-            // Needed for Hangfire to process jobs from extension assemblies
-            AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
-            {
-                var assemblyName = new AssemblyName(args.Name);
-                var existing = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(c => c.FullName == assemblyName.FullName);
-
-                if (existing != null)
-                {
-                    return existing;
-                }
-
-                return null;
-            };
-        }
 
         private static void RegisterMapper(ContainerBuilder builder)
         {
