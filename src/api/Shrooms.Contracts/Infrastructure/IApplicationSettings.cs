@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Contracts.Infrastructure
 {
@@ -7,6 +8,8 @@ namespace Shrooms.Contracts.Infrastructure
         string StorageConnectionString { get; }
 
         bool IsEmailEnabled { get; }
+
+        EmailBuildingStrategy EmailBuildingStrategy { get; }
 
         int DefaultOrganizationId { get; }
 
