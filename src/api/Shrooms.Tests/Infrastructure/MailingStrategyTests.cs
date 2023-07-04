@@ -15,7 +15,7 @@ namespace Shrooms.Tests.Infrastructure
     public class MailingStrategyTests
     {
         private Mock<IApplicationSettings> _settings = new ();
-        private Mock<ISmtpService> _smtpService = new ();
+        private Mock<IMailSendingService> _smtpService = new ();
         private readonly string[] _recipients = { "one@one.qqq", "two@two.qqq", "three@three.qqq" };
         private EmailDto _emailDto;
 
@@ -23,7 +23,7 @@ namespace Shrooms.Tests.Infrastructure
         public void SetupCommonMocks()
         {
             _smtpService
-                .Setup(x => x.HasSmtpServerConfigured())
+                .Setup(x => x.IsMailSenderConfigured())
                 .Returns(true);
 
             _emailDto = new EmailDto("sender", "senderemail@yes.no", _recipients, "subject", "body");

@@ -15,12 +15,12 @@ namespace Shrooms.Infrastructure.Email
     public class MailingService : IMailingService, IIdentityMessageService
     {
         private readonly EmailBuildingStrategy _emailBuildingStrategy;
-        private readonly ISmtpService _smtpService;
+        private readonly IMailSendingService _mailSendingService;
         private readonly TelemetryClient _telemetryClient;
 
-        public MailingService(ISmtpService smtpService, IApplicationSettings appSettings)
+        public MailingService(IMailSendingService mailSendingService, IApplicationSettings appSettings)
         {
-            _smtpService = smtpService;
+            _mailSendingService = mailSendingService;
             _telemetryClient = new TelemetryClient();
             _emailBuildingStrategy = appSettings.EmailBuildingStrategy;
         }
@@ -45,7 +45,7 @@ namespace Shrooms.Infrastructure.Email
 
         private async Task SendEmailInternalAsync(EmailDto email, bool skipDomainChange = false)
         {
-            if (!_smtpService.HasSmtpServerConfigured())
+            if (!_mailSendingService.IsMailSenderConfigured())
             {
                 return;
             }
@@ -58,7 +58,7 @@ namespace Shrooms.Infrastructure.Email
             try
             {
                 IEnumerable<MailMessage> messages = BuildMessages(email, skipDomainChange);
-                await _smtpService.SendAsync(messages);
+                await _mailSendingService.SendAsync(messages);
             }
             catch (SmtpException ex)
             {

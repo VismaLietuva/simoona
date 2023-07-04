@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 namespace Shrooms.Infrastructure.Email
 {
     /// <summary>
-    /// Service that wraps SMTP client and SMTP mail settings.
+    /// Service that wraps mail sending client.
     /// </summary>
-    public interface ISmtpService
+    public interface IMailSendingService
     {
         /// <summary>
-        /// Sends mail messages via SMTP asynchronously.
+        /// Sends mail messages asynchronously.
         /// </summary>
         /// <param name="messages">Message collection for sending.</param>
         /// <returns>A <see cref="Task"/> that represents asynchronous operation.</returns>
         Task SendAsync(IEnumerable<MailMessage> messages);
 
         /// <summary>
-        /// Determines if SMTP configuration is present and valid.
+        /// Determines if mail sender service is configured and ready.
         /// </summary>
-        bool HasSmtpServerConfigured();
+        bool IsMailSenderConfigured();
     }
 }

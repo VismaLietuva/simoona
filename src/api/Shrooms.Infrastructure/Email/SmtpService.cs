@@ -10,7 +10,7 @@ namespace Shrooms.Infrastructure.Email
     /// <summary>
     /// Service that wraps SMTP client and SMTP mail settings.
     /// </summary>
-    public class SmtpService : ISmtpService
+    public class SmtpService : IMailSendingService
     {
         private static MailSettingsSectionGroup _mailSettings;
 
@@ -21,8 +21,10 @@ namespace Shrooms.Infrastructure.Email
                 .GetSectionGroup("system.net/mailSettings");
         }
 
-        /// <inheritdoc />
-        public bool HasSmtpServerConfigured()
+        /// <summary>
+        /// Determines if SMTP configuration is present and valid.
+        /// </summary>
+        public bool IsMailSenderConfigured()
         {
             if (_mailSettings?.Smtp == null)
             {
@@ -42,7 +44,11 @@ namespace Shrooms.Infrastructure.Email
             return false;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Sends mail messages via SMTP asynchronously.
+        /// </summary>
+        /// <param name="messages">Message collection for sending.</param>
+        /// <returns>A <see cref="Task"/> that represents asynchronous operation.</returns>
         public async Task SendAsync(IEnumerable<MailMessage> messages)
         {
             using var client = new SmtpClient();
