@@ -102,6 +102,7 @@
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\Users\UserEmailReceiverDto.cs" />
     <Compile Include="DataTransferObjects\Wall\WallMemberEmailReceiverDto.cs" />
+    <Compile Include="Enums\EmailBuildingStrategy.cs" />
     <Compile Include="Enums\EventReminderType.cs" />
     <Compile Include="Enums\ExcelBorderStylePicker.cs" />
     <Compile Include="Enums\SortDirection.cs" />
