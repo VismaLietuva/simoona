@@ -29,8 +29,7 @@
 
         vm.filterWall = filterWall;
         vm.getAllWalls = getAllWalls;
-        vm.isMenuExpanded = vm.state.params.wall || vm.state.includes('Root.WithOrg.Client.Wall.Item.Feed') || vm.state.includes('Root.WithOrg.Client.Wall.All');
-
+        vm.isMenuExpanded = vm.state.includes('Root.WithOrg.Client.Wall');
         init();
 
         ////////
