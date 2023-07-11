@@ -1,0 +1,11 @@
+<a ng-click="vm.onExpandClick()">
+    <span class="{{::vm.menuIconClass}} icon-{{vm.menuName}}"></span><span
+        translate="{{::vm.menuTextTranslation}}"></span>
+    <span>
+        <span ng-class="vm.isExpanded ? 'glyphicon glyphicon-chevron-up' : 'glyphicon glyphicon-chevron-down'"
+            aria-hidden="true">
+        </span>
+    </span>
+</a>
+<div ng-hide="!vm.isExpanded" ng-transclude>
+</div>

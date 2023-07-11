@@ -1,33 +1,34 @@
-<div class="sidebar-overlay-container app-overlay" ace-sidebar ng-class="{visible: vm.isSidebarOpen()}" ng-click="vm.overlayDismiss($event)">
-<div ng-if="vm.isAuthenticated && vm.sidebarOpen" class="sidebar" data-test-id="sidebar-menu" id="sidebar-menu">
-    <span class="vismaicon vismaicon-arrow-left-circle sidebar-close-btn" ng-click="vm.closeSidebar()"></span>
-    <wave-spinner ng-if="vm.isAuthenticatedForWalls && (vm.isLoading || vm.isTranslating || vm.wallData.isWallListLoading)"></wave-spinner>
+<div class="sidebar-overlay-container app-overlay" ace-sidebar ng-class="{visible: vm.isSidebarOpen()}"
+    ng-click="vm.overlayDismiss($event)">
+    <div ng-if="vm.isAuthenticated && vm.sidebarOpen" class="sidebar" data-test-id="sidebar-menu" id="sidebar-menu">
+        <span class="vismaicon vismaicon-arrow-left-circle sidebar-close-btn" ng-click="vm.closeSidebar()"></span>
+        <wave-spinner
+            ng-if="vm.isAuthenticatedForWalls && (vm.isLoading || vm.isTranslating || vm.wallData.isWallListLoading)"></wave-spinner>
 
-    <ace-wall-menu-navigation ng-if="vm.isAuthenticatedForWalls && !vm.isLoading && !vm.isTranslating"></ace-wall-menu-navigation>
-    
-    <ul ng-if="!vm.isLoading && !vm.isTranslating && (!vm.wallData.isWallListLoading || !vm.isAuthenticatedForWalls)"
-        class="nav nav-sidebar first-level">
-        <li ng-if="!!group.menuItems.length" 
-        ng-repeat="(groupName, group) in vm.menuNavigationFactory.leftMenuList" data-test-id="sidebar-group-{{groupName}}" id="{{groupName}}-sidebar-nav">
-            <span class="{{::group.iconClass}} icon-{{groupName}}"></span><span translate="{{::group.resource}}"></span>
-            <ul class="nav second-level">
-                <li has-permissions="[item.permission]" ng-repeat="item in group.menuItems | orderBy: 'order'">
-                    <a ng-if="!item.name"
-                       ng-class="{active: $state.includes(item.active)}"
-                       ui-sref="{{::item.url}}"
-                       translate="{{::item.resource}}"
-                       ng-click="vm.closeSidebar()"></a>
+        <ace-wall-menu-navigation
+            ng-if="vm.isAuthenticatedForWalls && !vm.isLoading && !vm.isTranslating"></ace-wall-menu-navigation>
 
-                    <a ng-if="!!item.name"
-                       href="{{::item.url}}"
-                       ga-track-event="['Externals', item.name, 'opened']"
-                       target="_blank"
-                       ng-click="vm.closeSidebar()">
-                            {{::item.name}}
-                    </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-</div>
+        <ul ng-if="!vm.isLoading && !vm.isTranslating && (!vm.wallData.isWallListLoading || !vm.isAuthenticatedForWalls)"
+            class="nav nav-sidebar first-level">
+            <li ng-if="!!group.menuItems.length" ng-repeat="(groupName, group) in vm.menuNavigationFactory.leftMenuList"
+                data-test-id="sidebar-group-{{groupName}}" id="{{groupName}}-sidebar-nav">
+                <ace-expandable-menu menu-name="groupName" menu-icon-class="group.iconClass"
+                    menu-text-translation="group.resource" is-expanded="vm.activeMenuGroup == groupName">
+                    <ul class="nav second-level">
+                        <li has-permissions="[item.permission]" ng-repeat="item in group.menuItems | orderBy: 'order'">
+                            <a ng-if="!item.name" ng-class="{active: $state.includes(item.active)}"
+                                ui-sref="{{::item.url}}" translate="{{::item.resource}}"
+                                ng-click="vm.closeSidebar()"></a>
+
+                            <a ng-if="!!item.name" href="{{::item.url}}"
+                                ga-track-event="['Externals', item.name, 'opened']" target="_blank"
+                                ng-click="vm.closeSidebar()">
+                                {{::item.name}}
+                            </a>
+                        </li>
+                    </ul>
+                </ace-expandable-menu>
+            </li>
+        </ul>
+    </div>
 </div>

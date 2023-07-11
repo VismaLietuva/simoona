@@ -54,7 +54,7 @@
 .sidebar {
     min-height: 100px;
     width: 100%;
-    .nav > li {
+    .nav li {
         span {
             animation: fadein 0.5s;
         }
@@ -70,14 +70,14 @@
                 background-color: rgba(200, 200, 200, 0.3);
             }
         }
-        a {
+        > a {
             animation: fadein 0.5s;
             border-left: 0px;
             color: @base-color;
             font-size: 13px;
             width: 100%;
             line-height: @line-height-base;
-            padding: 6px 20px;
+            padding: 6px 0px;
             -ms-word-wrap: break-word;
             word-wrap: break-word;
             &:hover {
@@ -87,7 +87,7 @@
     }
 }
 
-.nav.first-level > li > span {
+.nav.first-level > li > * > a > span {
     &.glyphicon {
         padding: 4px 4px 6px 15px;
         line-height: 6px;
@@ -355,6 +355,6 @@
     }
 }
 
-.vismaicon-menu.vismaicon-announcement:before { background-image: url(../images/new-vismaicons/menu_announcement.svg); } 
+.vismaicon-menu.vismaicon-announcement:before { background-image: url(../images/new-vismaicons/menu_announcement.svg); }
 
 /* navigation bar custom styles end */
