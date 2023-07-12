@@ -21,8 +21,15 @@
         let vm = this;
 
         vm.onExpandClick = onExpandClick;
+
+        const wasExpanded = localStorage.getItem(vm.menuName);
+        if (wasExpanded == 'true') {
+            vm.isExpanded = true;
+        }
+
         function onExpandClick() {
             vm.isExpanded = !vm.isExpanded;
+            localStorage.setItem(vm.menuName, vm.isExpanded);
         }
     }
 })();
