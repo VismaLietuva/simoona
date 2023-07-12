@@ -23,7 +23,7 @@
         vm.onExpandClick = onExpandClick;
 
         const wasExpanded = localStorage.getItem(vm.menuName);
-        if (wasExpanded == 'true') {
+        if (wasExpanded === 'true') {
             vm.isExpanded = true;
         }
 
