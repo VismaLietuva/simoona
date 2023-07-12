@@ -130,9 +130,5 @@
         function isSidebarOpen() {
             return leftMenuService.getStatus();
         }
-
-        function isMenuExpanded(groupName) {
-
-        }
     }
 })();

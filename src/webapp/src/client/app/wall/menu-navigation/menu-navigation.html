@@ -1,8 +1,8 @@
 <ul id="walls-sidebar-nav" ng-if="!vm.wallServiceData.isWallListLoading"
     class="nav nav-sidebar first-level wall-menu-navigation-container">
     <li data-test-id="sidebar-group-walls">
-        <ace-expandable-menu menu-name="'walls'" menu-icon-class="'glyphicon glyphicon-show-thumbnails'"
-            menu-text-translation="'wall.wallList'" is-expanded="vm.isMenuExpanded">
+        <ace-collapsable-menu menu-name="'walls'" menu-icon-class="'glyphicon glyphicon-show-thumbnails'"
+            menu-text-translation="'wall.wallList'" is-collapsed="vm.isMenuCollapsed">
             <ul class="nav second-level">
                 <li ng-if="vm.wallServiceData.wallList.length > 1">
                     <a ng-click="vm.filterWall(null)"
@@ -26,6 +26,6 @@
                 </li>
                 <ace-discover-walls-menu-button></ace-discover-walls-menu-button>
             </ul>
-        </ace-expandable-menu>
+        </ace-collapsable-menu>
     </li>
 </ul>

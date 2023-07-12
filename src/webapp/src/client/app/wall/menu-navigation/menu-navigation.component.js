@@ -29,7 +29,7 @@
 
         vm.filterWall = filterWall;
         vm.getAllWalls = getAllWalls;
-        vm.isMenuExpanded = vm.state.includes('Root.WithOrg.Client.Wall');
+        vm.isMenuCollapsed = !vm.state.includes('Root.WithOrg.Client.Wall');
         init();
 
         ////////

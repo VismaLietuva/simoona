@@ -12,8 +12,8 @@
             class="nav nav-sidebar first-level">
             <li ng-if="!!group.menuItems.length" ng-repeat="(groupName, group) in vm.menuNavigationFactory.leftMenuList"
                 data-test-id="sidebar-group-{{groupName}}" id="{{groupName}}-sidebar-nav">
-                <ace-expandable-menu menu-name="groupName" menu-icon-class="group.iconClass"
-                    menu-text-translation="group.resource" is-expanded="vm.activeMenuGroup == groupName">
+                <ace-collapsable-menu menu-name="groupName" menu-icon-class="group.iconClass"
+                    menu-text-translation="group.resource" is-collapsed="vm.activeMenuGroup !== groupName">
                     <ul class="nav second-level">
                         <li has-permissions="[item.permission]" ng-repeat="item in group.menuItems | orderBy: 'order'">
                             <a ng-if="!item.name" ng-class="{active: $state.includes(item.active)}"
@@ -27,7 +27,7 @@
                             </a>
                         </li>
                     </ul>
-                </ace-expandable-menu>
+                </ace-collapsable-menu>
             </li>
         </ul>
     </div>
