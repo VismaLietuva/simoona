@@ -19,7 +19,7 @@
 
     function collapsableMenuController() {
         const vm = this;
-        const localStorageName = vm.menuName + 'isCollapsed';
+        const localStorageName = 'Menu' + vm.menuName + 'isCollapsed';
         vm.onCollapseClick = onCollapseClick;
 
         const wasCollapsed = localStorage.getItem(localStorageName);
