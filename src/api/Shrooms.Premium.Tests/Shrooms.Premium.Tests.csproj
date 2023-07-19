@@ -41,9 +41,6 @@
     <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutofacContrib.NSubstitute, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutofacContrib.NSubstitute.4.0.1\lib\NET45\AutofacContrib.NSubstitute.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="mscorlib" />
     <Reference Include="Shrooms.Presentation.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
