@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using RazorEngine;
 using RazorEngine.Templating;
@@ -14,7 +14,7 @@ namespace Shrooms.Premium.EmailTemplates
 
         public void Register(string baseDir)
         {
-            _baseDir = Path.Combine(baseDir, "Extensions");
+            _baseDir = Path.Combine(baseDir, "bin");
 
             AddAndCompile(EmailPremiumTemplateCacheKeys.BookRemind, @"EmailTemplates\Books\BookRemind.cshtml", typeof(BookReminderEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.BookReport, @"EmailTemplates\Books\BookReport.cshtml", typeof(BookReportEmailTemplateViewModel));

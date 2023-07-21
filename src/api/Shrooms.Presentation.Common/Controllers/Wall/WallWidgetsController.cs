@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -13,14 +13,14 @@ using Shrooms.Domain.Services.Events;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models.Birthday;
 using Shrooms.Presentation.WebViewModels.Models.Events;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Widgets;
 
-namespace Shrooms.Presentation.Api.Controllers.Wall
+namespace Shrooms.Presentation.Common.Controllers.Wall
 {
     [Authorize]
     [RoutePrefix("WallWidgets")]

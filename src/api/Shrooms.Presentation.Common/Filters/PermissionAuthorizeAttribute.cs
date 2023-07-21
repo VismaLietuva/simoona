@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,9 +7,9 @@ using System.Web.Http.Controllers;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Helpers;
 
-namespace Shrooms.Presentation.Api.Filters
+namespace Shrooms.Presentation.Common.Filters
 {
     public class PermissionAuthorizeAttribute : AuthorizeAttribute
     {

@@ -1,10 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Web;
-using System.Web.Http;
 using Autofac;
 using Autofac.Integration.SignalR;
 using Autofac.Integration.WebApi;
@@ -27,8 +20,14 @@ using Shrooms.Domain.ServiceValidators.Validators.UserAdministration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
-using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
+using Shrooms.Premium.IoC.Modules;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Web.Http;
 
 namespace Shrooms.IoC
 {
@@ -38,16 +37,20 @@ namespace Shrooms.IoC
         {
             var builder = new ContainerBuilder();
             var shroomsApi = Assembly.Load("Shrooms.Presentation.Api");
+            var common = Assembly.Load("Shrooms.Presentation.Common");
+            var premiumApi = Assembly.Load("Shrooms.Premium");
             var dataLayer = Assembly.Load("Shrooms.DataLayer");
             var modelMappings = Assembly.Load("Shrooms.Presentation.ModelMappings");
 
             builder.RegisterApiControllers(shroomsApi);
+            builder.RegisterApiControllers(premiumApi);
+            builder.RegisterApiControllers(common);
 
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new SignalRContractResolver();
             var serializer = JsonSerializer.Create(settings);
             builder.RegisterInstance(serializer).As<JsonSerializer>();
-            builder.RegisterHubs(shroomsApi);
+            builder.RegisterHubs(common);
 
             builder.RegisterAssemblyTypes(shroomsApi).Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
             builder.RegisterType<AsyncRunner>().As<IAsyncRunner>().SingleInstance();
@@ -55,6 +58,8 @@ namespace Shrooms.IoC
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);
             builder.RegisterAssemblyTypes(modelMappings).AssignableTo(typeof(Profile)).As<Profile>();
+
+            builder.RegisterAssemblyTypes(premiumApi).AssignableTo(typeof(Profile)).As<Profile>();
 
             // Interceptor
             builder.Register(_ => new TelemetryLoggingInterceptor());
@@ -81,7 +86,7 @@ namespace Shrooms.IoC
             builder.RegisterType<ProjectsService>().As<IProjectsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
             builder.RegisterModule(new IdentityModule());
-            builder.RegisterModule(new ServicesModule());
+            builder.RegisterModule(new Modules.ServicesModule());
             builder.RegisterModule(new InfrastructureModule());
             builder.RegisterModule(new WallModule());
             builder.RegisterModule(new KudosModule());
@@ -99,7 +104,21 @@ namespace Shrooms.IoC
             builder.RegisterModule(new EmployeeModule());
             builder.RegisterModule(new WidgetModule());
 
-            RegisterExtensions(builder, new Logger());
+            builder.RegisterModule(new BackgroundWorkersModule());
+            builder.RegisterModule(new BadgesModule());
+            builder.RegisterModule(new BooksModule());
+            builder.RegisterModule(new CommitteeModule());
+            builder.RegisterModule(new EventsModule());
+            builder.RegisterModule(new KudosShopModule());
+            builder.RegisterModule(new LotteryModule());
+            builder.RegisterModule(new OfficeMapModule());
+            builder.RegisterModule(new OrganizationalStructureModule());
+            builder.RegisterModule(new ServiceRequestModule());
+            builder.RegisterModule(new Premium.IoC.Modules.ServicesModule());
+            builder.RegisterModule(new UserEventsModule());
+            builder.RegisterModule(new VacationModule());
+            builder.RegisterModule(new WebHookCallbacksPremiumModule());
+
             RegisterMapper(builder);
 
             var container = builder.Build();
@@ -108,58 +127,6 @@ namespace Shrooms.IoC
             return container;
         }
 
-        private static void RegisterExtensions(ContainerBuilder builder, ILogger logger)
-        {
-            var extensionsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions");
-
-            if (!Directory.Exists(extensionsPath))
-            {
-                logger.Error(new DirectoryNotFoundException("Extension directory does not exist"));
-
-                return;
-            }
-
-            var files = Directory.GetFiles(extensionsPath, "*.dll", SearchOption.AllDirectories);
-
-            foreach (var dll in files)
-            {
-                try
-                {
-                    var assembly = Assembly.LoadFrom(dll);
-
-                    builder.RegisterAssemblyTypes(assembly);
-                    builder.RegisterAssemblyTypes(assembly).AssignableTo(typeof(Profile)).As<Profile>();
-                    builder.RegisterAssemblyModules(assembly);
-                    builder.RegisterApiControllers(assembly);
-                }
-                catch (FileLoadException loadException)
-                {
-                    logger.Error(loadException);
-                }
-                catch (BadImageFormatException formatException)
-                {
-                    logger.Error(formatException);
-                }
-                catch (ArgumentNullException nullException)
-                {
-                    logger.Error(nullException);
-                }
-            }
-
-            // Needed for Hangfire to process jobs from extension assemblies
-            AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
-            {
-                var assemblyName = new AssemblyName(args.Name);
-                var existing = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(c => c.FullName == assemblyName.FullName);
-
-                if (existing != null)
-                {
-                    return existing;
-                }
-
-                return null;
-            };
-        }
 
         private static void RegisterMapper(ContainerBuilder builder)
         {

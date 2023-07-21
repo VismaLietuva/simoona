@@ -107,46 +107,6 @@
     <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
       <HintPath>..\packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.Presentation.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\bin\Shrooms.Presentation.Api.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.DataLayer.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer.EntityModels\bin\$(Configuration)\Shrooms.DataLayer.EntityModels.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Presentation.ModelMappings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.ModelMappings\bin\$(Configuration)\Shrooms.Presentation.ModelMappings.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Authentification, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Authentification\bin\$(Configuration)\Shrooms.Authentification.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.DataLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer\bin\$(Configuration)\Shrooms.DataLayer.dll</HintPath>
-    </Reference>
-    <Reference Include="Shrooms.Tests, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Tests\bin\$(Configuration)\Shrooms.Tests.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -211,9 +171,37 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
+      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
+      <Name>Shrooms.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj">
+      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
+      <Name>Shrooms.DataLayer.EntityModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj">
+      <Project>{f75814b0-ade3-4e55-b44d-2ee966c41344}</Project>
+      <Name>Shrooms.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
+      <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
+      <Name>Shrooms.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj">
       <Project>{ce5546d3-8819-4b25-8ddc-b02769bab42f}</Project>
       <Name>Shrooms.Premium</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj">
+      <Project>{07a1d569-04a6-425e-8020-e7e161eccde9}</Project>
+      <Name>Shrooms.Presentation.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj">
+      <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
+      <Name>Shrooms.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Tests\Shrooms.Tests.csproj">
+      <Project>{093fe583-996b-435c-a4d2-201c94aa71e0}</Project>
+      <Name>Shrooms.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

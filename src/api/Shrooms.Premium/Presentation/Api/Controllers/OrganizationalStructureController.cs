@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.OrganizationalStructure;
 using Shrooms.Premium.Domain.Services.OrganizationalStructure;
 using Shrooms.Premium.Presentation.WebViewModels.OrganizationalStructure;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

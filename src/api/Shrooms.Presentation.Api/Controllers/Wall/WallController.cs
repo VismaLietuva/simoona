@@ -1,6 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
@@ -16,8 +13,13 @@ using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.Api.Hubs;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Web.Http;
 using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers.Wall
