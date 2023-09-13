@@ -1,271 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1F63D29F-E593-47F0-A304-54D62CC1AD2B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Shrooms.Presentation.WebViewModels</RootNamespace>
-    <AssemblyName>Shrooms.Presentation.WebViewModels</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>net472</TargetFramework>
     <LangVersion>9</LangVersion>
+    <AssemblyTitle>Shrooms.Presentation.WebViewModels</AssemblyTitle>
+    <Product>Shrooms.Presentation.WebViewModels</Product>
+    <Copyright>Copyright ©  2015</Copyright>
+    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataAnnotationsExtensions, Version=5.0.1.16, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataAnnotationsExtensions.5.0.1.16\lib\NETFramework40\DataAnnotationsExtensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2021.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
-      <HintPath>..\packages\JetBrains.Annotations.2021.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
+    <PackageReference Include="DataAnnotationsExtensions" Version="5.0.1.16" />
+    <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="X.PagedList" Version="8.1.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="X.PagedList, Version=8.1.0.0, Culture=neutral, PublicKeyToken=525ccaa9023f010c">
-      <HintPath>..\packages\X.PagedList.8.1.0\lib\netstandard2.0\X.PagedList.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\AccountModels\ProviderViewModel.cs" />
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\ApplicationUserViewModel.cs" />
-    <Compile Include="Models\BlacklistUsers\BlacklistUserViewModel.cs" />
-    <Compile Include="Models\BlacklistUsers\UpdateBlacklistUserViewModel.cs" />
-    <Compile Include="Models\BlacklistUsers\CreateBlacklistUserViewModel.cs" />
-    <Compile Include="Models\Employees\EmployeeListingArgsViewModel.cs" />
-    <Compile Include="Models\Employees\WorkingHourslWithOutLunchViewModel.cs" />
-    <Compile Include="Models\ExternalLink\ManageExternalLinkViewModel.cs" />
-    <Compile Include="Models\ExternalLink\ExternalLinkViewModel.cs" />
-    <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
-    <Compile Include="Models\ExternalLink\UpdatedExternalLinkViewModel.cs" />
-    <Compile Include="Models\FilterPresets\ManageFilterPresetViewModel.cs" />
-    <Compile Include="Models\FilterPresets\CreateFilterPresetViewModel.cs" />
-    <Compile Include="Models\FilterPresets\UpdateFilterPresetViewModel.cs" />
-    <Compile Include="Models\FilterPresets\FilterPresetItemViewModel.cs" />
-    <Compile Include="Models\FilterPresets\FilterPresetViewModel.cs" />
-    <Compile Include="Models\FilterPresets\FiltersViewModel.cs" />
-    <Compile Include="Models\FilterPresets\FilterViewModel.cs" />
-    <Compile Include="Models\FilterPresets\UpdatedFilterPresetViewModel.cs" />
-    <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
-    <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
-    <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />
-    <Compile Include="Models\Monitors\CreateMonitorViewModel.cs" />
-    <Compile Include="Models\Monitors\MonitorViewModel.cs" />
-    <Compile Include="Models\Profile\JobPosition\JobPositionViewModel.cs" />
-    <Compile Include="Models\Projects\ProjectDetailsViewModel.cs" />
-    <Compile Include="Models\Projects\ProjectsBasicInfoViewModel.cs" />
-    <Compile Include="Models\Projects\EditProjectDisplayViewModel.cs" />
-    <Compile Include="Models\Projects\EditProjectViewModel.cs" />
-    <Compile Include="Models\Projects\NewProjectViewModel.cs" />
-    <Compile Include="Models\Projects\ProjectsListItemViewModel.cs" />
-    <Compile Include="Models\Roles\RoleDetailsViewModel.cs" />
-    <Compile Include="Models\Roles\RoleUserViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosBasicDataViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosListBasicDataViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\WelcomeKudosViewModel.cs" />
-    <Compile Include="Models\User\ChangeUserLocalizationSettingsViewModel.cs" />
-    <Compile Include="Models\User\LanguageViewModel.cs" />
-    <Compile Include="Models\User\UserNotificationsSettingsViewModel.cs" />
-    <Compile Include="Models\User\WallNotificationsViewModel.cs" />
-    <Compile Include="Models\User\LocalizationSettingsViewModel.cs" />
-    <Compile Include="Models\User\TimeZoneViewModel.cs" />
-    <Compile Include="Models\VacationPage\VacationPageViewModel.cs" />
-    <Compile Include="Models\Wall\CreateWallViewModel.cs" />
-    <Compile Include="Models\Wall\Moderator\ModeratorViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\EditCommentViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\HideCommentViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\NewCommentViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\CreateWallPostViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\HidePostViewModel.cs" />
-    <Compile Include="Models\Wall\UpdateWallViewModel.cs" />
-    <Compile Include="Models\Wall\UserWallViewModel.cs" />
-    <Compile Include="Models\Wall\WallListViewModel.cs" />
-    <Compile Include="Models\Wall\WallMemberViewModel.cs" />
-    <Compile Include="Models\Wall\Widgets\GetWidgetsViewModel.cs" />
-    <Compile Include="Models\Wall\Widgets\KudosBasketWidgetViewModel.cs" />
-    <Compile Include="Models\Events\UpcomingEventWidgetViewModel.cs" />
-    <Compile Include="Models\Wall\Widgets\WidgetsViewModel.cs" />
-    <Compile Include="ValidationAttributes\DateTimeNotExpiredAttribute.cs" />
-    <Compile Include="ValidationAttributes\Walls\HasImageOrMessageBodyAttribute.cs" />
-    <Compile Include="ValidationAttributes\HasNoDuplicateLinksAttribute.cs" />
-    <Compile Include="ValidationAttributes\MinValueAttribute.cs" />
-    <Compile Include="Models\AbstractClassifierAbstractViewModel.cs" />
-    <Compile Include="Models\AbstractClassifierTypeViewModel.cs" />
-    <Compile Include="Models\AbstractClassifierViewModel.cs" />
-    <Compile Include="Models\AddressPostViewModel.cs" />
-    <Compile Include="Models\AddressViewModel.cs" />
-    <Compile Include="Models\ApplicationRoleMiniViewModel.cs" />
-    <Compile Include="Models\ApplicationRoleViewModel.cs" />
-    <Compile Include="Models\ApplicationUserReturnViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserAutoCompleteViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserBaseViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserDetailsViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserExamsPostModel.cs" />
-    <Compile Include="Models\User\ApplicationUserJobInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserLoginInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserOfficeInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPasswordModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPersonalInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserProfileViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPutJobInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPutLoginInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPutOfficeInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserPutPersonalInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserShroomsInfoViewModel.cs" />
-    <Compile Include="Models\Birthday\BirthdayViewModel.cs" />
-    <Compile Include="Models\Certificate\CertificateAutoCompleteViewModel.cs" />
-    <Compile Include="Models\Certificate\CertificateMiniViewModel.cs" />
-    <Compile Include="Models\Certificate\CertificatePostViewModel.cs" />
-    <Compile Include="Models\Certificate\CertificateViewModel.cs" />
-    <Compile Include="Models\ChangeProfile\ChangeProfileBaseModel.cs" />
-    <Compile Include="Models\ChangeProfile\ChangeProfileInfoViewModel.cs" />
-    <Compile Include="Models\ChangeProfile\ChangeProfileLoginViewModel.cs" />
-    <Compile Include="Models\ChangeProfile\ChangeProfileOfficeViewModel.cs" />
-    <Compile Include="Models\ChangeProfile\ChangeProfileViewModel.cs" />
-    <Compile Include="Models\CommentViewModel.cs" />
-    <Compile Include="Models\Employees\EmployeeViewModel.cs" />
-    <Compile Include="Models\Exam\ExamAutoCompleteViewModel.cs" />
-    <Compile Include="Models\Exam\ExamMiniViewModel.cs" />
-    <Compile Include="Models\Exam\ExamPostViewModel.cs" />
-    <Compile Include="Models\Exam\ExamViewModel.cs" />
-    <Compile Include="Models\AccountModels\ExternalLoginViewModel.cs" />
-    <Compile Include="Models\FloorMiniViewModel.cs" />
-    <Compile Include="Models\FloorViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketCreateViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketDonateViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketEditViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketLogUserViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketLogViewModel.cs" />
-    <Compile Include="Models\KudosBaskets\KudosBasketViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\AddKudosLogViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosFilterParameters.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogInputModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogListViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogsFilterViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogTypeViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogUserViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosLogViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosPaginatedViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosPieChartSliceViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosRejectViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosTypeViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosUserLogViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\KudosViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\UserKudosInformationViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\UserKudosViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\WallKudosLogViewModel.cs" />
-    <Compile Include="Models\AccountModels\LoggedInUserInfoViewModel.cs" />
-    <Compile Include="Models\Like\LikeViewModel.cs" />
-    <Compile Include="Models\ManagerMiniViewModel.cs" />
-    <Compile Include="Models\OfficeDropdownViewModel.cs" />
-    <Compile Include="Models\OfficeMiniViewModel.cs" />
-    <Compile Include="Models\OfficeViewModel.cs" />
-    <Compile Include="Models\OrganizationNameCheckResultModel.cs" />
-    <Compile Include="Models\OrganizationViewModel.cs" />
-    <Compile Include="Models\PartTimeHoursOptions.cs" />
-    <Compile Include="Models\PermissionGroupViewModel.cs" />
-    <Compile Include="Models\PostModels\AbstractClassifierPostViewModel.cs" />
-    <Compile Include="Models\PostModels\CommentPostViewModel.cs" />
-    <Compile Include="Models\Support\SupportPostViewModel.cs" />
-    <Compile Include="Models\PostModels\FloorPostViewModel.cs" />
-    <Compile Include="Models\PostModels\OfficePostViewModel.cs" />
-    <Compile Include="Models\PostModels\OrganizationPostViewModel.cs" />
-    <Compile Include="Models\PostModels\QualificationLevelPostViewModel.cs" />
-    <Compile Include="Models\PostModels\RoomPostViewModel.cs" />
-    <Compile Include="Models\PostModels\RoomTypePostViewModel.cs" />
-    <Compile Include="Models\QualificationLevelAutoCompleteViewModel.cs" />
-    <Compile Include="Models\QualificationLevelMiniViewModel.cs" />
-    <Compile Include="Models\QualificationLevelViewModel.cs" />
-    <Compile Include="Models\Roles\RoleMiniViewModel.cs" />
-    <Compile Include="Models\Roles\RoleViewModel.cs" />
-    <Compile Include="Models\RoomMiniViewModel.cs" />
-    <Compile Include="Models\RoomTypeMiniViewModel.cs" />
-    <Compile Include="Models\RoomTypeViewModel.cs" />
-    <Compile Include="Models\RoomViewModel.cs" />
-    <Compile Include="Models\Skill\SkillAutoCompleteViewModel.cs" />
-    <Compile Include="Models\Skill\SkillMiniViewModel.cs" />
-    <Compile Include="Models\Skill\SkillPostViewModel.cs" />
-    <Compile Include="Models\AccountModels\ExternalUserInfoViewModel.cs" />
-    <Compile Include="Models\Wall\PagedWallViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\EditPostViewModel.cs" />
-    <Compile Include="Models\WorkingHoursViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
-      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
-      <Name>Shrooms.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj">
-      <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
-      <Name>Shrooms.Resources</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj">
-      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
-      <Name>Shrooms.DataLayer.EntityModels</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
+    <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj" />
+    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
