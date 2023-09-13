@@ -1,607 +1,84 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\..\</SimoonaCoreLocation>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CE5546D3-8819-4B25-8DDC-B02769BAB42F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Shrooms.Premium</RootNamespace>
-    <AssemblyName>Shrooms.Premium</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>net472</TargetFramework>
     <LangVersion>9</LangVersion>
+    <AssemblyTitle>Shrooms.Premium</AssemblyTitle>
+    <Product>Shrooms.Premium</Product>
+    <Copyright>Copyright ©  2018</Copyright>
+    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
-    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
+  </PropertyGroup>
+  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
+    <Message Text="Recycling web app..." Importance="High" />
+    <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
+  </Target>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.9.2.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.9.2\lib\net45\Autofac.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Excel, Version=2.1.2.3, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.1.43.0\lib\net45\Google.Apis.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis.Auth, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.Auth.1.43.0\lib\net45\Google.Apis.Auth.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.Auth.1.43.0\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis.Books.v1, Version=1.43.0.1768, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.Books.v1.1.43.0.1768\lib\net45\Google.Apis.Books.v1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis.Core, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.Core.1.43.0\lib\net45\Google.Apis.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.Apis.PlatformServices, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\packages\Google.Apis.1.43.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Hangfire.Autofac, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Autofac.2.3.1\lib\net45\Hangfire.Autofac.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Hangfire.Core, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.6.6\lib\net45\Hangfire.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Ical.Net, Version=4.1.8.0, Culture=neutral, PublicKeyToken=65c0446cd019ea53, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ical.Net.4.1.11\lib\net46\Ical.Net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2021.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
-      <HintPath>..\packages\JetBrains.Annotations.2021.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="LinqKit, Version=1.1.3.1, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
-      <HintPath>..\packages\LinqKit.1.1.3.1\lib\net45\LinqKit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.2.10.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.2\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
-      <HintPath>..\packages\morelinq.1.4.0\lib\net35\MoreLinq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NodaTime, Version=2.0.2.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NodaTime.2.0.2\lib\net45\NodaTime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RazorEngine, Version=3.9.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a">
-      <HintPath>..\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
+    <PackageReference Include="Autofac" Version="4.9.2" />
+    <PackageReference Include="AutoMapper" Version="4.2.1" />
+    <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="ExcelDataReader" Version="2.1.2.3" />
+    <PackageReference Include="Google.Apis" Version="1.43.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.43.0" />
+    <PackageReference Include="Google.Apis.Books.v1" Version="1.43.0.1768" />
+    <PackageReference Include="Google.Apis.Core" Version="1.43.0" />
+    <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
+    <PackageReference Include="Hangfire.Core" Version="1.6.6" />
+    <PackageReference Include="Ical.Net" Version="4.1.11" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="LinqKit" Version="1.1.3.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.10.0" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.SystemWeb" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.3" />
+    <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
+    <PackageReference Include="X.PagedList" Version="8.1.0" />
+    <PackageReference Include="morelinq" Version="1.4.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="NodaTime" Version="2.0.2" />
+    <PackageReference Include="Owin" Version="1.0" />
+    <PackageReference Include="RazorEngine" Version="3.9.0" />
+    <PackageReference Include="SharpZipLib" Version="0.86.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
+    <PackageReference Include="System.Reflection" Version="4.1.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.10.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reflection, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.4.1.0\lib\net462\System.Reflection.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reflection.TypeExtensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.TypeExtensions.4.1.0\lib\net462\System.Reflection.TypeExtensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.Serialization.Primitives.4.3.0\lib\net46\System.Runtime.Serialization.Primitives.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Web.Http.Owin, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WebApi.OutputCache.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="WebApi.OutputCache.V2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.V2.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="X.PagedList, Version=8.1.0.0, Culture=neutral, PublicKeyToken=525ccaa9023f010c">
-      <HintPath>..\packages\X.PagedList.8.1.0\lib\netstandard2.0\X.PagedList.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Constants\EmailPremiumTemplateCacheKeys.cs" />
-    <Compile Include="Constants\EventsConstants.cs" />
-    <Compile Include="Constants\KudosShopConstants.cs" />
-    <Compile Include="Constants\PremiumErrorCodes.cs" />
-    <Compile Include="Constants\ServiceRequestConstants.cs" />
-    <Compile Include="Constants\ValidationConstants.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderDeadlineEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderStartEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\NewEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\SharedEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\ExternalBookInfo.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BasicBookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsAdministrationDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsLogDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookQuantityByOfficeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\EditBookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\NewBookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDetails\NewBookQuantityDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookLogDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobileDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobileGetDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobileLogDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobilePostDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobileReturnDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookMobileTakeSpecificDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookRemindDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BooksByOffice\BasicBookUserDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeOptionsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\BookTakeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\MobileUserDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\OfficeBookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\RetrievedBookInfoDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Books\TakenBookDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Calendar\CalendarAttendeeAction.cs" />
-    <Compile Include="DataTransferObjects\Models\Calendar\CalendarEventDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeMembersDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteePostDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionCreatedDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventEditDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantAttendDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantFirstTimeJoinDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\IEventArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\CreateEventDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\CreateEventTypeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EditEventDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventChangeOptionsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventDetailsListItemDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventDetailsOptionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventDetailsParticipantDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventEditDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventJoinDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventJoinResultDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventJoinValidationDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventListItemDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventOfficesDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventOptionCountDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventOptionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventOptionsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventTypeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventUserSearchResultDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDeadlineEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\IEventReminderEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderStartEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderEmailReceiverDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\UpdateEventTypeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Kudos\EmployeeLoyaltyKudosDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Kudos\KudosShopItemDto.cs" />
-    <Compile Include="DataTransferObjects\Models\LazyPaged\ILazyPaged.cs" />
-    <Compile Include="DataTransferObjects\Models\LazyPaged\LazyPaged.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsBuyerDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryRefundParticipantDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatusDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryTicketReceiverDto.cs" />
-    <Compile Include="DataTransferObjects\Models\MobileBookOfficeLogsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OfficeMap\OfficeDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OfficeMap\OfficeRoomDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OfficeMap\OfficeUserDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OfficeMap\UserOfficeAndFloorDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureDto.cs" />
-    <Compile Include="DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureUserDto.cs" />
-    <Compile Include="DataTransferObjects\Models\ServiceRequest\CreatedServiceRequestDto.cs" />
-    <Compile Include="DataTransferObjects\Models\ServiceRequest\ServiceRequestCategoryDto.cs" />
-    <Compile Include="DataTransferObjects\Models\ServiceRequest\ServiceRequestCommentDto.cs" />
-    <Compile Include="DataTransferObjects\Models\ServiceRequest\ServiceRequestDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Vacations\VacationAvailableDaysDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Vacations\VacationDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Vacations\VacationImportEntryDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Vacations\VacationImportStatusDto.cs" />
-    <Compile Include="Domain\DomainExceptions\Book\BookException.cs" />
-    <Compile Include="Domain\DomainExceptions\Event\EventException.cs" />
-    <Compile Include="Domain\DomainExceptions\Lotteries\LotteryException.cs" />
-    <Compile Include="Domain\DomainExceptions\Vacation\VacationImportException.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Books\BookMobileServiceValidator.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Books\BookServiceValidator.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Books\IBookMobileServiceValidator.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Books\IBookServiceValidator.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Events\EventValidationService.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Events\IEventValidationService.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Lotteries\ILotteryValidator.cs" />
-    <Compile Include="Domain\DomainServiceValidators\Lotteries\LotteryValidator.cs" />
-    <Compile Include="Domain\EmployeeComparer.cs" />
-    <Compile Include="Domain\Services\Badges\BadgesService.cs" />
-    <Compile Include="Domain\Services\Badges\IBadgesService.cs" />
-    <Compile Include="Domain\Services\Books\BookCoverService.cs" />
-    <Compile Include="Domain\Services\Books\BookMobileService.cs" />
-    <Compile Include="Domain\Services\Books\BookRemindService.cs" />
-    <Compile Include="Domain\Services\Books\BookService.cs" />
-    <Compile Include="Domain\Services\Books\IBookCoverService.cs" />
-    <Compile Include="Domain\Services\Books\IBookMobileService.cs" />
-    <Compile Include="Domain\Services\Books\IBookRemindService.cs" />
-    <Compile Include="Domain\Services\Books\IBookService.cs" />
-    <Compile Include="Domain\Services\Committees\CommitteesService.cs" />
-    <Compile Include="Domain\Services\Committees\ICommitteesService.cs" />
-    <Compile Include="Domain\Services\Email\Book\BooksNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Book\IBooksNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Committee\CommitteeNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Committee\ICommitteeNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Event\EventNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Event\IEventNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Kudos\IKudosPremiumNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Kudos\KudosPremiumNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Lotteries\ILotteryNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\Lotteries\LotteryNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\ServiceRequest\IServiceRequestNotificationService.cs" />
-    <Compile Include="Domain\Services\Email\ServiceRequest\ServiceRequestNotificationService.cs" />
-    <Compile Include="Domain\Services\Events\Calendar\EventCalendarService.cs" />
-    <Compile Include="Domain\Services\Events\Calendar\IEventCalendarService.cs" />
-    <Compile Include="Domain\Services\Events\EventService.cs" />
-    <Compile Include="Domain\Services\Events\Export\EventExportService.cs" />
-    <Compile Include="Domain\Services\Events\Export\IEventExportService.cs" />
-    <Compile Include="Domain\Services\Events\IEventService.cs" />
-    <Compile Include="Domain\Services\Events\List\EventListingService.cs" />
-    <Compile Include="Domain\Services\Events\List\IEventListingService.cs" />
-    <Compile Include="Domain\Services\Events\Participation\EventParticipationService.cs" />
-    <Compile Include="Domain\Services\Events\Participation\IEventParticipationService.cs" />
-    <Compile Include="Domain\Services\Events\Utilities\EventUtilitiesService.cs" />
-    <Compile Include="Domain\Services\Events\Utilities\IEventUtilitiesService.cs" />
-    <Compile Include="Domain\Services\KudosShop\IKudosShopService.cs" />
-    <Compile Include="Domain\Services\KudosShop\KudosShopService.cs" />
-    <Compile Include="Domain\Services\Lotteries\ILotteryAbortJob.cs" />
-    <Compile Include="Domain\Services\Lotteries\ILotteryExportService.cs" />
-    <Compile Include="Domain\Services\Lotteries\ILotteryService.cs" />
-    <Compile Include="Domain\Services\Lotteries\ILotteryParticipantService.cs" />
-    <Compile Include="Domain\Services\Lotteries\LotteryAbortJob.cs" />
-    <Compile Include="Domain\Services\Lotteries\LotteryExportService.cs" />
-    <Compile Include="Domain\Services\Lotteries\LotteryService.cs" />
-    <Compile Include="Domain\Services\Lotteries\LotteryParticipantService.cs" />
-    <Compile Include="Domain\Services\Notifications\INotificationService.cs" />
-    <Compile Include="Domain\Services\Notifications\NotificationService.cs" />
-    <Compile Include="Domain\Services\OfficeMap\IOfficeMapService.cs" />
-    <Compile Include="Domain\Services\OfficeMap\OfficeMapService.cs" />
-    <Compile Include="Domain\Services\OrganizationalStructure\IOrganizationalStructureService.cs" />
-    <Compile Include="Domain\Services\OrganizationalStructure\OranizationalStructureService.cs" />
-    <Compile Include="Domain\Services\ServiceRequests\IServiceRequestExportService.cs" />
-    <Compile Include="Domain\Services\ServiceRequests\IServiceRequestService.cs" />
-    <Compile Include="Domain\Services\ServiceRequests\ServiceRequestExportService.cs" />
-    <Compile Include="Domain\Services\ServiceRequests\ServiceRequestService.cs" />
-    <Compile Include="Domain\Services\Users\IUserEventsService.cs" />
-    <Compile Include="Domain\Services\Users\UserEventsService.cs" />
-    <Compile Include="Domain\Services\Vacations\IVacationDomainService.cs" />
-    <Compile Include="Domain\Services\Vacations\IVacationHistoryService.cs" />
-    <Compile Include="Domain\Services\Vacations\IVacationService.cs" />
-    <Compile Include="Domain\Services\Vacations\VacationDomainService.cs" />
-    <Compile Include="Domain\Services\Vacations\VacationHistoryService.cs" />
-    <Compile Include="Domain\Services\Vacations\VacationService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\EventRemindService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\EventsWebHookService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventRemindService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventsWebHookService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\IWebHookCallbackPremiumServices.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Lotteries\ILotteryStatusChangeService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\Lotteries\LotteryStatusChangeService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosCalculator.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosCalculator.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
-    <Compile Include="Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
-    <Compile Include="EmailTemplates\EmailPremiumTemplatesCompiler.cs" />
-    <Compile Include="Infrastructure\GoogleBookApiService\GoogleBookService.cs" />
-    <Compile Include="Infrastructure\GoogleBookApiService\IBookInfoService.cs" />
-    <Compile Include="Infrastructure\VacationBot\IVacationBotService.cs" />
-    <Compile Include="Infrastructure\VacationBot\VacationBotService.cs" />
-    <Compile Include="Infrastructure\VacationBot\VacationInfo.cs" />
-    <Compile Include="IoC\Modules\BackgroundWorkersModule.cs" />
-    <Compile Include="IoC\Modules\BadgesModule.cs" />
-    <Compile Include="IoC\Modules\BooksModule.cs" />
-    <Compile Include="IoC\Modules\CommitteeModule.cs" />
-    <Compile Include="IoC\Modules\EventsModule.cs" />
-    <Compile Include="IoC\Modules\KudosShopModule.cs" />
-    <Compile Include="IoC\Modules\LotteryModule.cs" />
-    <Compile Include="IoC\Modules\OfficeMapModule.cs" />
-    <Compile Include="IoC\Modules\OrganizationalStructureModule.cs" />
-    <Compile Include="IoC\Modules\ServicesModule.cs" />
-    <Compile Include="IoC\Modules\ServiceRequestModule.cs" />
-    <Compile Include="IoC\Modules\UserEventsModule.cs" />
-    <Compile Include="IoC\Modules\VacationModule.cs" />
-    <Compile Include="IoC\Modules\WebHookCallbacksPremiumModule.cs" />
-    <Compile Include="Presentation\Api\BackgroundWorkers\NewEventNotifier.cs" />
-    <Compile Include="Presentation\Api\BackgroundWorkers\SharedEventNotifier.cs" />
-    <Compile Include="Presentation\Api\Controllers\Book\BookController.cs" />
-    <Compile Include="Presentation\Api\Controllers\Book\BookMobileController.cs" />
-    <Compile Include="Presentation\Api\Controllers\CommitteesController.cs" />
-    <Compile Include="Presentation\Api\Controllers\EventController.cs" />
-    <Compile Include="Presentation\Api\Controllers\EventTypeController.cs" />
-    <Compile Include="Presentation\Api\Controllers\ExternalPremiumJobsController.cs" />
-    <Compile Include="Presentation\Api\Controllers\Kudos\KudosShopController.cs" />
-    <Compile Include="Presentation\Api\Controllers\Lotteries\LotteryController.cs" />
-    <Compile Include="Presentation\Api\Controllers\Lotteries\LotteryParticipantController.cs" />
-    <Compile Include="Presentation\Api\Controllers\Lotteries\LotteryWidgetController.cs" />
-    <Compile Include="Presentation\Api\Controllers\MapController.cs" />
-    <Compile Include="Presentation\Api\Controllers\OrganizationalStructureController.cs" />
-    <Compile Include="Presentation\Api\Controllers\ServiceRequestsController.cs" />
-    <Compile Include="Presentation\Api\Controllers\VacationsController.cs" />
-    <Compile Include="Presentation\ModelMappings\Helpers.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\Books.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\BooksProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\CommitteeProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\EventsProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\KudosShopProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\LotteryProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\LoyaltyKudosProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\OfficeMapProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\OrganizationalStructureProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\PostsProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\ServiceRequestProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\UsersProfile.cs" />
-    <Compile Include="Presentation\ModelMappings\Profiles\VacationsProfile.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsLogViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\EditBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\NewBookQuantityViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\NewBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookDetails\RetrievedMobileBookInfoViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobileGetViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobileLogViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobilePostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobileReturnViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobileTakeSpecificViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookMobileTakeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BookReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BooksByOffice\BasicBookUserViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\MobileUserViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\OfficeBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Book\RetrievedBookForPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Committees\CommitteePostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Committees\CommitteeSuggestionPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Committees\CommitteeSuggestionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Committees\CommitteeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\CreateEventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\CreateEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventChangeOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventDetailsCommentViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventDetailsListItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventDetailsOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventDetailsParticipantViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventEditDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventFilteredArgsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventJoinMultipleViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventJoinViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventListItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventListViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventOfficesViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventParticipantVisitedEventsListingArgsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventReminderDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventReminderViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventReportDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventVisitedReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventParticipantReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\ShareEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\UpdateAttendStatusViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\UpdateEventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\UpdateEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\KudosShop\KudosShopItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\BuyLotteryTicketsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\CreateLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\EditDraftedLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\EditStartedLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsBuyerViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryListingArgsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryParticipantViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryTicketReceiverViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryWidgetViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapAllFloorsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapApplicationUserViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapFloorViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapRoomTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapRoomViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Map\MapViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCategoryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCommentPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCommentViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCreateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestUpdateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\ValidateRemindersCollectionAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\RequireOneTimeEventForCollectionAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\NoDuplicatesInCollectionAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanPresentDateAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Lotteries\ValidLotteryCreationStatusAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\MinValueAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\Wall\Posts\EventPostViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="$(SimoonaCoreLocation)\src\api\stylecop.json">
@@ -610,7 +87,6 @@
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <Content Include="EmailTemplates\Events\CoacheeJoinedEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -632,11 +108,6 @@
     <None Include="EmailTemplates\Lotteries\StartedLottery.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="EmailTemplates\Books\BookRemind.cshtml">
@@ -674,52 +145,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Authentification\Shrooms.Authentification.csproj">
-      <Project>{da661aa0-3313-4c2d-81a9-c1a2b74f7317}</Project>
-      <Name>Shrooms.Authentification</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj">
-      <Project>{6611930d-880e-455c-8681-e0e2a33cf5a9}</Project>
-      <Name>Shrooms.Contracts.DataTransferObjects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
-      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
-      <Name>Shrooms.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj">
-      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
-      <Name>Shrooms.DataLayer.EntityModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj">
-      <Project>{f75814b0-ade3-4e55-b44d-2ee966c41344}</Project>
-      <Name>Shrooms.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
-      <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
-      <Name>Shrooms.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj">
-      <Project>{07a1d569-04a6-425e-8020-e7e161eccde9}</Project>
-      <Name>Shrooms.Presentation.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Presentation.WebViewModels\Shrooms.Presentation.WebViewModels.csproj">
-      <Project>{1f63d29f-e593-47f0-a304-54d62cc1ad2b}</Project>
-      <Name>Shrooms.Presentation.WebViewModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj">
-      <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
-      <Name>Shrooms.Resources</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Authentification\Shrooms.Authentification.csproj" />
+    <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj" />
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
+    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
+    <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj" />
+    <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj" />
+    <ProjectReference Include="..\Shrooms.Presentation.WebViewModels\Shrooms.Presentation.WebViewModels.csproj" />
+    <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
-    <Message Text="Recycling web app..." Importance="High" />
-    <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
-  </Target>
-  <PropertyGroup>
-    <PreBuildEvent Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent />
-  </PropertyGroup>
 </Project>
