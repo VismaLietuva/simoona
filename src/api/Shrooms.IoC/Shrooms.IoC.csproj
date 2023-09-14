@@ -1,48 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Targets\shared.targets" />
+
   <PropertyGroup>
     <ProjectGuid>{6E972BA4-C333-4441-A9DE-CEDB0AA3C7FF}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>9</LangVersion>
     <AssemblyTitle>Shrooms.IoC</AssemblyTitle>
     <Product>Shrooms.IoC</Product>
-    <Copyright>Copyright ©  2015</Copyright>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.2" />
     <PackageReference Include="Autofac.SignalR2" Version="4.0.0" />
     <PackageReference Include="Autofac.WebApi2" Version="4.2.1" />
-    <PackageReference Include="AutoMapper" Version="4.2.1" />
-    <PackageReference Include="EntityFramework" Version="6.1.3" />
-    <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
-    <PackageReference Include="Hangfire.Core" Version="1.6.6" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.3" />
-    <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="ReallySimpleFeatureToggle" Version="1.1.63.0" />
-    <PackageReference Include="System.Linq.Dynamic" Version="1.0.6" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -53,20 +23,8 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
   <ItemGroup>
-    <AdditionalFiles Include="..\stylecop.json">
-      <Link>stylecop.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AdditionalFiles>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
-    <ProjectReference Include="..\Shrooms.Domain.ServiceValidators\Shrooms.Domain.ServiceValidators.csproj" />
-    <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj" />
-    <ProjectReference Include="..\Shrooms.DataLayer\Shrooms.DataLayer.csproj" />
-    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
-    <ProjectReference Include="..\Shrooms.Authentification\Shrooms.Authentification.csproj" />
-    <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj" />
     <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj" />
     <ProjectReference Include="..\Shrooms.Presentation.ModelMappings\Shrooms.Presentation.ModelMappings.csproj" />
   </ItemGroup>

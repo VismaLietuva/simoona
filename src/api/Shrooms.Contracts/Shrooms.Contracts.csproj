@@ -1,29 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Targets\shared.targets" />
+  
   <PropertyGroup>
     <ProjectGuid>{E690CEB8-F266-441F-8A80-5A3440B3445A}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>9</LangVersion>
     <AssemblyTitle>Shrooms.Contracts</AssemblyTitle>
     <Product>Shrooms.Contracts</Product>
-    <Copyright>Copyright ©  2019</Copyright>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
-    <StyleCopEnabled>True</StyleCopEnabled>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.1.3" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="X.PagedList" Version="8.1.0" />
   </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.DataSetExtensions" />

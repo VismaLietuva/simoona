@@ -1,28 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Targets\shared.targets" />
+
   <PropertyGroup>
     <ProjectGuid>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>9</LangVersion>
-    <AssemblyTitle>Shrroms.Domain.ServiceValidators</AssemblyTitle>
-    <Product>Shrroms.Domain.ServiceValidators</Product>
-    <Copyright>Copyright ©  2015</Copyright>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
+    <AssemblyTitle>Shrooms.Domain.ServiceValidators</AssemblyTitle>
+    <Product>Shrooms.Domain.ServiceValidators</Product>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.1.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Net" />
@@ -31,17 +15,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
     <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj" />
     <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
     <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj" />
     <ProjectReference Include="..\Shrooms.Domain.Exceptions\Shrooms.Domain.Exceptions.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="..\stylecop.json">
-      <Link>stylecop.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AdditionalFiles>
   </ItemGroup>
 </Project>
