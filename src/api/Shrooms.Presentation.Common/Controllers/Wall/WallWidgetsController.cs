@@ -8,6 +8,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
+using Shrooms.Domain.Services.Banners;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Events;
 using Shrooms.Domain.Services.Kudos;
@@ -15,6 +16,7 @@ using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Helpers;
+using Shrooms.Presentation.WebViewModels.Models.Banners;
 using Shrooms.Presentation.WebViewModels.Models.Birthday;
 using Shrooms.Presentation.WebViewModels.Models.Events;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
@@ -32,13 +34,15 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
         private readonly IKudosBasketService _kudosBasketService;
         private readonly IBirthdayService _birthdayService;
         private readonly IEventWidgetService _eventWidgetService;
+        private readonly IBannerWidgetService _bannerWidgetService;
 
         public WallWidgetsController(IMapper mapper,
             IKudosService kudosService,
             IPermissionService permissionService,
             IKudosBasketService kudosBasketService,
             IBirthdayService birthdayService,
-            IEventWidgetService eventWidgetService)
+            IEventWidgetService eventWidgetService,
+            IBannerWidgetService bannerWidgetService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
@@ -46,6 +50,7 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
             _kudosBasketService = kudosBasketService;
             _birthdayService = birthdayService;
             _eventWidgetService = eventWidgetService;
+            _bannerWidgetService = bannerWidgetService;
         }
 
         [HttpGet]
@@ -62,7 +67,8 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
                 LastKudosLogRecords = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecordsAsync),
                 WeeklyBirthdays = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdaysAsync),
                 KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidgetAsync),
-                UpcomingEvents = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Event, GetUpcomingEventsAsync)
+                UpcomingEvents = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Event, GetUpcomingEventsAsync),
+                Banners = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Wall, GetBannersAsync)
             };
         }
 
@@ -75,6 +81,21 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
         {
             var events = await _eventWidgetService.GetUpcomingEventsAsync(GetOrganizationId());
             return _mapper.Map<IEnumerable<UpcomingEventWidgetViewModel>>(events);
+        }
+
+        private async Task<IEnumerable<BannerWidgetViewModel>> GetBannersAsync()
+        {
+            // var banners = await _bannerWidgetService.GetBannersAsync(GetOrganizationId());
+            // return _mapper.Map<IEnumerable<BannerWidgetViewModel>>(banners);
+
+            return new List<BannerWidgetViewModel>()
+            {
+                // new BannerWidgetViewModel()
+                // {
+                //     PictureId = "1234567890.png",
+                //     Url = "https://www.google.com"
+                // }
+            };
         }
 
         private async Task<IEnumerable<WallKudosLogViewModel>> GetLastKudosLogRecordsAsync()

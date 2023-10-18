@@ -105,6 +105,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BannerEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BlacklistUserEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
