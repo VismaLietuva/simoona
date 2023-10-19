@@ -145,6 +145,8 @@
     <Compile Include="ServiceExceptions\ServiceException.cs" />
     <Compile Include="Services\Administration\IAdministrationUsersService.cs" />
     <Compile Include="Services\Administration\AdministrationUsersService.cs" />
+    <Compile Include="Services\Banners\BannerWidgetService.cs" />
+    <Compile Include="Services\Banners\IBannerWidgetService.cs" />
     <Compile Include="Services\BlacklistUsers\BlacklistService.cs" />
     <Compile Include="Services\BlacklistUsers\IBlacklistService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
@@ -271,6 +273,5 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

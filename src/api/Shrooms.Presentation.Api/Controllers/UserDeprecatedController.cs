@@ -35,7 +35,6 @@ using Shrooms.Presentation.Common.Controllers.Kudos;
 using Shrooms.Presentation.Common.Controllers.Wall;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Helpers;
-using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;

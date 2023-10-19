@@ -66,6 +66,7 @@
     <Compile Include="Models\Administration\AdministrationUserDto.cs" />
     <Compile Include="Models\Administration\FilterDto.cs" />
     <Compile Include="Models\ApplicationUserDto.cs" />
+    <Compile Include="Models\Banners\BannerWidgetDto.cs" />
     <Compile Include="Models\Birthdays\BirthdayDto.cs" />
     <Compile Include="Models\Birthdays\UserBirthdayInfoDto.cs" />
     <Compile Include="Models\Emails\EmailSendingDto.cs" />
