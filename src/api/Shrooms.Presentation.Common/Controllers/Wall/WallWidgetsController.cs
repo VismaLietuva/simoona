@@ -85,17 +85,8 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
 
         private async Task<IEnumerable<BannerWidgetViewModel>> GetBannersAsync()
         {
-            // var banners = await _bannerWidgetService.GetBannersAsync(GetOrganizationId());
-            // return _mapper.Map<IEnumerable<BannerWidgetViewModel>>(banners);
-
-            return new List<BannerWidgetViewModel>()
-            {
-                // new BannerWidgetViewModel()
-                // {
-                //     PictureId = "1234567890.png",
-                //     Url = "https://www.google.com"
-                // }
-            };
+            var banners = await _bannerWidgetService.GetBannersAsync(GetOrganizationId());
+            return _mapper.Map<IEnumerable<BannerWidgetViewModel>>(banners);
         }
 
         private async Task<IEnumerable<WallKudosLogViewModel>> GetLastKudosLogRecordsAsync()

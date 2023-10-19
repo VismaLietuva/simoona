@@ -1,11 +1,7 @@
 <div class="panel panel-default banners-module" ng-repeat="banner in vm.banners">
     <a href="{{banner.url}}" target="_blank">
-        <!-- <img style="max-width: 100%; height: auto;" class="media-object" 
-            ng-src="{{:: banner.pictureId | wallImageThumb}}" 
-            image-loading ng-cloak/> -->
-
         <img class="media-object banner-image" 
-            ng-src="https://picsum.photos/475/200" 
+            ng-src="{{:: banner.pictureId | wallImageThumb}}"
             image-loading ng-cloak/>
     </a>
 </div>
