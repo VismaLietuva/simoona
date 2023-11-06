@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -7,7 +7,7 @@ using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Notifications;
-using Shrooms.Presentation.Api.Hubs;
+using Shrooms.Presentation.Common.Hubs;
 
 namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
 {

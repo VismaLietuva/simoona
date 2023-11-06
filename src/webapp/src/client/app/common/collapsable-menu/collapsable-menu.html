@@ -1,0 +1,11 @@
+<a ng-click="vm.onCollapseClick()">
+    <span class="{{::vm.menuIconClass}} icon-{{vm.menuName}}"></span><span
+        translate="{{::vm.menuTextTranslation}}"></span>
+    <span>
+        <span ng-class="vm.isCollapsed ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-up'"
+            aria-hidden="true">
+        </span>
+    </span>
+</a>
+<div ng-hide="vm.isCollapsed" ng-transclude>
+</div>

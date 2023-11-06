@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq.Expressions;
@@ -13,10 +13,10 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Filters;
 using X.PagedList;
 
-namespace Shrooms.Presentation.Api.Controllers
+namespace Shrooms.Presentation.Common.Controllers
 {
     public abstract class AbstractWebApiController<TModel, TViewModel, TPostViewModel> : BaseController
         where TModel : BaseModel, ISoftDelete

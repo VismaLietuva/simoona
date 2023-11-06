@@ -4,13 +4,13 @@ using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Contracts.DataTransferObjects
 {
-    public class EmailDto
+    public record EmailDto
     {
         public string SenderFullName { get; private set; }
 
         public string SenderEmail { get; private set; }
 
-        public IEnumerable<string> Receivers { get; private set; }
+        public IEnumerable<string> Receivers { get; set; }
 
         public string Subject { get; private set; }
 

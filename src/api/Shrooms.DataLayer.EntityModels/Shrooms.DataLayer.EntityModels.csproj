@@ -138,6 +138,7 @@
     <Compile Include="Models\Skill.cs" />
     <Compile Include="Models\SyncToken.cs" />
     <Compile Include="Models\VacationPage.cs" />
+    <Compile Include="Models\Banner.cs" />
     <Compile Include="Models\WorkingHours.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Notifications\NotificationsSettings.cs" />

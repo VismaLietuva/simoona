@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Web;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.Configuration
@@ -11,6 +13,8 @@ namespace Shrooms.Infrastructure.Configuration
         public string StorageConnectionString => ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
 
         public bool IsEmailEnabled => bool.Parse(ConfigurationManager.AppSettings["EmailEnabled"]);
+        public EmailBuildingStrategy EmailBuildingStrategy =>
+            Enum.TryParse(ConfigurationManager.AppSettings["EmailBuildingStrategy"], out EmailBuildingStrategy strat) ? strat : EmailBuildingStrategy.AllTo;
 
         public int DefaultOrganizationId => int.Parse(ConfigurationManager.AppSettings["DefaultOrganizationId"]);
 

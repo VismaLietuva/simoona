@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels.Notifications;
 using Shrooms.Domain.Services.Notifications;
+using Shrooms.Presentation.Common.Controllers;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

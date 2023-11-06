@@ -150,6 +150,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<BlacklistUser> BlacklistUsers { get; set; }
 
+        public virtual DbSet<Banner> Banners { get; set; }
+
         public string ConnectionName { get; }
 
         public int SaveChanges(string userId)
@@ -227,6 +229,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new FilterPresetEntityConfig());
             modelBuilder.Configurations.Add(new BlacklistUserEntityConfig());
             modelBuilder.Configurations.Add(new EventReminderEntityConfig());
+            modelBuilder.Configurations.Add(new BannerEntityConfiguration());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);

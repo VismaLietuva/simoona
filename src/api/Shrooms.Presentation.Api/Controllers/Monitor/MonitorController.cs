@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Monitors;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.Monitors;
 using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Monitors;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers.Monitor
 {

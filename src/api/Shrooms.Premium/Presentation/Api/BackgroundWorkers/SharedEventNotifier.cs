@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,7 +11,7 @@ using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events;
-using Shrooms.Presentation.Api.Hubs;
+using Shrooms.Presentation.Common.Hubs;
 
 namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
 {

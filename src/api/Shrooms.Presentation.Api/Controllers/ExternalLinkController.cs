@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.ExternalLinks;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
 using System.Collections.Generic;
 using System.Threading.Tasks;

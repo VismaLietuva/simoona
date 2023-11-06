@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.VacationPages;
 using Shrooms.Domain.Services.VacationPages;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.VacationPage;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

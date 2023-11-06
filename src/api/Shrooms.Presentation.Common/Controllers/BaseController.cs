@@ -1,12 +1,12 @@
-﻿using System.Net;
+using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Helpers;
 
-namespace Shrooms.Presentation.Api.Controllers
+namespace Shrooms.Presentation.Common.Controllers
 {
     public class BaseController : ApiController
     {

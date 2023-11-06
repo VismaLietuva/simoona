@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -7,8 +7,8 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Domain.Services.KudosShop;
 using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 {

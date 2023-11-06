@@ -438,7 +438,6 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AbstractClassifierController.cs" />
-    <Compile Include="Controllers\AbstractWebApiController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\JobTypeController.cs" />
     <Compile Include="Controllers\ExternalLinkController.cs" />
@@ -447,7 +446,6 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.Impersonation.cs" />
-    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
@@ -457,7 +455,6 @@
     <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\FloorController.cs" />
     <Compile Include="Controllers\KudosBasketController.cs" />
-    <Compile Include="Controllers\Kudos\KudosController.cs" />
     <Compile Include="Controllers\LocalizationController.cs" />
     <Compile Include="Controllers\OfficeController.cs" />
     <Compile Include="Controllers\OrganizationController.cs" />
@@ -470,26 +467,16 @@
     <Compile Include="Controllers\RoomTypeController.cs" />
     <Compile Include="Controllers\SkillController.cs" />
     <Compile Include="Filters\ApplicationInsightsHandleErrorAttribute.cs" />
-    <Compile Include="Filters\PermissionAwareCacheOutputFilterAttribute.cs" />
     <Compile Include="GeneralCode\ApplicationInsightsExceptionsLogger.cs" />
-    <Compile Include="Helpers\IdentityExtensions.cs" />
-    <Compile Include="GeneralCode\PerPermissionCacheKeyGenerator.cs" />
     <Compile Include="Controllers\Wall\WallController.cs" />
     <Compile Include="Controllers\ExternalJobsController.cs" />
-    <Compile Include="Controllers\Wall\WallWidgetsController.cs" />
     <Compile Include="Filters\FeatureToggleAttribute.cs" />
-    <Compile Include="Filters\HMACAuthenticationAttribute.cs" />
-    <Compile Include="Filters\BasicAuthenticationAttribute.cs" />
-    <Compile Include="Filters\IdentityBasicAuthenticationAttribute.cs" />
     <Compile Include="Filters\OrganizationExceptionFilterAttribute.cs" />
     <Compile Include="Filters\OrganizationValidationFilterAttribute.cs" />
     <Compile Include="Filters\QueryStringBearerAuthorizeAttribute.cs" />
     <Compile Include="Filters\SkipOrganizationValidationFilterAttribute.cs" />
     <Compile Include="GeneralCode\OrganizationUtils.cs" />
-    <Compile Include="GeneralCode\PerOrganizationCacheKeyGenerator.cs" />
     <Compile Include="Handlers\CancelledTaskBugWorkaroundMessageHandler.cs" />
-    <Compile Include="Filters\PermissionAuthorizeAttribute.cs" />
-    <Compile Include="Filters\ValidationFilterAttribute.cs" />
     <Compile Include="GeneralCode\SerializationIgnorer\SerializationIgnoreAttribute.cs" />
     <Compile Include="GeneralCode\SerializationIgnorer\SerializationIgnoreConfigs.cs" />
     <Compile Include="GeneralCode\SerializationIgnorer\SerializationIgnorer.cs" />
@@ -499,14 +486,10 @@
     </Compile>
     <Compile Include="Handlers\HttpNotFoundAwareControllerActionSelector.cs" />
     <Compile Include="Handlers\HttpNotFoundAwareDefaultHttpControllerSelector.cs" />
-    <Compile Include="Helpers\ClaimsHelper.cs" />
     <Compile Include="Helpers\CryptoHelper.cs" />
     <Compile Include="Helpers\EmptyToNullConverter.cs" />
     <Compile Include="Helpers\FormattedDecimalConverter.cs" />
-    <Compile Include="Helpers\HttpRequestMessageHelpers.cs" />
     <Compile Include="Helpers\CustomUrlHelper.cs" />
-    <Compile Include="Hubs\BaseHub.cs" />
-    <Compile Include="Hubs\NotificationHub.cs" />
     <Compile Include="ImageResizerPlugins\ImageResizerBlobCache.cs" />
     <Compile Include="ImageResizerPlugins\WritableBlobProvider.cs" />
     <Compile Include="Middlewares\ImageResizerMiddleware.cs" />
@@ -545,6 +528,14 @@
     <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
       <Project>{E690CEB8-F266-441F-8A80-5A3440B3445A}</Project>
       <Name>Shrooms.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj">
+      <Project>{ce5546d3-8819-4b25-8ddc-b02769bab42f}</Project>
+      <Name>Shrooms.Premium</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj">
+      <Project>{07a1d569-04a6-425e-8020-e7e161eccde9}</Project>
+      <Name>Shrooms.Presentation.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>

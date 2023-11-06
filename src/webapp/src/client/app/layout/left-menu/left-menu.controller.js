@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -20,11 +20,12 @@
         'authService',
         'wallService',
         'leftMenuService',
-        'externalLinkTypes'
+        'externalLinkTypes',
+        '$state'
     ];
 
     function leftMenuController($translate, $q, menuNavigationFactory, externalLinksRepository, leftMenuGroups,
-        authService, wallService, leftMenuService, externalLinkTypes) {
+        authService, wallService, leftMenuService, externalLinkTypes, $state) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -38,24 +39,39 @@
         vm.closeSidebar = closeSidebar;
         vm.overlayDismiss = overlayDismiss;
         vm.isSidebarOpen = isSidebarOpen;
+        vm.activeMenuGroup = null;
+
         //vm.startUserWalkThrough = walkThroughService.startWalkThrough;
 
         init();
+
 
         translateExternalLinks();
 
         function init() {
             if (authService.hasPermissions(['EXTERNALLINK_BASIC'])) {
                 vm.isLoading = true;
-                externalLinksRepository.getExternalLinks().then(function(response) {
+                externalLinksRepository.getExternalLinks().then(function (response) {
                     deleteLeftMenuExternals();
 
                     angular.forEach(response, defineMenuItem);
 
                     menuNavigationFactory.makeLeftMenu(leftMenuGroups);
+
                     vm.isLoading = false;
+                    for (const group in leftMenuGroups) {
+                        for (const iterator of leftMenuGroups[group].menuItems.map(i => i.active)) {
+                            if ($state.includes(iterator)) {
+                                vm.activeMenuGroup = group;
+                                // we return early as only 1 item can be active at the time.
+                                return;
+                            }
+                        }
+                    }
+
+
                     //vm.startUserWalkThrough();
-                }, function() {
+                }, function () {
                     vm.isLoading = false;
                 });
             } else {

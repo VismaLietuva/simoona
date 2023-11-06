@@ -120,6 +120,7 @@
     <script src="/src/client/app/config.js"></script>
     <script src="/src/client/app/routing.js"></script>
     <script src="/src/client/app/auth/auth.module.js"></script>
+    <script src="/src/client/app/banners/banners.module.js"></script>
     <script src="/src/client/app/birthdays/birthdays.module.js"></script>
     <script src="/src/client/app/books/books.module.js"></script>
     <script src="/src/client/app/certificate/certificate.module.js"></script>
@@ -175,6 +176,7 @@
     <script src="/src/client/app/auth/register/register.controller.js"></script>
     <script src="/src/client/app/auth/reset-password/reset-password.controller.js"></script>
     <script src="/src/client/app/auth/verify-email/verify-email.controller.js"></script>
+    <script src="/src/client/app/banners/banners-widget/banners-widget.component.js"></script>
     <script src="/src/client/app/birthdays/birthdays.component.js"></script>
     <script src="/src/client/app/books/books-report.directive.js"></script>
     <script src="/src/client/app/books/books.controller.js"></script>
@@ -189,6 +191,7 @@
     <script src="/src/client/app/committee/committee-suggestion.controller.js"></script>
     <script src="/src/client/app/committee/committee.controller.js"></script>
     <script src="/src/client/app/committee/committee.repository.js"></script>
+    <script src="/src/client/app/common/collapsable-menu/collapsable-menu.component.js"></script>
     <script src="/src/client/app/common/confirmation-popup/confirmation-popup.controller.js"></script>
     <script src="/src/client/app/common/directives/autocomplete/autocomplete.directive.js"></script>
     <script src="/src/client/app/common/directives/confirmation-modal/confirmation-modal.directive.js"></script>
@@ -241,6 +244,10 @@
     <script src="/src/client/app/common/directives/wall/comments/comment-show-hide/comment-show-hide.component.js"></script>
     <script src="/src/client/app/common/directives/wall/comments/comment.component.js"></script>
     <script src="/src/client/app/common/directives/wall/comments/comment.repository.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-info/youtube-preview-info.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-link/youtube-preview-link.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.service.js"></script>
     <script src="/src/client/app/common/directives/wall/mentions/mention.service.js"></script>
     <script src="/src/client/app/common/directives/wall/message-like/button/like-button.component.js"></script>
     <script src="/src/client/app/common/directives/wall/message-like/list/like-list-popover/like-list-popover.directive.js"></script>
@@ -259,10 +266,6 @@
     <script src="/src/client/app/common/directives/wall/wall-socket/wall-hub-listener.js"></script>
     <script src="/src/client/app/common/directives/wall/wall.component.js"></script>
     <script src="/src/client/app/common/directives/wall/wall.service.js"></script>
-    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-info/youtube-preview-info.directive.js"></script>
-    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-link/youtube-preview-link.directive.js"></script>
-    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.directive.js"></script>
-    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.service.js"></script>
     <script src="/src/client/app/common/filters/array-to-string.filter.js"></script>
     <script src="/src/client/app/common/filters/boldify-suggestion.filter.js"></script>
     <script src="/src/client/app/common/filters/comment-max-length.filter.js"></script>
@@ -288,8 +291,8 @@
     <script src="/src/client/app/common/services/locale.service.js"></script>
     <script src="/src/client/app/common/services/missing-translation.service.js"></script>
     <script src="/src/client/app/common/services/navigation.service.js"></script>
-    <script src="/src/client/app/common/services/notification.service.js"></script>
     <script src="/src/client/app/common/services/notify.service.js"></script>
+    <script src="/src/client/app/common/services/notification.service.js"></script>
     <script src="/src/client/app/common/services/picture.service.js"></script>
     <script src="/src/client/app/common/services/qualification-level.service.js"></script>
     <script src="/src/client/app/common/services/resource-cache.service.js"></script>
@@ -379,15 +382,15 @@
     <script src="/src/client/app/layout/navigation-bar/notifications/popup/dismiss-all-btn/dismiss-all-btn.component.js"></script>
     <script src="/src/client/app/layout/navigation-bar/notifications/popup/notification/notification.component.js"></script>
     <script src="/src/client/app/layout/navigation-bar/notifications/popup/popup.component.js"></script>
+    <script src="/src/client/app/lotteries/lottery-list.controller.js"></script>
+    <script src="/src/client/app/lotteries/lottery-manage.controller.js"></script>
+    <script src="/src/client/app/lotteries/lottery-refund.controller.js"></script>
     <script src="/src/client/app/lotteries/lotteries-widget/gift-ticket-list/flat-ticket-picker/flat-ticket-picker.directive.js"></script>
     <script src="/src/client/app/lotteries/lotteries-widget/gift-ticket-list/gift-ticket-list.directive.js"></script>
     <script src="/src/client/app/lotteries/lotteries-widget/lotteries-detail-modal.directive.js"></script>
     <script src="/src/client/app/lotteries/lotteries-widget/lotteries-widget.directive.js"></script>
     <script src="/src/client/app/lotteries/lotteries.repository.js"></script>
     <script src="/src/client/app/lotteries/lotteries.service.js"></script>
-    <script src="/src/client/app/lotteries/lottery-list.controller.js"></script>
-    <script src="/src/client/app/lotteries/lottery-manage.controller.js"></script>
-    <script src="/src/client/app/lotteries/lottery-refund.controller.js"></script>
     <script src="/src/client/app/lotteries/modal/modal.directive.js"></script>
     <script src="/src/client/app/office/floor/floor-manage.controller.js"></script>
     <script src="/src/client/app/office/floor/floor.controller.js"></script>
