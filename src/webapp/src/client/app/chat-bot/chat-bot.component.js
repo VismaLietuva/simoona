@@ -42,7 +42,7 @@
                     vm.isLoading = false;
                     vm.messages.pop();
 
-                    pushMessageToChat(messageResponse.data, true);
+                    pushMessageToChat(messageResponse.data.content, true);
 
                     $timeout(scrollChatWindowToBottom);
                 }, errorHandler.handleErrorMessage);
