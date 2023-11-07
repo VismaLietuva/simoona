@@ -11,7 +11,7 @@
         </div>
         <div class="input-group">
             <input type="text" class="form-control" ng-model="vm.newMessage"
-                translate-attr-placeholder="chatBot.sendAMessage" ng-keypress="vm.handleKeyPress($event)">
+                translate-attr-placeholder="chatBot.sendAMessage" translate ng-keypress="vm.handleKeyPress($event)">
             <span class="input-group-btn">
                 <button class="btn btn-primary" type="button" ng-click="vm.sendMessage()" ng-disabled="vm.isLoading">
                     <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>

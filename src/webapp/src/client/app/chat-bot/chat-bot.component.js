@@ -28,11 +28,6 @@
             vm.messages = [];
             vm.isChatWindowOpen = false;
             vm.historyId = crypto.randomUUID();
-
-            pushMessageToChat(
-                localeSrv.translate('chatBot.initialMessage'),
-                true
-            );
         }
 
         function sendMessageToApiAndUpdateChat(message) {
