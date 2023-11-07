@@ -13,6 +13,6 @@
         <ace-upcoming-events-widget events="vm.widgetsInfo.upcomingEvents"></ace-upcoming-events-widget>
         <ace-kudos-achievement-board-widget tabs="vm.widgetsInfo.kudosWidgetStats" tabOneMonths="3" tabOneAmount="3" tabTwoMonths="12" tabTwoAmount="3"></ace-kudos-achievement-board-widget>
         <ace-birthdays users="vm.widgetsInfo.weeklyBirthdays"></ace-birthdays>
-        <ace-chat-bot></ace-chat-bot>
+        <ace-chat-bot ng-if="vm.isChatBotEnabled"></ace-chat-bot>
     </div>
 </div>

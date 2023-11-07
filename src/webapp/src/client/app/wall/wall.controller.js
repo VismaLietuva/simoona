@@ -7,13 +7,14 @@
 
     wallController.$inject = [
         '$rootScope',
+        '$window',
         'wallRepository'
     ];
 
-    function wallController($rootScope, wallRepository) {
+    function wallController($rootScope, $window, wallRepository) {
         /*jshint validthis: true */
         var vm = this;
-
+        vm.isChatBotEnabled = $window.isChatBotEnabled;
         $rootScope.pageTitle = 'wall.wallTitle';
 
         //init
