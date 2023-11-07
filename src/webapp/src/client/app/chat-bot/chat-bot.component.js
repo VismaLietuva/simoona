@@ -30,7 +30,7 @@
             vm.historyId = crypto.randomUUID();
 
             pushMessageToChat(
-                localeSrv.formatTranslation('chatBot.initialMessage'),
+                localeSrv.translate('chatBot.initialMessage'),
                 true
             );
         }
@@ -42,7 +42,7 @@
                     vm.isLoading = false;
                     vm.messages.pop();
 
-                    pushMessageToChat(messageResponse.data, true);
+                    pushMessageToChat(messageResponse.data.content, true);
 
                     $timeout(scrollChatWindowToBottom);
                 }, errorHandler.handleErrorMessage);
@@ -50,7 +50,7 @@
 
         function pushMessageToChat(message, isBotMessage) {
             vm.messages.push({
-                text: message,
+                text: convertUrlsToAnchors(message),
                 isBotMessage: isBotMessage,
             });
         }
@@ -58,6 +58,19 @@
         function scrollChatWindowToBottom() {
             const chatWindow = document.getElementById('chatMessages');
             chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function convertUrlsToAnchors(text) {
+            let urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function (url) {
+                return '<a target="_blank" href="' + url + '">' + url + '</a>';
+            });
+        }
+
+        vm.formatMessage = function (message) {
+            return '<strong>' +
+                (message.isBotMessage ? localeSrv.translate('chatBot.aiAgent') : localeSrv.translate('common.you'))
+                + '</strong>' + ': <span>' + message.text + '</span>'
         }
 
         vm.sendMessage = function () {
@@ -71,7 +84,7 @@
                 $timeout(scrollChatWindowToBottom);
 
                 pushMessageToChat(
-                    localeSrv.formatTranslation('chatBot.thinking'),
+                    localeSrv.translate('chatBot.thinking'),
                     true
                 );
 
