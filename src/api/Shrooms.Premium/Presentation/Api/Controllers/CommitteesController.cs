@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,8 +11,8 @@ using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Domain.Services.Committees;
 using Shrooms.Premium.Presentation.WebViewModels.Committees;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

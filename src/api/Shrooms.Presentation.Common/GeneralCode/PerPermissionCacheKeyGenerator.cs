@@ -1,12 +1,12 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http.Controllers;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Helpers;
 
-namespace Shrooms.Presentation.Api.GeneralCode
+namespace Shrooms.Presentation.Common.GeneralCode
 {
     public class PerPermissionCacheKeyGenerator : PerOrganizationCacheKeyGenerator
     {

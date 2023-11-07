@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Authentification", "Shrooms.Authentification\Shrooms.Authentification.csproj", "{DA661AA0-3313-4C2D-81A9-C1A2B74F7317}"
 EndProject
@@ -56,6 +56,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.Tests", "Shrooms.Premium.Tests\Shrooms.Premium.Tests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "70. Extensions", "70. Extensions", "{37BA1D29-FB87-4F49-98AE-7BCA657B2AB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shrooms.Presentation.Common", "Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj", "{07A1D569-04A6-425E-8020-E7E161ECCDE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +133,10 @@ Global
 		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07A1D569-04A6-425E-8020-E7E161ECCDE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07A1D569-04A6-425E-8020-E7E161ECCDE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07A1D569-04A6-425E-8020-E7E161ECCDE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07A1D569-04A6-425E-8020-E7E161ECCDE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,12 +157,13 @@ Global
 		{093FE583-996B-435C-A4D2-201C94AA71E0} = {836C79A9-7F69-4504-A7AF-4B0EC58FED34}
 		{D92E5D79-8D6B-410F-B9FC-0FCE46FBC116} = {4F02D4C5-130A-4B3B-B633-414D25A845D8}
 		{E690CEB8-F266-441F-8A80-5A3440B3445A} = {70049733-8ED2-403C-B6C7-31A4755073B6}
-		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625} = {836C79A9-7F69-4504-A7AF-4B0EC58FED34}
 		{CE5546D3-8819-4B25-8DDC-B02769BAB42F} = {37BA1D29-FB87-4F49-98AE-7BCA657B2AB1}
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625} = {836C79A9-7F69-4504-A7AF-4B0EC58FED34}
+		{07A1D569-04A6-425E-8020-E7E161ECCDE9} = {4F02D4C5-130A-4B3B-B633-414D25A845D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 		SolutionGuid = {4B7BEB0E-C314-4215-8F22-59E3B8655722}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = 26bdd0af-3b1d-458d-a138-31fef424d65b

@@ -9,7 +9,7 @@ using System.Web.Http.Results;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 
-namespace Shrooms.Presentation.Api.Filters
+namespace Shrooms.Presentation.Common.Filters
 {
     public class HmacAuthenticationAttribute : Attribute, IAuthenticationFilter
     {

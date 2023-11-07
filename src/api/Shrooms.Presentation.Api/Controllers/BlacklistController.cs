@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -7,7 +7,8 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.BlacklistUsers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 
 namespace Shrooms.Presentation.Api.Controllers

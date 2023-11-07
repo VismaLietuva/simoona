@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -20,8 +20,8 @@ using Shrooms.Premium.Domain.Services.KudosShop;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
 using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers

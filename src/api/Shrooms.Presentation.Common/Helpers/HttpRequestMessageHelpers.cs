@@ -1,6 +1,6 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 
-namespace Shrooms.Presentation.Api.Helpers
+namespace Shrooms.Presentation.Common.Helpers
 {
     public static class HttpRequestMessageHelpers
     {

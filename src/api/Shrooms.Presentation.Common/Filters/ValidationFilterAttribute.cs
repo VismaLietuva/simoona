@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 
-namespace Shrooms.Presentation.Api.Filters
+namespace Shrooms.Presentation.Common.Filters
 {
     /// <summary>
     /// Executes ModelState.IsValid and return error response if failed
