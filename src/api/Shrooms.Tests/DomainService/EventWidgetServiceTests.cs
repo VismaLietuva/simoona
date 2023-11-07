@@ -176,7 +176,7 @@ namespace Shrooms.Tests.DomainService
             Assert.AreEqual(eventsWithUpcomingTypeSet, result.Count());
         }
 
-        public List<Event> CreateEventsForGetUpcomingEventsAsyncTest(
+        private List<Event> CreateEventsForGetUpcomingEventsAsyncTest(
             DateTime eventStartDate,
             DateTime eventDeadlineDate,
             int eventsWithUpcomingTypeSet = 3,

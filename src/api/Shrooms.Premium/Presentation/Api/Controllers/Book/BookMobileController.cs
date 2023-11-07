@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -7,7 +7,7 @@ using Shrooms.Premium.Domain.DomainExceptions.Book;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Presentation.WebViewModels.Book;
 using Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 {

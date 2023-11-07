@@ -1,6 +1,3 @@
-﻿using System;
-using System.Configuration;
-using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.Infrastructure;
@@ -8,6 +5,10 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.RefreshTokens;
 using Shrooms.Domain.Services.RefreshTokens;
 using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Helpers;
+using System;
+using System.Configuration;
+using System.Threading.Tasks;
 
 namespace Shrooms.Presentation.Api.Providers
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -13,9 +13,9 @@ using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Presentation.WebViewModels.Book;
 using Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails;
 using Shrooms.Premium.Presentation.WebViewModels.Book.BooksByOffice;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 {

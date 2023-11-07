@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -8,8 +8,8 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Domain.Services.Vacations;
 using Shrooms.Premium.Presentation.WebViewModels.Vacations;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

@@ -1,11 +1,12 @@
-﻿using System.Net.Http.Headers;
-using System.Web.Http;
-using System.Web.Http.ExceptionHandling;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 using Shrooms.Presentation.Api.GeneralCode;
 using Shrooms.Presentation.Api.Handlers;
 using Shrooms.Presentation.Api.Helpers;
+using Shrooms.Presentation.Common.GeneralCode;
+using System.Net.Http.Headers;
+using System.Web.Http;
+using System.Web.Http.ExceptionHandling;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Presentation.Api

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -9,9 +9,9 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
-using Shrooms.Presentation.Api.Controllers;
-using Shrooms.Presentation.Api.Controllers.Wall;
-using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Controllers.Wall;
+using Shrooms.Presentation.Common.Filters;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers

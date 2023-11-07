@@ -46,7 +46,7 @@
 						ng-if="!vm.isLoading"
 						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
 						data-test-id="{{provider.name.toLowerCase()+'-sign-in-button'}}"
-						ng-click="{{vm.setProviderName(provider.name)}}">
+						ng-click="vm.setProviderName(provider.name)">
 					<span class="{{'vismaicon vismaicon-'+ provider.name.toLowerCase()}}"></span><span translate="{{provider.singInTranslation}}"></span>
 				</button>
             </div>

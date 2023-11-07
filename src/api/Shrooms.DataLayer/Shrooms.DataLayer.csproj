@@ -105,6 +105,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BannerEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BlacklistUserEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
@@ -935,6 +936,10 @@
     <Compile Include="Migrations\202304030926523_AddMicrosoftProvider.Designer.cs">
       <DependentUpon>202304030926523_AddMicrosoftProvider.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202310181756536_AddBanners.cs" />
+    <Compile Include="Migrations\202310181756536_AddBanners.Designer.cs">
+      <DependentUpon>202310181756536_AddBanners.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1561,6 +1566,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202304030926523_AddMicrosoftProvider.resx">
       <DependentUpon>202304030926523_AddMicrosoftProvider.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202310181756536_AddBanners.resx">
+      <DependentUpon>202310181756536_AddBanners.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

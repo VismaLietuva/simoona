@@ -1,7 +1,7 @@
-﻿using Shrooms.Presentation.Api.GeneralCode;
+using Shrooms.Presentation.Common.GeneralCode;
 using WebApi.OutputCache.V2;
 
-namespace Shrooms.Presentation.Api.Filters
+namespace Shrooms.Presentation.Common.Filters
 {
     public class PermissionAwareCacheOutputFilterAttribute : CacheOutputAttribute
     {

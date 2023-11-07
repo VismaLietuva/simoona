@@ -1,7 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
@@ -12,9 +8,13 @@ using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Presentation.Api.Controllers.Kudos;
+using Shrooms.Presentation.Common.Controllers.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
 using Shrooms.Tests.Extensions;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {

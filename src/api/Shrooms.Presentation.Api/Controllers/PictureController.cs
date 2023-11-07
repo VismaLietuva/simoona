@@ -1,13 +1,14 @@
-﻿using System;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Services.Picture;
+using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Shrooms.Contracts.Constants;
-using Shrooms.Domain.Services.Picture;
-using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

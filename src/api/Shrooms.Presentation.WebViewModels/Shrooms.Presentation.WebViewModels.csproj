@@ -76,6 +76,7 @@
     <Compile Include="Models\AccountModels\ProviderViewModel.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationUserViewModel.cs" />
+    <Compile Include="Models\Banners\BannerWidgetViewModel.cs" />
     <Compile Include="Models\BlacklistUsers\BlacklistUserViewModel.cs" />
     <Compile Include="Models\BlacklistUsers\UpdateBlacklistUserViewModel.cs" />
     <Compile Include="Models\BlacklistUsers\CreateBlacklistUserViewModel.cs" />

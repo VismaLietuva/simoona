@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Security.Principal;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Filters;
 
-namespace Shrooms.Presentation.Api.Filters
+namespace Shrooms.Presentation.Common.Filters
 {
     public abstract class BasicAuthenticationAttribute : Attribute, IAuthenticationFilter
     {
