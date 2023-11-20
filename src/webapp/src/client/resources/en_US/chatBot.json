@@ -1,6 +1,4 @@
 {
-    "initialMessage": "Hello, how can I help you today?",
-    "talkToAiAgent": "Talk to AI agent",
     "aiAgent": "AI Agent",
     "thinking": "Thinking...",
     "sendAMessage": "Send a message"

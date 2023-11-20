@@ -1,27 +1,27 @@
-.chat-bot-container {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
+.chat-bot-widget {
 
-    .panel {
-        margin-right: 20px;
+    .panel-body {
+        padding-top: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
     }
-}
 
-.chat-window {
-    width: 100px;
-}
+    .chat-bot-widget-header {
+        background-color: #F5F5F5;
+        color: #1e8ac7;
+        text-align: center;
+        padding: 1px 10px;
+        border-bottom: 1px solid #D0D0D0;
+    }
 
-.chat-window.expanded {
-    width: 500px;
-}
+    .chat-bot-messages {
+        max-height: 300px;
+        overflow-y: auto;
 
-.chat-bot-messages {
-    max-height: 300px;
-    overflow-y: auto;
-
-    .message {
-        white-space: pre-wrap;
+        .message {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
     }
 }
