@@ -30,4 +30,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="sql_scripts\likes_migration.sql" />
+    <EmbeddedResource Include="sql_scripts\likes_migration.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
