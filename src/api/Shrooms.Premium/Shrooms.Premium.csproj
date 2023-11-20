@@ -12,10 +12,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PreBuildEvent Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
+    <PreBuildEvent Condition=" '$(Configuration)' != 'Release' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
   </PropertyGroup>
 
-  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
+  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)' != 'Release' ">
     <Message Text="Recycling web app..." Importance="High" />
     <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
   </Target>
