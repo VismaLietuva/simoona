@@ -62,7 +62,7 @@
   </ItemGroup>
 
    <Target Name="CustomActionsAfterPublish" AfterTargets="Publish">
-       <Message Text="[CUSTOM TARGET] Moving some files in $(PublishDir) and $(RenameFile)" Importance="high" />
+       <Message Text="[CUSTOM TARGET] Moving some files in $(PublishDir)" Importance="high" />
        <Move SourceFiles="$(PublishDir)Service References\Application Insights\ConnectedService.json" DestinationFiles="$(PublishDir)..\Service References\Application Insights\ConnectedService.json"/>
        <Move SourceFiles="$(PublishDir)ApplicationInsights.config" DestinationFiles="$(PublishDir)..\ApplicationInsights.config"/>
        <Move SourceFiles="$(PublishDir)Global.asax" DestinationFiles="$(PublishDir)..\Global.asax"/>
