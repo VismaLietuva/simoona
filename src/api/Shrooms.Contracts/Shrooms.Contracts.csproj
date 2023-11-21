@@ -1,185 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Targets\shared.targets" />
+  
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E690CEB8-F266-441F-8A80-5A3440B3445A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Shrooms.Contracts</RootNamespace>
-    <AssemblyName>Shrooms.Contracts</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <LangVersion>9</LangVersion>
+    <AssemblyTitle>Shrooms.Contracts</AssemblyTitle>
+    <Product>Shrooms.Contracts</Product>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <StyleCopEnabled>True</StyleCopEnabled>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <StyleCopEnabled>True</StyleCopEnabled>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+  
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2021.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
-      <HintPath>..\packages\JetBrains.Annotations.2021.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
+    <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="X.PagedList" Version="8.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="X.PagedList, Version=8.1.0.0, Culture=neutral, PublicKeyToken=525ccaa9023f010c">
-      <HintPath>..\packages\X.PagedList.8.1.0\lib\netstandard2.0\X.PagedList.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Constants\AdministrationPermissions.cs" />
-    <Compile Include="Constants\AuthenticationConstants.cs" />
-    <Compile Include="Constants\BasicPermissions.cs" />
-    <Compile Include="Constants\BusinessLayerConstants.cs" />
-    <Compile Include="Constants\DataLayerConstants.cs" />
-    <Compile Include="Constants\EmailTemplateCacheKeys.cs" />
-    <Compile Include="Constants\ErrorCodes.cs" />
-    <Compile Include="Constants\ExcelWorksheetBuilderConstants.cs" />
-    <Compile Include="Constants\KudosBasketConstants.cs" />
-    <Compile Include="Constants\Modules.cs" />
-    <Compile Include="Constants\PermissionScopes.cs" />
-    <Compile Include="Constants\Roles.cs" />
-    <Compile Include="Constants\SortDirectionConstants.cs" />
-    <Compile Include="Constants\Templates.cs" />
-    <Compile Include="Constants\ValidationConstants.cs" />
-    <Compile Include="Constants\WebApiConstants.cs" />
-    <Compile Include="DAL\IDbContext.cs" />
-    <Compile Include="DAL\IRepository.cs" />
-    <Compile Include="DAL\IUnitOfWork.cs" />
-    <Compile Include="DAL\IUnitOfWork2.cs" />
-    <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
-    <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\BlacklistUsers\BlacklistUserDto.cs" />
-    <Compile Include="DataTransferObjects\BlacklistUsers\CreateBlacklistUserDto.cs" />
-    <Compile Include="DataTransferObjects\BlacklistUsers\UpdateBlacklistUserDto.cs" />
-    <Compile Include="DataTransferObjects\EmailDto.cs" />
-    <Compile Include="DataTransferObjects\Employees\EmployeeDto.cs" />
-    <Compile Include="DataTransferObjects\Employees\EmployeeListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Employees\WorkingHourslWithOutLunchDto.cs" />
-    <Compile Include="DataTransferObjects\Events\SharedEventEmailDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Events\SharedEventEmailDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\FilterDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\FilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\Users\UserEmailReceiverDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\WallMemberEmailReceiverDto.cs" />
-    <Compile Include="Enums\EmailBuildingStrategy.cs" />
-    <Compile Include="Enums\EventReminderType.cs" />
-    <Compile Include="Enums\ExcelBorderStylePicker.cs" />
-    <Compile Include="Enums\SortDirection.cs" />
-    <Compile Include="Infrastructure\Email\IEmailReceiver.cs" />
-    <Compile Include="Infrastructure\Email\ITimeZoneEmailGroup.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelColumnInternal.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelRow.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelRowCollection.cs" />
-    <Compile Include="Infrastructure\ExcelGenerator\IExcelWorksheetBuilder.cs" />
-    <Compile Include="Enums\BlacklistStatus.cs" />
-    <Compile Include="Infrastructure\IFilterableByDate.cs" />
-    <Compile Include="Infrastructure\IPageable.cs" />
-    <Compile Include="DataTransferObjects\ISoftDelete.cs" />
-    <Compile Include="DataTransferObjects\ITrackable.cs" />
-    <Compile Include="DataTransferObjects\Kudos\AddKudosLogDto.cs" />
-    <Compile Include="DataTransferObjects\Notification\NotificationDto.cs" />
-    <Compile Include="DataTransferObjects\Notification\SourcesDto.cs" />
-    <Compile Include="DataTransferObjects\UserAndOrganizationDto.cs" />
-    <Compile Include="DataTransferObjects\UserAndOrganizationHubDto.cs" />
-    <Compile Include="DataTransferObjects\Users\UserAutoCompleteDto.cs" />
-    <Compile Include="DataTransferObjects\Users\UserDto.cs" />
-    <Compile Include="DataTransferObjects\Users\UserEventAttendStatusChangeEmailDto.cs" />
-    <Compile Include="DataTransferObjects\VacationPages\VacationPageDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Comments\CommentDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\CreateWallDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Likes\AddLikeDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Likes\LikeDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Posts\NewlyCreatedPostDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Posts\NewPostDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\Posts\PostDto.cs" />
-    <Compile Include="DataTransferObjects\Wall\UpdateWallDto.cs" />
-    <Compile Include="Enums\ExternalLinkTypeEnum.cs" />
-    <Compile Include="Enums\FilterType.cs" />
-    <Compile Include="Enums\KudosTypeEnum.cs" />
-    <Compile Include="Enums\LotteryStatus.cs" />
-    <Compile Include="Enums\NotificationType.cs" />
-    <Compile Include="Enums\OptionRules.cs" />
-    <Compile Include="Enums\LikeTypeEnum.cs" />
-    <Compile Include="Enums\PageType.cs" />
-    <Compile Include="Enums\WallAccess.cs" />
-    <Compile Include="Enums\WallsType.cs" />
-    <Compile Include="Enums\WallType.cs" />
-    <Compile Include="Exceptions\ValidationException.cs" />
-    <Compile Include="Infrastructure\Email\IEmailTemplateCompiler.cs" />
-    <Compile Include="Infrastructure\Email\IMailingService.cs" />
-    <Compile Include="Infrastructure\Email\IMailTemplate.cs" />
-    <Compile Include="Infrastructure\IApplicationSettings.cs" />
-    <Compile Include="Infrastructure\IAsyncRunner.cs" />
-    <Compile Include="Infrastructure\IBackgroundWorker.cs" />
-    <Compile Include="Infrastructure\ICustomCache.cs" />
-    <Compile Include="Infrastructure\IJobScheduler.cs" />
-    <Compile Include="Infrastructure\ILogger.cs" />
-    <Compile Include="Infrastructure\ISortable.cs" />
-    <Compile Include="Infrastructure\ISystemClock.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\AbstractViewModel.cs" />
-    <Compile Include="ViewModels\Notifications\NotificationViewModel.cs" />
-    <Compile Include="ViewModels\Notifications\SourcesViewModel.cs" />
-    <Compile Include="ViewModels\PagedViewModel.cs" />
-    <Compile Include="ViewModels\User\ApplicationUserMinimalViewModel.cs" />
-    <Compile Include="ViewModels\User\UserViewModel.cs" />
-    <Compile Include="ViewModels\Wall\Likes\AddLikeViewModel.cs" />
-    <Compile Include="ViewModels\Wall\Likes\LikeViewModel.cs" />
-    <Compile Include="ViewModels\Wall\Posts\CommentViewModel.cs" />
-    <Compile Include="ViewModels\Wall\Posts\WallPostViewModel.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
