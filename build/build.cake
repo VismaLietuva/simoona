@@ -320,6 +320,7 @@ Task("OnlyDbAndDependencies")
     .IsDependentOn("AddOrganization")
     .IsDependentOn("Restore")
     .IsDependentOn("BuildWebApp")
+    .IsDependentOn("ExecuteMigrations")
     .Does(() =>
 {
     LogMessage(logFile, "Task OnlyDbAndDependencies is finished successfully");

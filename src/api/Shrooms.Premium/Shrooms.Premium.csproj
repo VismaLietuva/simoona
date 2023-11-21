@@ -7,7 +7,7 @@
     <Product>Shrooms.Premium</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
@@ -51,61 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="EmailTemplates\Events\CoacheeJoinedEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="EmailTemplates\Events\NewEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="EmailTemplates\Events\SharedEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="EmailTemplates\Events\RemindDeadlineDate.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="EmailTemplates\Events\RemindStartDate.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="EmailTemplates\Lotteries\StartedLottery.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="EmailTemplates\Books\BookRemind.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Books\BookReport.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Books\BookTaken.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Committees\CommitteesSuggestion.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\ParticipantExpelled.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\RemindToJoin.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosDecreased.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosReceived.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\NewServiceRequest.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml">
+    <None Remove="EmailTemplates\**\*.cshtml" />
+    <Content Include="EmailTemplates\**\*.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

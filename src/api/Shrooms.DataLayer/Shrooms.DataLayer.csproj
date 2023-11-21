@@ -5,6 +5,7 @@
     <ProjectGuid>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</ProjectGuid>
     <AssemblyTitle>Shrooms.DataLayer</AssemblyTitle>
     <Product>Shrooms.DataLayer</Product>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
   </PropertyGroup>
 
   <ItemGroup>
