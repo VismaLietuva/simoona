@@ -120,4 +120,7 @@
   <data name="StartedLotteryEmailSubject" xml:space="preserve">
     <value>Sukurta nauja loterija {0}</value>
   </data>
+  <data name="LotteryTicketGiftedEmailSubject" xml:space="preserve">
+      <value>Jums padovanojo loterijos bilietą!</value>
+  </data>
 </root>

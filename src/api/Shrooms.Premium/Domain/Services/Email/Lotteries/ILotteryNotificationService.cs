@@ -5,6 +5,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
     public interface ILotteryNotificationService
     {
-        Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto startedDto, int organizationId);
+        Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto lotteryStartedEmail, int organizationId);
+        Task NotifyUsersAboutGiftedLotteryTicketsAsync(LotteryTicketGiftedEmailDto lotteryTicketGiftedEmail, int organizationId);
     }
 }
