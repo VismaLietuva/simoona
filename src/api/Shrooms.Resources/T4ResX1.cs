@@ -15,7 +15,7 @@
  *
  * Version 1.00
  * https://github.com/itechnology/T4ResX
- */ 
+ */
  using System;
  using System.Linq;
  using System.Threading;
@@ -4424,6 +4424,30 @@ namespace Shrooms.Resources.Models.Lotteries {
         /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
         /// </summary>
         public const string StartedLotteryEmailSubjectKey = "StartedLotteryEmailSubject";
+    }
+}
+
+namespace Shrooms.Resources.Models.Lotteries {
+    public partial class Lottery {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>You were gifted a lottery ticket!</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string LotteryTicketGiftedEmailSubject => GetResourceString(LotteryTicketGiftedEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="LotteryTicketGiftedEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string LotteryTicketGiftedEmailSubjectKey = "LotteryTicketGiftedEmailSubject";
     }
 }
 
