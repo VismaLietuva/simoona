@@ -59,23 +59,30 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         public async Task NotifyUsersAboutGiftedLotteryTicketsAsync(LotteryTicketGiftedEmailDto lotteryTicketGiftedEmail, int organizationId)
         {
             var receiverIds = lotteryTicketGiftedEmail.Receivers.Select(x => x.UserId).ToList();
-
             var receivers = await _usersDbSet
                 .Where(x => receiverIds.Contains(x.Id))
-                .Select(user => new LotteryStartedEmailUserInfoDto
+                .Select(user => new
                 {
-                    Email = user.Email
+                    user.Id,
+                    user.Email
                 })
                 .ToListAsync();
 
             var organization = await _organizationService.GetOrganizationByIdAsync(organizationId);
+            var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var lotteryUrl = GetLotteryUrl(organization.ShortName, lotteryTicketGiftedEmail.LotteryDetails.Id);
 
-            await SendSingleEmailAsync(
-                employee.Email,
-                Resources.Models.Lotteries.Lottery.,
-                emailTemplateViewModel,
-                EmailPremiumTemplateCacheKeys.LotteryTicketGifted);
+            foreach (var receiver in receivers)
+            {
+                var giftedTicketCount = lotteryTicketGiftedEmail.Receivers.First(x => x.UserId == receiver.Id).TicketCount;
+                var lotteryTicketGiftedEmailTemplate = new LotteryTicketGiftedEmailTemplateViewModel(lotteryTicketGiftedEmail.LotteryDetails.Title, lotteryUrl, lotteryTicketGiftedEmail.BuyerFullName, giftedTicketCount, userNotificationSettingsUrl);
+
+                await SendSingleEmailAsync(
+                    receiver.Email,
+                    "Testas",
+                    lotteryTicketGiftedEmailTemplate,
+                    EmailPremiumTemplateCacheKeys.LotteryTicketGifted);
+            }
         }
 
         private string GetLotteryUrl(string organizationShortName, int lotteryId)
