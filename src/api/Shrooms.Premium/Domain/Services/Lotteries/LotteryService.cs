@@ -380,6 +380,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             {
                 AddLotteryTicketsForUser(lotteryDetailsDto.Id, receiver.UserId, buyerUser.Id, receiver.TicketCount);
             }
+
+            NotifyAboutGiftedLotteryTickets(lotteryDetailsDto, buyerUser, receivers);
         }
 
         private void AddLotteryTicketsForUser(int lotteryId, string userId, string buyerUserId, int ticketCount)
@@ -432,6 +434,19 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
 
             _asyncRunner.Run<ILotteryNotificationService>(async notifier => await notifier.NotifyUsersAboutStartedLotteryAsync(lotteryStartedEmailDto, userOrg.OrganizationId),
+                _uow.ConnectionName);
+        }
+
+        private void NotifyAboutGiftedLotteryTickets(LotteryDetailsDto lotteryDetails, ApplicationUser buyerUser, LotteryTicketReceiverDto[] receivers)
+        {
+            var lotteryTicketGiftedEmail = new LotteryTicketGiftedEmailDto
+            {
+                LotteryDetails = lotteryDetails,
+                BuyerFullName = buyerUser.FullName,
+                Receivers = receivers
+            };
+
+            _asyncRunner.Run<ILotteryNotificationService>(async notifier => await notifier.NotifyUsersAboutGiftedLotteryTicketsAsync(lotteryTicketGiftedEmail, buyerUser.OrganizationId),
                 _uow.ConnectionName);
         }
 

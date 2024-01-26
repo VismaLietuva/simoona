@@ -24,8 +24,8 @@ namespace Shrooms.Domain.Services.Banners
         {
             return await _bannersDbSet
                 .Where(x => x.OrganizationId == organizationId &&
-                            (x.ValidFrom == null || x.ValidFrom >= _systemClock.UtcNow) &&
-                            (x.ValidTo == null || x.ValidTo <= _systemClock.UtcNow))
+                            (x.ValidFrom == null || x.ValidFrom <= _systemClock.UtcNow) &&
+                            (x.ValidTo == null || x.ValidTo >= _systemClock.UtcNow))
                 .Select(x => new BannerWidgetDto
                 {
                     Url = x.Url,
