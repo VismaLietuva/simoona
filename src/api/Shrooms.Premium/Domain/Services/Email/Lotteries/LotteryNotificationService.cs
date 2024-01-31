@@ -79,7 +79,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 
                 await SendSingleEmailAsync(
                     receiver.Email,
-                    "Testas",
+                    Lottery.LotteryTicketGiftedEmailSubject,
                     lotteryTicketGiftedEmailTemplate,
                     EmailPremiumTemplateCacheKeys.LotteryTicketGifted);
             }
