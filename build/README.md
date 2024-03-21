@@ -88,9 +88,7 @@ creates the database for you using SQL scripts, inserts organization name and co
     * Expand World Wide Web Services
     * Expand Application Development Features
     * Make sure these features are turned on:
-        * .NET Extensibility 3.5
         * .NET Extensibility 4.7
-        * ASP.NET 3.5
         * ASP.NET 4.7
         * ISAPI Extensions
         * ISAPI Filters
@@ -103,9 +101,7 @@ creates the database for you using SQL scripts, inserts organization name and co
     * Expand World Wide Web Services
     * Expand Application Development Features
     * Make sure these features are turned on:
-        * .NET Extensibility 3.5
         * .NET Extensibility 4.7
-        * ASP.NET 3.5
         * ASP.NET 4.7
         * ISAPI Extensions
         * ISAPI Filters

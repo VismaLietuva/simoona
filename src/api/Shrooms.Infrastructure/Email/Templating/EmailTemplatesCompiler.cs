@@ -14,7 +14,7 @@ namespace Shrooms.Infrastructure.Email.Templating
 
         public void Register(string baseDir)
         {
-            _baseDir = baseDir;
+            _baseDir = Path.Combine(baseDir, "bin");
 
             Engine.Razor.AddTemplate(EmailTemplateCacheKeys.HeaderFooterLayout, File.ReadAllText(Path.Combine(_baseDir, @"EmailTemplates\HeaderFooter.cshtml")));
 

@@ -16,6 +16,7 @@
         public const string CoacheeJoinedEvent = nameof(CoacheeJoinedEvent);
         public const string CoacheeLeftEvent = nameof(CoacheeLeftEvent);
         public const string StartedLottery = nameof(StartedLottery);
+        public const string LotteryTicketGifted = nameof(LotteryTicketGifted);
         public const string EventStartRemind = nameof(EventStartRemind);
         public const string EventDeadlineRemind = nameof(EventDeadlineRemind);
         public const string EventShared = nameof(EventShared);
