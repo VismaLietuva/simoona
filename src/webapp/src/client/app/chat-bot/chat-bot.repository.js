@@ -9,10 +9,10 @@
 
     function chatBotRepository($http, chatBotEndpoint, chatBotAgentId) {
         return {
-            message: function (message, historyId) {
+            message: function (message, conversationId) {
                 return $http.post(chatBotEndpoint, {
                     agentId: chatBotAgentId,
-                    chatHistoryId: historyId,
+                    conversationId: conversationId,
                     message: message
                 })
             }

@@ -27,12 +27,17 @@
         function init() {
             vm.messages = [];
             vm.isChatWindowOpen = false;
-            vm.historyId = crypto.randomUUID();
+            vm.conversationId = crypto.randomUUID();
+
+            pushMessageToChat(
+                localeSrv.translate('chatBot.initialMessage'),
+                true
+            );
         }
 
         function sendMessageToApiAndUpdateChat(message) {
             chatBotRepository
-                .message(message, vm.historyId)
+                .message(message, vm.conversationId)
                 .then(function (messageResponse) {
                     vm.isLoading = false;
                     vm.messages.pop();
