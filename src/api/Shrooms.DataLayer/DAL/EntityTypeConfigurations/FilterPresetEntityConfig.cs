@@ -1,21 +1,22 @@
-﻿using Shrooms.DataLayer.EntityModels.Models;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class FilterPresetEntityConfig : EntityTypeConfiguration<FilterPreset>
+    public class FilterPresetEntityConfig : IEntityTypeConfiguration<FilterPreset>
     {
-        public FilterPresetEntityConfig()
+        public void Configure(EntityTypeBuilder<FilterPreset> builder)
         {
-            Map(filter => filter.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(filter => !filter.IsDeleted);
 
-            Property(filter => filter.Preset)
+            builder.Property(filter => filter.Preset)
                 .IsRequired();
 
-            Property(filter => filter.Name)
+            builder.Property(filter => filter.Name)
                 .IsRequired();
 
-            Property(filter => filter.ForPage)
+            builder.Property(filter => filter.ForPage)
                 .IsRequired();
         }
     }

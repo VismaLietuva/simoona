@@ -1,17 +1,17 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Shrooms.DataLayer.EntityModels.Models.Monitors;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class MonitorConfig : EntityTypeConfiguration<Monitor>
+    internal class MonitorConfig : IEntityTypeConfiguration<EntityModels.Models.Monitors.Monitor>
     {
-        public MonitorConfig()
+        public void Configure(EntityTypeBuilder<EntityModels.Models.Monitors.Monitor> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(x => x.Organization)
+            builder.HasOne(x => x.Organization)
               .WithMany()
-              .WillCascadeOnDelete(false);
+              .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

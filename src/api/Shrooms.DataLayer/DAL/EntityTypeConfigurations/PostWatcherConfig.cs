@@ -1,13 +1,14 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class PostWatcherConfig : EntityTypeConfiguration<PostWatcher>
+    public class PostWatcherConfig : IEntityTypeConfiguration<PostWatcher>
     {
-        public PostWatcherConfig()
+        public void Configure(EntityTypeBuilder<PostWatcher> builder)
         {
-            ToTable("PostWatchers", "dbo");
+            builder.ToTable("PostWatchers", "dbo");
         }
     }
 }

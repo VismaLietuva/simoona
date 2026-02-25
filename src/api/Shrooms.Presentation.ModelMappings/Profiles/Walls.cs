@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
@@ -16,7 +16,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Walls : Profile
     {
-        protected override void Configure()
+        public Walls()
         {
             CreateViewModelToDtoMappings();
             CreateDtoToViewModelMappings();
@@ -52,7 +52,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .ForMember(m => m.IsLiked, opt => opt.Ignore())
                 .ForMember(m => m.IsEdited, opt => opt.Ignore())
                 .ForMember(m => m.CanModerate, opt => opt.Ignore())
-                .ForMember(m => m.Comments, opt => opt.UseValue(new List<CommentDto>()))
+                .ForMember(m => m.Comments, opt => opt.MapFrom(src => new List<CommentDto>()))
                 .ForMember(m => m.WallType, opt => opt.MapFrom(s => s.Wall.Type))
                 .ForMember(m => m.WallName, opt => opt.MapFrom(s => s.Wall.Name))
                 .ForMember(m => m.IsWatched, opt => opt.Ignore());

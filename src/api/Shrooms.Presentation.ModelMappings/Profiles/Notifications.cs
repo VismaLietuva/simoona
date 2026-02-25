@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.ViewModels.Notifications;
@@ -9,13 +9,13 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Notifications : Profile
     {
-        protected override void Configure()
+        public Notifications()
         {
             CreateMap<Notification, NotificationDto>()
                 .ForMember(dest => dest.SourceIds, opt => opt.MapFrom(u => u.Sources));
             CreateMap<NotificationDto, NotificationViewModel>()
-                .ForMember(dest => dest.stackedIds, opt => opt.UseValue(new List<int>()))
-                .ForMember(dest => dest.others, opt => opt.UseValue(0));
+                .ForMember(dest => dest.stackedIds, opt => opt.MapFrom(src => new List<int>()))
+                .ForMember(dest => dest.others, opt => opt.MapFrom(src => 0));
 
             CreateMap<WallPostViewModel, NotificationDto>()
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(u => u.MessageBody))

@@ -1,12 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\Targets\shared.targets" />
 
+  <!-- Override shared.targets net472 with net10.0 -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.3" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.10.0" />
+    <!-- ASP.NET Core SignalR replacement for Microsoft.AspNet.SignalR 2.2.1 -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    
+    <!-- ASP.NET Core MVC replacement for WebApi.Core and WebApi.Owin -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    
+    <!-- ResponseCaching middleware replacement for Strathweb.CacheOutput.WebApi2 -->
+    <PackageReference Include="Microsoft.AspNetCore.ResponseCaching" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

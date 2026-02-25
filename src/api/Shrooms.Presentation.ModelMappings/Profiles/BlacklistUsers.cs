@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class BlacklistUsers : Profile
     {
-        protected override void Configure()
+        public BlacklistUsers()
         {
             CreateViewModelToDtoMappings();
             CreateDtoToViewModelMappings();

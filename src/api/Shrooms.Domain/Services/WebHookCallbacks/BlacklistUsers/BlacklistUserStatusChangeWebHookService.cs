@@ -1,8 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers
         private readonly ISystemClock _systemClock;
         private readonly IUnitOfWork2 _uow;
 
-        private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
+        private readonly DbSet<BlacklistUser> _blacklistUsersDbSet;
 
         public BlacklistUserStatusChangeWebHookService(IUnitOfWork2 uow, ISystemClock systemClock)
         {

@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class FilterPresets : Profile
     {
-        protected override void Configure()
+        public FilterPresets()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

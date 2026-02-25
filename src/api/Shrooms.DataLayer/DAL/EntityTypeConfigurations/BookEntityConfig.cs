@@ -1,41 +1,43 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class BookEntityConfig : EntityTypeConfiguration<Book>
+    internal class BookEntityConfig : IEntityTypeConfiguration<Book>
     {
-        public BookEntityConfig()
+        public void Configure(EntityTypeBuilder<Book> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(x => x.Organization)
+            builder.HasOne(x => x.Organization)
                .WithMany()
-               .WillCascadeOnDelete(false);
+               .OnDelete(DeleteBehavior.Restrict);
 
-            Property(u => u.Code)
+            builder.Property(u => u.Code)
               .HasMaxLength(20);
 
-            Property(u => u.Title)
+            builder.Property(u => u.Title)
                 .IsRequired();
 
-            Property(u => u.Author)
+            builder.Property(u => u.Author)
                .IsRequired();
 
-            Property(u => u.Url)
+            builder.Property(u => u.Url)
                 .HasMaxLength(2000);
 
-            Property(u => u.ModifiedBy)
+            builder.Property(u => u.ModifiedBy)
                 .HasMaxLength(50);
 
-            Property(u => u.CreatedBy)
+            builder.Property(u => u.CreatedBy)
                 .HasMaxLength(50);
 
-            HasOptional(x => x.ApplicationUser)
+            builder.HasOne(x => x.ApplicationUser)
                 .WithMany(x => x.Books)
-                .WillCascadeOnDelete(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(u => u.Note)
+            builder.Property(u => u.Note)
                 .HasMaxLength(9000);
         }
     }

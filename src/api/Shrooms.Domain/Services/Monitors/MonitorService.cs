@@ -1,6 +1,6 @@
-﻿using System;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -8,19 +8,19 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Monitors;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.DataLayer.EntityModels.Models.Monitors;
+using MonitorModel = Shrooms.DataLayer.EntityModels.Models.Monitors.Monitor;
 
 namespace Shrooms.Domain.Services.Monitors
 {
     public class MonitorService : IMonitorService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<Monitor> _monitorsDbSet;
+        private readonly DbSet<MonitorModel> _monitorsDbSet;
 
         public MonitorService(IUnitOfWork2 uow)
         {
             _uow = uow;
-            _monitorsDbSet = uow.GetDbSet<Monitor>();
+            _monitorsDbSet = uow.GetDbSet<MonitorModel>();
         }
 
         public async Task<IEnumerable<MonitorDto>> GetMonitorListAsync(int organizationId)
@@ -42,7 +42,7 @@ namespace Shrooms.Domain.Services.Monitors
             }
 
             var timestamp = DateTime.UtcNow;
-            var monitor = new Monitor
+            var monitor = new MonitorModel
             {
                 Created = timestamp,
                 Modified = timestamp,

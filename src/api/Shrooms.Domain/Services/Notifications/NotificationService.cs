@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -20,12 +20,12 @@ namespace Shrooms.Domain.Services.Notifications
 {
     public class NotificationService : INotificationService
     {
-        private readonly IDbSet<Notification> _notificationDbSet;
-        private readonly IDbSet<NotificationUser> _notificationUserDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
-        private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallDbSet;
-        private readonly IDbSet<Event> _eventDbSet;
-        private readonly IDbSet<Project> _projectDbSet;
+        private readonly DbSet<Notification> _notificationDbSet;
+        private readonly DbSet<NotificationUser> _notificationUserDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallDbSet;
+        private readonly DbSet<Event> _eventDbSet;
+        private readonly DbSet<Project> _projectDbSet;
 
         private readonly IWallService _wallService;
 
@@ -133,7 +133,7 @@ namespace Shrooms.Domain.Services.Notifications
                              .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
                              .Select(s => s.Notification)
                              .OrderByDescending(o => o.Created)
-                            .Take(() => BusinessLayerConstants.MaxNotificationsToShow)
+                            .Take(BusinessLayerConstants.MaxNotificationsToShow)
                              .ToListAsync();
 
             return _mapper.Map<IEnumerable<NotificationDto>>(result);

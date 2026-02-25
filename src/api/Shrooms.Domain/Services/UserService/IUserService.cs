@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
@@ -30,7 +29,7 @@ namespace Shrooms.Domain.Services.UserService
 
         Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDto userOrg);
 
-        Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id);
+        Task<IList<IdentityUserLogin<string>>> GetUserLoginsAsync(string id);
 
         Task RemoveLoginAsync(string id, UserLoginInfo loginInfo);
 

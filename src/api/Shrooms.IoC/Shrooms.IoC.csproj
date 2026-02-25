@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Targets\shared.targets" />
 
   <PropertyGroup>
@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.SignalR2" Version="4.0.0" />
-    <PackageReference Include="Autofac.WebApi2" Version="4.2.1" />
+    <PackageReference Include="Autofac.SignalR2" Version="5.0.0" />
+    <PackageReference Include="Autofac.WebApi2" Version="5.0.0" />
     <PackageReference Include="ReallySimpleFeatureToggle" Version="1.1.63.0" />
   </ItemGroup>
 

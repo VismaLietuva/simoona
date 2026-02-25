@@ -1,6 +1,7 @@
-﻿using System;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -16,12 +17,14 @@ namespace Shrooms.Domain.Services.Permissions
 {
     public class PermissionService : IPermissionService
     {
-        private readonly IDbSet<Permission> _permissionsDbSet;
+        private readonly DbSet<Permission> _permissionsDbSet;
+        private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
         private readonly ICustomCache<string, IList<string>> _permissionsCache;
 
         public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IList<string>> permissionsCache)
         {
             _permissionsDbSet = unitOfWork.GetDbSet<Permission>();
+            _userRolesDbSet = unitOfWork.GetDbSet<IdentityUserRole<string>>();
             _permissionsCache = permissionsCache;
         }
 
@@ -29,10 +32,15 @@ namespace Shrooms.Domain.Services.Permissions
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
-                permissions = _permissionsDbSet
-                    .Where(p => p.Roles.Any(r => r.Users.Any(u => u.UserId == userAndOrg.UserId)))
+                // In EF Core: Permission -> Role -> UserRole -> User
+                permissions = (from p in _permissionsDbSet
+                              from r in p.Roles
+                              join ur in _userRolesDbSet on r.Id equals ur.RoleId
+                              where ur.UserId == userAndOrg.UserId
+                              select p)
                     .Where(FilterActiveModules(userAndOrg.OrganizationId))
                     .Select(x => x.Name)
+                    .Distinct()
                     .ToList();
 
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
@@ -46,10 +54,15 @@ namespace Shrooms.Domain.Services.Permissions
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
-                permissions = await _permissionsDbSet
-                    .Where(p => p.Roles.Any(r => r.Users.Any(u => u.UserId == userAndOrg.UserId)))
+                // In EF Core: Permission -> Role -> UserRole -> User
+                permissions = await (from p in _permissionsDbSet
+                                    from r in p.Roles
+                                    join ur in _userRolesDbSet on r.Id equals ur.RoleId
+                                    where ur.UserId == userAndOrg.UserId
+                                    select p)
                     .Where(FilterActiveModules(userAndOrg.OrganizationId))
                     .Select(x => x.Name)
+                    .Distinct()
                     .ToListAsync();
 
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
@@ -80,9 +93,15 @@ namespace Shrooms.Domain.Services.Permissions
                 return permissions;
             }
 
-            Expression<Func<Permission, bool>> userFilter = p => p.Roles.Any(r => r.Users.Any(u => u.UserId == userId));
+            // Use join with IdentityUserRole junction table since ApplicationRole.Users navigation property doesn't exist in EF Core
+            var organizationScope = organizationId.ToString();
+            var permissionsQuery = from p in _permissionsDbSet
+                                   from r in p.Roles
+                                   join ur in _userRolesDbSet on r.Id equals ur.RoleId
+                                   where ur.UserId == userId && p.Scope == organizationScope
+                                   select p;
 
-            permissions = (await GetPermissionsAsync(organizationId, userFilter)).Select(x => x.Name).ToList();
+            permissions = (await permissionsQuery.Distinct().ToListAsync()).Select(x => x.Name).ToList();
 
             return permissions;
         }

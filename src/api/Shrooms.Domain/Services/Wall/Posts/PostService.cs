@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,9 +28,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IWallService _wallService;
 
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<Post> _postsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly DbSet<Post> _postsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
         public PostService(IUnitOfWork2 uow, ICommentService commentService, IWallService wallService)

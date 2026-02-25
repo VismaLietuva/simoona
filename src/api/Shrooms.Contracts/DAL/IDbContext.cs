@@ -1,5 +1,5 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Threading.Tasks;
 
 namespace Shrooms.Contracts.DAL
@@ -10,7 +10,7 @@ namespace Shrooms.Contracts.DAL
         DbSet<T> Set<T>()
             where T : class;
 
-        DbEntityEntry<T> Entry<T>(T entity)
+        EntityEntry<T> Entry<T>(T entity)
             where T : class;
 
         int SaveChanges(bool useMetaTracking = true);

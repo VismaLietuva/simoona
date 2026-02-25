@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.DataTransferObjects;
@@ -17,6 +17,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public DateTime Modified { get; set; }
 
         public string ModifiedBy { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

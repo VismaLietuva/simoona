@@ -1,21 +1,23 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class BannerEntityConfiguration : EntityTypeConfiguration<Banner>
+    public class BannerEntityConfiguration : IEntityTypeConfiguration<Banner>
     {
-        public BannerEntityConfiguration()
+        public void Configure(EntityTypeBuilder<Banner> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            // Soft delete query filter
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            Property(e => e.PictureId)
+            builder.Property(e => e.PictureId)
                 .IsRequired();
 
-            Property(e => e.ValidFrom)
+            builder.Property(e => e.ValidFrom)
                 .HasColumnType("datetime2");
 
-            Property(e => e.ValidTo)
+            builder.Property(e => e.ValidTo)
                 .HasColumnType("datetime2");
         }
     }

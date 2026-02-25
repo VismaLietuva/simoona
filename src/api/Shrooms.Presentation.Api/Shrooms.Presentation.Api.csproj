@@ -1,21 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Targets\shared.targets" />
 
   <PropertyGroup>
     <ProjectGuid>{D92E5D79-8D6B-410F-B9FC-0FCE46FBC116}</ProjectGuid>
-	<ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <AssemblyTitle>Shrooms.Presentation.Api</AssemblyTitle>
     <Product>Shrooms.Presentation.Api</Product>
-	<OutputType>Library</OutputType>
-	<UseIISExpress>false</UseIISExpress>
+    <OutputType>Library</OutputType>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort>44388</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>enabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
-	<ApplicationInsightsResourceId>/subscriptions/e25d538b-2e04-4f63-b7d3-796f72b34494/resourcegroups/Simoona-app/providers/microsoft.insights/components/simoona-app</ApplicationInsightsResourceId>
+    <ApplicationInsightsResourceId>/subscriptions/e25d538b-2e04-4f63-b7d3-796f72b34494/resourcegroups/Simoona-app/providers/microsoft.insights/components/simoona-app</ApplicationInsightsResourceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	<NoWarn>1591</NoWarn>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
     
 <!-- BEGIN PART WHICH SHOULD BE REMOVED AFTER MOVING FROM .NET FRAMEWORK -->
@@ -29,15 +29,10 @@
     <PackageReference Include="jQuery" version="1.10.2" />
     <PackageReference Include="jQuery.Validation" version="1.11.1" />
     <PackageReference Include="Microsoft.AspNet.Web.Optimization" version="1.1.3" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="1.0.5" />
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" version="3.2.3" />
-    <PackageReference Include="Microsoft.Net.Compilers" version="4.2.0" developmentDependency="true" />
     <PackageReference Include="Modernizr" version="2.6.2" />
     <PackageReference Include="Respond" version="1.2.0" />
     <PackageReference Include="WebGrease" version="1.5.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,10 +58,10 @@
 
    <Target Name="CustomActionsAfterPublish" AfterTargets="Publish">
        <Message Text="[CUSTOM TARGET] Moving some files in $(PublishDir)" Importance="high" />
-       <Move SourceFiles="$(PublishDir)Service References\Application Insights\ConnectedService.json" DestinationFiles="$(PublishDir)..\Service References\Application Insights\ConnectedService.json"/>
-       <Move SourceFiles="$(PublishDir)ApplicationInsights.config" DestinationFiles="$(PublishDir)..\ApplicationInsights.config"/>
-       <Move SourceFiles="$(PublishDir)Global.asax" DestinationFiles="$(PublishDir)..\Global.asax"/>
-       <Move SourceFiles="$(PublishDir)Web.config" DestinationFiles="$(PublishDir)..\Web.config"/>
+       <Move SourceFiles="$(PublishDir)Service References\Application Insights\ConnectedService.json" DestinationFiles="$(PublishDir)..\Service References\Application Insights\ConnectedService.json" />
+       <Move SourceFiles="$(PublishDir)ApplicationInsights.config" DestinationFiles="$(PublishDir)..\ApplicationInsights.config" />
+       <Move SourceFiles="$(PublishDir)Global.asax" DestinationFiles="$(PublishDir)..\Global.asax" />
+       <Move SourceFiles="$(PublishDir)Web.config" DestinationFiles="$(PublishDir)..\Web.config" />
        <Exec Command="ren $(PublishDir) bin" />
    </Target>
 <!-- END REMOVE AFTER MOVING FROM .NET FRAMEWORK -->
@@ -79,36 +74,36 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Autofac.Owin" Version="4.2.0" />
-	<PackageReference Include="Autofac.SignalR" Version="3.0.0" />
-	<PackageReference Include="Autofac.WebApi" Version="2.6.1.841" />
-	<PackageReference Include="Autofac.WebApi2.Owin" Version="4.0.0" />
-	<PackageReference Include="Hangfire.MemoryStorage" Version="1.3.0" />
-	<PackageReference Include="ICSharpCode.SharpZipLib" Version="0.86.0.518" />
-	<PackageReference Include="ImageResizer" Version="4.2.5" />
-	<PackageReference Include="ImageResizer.Plugins.AnimatedGifs" Version="4.2.5" />
-	<PackageReference Include="ImageResizer.Plugins.AzureReader2" Version="4.2.5" />
-	<PackageReference Include="ImageResizer.Plugins.DiskCache" Version="4.2.5" />
-	<PackageReference Include="ImageResizer.Plugins.PrettyGifs" Version="4.2.5" />
-	<PackageReference Include="ImageResizer.Storage" Version="4.2.5" />
+    <PackageReference Include="Autofac.Owin" Version="5.0.1" />
+    <PackageReference Include="Autofac.SignalR" Version="3.0.0" />
+    <PackageReference Include="Autofac.WebApi" Version="3.1.0" />
+    <PackageReference Include="Autofac.WebApi2.Owin" Version="5.0.0" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.3.0" />
+    <PackageReference Include="ICSharpCode.SharpZipLib" Version="0.86.0.518" />
+    <PackageReference Include="ImageResizer" Version="4.2.5" />
+    <PackageReference Include="ImageResizer.Plugins.AnimatedGifs" Version="4.2.5" />
+    <PackageReference Include="ImageResizer.Plugins.AzureReader2" Version="4.2.5" />
+    <PackageReference Include="ImageResizer.Plugins.DiskCache" Version="4.2.5" />
+    <PackageReference Include="ImageResizer.Plugins.PrettyGifs" Version="4.2.5" />
+    <PackageReference Include="ImageResizer.Storage" Version="4.2.5" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.10.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.Agent.Intercept" Version="2.4.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Agent.Intercept" Version="2.4.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.10.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.10.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel" Version="2.10.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.10.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.NLogTarget" Version="2.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel" Version="2.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.NLogTarget" Version="2.10.0" />
     <PackageReference Include="Microsoft.AspNet.TelemetryCorrelation" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.3" />
-	<PackageReference Include="Microsoft.Owin.Cors" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Facebook" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Google" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.MicrosoftAccount" Version="4.0.1" />
-	<PackageReference Include="Microsoft.Owin.Security.WsFederation" Version="3.0.1" />
-	<PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.1.0" />
-	<PackageReference Include="WindowsAzure.Storage" Version="6.2.0" />
-	<PackageReference Include="MVCControlsToolkit.Owin.Globalization" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Owin.Security.WsFederation" Version="3.0.1" />
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.1.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="6.2.0" />
+    <PackageReference Include="MVCControlsToolkit.Owin.Globalization" Version="1.5.0" />
     <PackageReference Include="Swashbuckle.Core" Version="5.2.2" />
   </ItemGroup>
 
@@ -151,7 +146,7 @@
   </ProjectExtensions>
 
   <ItemGroup>
-	<ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
+    <ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
   </ItemGroup>
 
   <ItemGroup>

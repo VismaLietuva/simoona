@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.AspNet.Identity;
 
 namespace Shrooms.Authentification.ExternalLoginInfrastructure
 {
@@ -48,8 +47,8 @@ namespace Shrooms.Authentification.ExternalLoginInfrastructure
             {
                 LoginProvider = providerKeyClaim.Issuer,
                 ProviderKey = providerKeyClaim.Value,
-                UserName = identity.FindFirstValue(ClaimTypes.Name),
-                Email = identity.FindFirstValue(ClaimTypes.Email)
+                UserName = identity.FindFirst(ClaimTypes.Name)?.Value,
+                Email = identity.FindFirst(ClaimTypes.Email)?.Value
             };
         }
     }

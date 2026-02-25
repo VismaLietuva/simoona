@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Permissions : Profile
     {
-        protected override void Configure()
+        public Permissions()
         {
             CreateDtoToViewModelMappings();
         }

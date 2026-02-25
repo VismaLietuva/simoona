@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Jobs : Profile
     {
-        protected override void Configure()
+        public Jobs()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

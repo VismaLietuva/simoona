@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -9,9 +9,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
     internal class OtherEntitiesConfig
     {
-        private readonly DbModelBuilder _modelBuilder;
+        private readonly ModelBuilder _modelBuilder;
 
-        public OtherEntitiesConfig(DbModelBuilder modelBuilder)
+        public OtherEntitiesConfig(ModelBuilder modelBuilder)
         {
             _modelBuilder = modelBuilder;
         }
@@ -19,115 +19,116 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
         public void Add()
         {
             _modelBuilder.Entity<KudosType>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<JobPosition>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<KudosShopItem>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<Floor>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<RoomType>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<Picture>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<Comment>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<Post>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<WorkingHours>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<Exam>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<ServiceRequest>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<ServiceRequestCategory>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<ServiceRequestPriority>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<ServiceRequestStatus>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<ServiceRequestComment>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<CommitteeSuggestion>()
-                .Map(m => m.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(m => !m.IsDeleted);
             _modelBuilder.Entity<Project>()
-                .Map(m => m.Requires("IsDeleted").HasValue(false));
+                .HasQueryFilter(m => !m.IsDeleted);
             _modelBuilder.Entity<NotificationsSettings>()
-                .Map(e => e.Requires("IsDeleted").HasValue(false));
-            _modelBuilder.ComplexType<LikesCollection>()
+                .HasQueryFilter(e => !e.IsDeleted);
+
+            _modelBuilder.Entity<LikesCollection>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Likes");
-            _modelBuilder.ComplexType<ImageCollection>()
+            _modelBuilder.Entity<ImageCollection>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Images");
-            _modelBuilder.ComplexType<Sources>()
+            _modelBuilder.Entity<Sources>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Sources");
-            _modelBuilder.ComplexType<Sources>()
+            _modelBuilder.Entity<Sources>()
                 .Ignore(x => x.EventId)
                 .Ignore(x => x.PostId)
                 .Ignore(x => x.ProjectId)
                 .Ignore(x => x.WallId);
 
             _modelBuilder.Entity<Exam>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<QualificationLevel>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<Floor>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<Picture>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<RoomType>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<WorkingHours>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<QualificationLevel>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<ServiceRequestComment>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<ServiceRequest>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<SyncToken>()
-                .HasRequired(a => a.Organization)
+                .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<Project>()
                 .HasMany(p => p.Attributes)

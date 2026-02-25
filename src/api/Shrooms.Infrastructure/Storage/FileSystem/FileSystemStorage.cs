@@ -1,15 +1,22 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
-using System.Web.Hosting;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Shrooms.Infrastructure.Storage.FileSystem
 {
     public class FileSystemStorage : IStorage
     {
+        private readonly IWebHostEnvironment _environment;
+
+        public FileSystemStorage(IWebHostEnvironment environment)
+        {
+            _environment = environment;
+        }
+
         public Task RemovePictureAsync(string blobKey, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/{blobKey}");
+            var filePath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer, blobKey);
             var fileInfo = new FileInfo(filePath);
 
             if (fileInfo.Exists)
@@ -17,14 +24,14 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
                 fileInfo.Delete();
             }
 
-            return Task.FromResult<object>(null);
+            return Task.CompletedTask;
         }
 
         public Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
-            var fullPath = Path.Combine(filePath, blobKey);
-            Directory.CreateDirectory(filePath);
+            var directoryPath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer);
+            var fullPath = Path.Combine(directoryPath, blobKey);
+            Directory.CreateDirectory(directoryPath);
 
             image.Save(fullPath);
 
@@ -33,11 +40,11 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public async Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
-            var fullPath = Path.Combine(filePath, blobKey);
-            Directory.CreateDirectory(filePath);
+            var directoryPath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer);
+            var fullPath = Path.Combine(directoryPath, blobKey);
+            Directory.CreateDirectory(directoryPath);
 
-            var destinationStream = File.Create(fullPath);
+            using var destinationStream = File.Create(fullPath);
             await stream.CopyToAsync(destinationStream);
         }
     }

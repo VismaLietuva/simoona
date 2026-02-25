@@ -7,7 +7,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class KudosBasket : Profile
     {
-        protected override void Configure()
+        public KudosBasket()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

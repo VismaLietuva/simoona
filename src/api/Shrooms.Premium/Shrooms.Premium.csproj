@@ -11,15 +11,6 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PreBuildEvent Condition=" '$(Configuration)' != 'Release' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
-  </PropertyGroup>
-
-  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)' != 'Release' ">
-    <Message Text="Recycling web app..." Importance="High" />
-    <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
-  </Target>
-
   <ItemGroup>
     <PackageReference Include="ExcelDataReader" Version="2.1.2.3" />
     <PackageReference Include="Google.Apis" Version="1.43.0" />

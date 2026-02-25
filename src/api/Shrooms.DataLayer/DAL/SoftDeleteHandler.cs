@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -16,10 +15,10 @@ namespace Shrooms.DataLayer.DAL
 {
     public static class SoftDeleteHandler
     {
-        private static readonly Dictionary<Type, EntitySetBase> _mappingCache = new Dictionary<Type, EntitySetBase>();
+        private static readonly Dictionary<Type, IEntityType> _mappingCache = new Dictionary<Type, IEntityType>();
         private static ShroomsDbContext _context;
 
-        public static void Execute(IEnumerable<DbEntityEntry> entries, ShroomsDbContext ctx)
+        public static void Execute(IEnumerable<EntityEntry> entries, ShroomsDbContext ctx)
         {
             _context = ctx;
 
@@ -31,7 +30,7 @@ namespace Shrooms.DataLayer.DAL
                 var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
-                _context.Database.ExecuteSqlCommand($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
+                _context.Database.ExecuteSqlRaw($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
                 // So does setting it to Detached and that is what EF does when it deletes an item: http://msdn.microsoft.com/en-us/data/jj592676.aspx
@@ -39,7 +38,7 @@ namespace Shrooms.DataLayer.DAL
             }
         }
 
-        public static async Task ExecuteAsync(IEnumerable<DbEntityEntry> entries, ShroomsDbContext ctx)
+        public static async Task ExecuteAsync(IEnumerable<EntityEntry> entries, ShroomsDbContext ctx)
         {
             _context = ctx;
 
@@ -51,7 +50,7 @@ namespace Shrooms.DataLayer.DAL
                 var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
-                await _context.Database.ExecuteSqlCommandAsync($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
+                await _context.Database.ExecuteSqlRawAsync($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
                 // So does setting it to Detached and that is what EF does when it deletes an item: http://msdn.microsoft.com/en-us/data/jj592676.aspx
@@ -61,9 +60,13 @@ namespace Shrooms.DataLayer.DAL
 
         private static string GetEntityId(object e)
         {
-            if (e is IdentityUser || e is ApplicationRole)
+            if (e is IdentityUser identityUser)
             {
-                return ((IdentityUser)e).Id;
+                return identityUser.Id;
+            }
+            else if (e is ApplicationRole role)
+            {
+                return role.Id;
             }
             else if (e is BaseModel model)
             {
@@ -83,17 +86,24 @@ namespace Shrooms.DataLayer.DAL
 
         internal static string GetTableName(Type type)
         {
-            var entitySet = GetEntitySet(type);
+            var entityType = GetEntityType(type);
+            var schema = entityType.GetSchema() ?? "dbo";
+            var tableName = entityType.GetTableName();
 
-            return $"[{entitySet.Schema}].[{entitySet.Table}]";
+            return $"[{schema}].[{tableName}]";
         }
 
         internal static Type GetObjectType(Type type)
         {
-            return ObjectContext.GetObjectType(type);
+            // EF Core doesn't have dynamic proxies like EF6, but we keep this for compatibility
+            if (type.Namespace == "Castle.Proxies")
+            {
+                return type.BaseType;
+            }
+            return type;
         }
 
-        private static EntitySetBase GetEntitySet(Type type)
+        private static IEntityType GetEntityType(Type type)
         {
             if (_mappingCache.ContainsKey(type))
             {
@@ -101,24 +111,26 @@ namespace Shrooms.DataLayer.DAL
             }
 
             type = GetObjectType(type);
-            var baseTypeName = type.BaseType?.Name;
-            var typeName = type.Name;
 
-            var context = ((IObjectContextAdapter)_context).ObjectContext;
-            var entitySet = context.MetadataWorkspace
-                            .GetItemCollection(DataSpace.SSpace)
-                            .GetItems<EntityContainer>()
-                            .SelectMany(c => c.BaseEntitySets.Where(e => e.Name == typeName || e.Name == baseTypeName))
-                            .FirstOrDefault();
+            var entityType = _context.Model.FindEntityType(type);
 
-            if (entitySet == null)
+            if (entityType == null)
             {
-                throw new ArgumentException("Entity type not found in GetEntitySet() method", typeName);
+                // Try with base type
+                if (type.BaseType != null && type.BaseType != typeof(object))
+                {
+                    entityType = _context.Model.FindEntityType(type.BaseType);
+                }
             }
 
-            _mappingCache.Add(type, entitySet);
+            if (entityType == null)
+            {
+                throw new ArgumentException($"Entity type not found in GetEntityType() method: {type.Name}");
+            }
 
-            return entitySet;
+            _mappingCache.Add(type, entityType);
+
+            return entityType;
         }
     }
 }

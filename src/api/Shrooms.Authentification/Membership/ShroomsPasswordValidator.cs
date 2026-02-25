@@ -1,32 +1,40 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Authentification.Membership
 {
-    public class ShroomsPasswordValidator : PasswordValidator
+    public class ShroomsPasswordValidator : IPasswordValidator<ApplicationUser>
     {
-        public async override Task<IdentityResult> ValidateAsync(string item)
+        public async Task<IdentityResult> ValidateAsync(UserManager<ApplicationUser> manager, ApplicationUser user, string password)
         {
-            var result = await base.ValidateAsync(item);
-            var errors = TranslatePasswordHasherErrors(result.Errors).ToArray();
-            return result.Succeeded ? IdentityResult.Success : new IdentityResult(errors);
-        }
+            var errors = new List<IdentityError>();
 
-        //TODO: workaround for Microsoft.AspNet.Identity.Core.dll, v2.0.0.0, in future version 3.0 IdentityResult will return status codes
-        //check - https://github.com/aspnet/Identity/issues/86
-        protected IEnumerable<string> TranslatePasswordHasherErrors(IEnumerable<string> errors)
-        {
-            foreach (var error in errors)
+            // Basic validation
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
             {
-                var strBuilder = new StringBuilder(error);
-                strBuilder = strBuilder.Replace("Passwords must have at least one digit ('0'-'9').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainDigit);
-                strBuilder = strBuilder.Replace("Passwords must have at least one lowercase ('a'-'z').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainLowerCase);
-                strBuilder = strBuilder.Replace("Passwords must have at least one uppercase ('A'-'Z').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainUpperCase);
-                yield return strBuilder.ToString();
+                errors.Add(new IdentityError { Description = "Passwords must be at least 6 characters." });
             }
+
+            if (!password.Any(char.IsDigit))
+            {
+                errors.Add(new IdentityError { Description = Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainDigit });
+            }
+
+            if (!password.Any(char.IsLower))
+            {
+                errors.Add(new IdentityError { Description = Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainLowerCase });
+            }
+
+            if (!password.Any(char.IsUpper))
+            {
+                errors.Add(new IdentityError { Description = Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainUpperCase });
+            }
+
+            return await Task.FromResult(errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray()));
         }
     }
 }

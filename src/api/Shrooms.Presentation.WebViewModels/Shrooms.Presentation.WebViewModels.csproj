@@ -1,24 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Targets\shared.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ProjectGuid>{1F63D29F-E593-47F0-A304-54D62CC1AD2B}</ProjectGuid>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyTitle>Shrooms.Presentation.WebViewModels</AssemblyTitle>
     <Product>Shrooms.Presentation.WebViewModels</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataAnnotationsExtensions" Version="5.0.1.16" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="DataAnnotationsExtensions" Version="5.0.1.16" />
   </ItemGroup>
 
   <ItemGroup>

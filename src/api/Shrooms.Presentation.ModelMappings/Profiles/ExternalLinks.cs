@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class ExternalLinks : Profile
     {
-        protected override void Configure()
+        public ExternalLinks()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

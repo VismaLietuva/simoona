@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
-using System.Web.Hosting;
 using Autofac;
 using Autofac.Core.Lifetime;
 using Shrooms.Contracts.Infrastructure;
@@ -18,7 +17,9 @@ namespace Shrooms.Infrastructure.FireAndForget
 
         public void Run<T>(Func<T, Task> action, string tenantName)
         {
-            HostingEnvironment.QueueBackgroundWorkItem(async _ =>
+            // ASP.NET Core equivalent: use Task.Run for background work
+            // In production, consider using IHostedService or BackgroundService
+            Task.Run(async () =>
             {
                 using (var container = LifetimeScope.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag,
                     builder => { builder.RegisterInstance(new TenantNameContainer(tenantName)).As<ITenantNameContainer>().SingleInstance(); }))

@@ -1,13 +1,14 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class WallMembersConfiguration : EntityTypeConfiguration<WallMember>
+    internal class WallMembersConfiguration : IEntityTypeConfiguration<WallMember>
     {
-        public WallMembersConfiguration()
+        public void Configure(EntityTypeBuilder<WallMember> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

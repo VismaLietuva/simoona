@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Configuration;
+using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Shrooms.Infrastructure.Email
 {
@@ -12,13 +10,11 @@ namespace Shrooms.Infrastructure.Email
     /// </summary>
     public class SmtpService : IMailSendingService
     {
-        private static MailSettingsSectionGroup _mailSettings;
+        private readonly IConfiguration _configuration;
 
-        public SmtpService()
+        public SmtpService(IConfiguration configuration)
         {
-            _mailSettings = (MailSettingsSectionGroup)WebConfigurationManager
-                .OpenWebConfiguration(HttpRuntime.AppDomainAppVirtualPath)
-                .GetSectionGroup("system.net/mailSettings");
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -26,17 +22,15 @@ namespace Shrooms.Infrastructure.Email
         /// </summary>
         public bool IsMailSenderConfigured()
         {
-            if (_mailSettings?.Smtp == null)
-            {
-                return false;
-            }
+            var host = _configuration["Smtp:Host"];
+            var pickupDirectory = _configuration["Smtp:PickupDirectoryLocation"];
 
-            if (_mailSettings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(_mailSettings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+            if (!string.IsNullOrEmpty(pickupDirectory))
             {
                 return true;
             }
 
-            if (_mailSettings.Smtp.Network != null && string.IsNullOrEmpty(_mailSettings.Smtp.Network.Host) == false)
+            if (!string.IsNullOrEmpty(host))
             {
                 return true;
             }

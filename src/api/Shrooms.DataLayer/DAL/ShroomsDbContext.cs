@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Data.Entity.ModelConfiguration.Conventions;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
 using Shrooms.DataLayer.EntityModels.Attributes;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
@@ -24,21 +23,20 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL
 {
-    [DbConfigurationType(typeof(ShroomsContextConfiguration))]
     public class ShroomsDbContext : DbContext, IDbContext
     {
         public ShroomsDbContext()
         {
         }
 
-        public ShroomsDbContext(string connectionStringName)
-            : base(connectionStringName)
+        public ShroomsDbContext(DbContextOptions<ShroomsDbContext> options)
+            : base(options)
         {
-            ConnectionName = connectionStringName;
-            Configuration.LazyLoadingEnabled = false;
-            Configuration.ProxyCreationEnabled = false;
-            Database.SetInitializer<ShroomsDbContext>(null);
+            ChangeTracker.LazyLoadingEnabled = false;
         }
+
+        // For backward compatibility - connection string based initialization
+        public string ConnectionName { get; private set; }
 
         public virtual DbSet<ApplicationUser> Users { get; set; }
 
@@ -122,7 +120,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<ExternalLink> ExternalLinks { get; set; }
 
-        public virtual DbSet<Monitor> Monitors { get; set; }
+        public virtual DbSet<EntityModels.Models.Monitors.Monitor> Monitors { get; set; }
 
         public virtual DbSet<JobPosition> JobPosition { get; set; }
 
@@ -152,8 +150,6 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<Banner> Banners { get; set; }
 
-        public string ConnectionName { get; }
-
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -180,7 +176,7 @@ namespace Shrooms.DataLayer.DAL
             return await base.SaveChangesAsync();
         }
 
-        public int SaveChanges(bool useMetaTracking = true)
+        public new int SaveChanges(bool useMetaTracking = true)
         {
             if (useMetaTracking)
             {
@@ -192,57 +188,71 @@ namespace Shrooms.DataLayer.DAL
             return base.SaveChanges();
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Configurations.Add(new KudosBasketEntityConfig());
-            modelBuilder.Configurations.Add(new KudosLogEntityConfig());
-            modelBuilder.Configurations.Add(new ApplicationUserConfiguration());
-            modelBuilder.Configurations.Add(new IdentityUserRoleEntityConfig());
-            modelBuilder.Configurations.Add(new IdentityUserLoginEntityConfig());
-            modelBuilder.Configurations.Add(new IdentityUserClaimEntityConfig());
-            modelBuilder.Configurations.Add(new ApplicationRoleConfiguration());
-            modelBuilder.Configurations.Add(new AbstractClassifierConfiguration());
-            modelBuilder.Configurations.Add(new RoomEntityConfig());
-            modelBuilder.Configurations.Add(new PageEntityConfig());
-            modelBuilder.Configurations.Add(new PermissionEntityConfig());
-            modelBuilder.Configurations.Add(new EventEntityConfig());
-            modelBuilder.Configurations.Add(new EventTypeEntityConfig());
-            modelBuilder.Configurations.Add(new EventParticipantEntityConfig());
-            modelBuilder.Configurations.Add(new EventOptionEntityConfig());
-            modelBuilder.Configurations.Add(new CommitteeEntityConfig());
-            modelBuilder.Configurations.Add(new BookOfficeEntityConfig());
-            modelBuilder.Configurations.Add(new BookLogEntityConfig());
-            modelBuilder.Configurations.Add(new BookEntityConfig());
-            modelBuilder.Configurations.Add(new OfficeEntityConfig());
-            modelBuilder.Configurations.Add(new OrganizationEntityConfig());
-            modelBuilder.Configurations.Add(new RefreshTokenConfiguration());
-            modelBuilder.Configurations.Add(new WallConfiguration());
-            modelBuilder.Configurations.Add(new WallMembersConfiguration());
-            modelBuilder.Configurations.Add(new WallModeratorsConfiguration());
-            modelBuilder.Configurations.Add(new PostEntityConfig());
-            modelBuilder.Configurations.Add(new ExternalLinkConfig());
-            modelBuilder.Configurations.Add(new MonitorConfig());
-            modelBuilder.Configurations.Add(new NotificationConfig());
-            modelBuilder.Configurations.Add(new NotifiationUserConfig());
-            modelBuilder.Configurations.Add(new PostWatcherConfig());
-            modelBuilder.Configurations.Add(new VacationEntityConfig());
-            modelBuilder.Configurations.Add(new FilterPresetEntityConfig());
-            modelBuilder.Configurations.Add(new BlacklistUserEntityConfig());
-            modelBuilder.Configurations.Add(new EventReminderEntityConfig());
-            modelBuilder.Configurations.Add(new BannerEntityConfiguration());
+            base.OnModelCreating(modelBuilder);
+            
+            // Apply all entity type configurations
+            modelBuilder.ApplyConfiguration(new KudosBasketEntityConfig());
+            modelBuilder.ApplyConfiguration(new KudosLogEntityConfig());
+            modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+            // Identity configurations are handled by ASP.NET Core Identity
+            // modelBuilder.ApplyConfiguration(new IdentityUserRoleEntityConfig());
+            // modelBuilder.ApplyConfiguration(new IdentityUserLoginEntityConfig());
+            // modelBuilder.ApplyConfiguration(new IdentityUserClaimEntityConfig());
+            modelBuilder.ApplyConfiguration(new ApplicationRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new AbstractClassifierConfiguration());
+            modelBuilder.ApplyConfiguration(new RoomEntityConfig());
+            modelBuilder.ApplyConfiguration(new PageEntityConfig());
+            modelBuilder.ApplyConfiguration(new PermissionEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventTypeEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventOptionEntityConfig());
+            modelBuilder.ApplyConfiguration(new CommitteeEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookOfficeEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookLogEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookEntityConfig());
+            modelBuilder.ApplyConfiguration(new OfficeEntityConfig());
+            modelBuilder.ApplyConfiguration(new OrganizationEntityConfig());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+            modelBuilder.ApplyConfiguration(new WallConfiguration());
+            modelBuilder.ApplyConfiguration(new WallMembersConfiguration());
+            modelBuilder.ApplyConfiguration(new WallModeratorsConfiguration());
+            modelBuilder.ApplyConfiguration(new PostEntityConfig());
+            modelBuilder.ApplyConfiguration(new ExternalLinkConfig());
+            modelBuilder.ApplyConfiguration(new MonitorConfig());
+            modelBuilder.ApplyConfiguration(new NotificationConfig());
+            modelBuilder.ApplyConfiguration(new NotifiationUserConfig());
+            modelBuilder.ApplyConfiguration(new PostWatcherConfig());
+            modelBuilder.ApplyConfiguration(new VacationEntityConfig());
+            modelBuilder.ApplyConfiguration(new FilterPresetEntityConfig());
+            modelBuilder.ApplyConfiguration(new BlacklistUserEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventReminderEntityConfig());
+            modelBuilder.ApplyConfiguration(new BannerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeCategoryKudosTypeEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeCategoryEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeLogEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeTypeEntityConfiguration());
 
-            var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
-            modelBuilder.Conventions.Add(convention);
+            // TODO: SqlDefaultValue attribute convention needs to be reimplemented for EF Core
+            // var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
+            // modelBuilder.Conventions.Add(convention);
 
             new OtherEntitiesConfig(modelBuilder).Add();
         }
 
-        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId = "")
+        // TODO: HttpContext.Current is not available in ASP.NET Core
+        // This method needs to be updated to receive IHttpContextAccessor through dependency injection
+        // For now, userId must be explicitly passed
+        private static void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = "")
         {
-            if (string.IsNullOrEmpty(userId) && HttpContext.Current != null && HttpContext.Current.User != null)
-            {
-                userId = HttpContext.Current.User.Identity.GetUserId();
-            }
+            // TODO: In ASP.NET Core, inject IHttpContextAccessor instead of using HttpContext.Current
+            // Example:
+            // if (string.IsNullOrEmpty(userId) && _httpContextAccessor.HttpContext?.User != null)
+            // {
+            //     userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // }
 
             var now = DateTime.UtcNow;
             var items = entries

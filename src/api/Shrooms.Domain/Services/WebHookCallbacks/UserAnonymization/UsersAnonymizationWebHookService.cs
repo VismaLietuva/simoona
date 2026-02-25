@@ -1,7 +1,7 @@
-﻿using System;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Configuration;
-using System.Data.Entity;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -49,7 +49,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
                 new SqlParameter("@userLimit", _anonymizeUsersPerRequest)
             };
 
-            var usersToAnonymize = await _usersDbSet.SqlQuery(sqlQuery, sqlParameters).ToListAsync();
+            var usersToAnonymize = await _usersDbSet
+                .FromSqlRaw(sqlQuery, sqlParameters)
+                .ToListAsync();
 
             foreach (var user in usersToAnonymize)
             {

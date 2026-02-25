@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
@@ -29,7 +29,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Other : Profile
     {
-        protected override void Configure()
+        public Other()
         {
             CreateViewModelMappings();
             CreateApplicationUserModelMappings();
@@ -77,7 +77,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         private void CreateAdministrationMappings()
         {
             CreateMap<ApplicationUser, AdministrationUserDto>()
-                .ForMember(dest => dest.HasRoom, opt => opt.ResolveUsing(new AdministrationUserRoomResolver()))
+                .ForMember(dest => dest.HasRoom, opt => opt.MapFrom(new AdministrationUserRoomResolver()))
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(u => u.JobPosition.Title));
 
             CreateMap<Project, AdministrationProjectDto>();
@@ -120,7 +120,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.Certificates, src => src.Ignore())
                 .ForMember(dest => dest.Exams, src => src.Ignore())
                 .ForMember(dest => dest.QualificationLevel, src => src.Ignore())
-                .ForMember(dest => dest.Roles, src => src.Ignore())
                 .ForMember(dest => dest.Organization, src => src.Ignore())
                 .ForMember(dest => dest.OrganizationId, src => src.Ignore());
 
@@ -240,7 +239,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<ApplicationRole, RoleViewModel>();
 
             CreateMap<RoleViewModel, ApplicationRole>()
-                .ForMember(dest => dest.Users, src => src.Ignore())
                 .ForMember(dest => dest.Permissions, src => src.Ignore());
 
             CreateMap<ApplicationRole, ApplicationRoleMiniViewModel>();
@@ -249,10 +247,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<ApplicationRoleViewModel, ApplicationRole>();
 
             CreateMap<ApplicationRole, RoleMiniViewModel>()
-                .ForMember(dest => dest.Users, src => src.Ignore())
                 .ForMember(dest => dest.Permissions, src => src.Ignore());
             CreateMap<RoleMiniViewModel, ApplicationRole>()
-                .ForMember(dest => dest.Users, src => src.Ignore())
                 .ForMember(dest => dest.Permissions, src => src.Ignore());
 
             CreateMap<Organization, OrganizationViewModel>();

@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Monitors : Profile
     {
-        protected override void Configure()
+        public Monitors()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

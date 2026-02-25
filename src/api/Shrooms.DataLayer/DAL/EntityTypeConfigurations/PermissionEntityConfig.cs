@@ -1,21 +1,18 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class PermissionEntityConfig : EntityTypeConfiguration<Permission>
+    internal class PermissionEntityConfig : IEntityTypeConfiguration<Permission>
     {
-        public PermissionEntityConfig()
+        public void Configure(EntityTypeBuilder<Permission> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false))
-                .HasMany(r => r.Roles)
+            builder.HasQueryFilter(e => !e.IsDeleted);
+
+            builder.HasMany(r => r.Roles)
                 .WithMany(r => r.Permissions)
-                .Map(m =>
-                {
-                    m.MapLeftKey("PermissionId");
-                    m.MapRightKey("RoleId");
-                    m.ToTable("RolePermissions");
-                });
+                .UsingEntity(j => j.ToTable("RolePermissions"));
         }
     }
 }

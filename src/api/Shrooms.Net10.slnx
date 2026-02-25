@@ -1,0 +1,15 @@
+<Solution>
+  <Project Path="Shrooms.Authentification/Shrooms.Authentification.csproj" />
+  <Project Path="Shrooms.Contracts.DataTransferObjects/Shrooms.Contracts.DataTransferObjects.csproj" />
+  <Project Path="Shrooms.Contracts/Shrooms.Contracts.csproj" />
+  <Project Path="Shrooms.DataLayer.EntityModels/Shrooms.DataLayer.EntityModels.csproj" />
+  <Project Path="Shrooms.DataLayer/Shrooms.DataLayer.csproj" />
+  <Project Path="Shrooms.Domain.Exceptions/Shrooms.Domain.Exceptions.csproj" />
+  <Project Path="Shrooms.Domain.ServiceValidators/Shrooms.Domain.ServiceValidators.csproj" />
+  <Project Path="Shrooms.Domain/Shrooms.Domain.csproj" />
+  <Project Path="Shrooms.Infrastructure/Shrooms.Infrastructure.csproj" />
+  <Project Path="Shrooms.Presentation.Common/Shrooms.Presentation.Common.csproj" />
+  <Project Path="Shrooms.Presentation.ModelMappings/Shrooms.Presentation.ModelMappings.csproj" />
+  <Project Path="Shrooms.Presentation.WebViewModels/Shrooms.Presentation.WebViewModels.csproj" />
+  <Project Path="Shrooms.Resources/Shrooms.Resources.csproj" />
+</Solution>

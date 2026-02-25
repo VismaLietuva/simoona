@@ -1,21 +1,22 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
 {
-    internal class BadgeCategoryKudosTypeEntityConfiguration : EntityTypeConfiguration<BadgeCategoryKudosType>
+    internal class BadgeCategoryKudosTypeEntityConfiguration : IEntityTypeConfiguration<BadgeCategoryKudosType>
     {
-        public BadgeCategoryKudosTypeEntityConfiguration()
+        public void Configure(EntityTypeBuilder<BadgeCategoryKudosType> builder)
         {
-            HasRequired(x => x.BadgeCategory)
-                .WithRequiredDependent()
-                .WillCascadeOnDelete(false);
+            builder.HasOne(x => x.BadgeCategory)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(x => x.KudosType)
-                .WithRequiredDependent()
-                .WillCascadeOnDelete(false);
+            builder.HasOne(x => x.KudosType)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasKey(type => type.Id);
+            builder.HasKey(type => type.Id);
         }
     }
 }

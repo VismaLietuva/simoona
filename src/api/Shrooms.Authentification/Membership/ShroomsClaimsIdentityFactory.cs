@@ -1,27 +1,37 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Authentification.Membership
 {
-    public class ShroomsClaimsIdentityFactory : ClaimsIdentityFactory<ApplicationUser, string>
+    public class ShroomsClaimsIdentityFactory : UserClaimsPrincipalFactory<ApplicationUser, ApplicationRole>
     {
         private readonly IDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ShroomsClaimsIdentityFactory(IDbContext context)
+        public ShroomsClaimsIdentityFactory(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
+            IOptions<IdentityOptions> optionsAccessor,
+            IDbContext context,
+            IHttpContextAccessor httpContextAccessor)
+            : base(userManager, roleManager, optionsAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public override async Task<ClaimsIdentity> CreateAsync(UserManager<ApplicationUser, string> userManager, ApplicationUser user, string authenticationType)
+        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
         {
-            var contextUser = HttpContext.Current.User as ClaimsPrincipal;
-            var claimsIdentity = await base.CreateAsync(userManager, user, authenticationType);
+            var claimsIdentity = await base.GenerateClaimsAsync(user);
+            var contextUser = _httpContextAccessor.HttpContext?.User;
+            
             var organizationIdClaim = new Claim(WebApiConstants.ClaimOrganizationId, user.OrganizationId.ToString());
 
             if (!claimsIdentity.HasClaim(claim => claim.Type == ClaimTypes.GivenName))

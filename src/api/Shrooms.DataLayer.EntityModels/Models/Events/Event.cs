@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -61,6 +61,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public virtual ICollection<EventOption> EventOptions { get; set; }
         public bool IsPinned { get; set; }
         public bool IsShownInUpcomingEventsWidget { get; set; }
+        public bool IsDeleted { get; set; }
 
         [Required]
         public string Offices { get; set; }

@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
 {
     public class RefreshTokenService : IRefreshTokenService
     {
-        private readonly IDbSet<RefreshToken> _refreshTokensDbSet;
+        private readonly DbSet<RefreshToken> _refreshTokensDbSet;
         private readonly IUnitOfWork2 _uow;
 
         public RefreshTokenService(IUnitOfWork2 uow)

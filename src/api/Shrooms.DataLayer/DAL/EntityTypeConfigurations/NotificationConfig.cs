@@ -1,13 +1,14 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class NotificationConfig : EntityTypeConfiguration<Notification>
+    internal class NotificationConfig : IEntityTypeConfiguration<Notification>
     {
-        public NotificationConfig()
+        public void Configure(EntityTypeBuilder<Notification> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

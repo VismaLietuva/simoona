@@ -1,10 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Events;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 

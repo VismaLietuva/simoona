@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -183,21 +183,24 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<KudosLogsEntriesDto<MainKudosLogDto>> GetKudosLogsAsync(KudosLogsFilterDto options)
         {
-            var kudosLogsQuery = _kudosLogsDbSet
+            var kudosLogsQueryBeforeSort = _kudosLogsDbSet
                 .Include(log => log.Employee)
                 .Where(log => log.OrganizationId == options.OrganizationId && log.KudosBasketId == null)
                 .Where(KudosServiceHelper.StatusFilter(options.Status))
                 .Where(KudosServiceHelper.UserFilter(options.SearchUserId))
                 .Where(KudosServiceHelper.TypeFilter(options.FilteringType))
-                .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto())
-                .OrderBy(string.Concat(options.SortBy, " ", options.SortOrder));
+                .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto());
+
+            var kudosLogsQuery = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
+                kudosLogsQueryBeforeSort.AsQueryable(), 
+                string.Concat(options.SortBy, " ", options.SortOrder));
 
             var logsTotalCount = await kudosLogsQuery.CountAsync();
 
             var entriesCountToSkip = EntriesCountToSkip(options.Page);
             var kudosLogs = await kudosLogsQuery
-                .Skip(() => entriesCountToSkip)
-                .Take(() => BusinessLayerConstants.MaxKudosLogsPerPage)
+                .Skip(entriesCountToSkip)
+                .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
             var user = await _usersDbSet.FindAsync(options.UserId);
@@ -255,8 +258,8 @@ namespace Shrooms.Domain.Services.Kudos
 
             var entriesCountToSkip = EntriesCountToSkip(page);
             var userLogs = await userLogsQuery
-                .Skip(() => entriesCountToSkip)
-                .Take(() => BusinessLayerConstants.MaxKudosLogsPerPage)
+                .Skip(entriesCountToSkip)
+                .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
             var user = await _usersDbSet.FindAsync(userId);
@@ -292,7 +295,7 @@ namespace Shrooms.Domain.Services.Kudos
                     log.OrganizationId == userAndOrg.OrganizationId)
                 .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, MapKudosLogToWallKudosLogDto())
                 .OrderByDescending(log => log.Created)
-                .Take(() => BusinessLayerConstants.WallKudosLogCount)
+                .Take(BusinessLayerConstants.WallKudosLogCount)
                 .ToListAsync();
 
             return approvedKudos;
@@ -566,7 +569,7 @@ namespace Shrooms.Domain.Services.Kudos
                     KudosAmount = log.Sum(s => s.Points)
                 })
                 .OrderByDescending(log => log.KudosAmount)
-                .Take(() => amount)
+                .Take(amount)
                 .ToListAsync();
 
             var userIds = kudosLogsStats.Select(s => s.Name).ToArray();

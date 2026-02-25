@@ -1,26 +1,23 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class CommitteeEntityConfig : EntityTypeConfiguration<Committee>
+    internal class CommitteeEntityConfig : IEntityTypeConfiguration<Committee>
     {
-        public CommitteeEntityConfig()
+        public void Configure(EntityTypeBuilder<Committee> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
-            HasMany(a => a.Suggestions)
-                .WithMany()
-                .Map(x =>
-                {
-                    x.MapLeftKey("Committees_Id");
-                    x.MapRightKey("CommitteeSuggestions_Id");
-                    x.ToTable("CommitteeSuggestionsIDs");
-                });
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(c => c.Organization)
+            builder.HasMany(a => a.Suggestions)
+                .WithMany()
+                .UsingEntity(j => j.ToTable("CommitteeSuggestionsIDs"));
+
+            builder.HasOne(c => c.Organization)
                 .WithMany()
                 .HasForeignKey(c => c.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

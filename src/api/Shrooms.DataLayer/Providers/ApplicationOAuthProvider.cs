@@ -1,4 +1,9 @@
-﻿using System;
+// TODO: This OWIN OAuth provider needs to be replaced with ASP.NET Core authentication
+// Commented out during migration to .NET 10
+// Original OWIN authentication will be replaced with ASP.NET Core Identity authentication in the API project
+
+/*
+using System;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.OAuth;
 
@@ -39,3 +44,4 @@ namespace AceShrooms.Providers
         }
     }
 }
+*/

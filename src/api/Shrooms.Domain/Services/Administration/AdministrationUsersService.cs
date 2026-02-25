@@ -1,7 +1,7 @@
-﻿using System;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,8 +12,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -41,10 +40,11 @@ namespace Shrooms.Domain.Services.Administration
 
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<ApplicationRole> _rolesRepository;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Organization> _organizationDbSet;
-        private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
-        private readonly IDbSet<WallMember> _wallUsersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationDbSet;
+        private readonly DbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly DbSet<WallMember> _wallUsersDbSet;
+        private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
         private readonly ShroomsUserManager _userManager;
         private readonly IUserAdministrationValidator _userAdministrationValidator;
         private readonly IOrganizationService _organizationService;
@@ -76,6 +76,7 @@ namespace Shrooms.Domain.Services.Administration
             _organizationDbSet = uow.GetDbSet<Organization>();
             _wallsDbSet = uow.GetDbSet<DataLayer.EntityModels.Models.Multiwall.Wall>();
             _wallUsersDbSet = uow.GetDbSet<WallMember>();
+            _userRolesDbSet = uow.GetDbSet<IdentityUserRole<string>>();
             _userManager = userManager;
             _userAdministrationValidator = userAdministrationValidator;
             _organizationService = organizationService;
@@ -128,7 +129,7 @@ namespace Shrooms.Domain.Services.Administration
 
             var user = await shroomsContext
                 .Users
-                .SqlQuery("SELECT * FROM [dbo].[AspNetUsers] WHERE Email = @email", new SqlParameter("@email", email))
+                .FromSqlRaw("SELECT * FROM [dbo].[AspNetUsers] WHERE Email = @email", new SqlParameter("@email", email))
                 .SingleOrDefaultAsync();
 
             return user != null;
@@ -144,7 +145,7 @@ namespace Shrooms.Domain.Services.Administration
             }
 
             await shroomsContext.Database
-                .ExecuteSqlCommandAsync("UPDATE [dbo].[AspNetUsers] SET[IsDeleted] = '0' WHERE Email = @email", new SqlParameter("@email", email));
+                .ExecuteSqlRawAsync("UPDATE [dbo].[AspNetUsers] SET [IsDeleted] = '0' WHERE Email = @email", new SqlParameter("@email", email));
 
             var user = await _userManager.FindByEmailAsync(email);
             await AddNewUserRolesAsync(user.Id);
@@ -168,14 +169,14 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task SendUserPasswordResetEmailAsync(ApplicationUser user, string organizationName)
         {
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user.Id);
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             await _notificationService.SendUserResetPasswordEmailAsync(user, token, organizationName);
         }
 
         public async Task SendUserVerificationEmailAsync(ApplicationUser user, string orgazinationName)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
             await _notificationService.SendUserVerificationEmailAsync(user, token, orgazinationName);
         }
@@ -185,13 +186,16 @@ namespace Shrooms.Domain.Services.Administration
             var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
-            var hasRole = await _userManager.IsInRoleAsync(userId, Contracts.Constants.Roles.FirstLogin);
+            var hasRole = await _userManager.IsInRoleAsync(applicationUser, Contracts.Constants.Roles.FirstLogin);
             _userAdministrationValidator.CheckIfUserHasFirstLoginRole(hasRole);
 
-            var addRoleResult = await _userManager.AddToRoleAsync(userId, Contracts.Constants.Roles.User);
-            var removeRoleResult = await _userManager.RemoveFromRoleAsync(userId, Contracts.Constants.Roles.NewUser);
+            var addRoleResult = await _userManager.AddToRoleAsync(applicationUser, Contracts.Constants.Roles.User);
+            var removeRoleResult = await _userManager.RemoveFromRoleAsync(applicationUser, Contracts.Constants.Roles.NewUser);
 
-            _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors.ToList(), removeRoleResult.Errors.ToList());
+            // Convert IdentityError to string list for validation
+            _userAdministrationValidator.CheckForAddingRemovingRoleErrors(
+                addRoleResult.Errors.Select(e => e.Description).ToList(), 
+                removeRoleResult.Errors.Select(e => e.Description).ToList());
             await _notificationService.SendConfirmedNotificationEmailAsync(applicationUser.Email, userAndOrg);
 
             SetTutorialStatus(applicationUser, false);
@@ -204,7 +208,8 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization)
         {
-            var externalIdentity = info.ExternalIdentity;
+            // EF6: info.ExternalIdentity → EF Core: info.Principal
+            var externalIdentity = info.Principal;
             var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
                 .Select(u => new { u.CultureCode, u.TimeZone })
                 .FirstAsync();
@@ -229,7 +234,8 @@ namespace Shrooms.Domain.Services.Administration
                 user.PictureId = picture;
             }
 
-            var result = _userManager.Create(user);
+            // EF6: Create() → EF Core: CreateAsync()
+            var result = await _userManager.CreateAsync(user);
             if (!result.Succeeded)
             {
                 return result;
@@ -257,8 +263,10 @@ namespace Shrooms.Domain.Services.Administration
                 return result;
             }
 
-            var userLoginInfo = new UserLoginInfo(AuthenticationConstants.InternalLoginProvider, user.Id);
-            var addLoginResult = await _userManager.AddLoginAsync(user.Id, userLoginInfo);
+            // UserLoginInfo now requires 3 parameters (loginProvider, providerKey, displayName)
+            var userLoginInfo = new UserLoginInfo(AuthenticationConstants.InternalLoginProvider, user.Id, "Internal");
+            // AddLoginAsync now expects ApplicationUser instead of string userId
+            var addLoginResult = await _userManager.AddLoginAsync(user, userLoginInfo);
             if (!addLoginResult.Succeeded)
             {
                 return addLoginResult;
@@ -278,7 +286,9 @@ namespace Shrooms.Domain.Services.Administration
                 return false;
             }
 
-            var hasLogin = user.Logins.Any(login => login.LoginProvider == loginProvider);
+            // EF Core doesn't have ApplicationUser.Logins navigation property
+            var logins = await _userManager.GetLoginsAsync(user);
+            var hasLogin = logins.Any(login => login.LoginProvider == loginProvider);
             return hasLogin;
         }
 
@@ -466,16 +476,22 @@ namespace Shrooms.Domain.Services.Administration
 
         private async Task AddNewUserRolesAsync(string id)
         {
-            await _userManager.AddToRoleAsync(id, Contracts.Constants.Roles.NewUser);
-            await _userManager.AddToRoleAsync(id, Contracts.Constants.Roles.FirstLogin);
+            // AddToRoleAsync now expects ApplicationUser instead of string userId
+            var user = await _userManager.FindByIdAsync(id);
+            await _userManager.AddToRoleAsync(user, Contracts.Constants.Roles.NewUser);
+            await _userManager.AddToRoleAsync(user, Contracts.Constants.Roles.FirstLogin);
         }
 
         private async Task SetNewUsersValuesAsync(IList<AdministrationUserDto> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
             var newUserRole = await _rolesRepository.Get(x => x.Name == Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefaultAsync();
 
-            var usersWaitingForConfirmationIds =
-                applicationUsers.Where(x => x.Roles.Any(y => y.RoleId == newUserRole)).Select(x => x.Id).ToList();
+            // EF Core doesn't have ApplicationUser.Roles navigation property, need to query junction table
+            var userIds = applicationUsers.Select(x => x.Id).ToList();
+            var usersWaitingForConfirmationIds = await _userRolesDbSet
+                .Where(ur => userIds.Contains(ur.UserId) && ur.RoleId == newUserRole)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
 
             foreach (var user in usersWaitingForConfirmationIds)
             {

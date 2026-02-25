@@ -11,7 +11,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Comments : Profile
     {
-        protected override void Configure()
+        public Comments()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

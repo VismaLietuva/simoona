@@ -1,35 +1,36 @@
-﻿using Shrooms.DataLayer.EntityModels.Models;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class BlacklistUserEntityConfig : EntityTypeConfiguration<BlacklistUser>
+    public class BlacklistUserEntityConfig : IEntityTypeConfiguration<BlacklistUser>
     {
-        public BlacklistUserEntityConfig()
+        public void Configure(EntityTypeBuilder<BlacklistUser> builder)
         {
-            HasRequired(u => u.ModifiedByUser)
+            builder.HasOne(u => u.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(u => u.ModifiedBy)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(u => u.CreatedByUser)
+            builder.HasOne(u => u.CreatedByUser)
                 .WithMany()
                 .HasForeignKey(u => u.CreatedBy)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(u => u.Reason)
-                .IsOptional();
+            builder.Property(u => u.Reason)
+                .IsRequired(false);
 
-            Property(u => u.UserId)
+            builder.Property(u => u.UserId)
                 .IsRequired();
 
-            Property(u => u.EndDate)
+            builder.Property(u => u.EndDate)
                 .IsRequired();
 
-            Property(u => u.Status)
+            builder.Property(u => u.Status)
                 .IsRequired();
 
-            Property(u => u.ModifiedBy)
+            builder.Property(u => u.ModifiedBy)
                 .IsRequired();
         }
     }

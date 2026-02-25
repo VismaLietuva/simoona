@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels.User;
@@ -9,7 +9,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Users : Profile
     {
-        protected override void Configure()
+        public Users()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

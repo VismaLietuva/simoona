@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataLayer.Migrations
+namespace Shrooms.DataLayer.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -26,9 +26,8 @@
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organizations", t => t.OrganizationId, cascadeDelete: true)
                 .Index(t => t.OrganizationId);
-            
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.Banners", "OrganizationId", "dbo.Organizations");
