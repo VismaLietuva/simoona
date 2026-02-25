@@ -15,6 +15,7 @@ using Shrooms.Premium.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +34,10 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             _lotteryService = Substitute.For<ILotteryService>();
             _lotteryExportService = Substitute.For<ILotteryExportService>();
+
+            _lotteryExportService
+                .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(new ByteArrayContent(Array.Empty<byte>()));
 
             _sut = new LotteryController(ModelMapper.Create(), _lotteryService, _lotteryExportService);
             _sut.SetUpControllerForTesting();

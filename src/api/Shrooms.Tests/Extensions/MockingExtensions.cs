@@ -47,9 +47,14 @@ namespace Shrooms.Tests.Extensions
         {
             if (model == null)
             {
-                controller.ModelState.AddModelError("model", "Value cannot be null.");
                 return;
             }
+
+            ValidateRecursive(controller, model, string.Empty);
+        }
+
+        private static void ValidateRecursive(ControllerBase controller, object model, string prefix)
+        {
             var context = new ValidationContext(model, null, null);
             var results = new List<ValidationResult>();
             Validator.TryValidateObject(model, context, results, true);
@@ -63,7 +68,26 @@ namespace Shrooms.Tests.Extensions
 
                 foreach (var member in memberNames)
                 {
-                    controller.ModelState.AddModelError(member, validationResult.ErrorMessage);
+                    var key = string.IsNullOrEmpty(prefix) ? member : $"{prefix}.{member}";
+                    controller.ModelState.AddModelError(key, validationResult.ErrorMessage);
+                }
+            }
+
+            foreach (var prop in model.GetType().GetProperties())
+            {
+                var value = prop.GetValue(model);
+                if (value is System.Collections.IEnumerable enumerable && value is not string)
+                {
+                    var i = 0;
+                    foreach (var item in enumerable)
+                    {
+                        if (item != null && item.GetType().IsClass)
+                        {
+                            var itemPrefix = string.IsNullOrEmpty(prefix) ? $"{prop.Name}[{i}]" : $"{prefix}.{prop.Name}[{i}]";
+                            ValidateRecursive(controller, item, itemPrefix);
+                        }
+                        i++;
+                    }
                 }
             }
         }
