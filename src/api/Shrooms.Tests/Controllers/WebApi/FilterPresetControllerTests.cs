@@ -73,7 +73,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             // Arrange
             _filterPresetService.UpdateAsync(Arg.Any<ManageFilterPresetDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             var updateViewModel = new ManageFilterPresetViewModel();
 
@@ -105,7 +105,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             // Arrange
             _filterPresetService.GetPresetsForPageAsync(Arg.Any<PageType>(), Arg.Any<int>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             const PageType pageType = PageType.EventReportList;
 
@@ -141,7 +141,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             // Arrange
             _filterPresetService.GetFiltersAsync(Arg.Any<FilterType[]>(), Arg.Any<int>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             var filterTypes = new[]
             {

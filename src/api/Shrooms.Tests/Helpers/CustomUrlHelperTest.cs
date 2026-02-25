@@ -14,7 +14,7 @@ namespace Shrooms.Tests.Helpers
         {
             var helper = Substitute.For<IUrlHelper>();
 
-            helper.RouteUrl(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 
@@ -26,7 +26,7 @@ namespace Shrooms.Tests.Helpers
         {
             var helper = Substitute.For<IUrlHelper>();
 
-            helper.RouteUrl(Arg.Any<string>(), Arg.Any<object>()).Returns("/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 
@@ -38,7 +38,7 @@ namespace Shrooms.Tests.Helpers
         {
             var helper = Substitute.For<IUrlHelper>();
 
-            helper.RouteUrl(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "", null);
 
@@ -50,7 +50,7 @@ namespace Shrooms.Tests.Helpers
         {
             var helper = Substitute.For<IUrlHelper>();
 
-            helper.RouteUrl(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", null, null);
 
@@ -62,7 +62,7 @@ namespace Shrooms.Tests.Helpers
         {
             var helper = Substitute.For<IUrlHelper>();
 
-            helper.RouteUrl(Arg.Any<string>(), Arg.Any<object>()).Returns("/a/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/a/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 

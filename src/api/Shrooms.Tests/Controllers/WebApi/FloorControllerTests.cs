@@ -186,7 +186,6 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Floor_Delete_Should_Return_Not_Found_Response()
         {
-
             var response = await _floorController.Delete(-1);
 
             Assert.That(response, Is.InstanceOf<NotFoundResult>());
@@ -208,7 +207,6 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Floor_GetAllFloors_Should_Return_Floors()
         {
-
             var response = await _floorController.GetAllFloors(1);
 
             var mockOffice = _unitOfWork.GetDbContextAs<MockDbContext>().Offices.Find(o => o.Id == 1);

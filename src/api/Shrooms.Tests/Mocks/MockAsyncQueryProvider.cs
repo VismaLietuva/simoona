@@ -59,7 +59,7 @@ namespace Shrooms.Tests.Mocks
         }
     }
 
-    public class MockAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
+    public sealed class MockAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
     {
         public MockAsyncEnumerable(IEnumerable<T> enumerable)
             : base(enumerable) { }

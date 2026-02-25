@@ -435,7 +435,6 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Kudos_Logs_Has_Not_Been_Saved_2()
         {
-
             var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,

@@ -8,7 +8,7 @@ namespace Shrooms.Presentation.Api.Helpers
     {
         public static string GetHash(string input)
         {
-            var hashAlgorithm = new SHA256CryptoServiceProvider();
+            using var hashAlgorithm = SHA256.Create();
             var byteValue = Encoding.UTF8.GetBytes(input);
             var byteHash = hashAlgorithm.ComputeHash(byteValue);
             var base64Representation = Convert.ToBase64String(byteHash);

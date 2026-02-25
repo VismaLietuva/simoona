@@ -278,7 +278,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             _sut.Validate(buyViewModel);
 
@@ -317,7 +317,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             _sut.Validate(buyViewModel);
 
@@ -497,7 +497,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .CreateLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             _sut.Validate(args);
 
@@ -813,7 +813,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .EditDraftedLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             _sut.Validate(args);
@@ -1137,7 +1137,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .EditStartedLotteryAsync(Arg.Any<EditStartedLotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             var expectedStatus = HttpStatusCode.BadRequest;
 
@@ -1214,7 +1214,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .FinishLotteryAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             var httpActionResult = await _sut.FinishLottery(id);
@@ -1282,7 +1282,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryExportService
                 .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             var httpActionResult = await _sut.Export(id);

@@ -6,6 +6,7 @@
     <ProjectGuid>{093FE583-996B-435C-A4D2-201C94AA71E0}</ProjectGuid>
     <AssemblyTitle>Shrooms.Tests</AssemblyTitle>
     <Product>Shrooms.Tests</Product>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <DebugType>pdbonly</DebugType>
     <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
     <IsPackable>false</IsPackable>

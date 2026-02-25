@@ -168,7 +168,6 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Room_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
         {
-
             var response = await _roomController.Delete(-1);
 
             Assert.That(response, Is.InstanceOf<NotFoundResult>());
@@ -177,7 +176,6 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Room_Delete_Should_Return_Ok_If_Room_Deleted_SuccessfullyDeleteReturnOkResponse()
         {
-
             var response = await _roomController.Delete(1);
 
             Assert.That(response, Is.InstanceOf<OkResult>());

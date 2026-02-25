@@ -30,7 +30,9 @@ namespace Shrooms.DataLayer.DAL
                 var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
+#pragma warning disable EF1002 // tableName comes from EF model metadata, not user input
                 _context.Database.ExecuteSqlRaw($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
+#pragma warning restore EF1002
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
                 // So does setting it to Detached and that is what EF does when it deletes an item: http://msdn.microsoft.com/en-us/data/jj592676.aspx
@@ -50,7 +52,9 @@ namespace Shrooms.DataLayer.DAL
                 var id = GetEntityId(e);
 
                 var tableName = GetTableName(e.GetType());
+#pragma warning disable EF1002 // tableName comes from EF model metadata, not user input
                 await _context.Database.ExecuteSqlRawAsync($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
+#pragma warning restore EF1002
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
                 // So does setting it to Detached and that is what EF does when it deletes an item: http://msdn.microsoft.com/en-us/data/jj592676.aspx

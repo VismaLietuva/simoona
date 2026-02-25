@@ -15,7 +15,6 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using X.PagedList;
 
 namespace Shrooms.Domain.Services.Employees
 {

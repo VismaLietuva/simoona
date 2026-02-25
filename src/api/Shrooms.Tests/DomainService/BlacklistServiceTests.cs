@@ -58,7 +58,7 @@ namespace Shrooms.Tests.DomainService
 
             _validator
                 .CheckIfUserIsAlreadyBlacklistedAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () => await _blacklistService.CreateAsync(args, userOrg));
@@ -73,7 +73,7 @@ namespace Shrooms.Tests.DomainService
 
             _validator
                 .CheckIfUserExistsAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () => await _blacklistService.CreateAsync(args, userOrg));

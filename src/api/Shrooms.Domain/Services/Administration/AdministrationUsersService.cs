@@ -156,7 +156,7 @@ namespace Shrooms.Domain.Services.Administration
             var user = await _usersDbSet.FirstAsync(u => u.Id == userId);
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
-                byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
+                byte[] data = data = await new HttpClient().GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
                 user.PictureId = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
                 await _uow.SaveChangesAsync(userId);
             }
@@ -229,7 +229,7 @@ namespace Shrooms.Domain.Services.Administration
 
             if (externalIdentity.FindFirst("picture") != null)
             {
-                var data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
+                var data = await new HttpClient().GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
                 var picture = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
                 user.PictureId = picture;
             }

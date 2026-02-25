@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -20,6 +21,7 @@ namespace Shrooms.Domain.Services.Picture
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
+        [SupportedOSPlatform("windows")]
         public async Task<string> UploadFromImageAsync(Image image, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);

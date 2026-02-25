@@ -12,7 +12,7 @@ namespace Shrooms.Infrastructure.Interceptors
 
         public TelemetryLoggingInterceptor()
         {
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
         }
 
         public void Intercept(IInvocation invocation)

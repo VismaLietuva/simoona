@@ -26,14 +26,20 @@ namespace Shrooms.Tests.Extensions
         public static HttpStatusCode GetStatusCode(this IActionResult result)
         {
             if (result is IStatusCodeActionResult statusCodeResult && statusCodeResult.StatusCode.HasValue)
+            {
                 return (HttpStatusCode)statusCodeResult.StatusCode.Value;
+            }
+
             return HttpStatusCode.OK;
         }
 
         public static T GetContent<T>(this IActionResult result)
         {
             if (result is ObjectResult objectResult)
+            {
                 return (T)objectResult.Value;
+            }
+
             return default;
         }
 
@@ -51,9 +57,14 @@ namespace Shrooms.Tests.Extensions
             {
                 var memberNames = validationResult.MemberNames.ToList();
                 if (!memberNames.Any())
+                {
                     memberNames.Add(string.Empty);
+                }
+
                 foreach (var member in memberNames)
+                {
                     controller.ModelState.AddModelError(member, validationResult.ErrorMessage);
+                }
             }
         }
 
@@ -70,9 +81,6 @@ namespace Shrooms.Tests.Extensions
             queryableMockSet.Expression.Returns(dataQueryable.Expression);
             queryableMockSet.ElementType.Returns(dataQueryable.ElementType);
             queryableMockSet.GetEnumerator().Returns(dataQueryable.GetEnumerator());
-            queryableMockSet.AsNoTracking().Returns(mockedDbSet);
-
-            mockedDbSet.Include(Arg.Any<string>()).Returns(mockedDbSet);
         }
 
         public static DbSet<T> MockDbSetForAsync<T>(this IUnitOfWork2 uow, IEnumerable<T> data = null)
@@ -85,8 +93,6 @@ namespace Shrooms.Tests.Extensions
             {
                 dbSetMock.SetDbSetDataForAsync(data);
             }
-
-            dbSetMock.Include(Arg.Any<string>()).Returns(dbSetMock);
 
             return dbSetMock;
         }

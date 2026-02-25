@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
+    <!-- Use 'annotations' mode: compiler emits nullability metadata (needed by EF Core) without enforcing it -->
+    <Nullable>annotations</Nullable>
     <AssemblyTitle>Shrooms.DataLayer.EntityModels</AssemblyTitle>
     <Product>Shrooms.DataLayer.EntityModels</Product>
   </PropertyGroup>

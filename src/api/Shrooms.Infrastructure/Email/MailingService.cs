@@ -20,7 +20,7 @@ namespace Shrooms.Infrastructure.Email
         public MailingService(IMailSendingService mailSendingService, IApplicationSettings appSettings)
         {
             _mailSendingService = mailSendingService;
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
             _emailBuildingStrategy = appSettings.EmailBuildingStrategy;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
@@ -7,7 +8,7 @@ using Shrooms.Premium.DataTransferObjects;
 
 namespace Shrooms.Premium.Infrastructure.GoogleBookApiService
 {
-    public class GoogleBookService : IBookInfoService
+    public sealed class GoogleBookService : IBookInfoService, IDisposable
     {
         private readonly BooksService _service;
 
@@ -17,6 +18,11 @@ namespace Shrooms.Premium.Infrastructure.GoogleBookApiService
             {
                 ApiKey = configuration["GoogleAccountApiKey"]
             });
+        }
+
+        public void Dispose()
+        {
+            _service.Dispose();
         }
 
         public async Task<ExternalBookInfo> FindBookByIsbnAsync(string isbn)

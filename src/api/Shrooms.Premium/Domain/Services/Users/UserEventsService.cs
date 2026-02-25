@@ -34,7 +34,7 @@ namespace Shrooms.Premium.Domain.Services.Users
 
         public async Task<IEnumerable<EventReminder>> GetReadyNotCompletedRemindersAsync(Organization organization)
         {
-            var readyRemindersPredicate = PredicateBuilder.False<EventReminder>()
+            var readyRemindersPredicate = PredicateBuilder.New<EventReminder>(false)
                 .Or(FilterReadyStartReminders())
                 .Or(FilterReadyDeadlineReminders())
                 .Expand();

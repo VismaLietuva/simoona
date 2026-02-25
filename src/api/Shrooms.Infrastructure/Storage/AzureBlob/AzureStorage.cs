@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -27,6 +28,7 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
             }
         }
 
+        [SupportedOSPlatform("windows")]
         public async Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var blobClient = GetBlobClient(blobKey, tenantPicturesContainer);

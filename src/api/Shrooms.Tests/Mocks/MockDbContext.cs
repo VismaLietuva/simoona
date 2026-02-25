@@ -535,9 +535,6 @@ namespace Shrooms.Tests.Mocks
             queryableMockSet.Expression.Returns(list.Expression);
             queryableMockSet.ElementType.Returns(list.ElementType);
             queryableMockSet.GetEnumerator().Returns(_ => list.GetEnumerator());
-            queryableMockSet.AsNoTracking().Returns(queryableMockSet);
-
-            mockedDbSet.Include(Arg.Any<string>()).Returns(mockedDbSet);
 
             return mockedDbSet;
         }

@@ -49,7 +49,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             _employeeListingService
                 .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             var args = new EmployeeListingArgsViewModel();
 

@@ -82,7 +82,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             // Arrange
             _eventService.GetReportEventDetailsAsync(Arg.Any<Guid>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var eventId = Guid.NewGuid();
 
@@ -131,7 +131,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetNotStartedEventsFilteredByTitleAsync(
                 Arg.Any<EventReportListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var reportArgsViewModel = new EventReportListingArgsViewModel();
 
@@ -180,7 +180,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetReportParticipantsAsync(
                 Arg.Any<EventParticipantsReportListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var reportArgsViewModel = new EventParticipantsReportListingArgsViewModel();
 
@@ -213,7 +213,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetEventParticipantVisitedReportEventsAsync(
                 Arg.Any<EventParticipantVisitedEventsListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
 

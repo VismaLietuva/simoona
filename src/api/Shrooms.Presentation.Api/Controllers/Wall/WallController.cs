@@ -22,8 +22,6 @@ using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using X.PagedList.Extensions;
 using X.PagedList.EF;

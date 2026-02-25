@@ -35,7 +35,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         public VacationService(IUnitOfWork2 unitOfWork2, IVacationDomainService vacationDomainService)
         {
             _uow = unitOfWork2;
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
 
             _applicationUserDbSet = unitOfWork2.GetDbSet<ApplicationUser>();
             _vacationDomainService = vacationDomainService;

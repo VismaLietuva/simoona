@@ -67,7 +67,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .CreateAsync(Arg.Any<CreateBlacklistUserDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
             var result = await _blacklistController.AddToBlacklist(args);
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .UpdateAsync(Arg.Any<UpdateBlacklistUserDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
             var result = await _blacklistController.UpdateBlacklist(args);
@@ -142,7 +142,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .CancelAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
             var result = await _blacklistController.CancelBlacklist(userId);
@@ -209,7 +209,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .GetAllExceptActiveAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
             var result = await _blacklistController.GetBlacklistHistory(userId);

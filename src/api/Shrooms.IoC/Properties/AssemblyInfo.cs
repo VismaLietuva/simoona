@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
-
 [assembly: Guid("6e972ba4-c333-4441-a9de-cedb0aa3c7ff")]
+[assembly: AssemblyVersion("1.0.0.0")]

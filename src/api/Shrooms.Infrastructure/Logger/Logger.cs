@@ -14,7 +14,7 @@ namespace Shrooms.Infrastructure.Logger
         public Logger()
         {
             _logger = LogManager.GetCurrentClassLogger();
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
         }
 
         public void Debug(string log, Exception e = null)

@@ -1,4 +1,6 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Shrooms.Presentation.Api.Helpers
 {
@@ -6,7 +8,11 @@ namespace Shrooms.Presentation.Api.Helpers
     {
         public static string RouteFromController(this IUrlHelper helper, string route, string controllerName, object routeData)
         {
-            return helper.RouteUrl(route, routeData) ?? string.Empty;
+            var urlPath = helper.RouteUrl(new UrlRouteContext { RouteName = route, Values = routeData }) ?? string.Empty;
+
+            var pos = urlPath.IndexOf(controllerName ?? string.Empty, StringComparison.Ordinal);
+
+            return pos < 2 ? urlPath : urlPath.Substring(pos - 1);
         }
     }
 }
