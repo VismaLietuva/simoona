@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
@@ -21,33 +21,33 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<CommentDto, CommentViewModel>();
+            CreateMap<CommentDto, CommentViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<EditCommentViewModel, EditCommentDto>()
+            CreateMap<EditCommentViewModel, EditCommentDto>(MemberList.None)
                 .IgnoreUserOrgDto()
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
-            CreateMap<NewCommentViewModel, NewCommentDto>()
+            CreateMap<NewCommentViewModel, NewCommentDto>(MemberList.None)
                 .IgnoreUserOrgDto()
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
-            CreateMap<CommentPostViewModel, EditCommentDto>()
+            CreateMap<CommentPostViewModel, EditCommentDto>(MemberList.None)
                 .IgnoreUserOrgDto();
-            CreateMap<CommentPostViewModel, NewCommentDto>()
+            CreateMap<CommentPostViewModel, NewCommentDto>(MemberList.None)
                 .IgnoreUserOrgDto();
         }
 
         private void CreateEntityToViewModel()
         {
-            CreateMap<Comment, Presentation.WebViewModels.Models.CommentViewModel>();
-            CreateMap<Comment, CommentPostViewModel>();
+            CreateMap<Comment, Presentation.WebViewModels.Models.CommentViewModel>(MemberList.None);
+            CreateMap<Comment, CommentPostViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToEntity()
         {
-            CreateMap<Presentation.WebViewModels.Models.CommentViewModel, Comment>();
-            CreateMap<CommentPostViewModel, Comment>();
+            CreateMap<Presentation.WebViewModels.Models.CommentViewModel, Comment>(MemberList.None);
+            CreateMap<CommentPostViewModel, Comment>(MemberList.None);
         }
     }
 }

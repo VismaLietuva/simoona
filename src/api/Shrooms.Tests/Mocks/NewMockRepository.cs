@@ -15,7 +15,7 @@ namespace Shrooms.Tests.Mocks
         private readonly List<TEntity> _listContext;
 
         public NewMockRepository(IDbContext context)
-            : base(context, Substitute.For<IApplicationSettings>())
+            : base(context, CreateMockSettings())
         {
             _listContext = context.Set<TEntity>().ToList();
         }
@@ -88,6 +88,13 @@ namespace Shrooms.Tests.Mocks
             var queryable = _listContext.AsQueryable();
             _dbSet.SetDbSetDataForAsync(queryable);
             return entity;
+        }
+
+        private static IApplicationSettings CreateMockSettings()
+        {
+            var settings = Substitute.For<IApplicationSettings>();
+            settings.DefaultOrganizationId.Returns(TestConstants.DefaultOrganizationId);
+            return settings;
         }
     }
 }

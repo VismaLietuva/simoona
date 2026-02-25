@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -36,21 +36,13 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         {
             var organization = await _organizationsDbSet.FirstAsync(org => org.ShortName == organizationName);
 
-            var sqlQuery = @"SELECT TOP(@userLimit) * FROM [dbo].[AspNetUsers] WHERE
-                             IsDeleted = 1 AND
-                             OrganizationId = @organizationId AND
-                             IsAnonymized = 0 AND
-                             DATEDIFF(DAY, Modified, GETDATE()) >= @anonymizeAfterDays";
-
-            var sqlParameters = new object[]
-            {
-                new SqlParameter("@organizationId", organization.Id),
-                new SqlParameter("@anonymizeAfterDays", _anonymizeUsersAfterDays),
-                new SqlParameter("@userLimit", _anonymizeUsersPerRequest)
-            };
-
+            var cutoffDate = DateTime.UtcNow.AddDays(-_anonymizeUsersAfterDays);
             var usersToAnonymize = await _usersDbSet
-                .FromSqlRaw(sqlQuery, sqlParameters)
+                .Where(u => u.IsDeleted &&
+                            u.OrganizationId == organization.Id &&
+                            !u.IsAnonymized &&
+                            u.Modified <= cutoffDate)
+                .Take(_anonymizeUsersPerRequest)
                 .ToListAsync();
 
             foreach (var user in usersToAnonymize)

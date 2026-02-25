@@ -11,18 +11,18 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
     {
         public Notifications()
         {
-            CreateMap<Notification, NotificationDto>()
+            CreateMap<Notification, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.SourceIds, opt => opt.MapFrom(u => u.Sources));
-            CreateMap<NotificationDto, NotificationViewModel>()
+            CreateMap<NotificationDto, NotificationViewModel>(MemberList.None)
                 .ForMember(dest => dest.stackedIds, opt => opt.MapFrom(src => new List<int>()))
                 .ForMember(dest => dest.others, opt => opt.MapFrom(src => 0));
 
-            CreateMap<WallPostViewModel, NotificationDto>()
+            CreateMap<WallPostViewModel, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(u => u.MessageBody))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(u => u.Author.FullName));
 
-            CreateMap<Sources, SourcesDto>();
-            CreateMap<SourcesDto, SourcesViewModel>();
+            CreateMap<Sources, SourcesDto>(MemberList.None);
+            CreateMap<SourcesDto, SourcesViewModel>(MemberList.None);
         }
     }
 }

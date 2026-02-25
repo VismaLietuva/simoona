@@ -11,10 +11,8 @@ using NSubstitute;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Tests.Mocks
 {
@@ -29,15 +27,13 @@ namespace Shrooms.Tests.Mocks
             return mockRoleStore;
         }
 
-        public static ShroomsUserStore MockShroomsUserStore(IDbContext context)
+        public static IUserStore<ApplicationUser> MockShroomsUserStore(IDbContext context)
         {
-            var mockShroomsUserStore = Substitute.For<ShroomsUserStore>(context);
-            var mockPermissionService = Substitute.For<IPermissionService>();
+            var mockShroomsUserStore = Substitute.For<IUserStore<ApplicationUser>>();
             mockShroomsUserStore.FindByNameAsync(string.Empty, default).Returns(Task.FromResult((ApplicationUser)null));
             mockShroomsUserStore.FindByNameAsync("user", default).Returns(Task.FromResult(new ApplicationUser { UserName = "user", Email = "user@test.lt" }));
             mockShroomsUserStore.FindByNameAsync("admin", default).Returns(Task.FromResult(new ApplicationUser { UserName = "admin", Email = "admin@test.lt" }));
             mockShroomsUserStore.FindByIdAsync(string.Empty, default).Returns(Task.FromResult(new ApplicationUser { UserName = "test", Email = "test@test.lt" }));
-            mockPermissionService.UserHasPermissionAsync(new UserAndOrganizationDto { UserId = string.Empty }, AdministrationPermissions.ApplicationUser).Returns(true);
             return mockShroomsUserStore;
         }
 

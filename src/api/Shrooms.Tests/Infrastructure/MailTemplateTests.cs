@@ -57,7 +57,7 @@ namespace Shrooms.Tests.Infrastructure
             Assembly.Load("Shrooms.Domain");
 
             var emailTemplatesConfig = new EmailTemplatesCompiler();
-            emailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
+            emailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
 
             _stopWatch.Stop();
             TestContext.Progress.WriteLine("Finished templates compilation.");
@@ -215,8 +215,7 @@ namespace Shrooms.Tests.Infrastructure
 
         private static string CreateTemplate<TEmailTemplate>(string body) where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            var model = $"@model {typeof(TEmailTemplate).FullName}";
-            return $"{model}\n{body}";
+            return body;
         }
 
         private static string GetLastAvailableTimeZoneKey()

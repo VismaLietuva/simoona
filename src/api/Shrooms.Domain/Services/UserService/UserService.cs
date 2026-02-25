@@ -223,19 +223,33 @@ namespace Shrooms.Domain.Services.UserService
             var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.NewUser).Id;
             var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.External).Id;
 
-            // EF Core doesn't have ApplicationUser.Roles navigation property, need to join with IdentityUserRole
+            // Materialize role memberships first to avoid cross-DbSet subqueries in LINQ expression trees
+            var rolesToFilter = new[] { newUserRoleId, externalRoleId };
+            var usersInFilteredRoles = await _userRolesDbSet
+                .Where(ur => rolesToFilter.Contains(ur.RoleId))
+                .Select(ur => new { ur.UserId, ur.RoleId })
+                .ToListAsync();
+
+            var newUserRoleUserIds = usersInFilteredRoles
+                .Where(ur => ur.RoleId == newUserRoleId)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+            var externalRoleUserIds = usersInFilteredRoles
+                .Where(ur => ur.RoleId == externalRoleId)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+
             var emailsQuery = from u in _usersDbSet
-                .Include(u => u.WallUsers)
+                    .Include(u => u.WallUsers)
                 where u.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled) &&
                       u.Email != senderEmail &&
-                      !_userRolesDbSet.Any(ur => ur.UserId == u.Id && ur.RoleId == newUserRoleId)
+                      !newUserRoleUserIds.Contains(u.Id)
                 select u;
 
-            // Apply external role filter inline (ExternalRoleFilter can't use navigation properties in EF Core)
             if (wall.Type != WallType.Events)
             {
                 emailsQuery = emailsQuery
-                    .Where(u => !_userRolesDbSet.Any(ur => ur.UserId == u.Id && ur.RoleId == externalRoleId));
+                    .Where(u => !externalRoleUserIds.Contains(u.Id));
             }
 
             var emails = await emailsQuery

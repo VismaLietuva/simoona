@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
 using Shrooms.Presentation.WebViewModels.Models;
 
@@ -13,7 +13,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<PermissionGroupDto, PermissionGroupViewModel>();
+            CreateMap<PermissionGroupDto, PermissionGroupViewModel>(MemberList.None);
         }
     }
 }

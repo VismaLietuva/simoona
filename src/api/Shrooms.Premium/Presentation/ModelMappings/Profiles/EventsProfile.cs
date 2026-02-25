@@ -19,84 +19,84 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<OfficeDto, EventOfficeViewModel>();
-            CreateMap<EventTypeDto, EventTypeViewModel>();
-            CreateMap<EventListItemDto, EventListItemViewModel>()
+            CreateMap<OfficeDto, EventOfficeViewModel>(MemberList.None);
+            CreateMap<EventTypeDto, EventTypeViewModel>(MemberList.None);
+            CreateMap<EventListItemDto, EventListItemViewModel>(MemberList.None)
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
-            CreateMap<EventDetailsListItemDto, EventDetailsListItemViewModel>();
-            CreateMap<EventOptionDto, EventOptionViewModel>();
-            CreateMap<EventDetailsDto, EventDetailsViewModel>()
+            CreateMap<EventDetailsListItemDto, EventDetailsListItemViewModel>(MemberList.None);
+            CreateMap<EventOptionDto, EventOptionViewModel>(MemberList.None);
+            CreateMap<EventDetailsDto, EventDetailsViewModel>(MemberList.None)
                 .Ignore(x => x.Comments)
                 .Ignore(x => x.IsForAllOffices)
                 .ForMember(dest => dest.OfficesName, opt => opt.MapFrom(u => u.Offices.OfficeNames));
 
-            CreateMap<NewEventOptionDto, NewEventOptionViewModel>();
-            CreateMap<NewEventOptionViewModel, NewEventOptionDto>();
+            CreateMap<NewEventOptionDto, NewEventOptionViewModel>(MemberList.None);
+            CreateMap<NewEventOptionViewModel, NewEventOptionDto>(MemberList.None);
 
-            CreateMap<EventFilteredArgsViewModel, EventFilteredArgsDto>()
+            CreateMap<EventFilteredArgsViewModel, EventFilteredArgsDto>(MemberList.None)
                 .Ignore(opt => opt.TypeIdParsed)
                 .Ignore(opt => opt.OfficeIdParsed);
 
-            CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>();
-            CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>();
-            CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>();
-            CreateMap<EventProjectReportDto, EventProjectReportViewModel>();
-            CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>();
+            CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>(MemberList.None);
+            CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>(MemberList.None);
+            CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>(MemberList.None);
+            CreateMap<EventProjectReportDto, EventProjectReportViewModel>(MemberList.None);
+            CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>(MemberList.None);
 
-            CreateMap<EventEditDetailsDto, EventEditDetailsViewModel>()
+            CreateMap<EventEditDetailsDto, EventEditDetailsViewModel>(MemberList.None)
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
-            CreateMap<EventOptionsDto, EventOptionsViewModel>();
+            CreateMap<EventOptionsDto, EventOptionsViewModel>(MemberList.None);
 
-            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>()
+            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
 
-            CreateMap<EventOfficesDto, EventOfficesViewModel>();
-            CreateMap<EventReportDetailsDto, EventReportDetailsViewModel>();
+            CreateMap<EventOfficesDto, EventOfficesViewModel>(MemberList.None);
+            CreateMap<EventReportDetailsDto, EventReportDetailsViewModel>(MemberList.None);
 
-            CreateMap<EventReminderDto, EventReminderViewModel>();
-            CreateMap<EventReminderDetailsDto, EventReminderDetailsViewModel>()
+            CreateMap<EventReminderDto, EventReminderViewModel>(MemberList.None);
+            CreateMap<EventReminderDetailsDto, EventReminderDetailsViewModel>(MemberList.None)
                 .ForMember(dest => dest.IsDisabled, opt => opt.MapFrom(u => u.RemindedCount > 0));
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateEventViewModel, CreateEventDto>()
+            CreateMap<CreateEventViewModel, CreateEventDto>(MemberList.None)
                 .Ignore(d => d.Id)
                 .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();
-            CreateMap<UpdateEventViewModel, EditEventDto>()
+            CreateMap<UpdateEventViewModel, EditEventDto>(MemberList.None)
                 .IgnoreUserOrgDto()
                 .Ignore(d => d.Offices);
-            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>();
-            CreateMap<EventJoinViewModel, EventJoinDto>()
+            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>(MemberList.None);
+            CreateMap<EventJoinViewModel, EventJoinDto>(MemberList.None)
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
-            CreateMap<EventJoinMultipleViewModel, EventJoinDto>()
+            CreateMap<EventJoinMultipleViewModel, EventJoinDto>(MemberList.None)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
-            CreateMap<EventOptionViewModel, EventOptionDto>();
+            CreateMap<EventOptionViewModel, EventOptionDto>(MemberList.None);
 
-            CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>()
+            CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(MemberList.None)
                 .IgnoreUserOrgDto();
 
-            CreateMap<EventDetailsOptionViewModel, EventDetailsOptionDto>();
-            CreateMap<EventDetailsParticipantViewModel, EventDetailsParticipantDto>();
-            CreateMap<EventVisitedReportViewModel, EventVisitedReportDto>();
-            CreateMap<EventProjectReportViewModel, EventProjectReportDto>();
-            CreateMap<EventParticipantReportViewModel, EventParticipantReportDto>();
+            CreateMap<EventDetailsOptionViewModel, EventDetailsOptionDto>(MemberList.None);
+            CreateMap<EventDetailsParticipantViewModel, EventDetailsParticipantDto>(MemberList.None);
+            CreateMap<EventVisitedReportViewModel, EventVisitedReportDto>(MemberList.None);
+            CreateMap<EventProjectReportViewModel, EventProjectReportDto>(MemberList.None);
+            CreateMap<EventParticipantReportViewModel, EventParticipantReportDto>(MemberList.None);
 
-            CreateMap<CreateEventTypeViewModel, CreateEventTypeDto>().IgnoreUserOrgDto();
-            CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>().IgnoreUserOrgDto();
-            CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>();
-            CreateMap<EventReportListingArgsViewModel, EventReportListingArgsDto>();
-            CreateMap<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>();
-            CreateMap<EventReminderViewModel, EventReminderDto>();
+            CreateMap<CreateEventTypeViewModel, CreateEventTypeDto>(MemberList.None).IgnoreUserOrgDto();
+            CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>(MemberList.None).IgnoreUserOrgDto();
+            CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>(MemberList.None);
+            CreateMap<EventReportListingArgsViewModel, EventReportListingArgsDto>(MemberList.None);
+            CreateMap<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>(MemberList.None);
+            CreateMap<EventReminderViewModel, EventReminderDto>(MemberList.None);
         }
 
         private void CreateEventsModelMappings()
         {
-            CreateMap<Event, Event>()
+            CreateMap<Event, Event>(MemberList.None)
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.EventParticipants, opt => opt.Ignore());
         }

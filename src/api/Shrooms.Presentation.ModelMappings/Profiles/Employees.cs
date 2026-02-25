@@ -14,14 +14,14 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<EmployeeListingArgsViewModel, EmployeeListingArgsDto>();
+            CreateMap<EmployeeListingArgsViewModel, EmployeeListingArgsDto>(MemberList.None);
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<EmployeeDto, EmployeeViewModel>()
+            CreateMap<EmployeeDto, EmployeeViewModel>(MemberList.None)
                 .ForMember(dest => dest.BlacklistEndDate, opt => opt.MapFrom(u => u.BlacklistEntry.EndDate));
-            CreateMap<WorkingHourslWithOutLunchDto, WorkingHourslWithOutLunchViewModel>();
+            CreateMap<WorkingHourslWithOutLunchDto, WorkingHourslWithOutLunchViewModel>(MemberList.None);
         }
     }
 }

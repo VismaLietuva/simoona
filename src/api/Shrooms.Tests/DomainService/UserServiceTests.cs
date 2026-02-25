@@ -33,6 +33,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<WallMember> _wallUsersDbSet;
         private DbSet<WallModerator> _wallModeratorsDbSet;
         private DbSet<ApplicationRole> _rolesDbSet;
+        private DbSet<IdentityUserRole<string>> _userRolesDbSet;
         private ShroomsUserManager _userManager;
         private IUserService _userService;
 
@@ -45,6 +46,7 @@ namespace Shrooms.Tests.DomainService
             _rolesDbSet = uow.MockDbSetForAsync(MockRolesForMailing());
             _wallUsersDbSet = uow.MockDbSetForAsync<WallMember>();
             _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
+            _userRolesDbSet = uow.MockDbSetForAsync<IdentityUserRole<string>>(new List<IdentityUserRole<string>>());
 
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
@@ -431,15 +433,9 @@ namespace Shrooms.Tests.DomainService
 
             _rolesDbSet.SetDbSetDataForAsync(roles.AsQueryable());
 
-            var user1 = Substitute.For<ApplicationUser>();
-            user1.Email = "user1";
-
-            var user2 = Substitute.For<ApplicationUser>();
-            user2.Email = "user2";
-
-            var user3 = Substitute.For<ApplicationUser>();
-            user3.Email = "user3";
-
+            var user1 = new ApplicationUser { Id = "uid1", Email = "user1" };
+            var user2 = new ApplicationUser { Id = "uid2", Email = "user2" };
+            var user3 = new ApplicationUser { Id = "uid3", Email = "user3" };
 
             var users = new List<ApplicationUser>
             {
@@ -449,6 +445,13 @@ namespace Shrooms.Tests.DomainService
             };
 
             _usersDbSet.SetDbSetDataForAsync(users);
+
+            var userRoles = new List<IdentityUserRole<string>>
+            {
+                new() { UserId = "uid1", RoleId = "roleId1" }
+            };
+
+            _userRolesDbSet.SetDbSetDataForAsync(userRoles);
         }
 
         private static IEnumerable<ApplicationRole> MockRolesForMailing()

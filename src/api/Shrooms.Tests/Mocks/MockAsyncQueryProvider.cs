@@ -49,10 +49,23 @@ namespace Shrooms.Tests.Mocks
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
             var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            // IQueryProvider has two Execute overloads (generic and non-generic); GetMethod throws AmbiguousMatchException in .NET 10
             var executeMethod = typeof(IQueryProvider)
-                .GetMethod(nameof(IQueryProvider.Execute))
+                .GetMethods()
+                .Single(m => m.Name == nameof(IQueryProvider.Execute) && m.IsGenericMethod)
                 .MakeGenericMethod(expectedResultType);
-            var result = executeMethod.Invoke(_inner, new object[] { expression });
+
+            object result;
+            try
+            {
+                result = executeMethod.Invoke(_inner, new object[] { expression });
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw; // unreachable
+            }
+
             return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
                 .MakeGenericMethod(expectedResultType)
                 .Invoke(null, new[] { result });

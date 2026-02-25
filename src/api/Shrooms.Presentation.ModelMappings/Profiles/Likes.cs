@@ -14,12 +14,12 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<LikeDto, LikeViewModel>();
+            CreateMap<LikeDto, LikeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<AddLikeViewModel, AddLikeDto>();
+            CreateMap<AddLikeViewModel, AddLikeDto>(MemberList.None);
         }
     }
 }

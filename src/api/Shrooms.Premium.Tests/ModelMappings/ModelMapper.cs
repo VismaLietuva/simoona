@@ -1,4 +1,3 @@
-﻿using System;
 using AutoMapper;
 using Shrooms.Premium.Presentation.ModelMappings.Profiles;
 

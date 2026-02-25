@@ -15,28 +15,28 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<ServiceRequestCommentPostViewModel, ServiceRequestCommentDto>();
-            CreateMap<ServiceRequestCreateViewModel, ServiceRequestDto>()
+            CreateMap<ServiceRequestCommentPostViewModel, ServiceRequestCommentDto>(MemberList.None);
+            CreateMap<ServiceRequestCreateViewModel, ServiceRequestDto>(MemberList.None)
                 .Ignore(x => x.Id)
                 .Ignore(x => x.StatusId)
                 .Ignore(x => x.CategoryName);
-            CreateMap<ServiceRequestUpdateViewModel, ServiceRequestDto>()
+            CreateMap<ServiceRequestUpdateViewModel, ServiceRequestDto>(MemberList.None)
                 .Ignore(x => x.CategoryName);
 
             //Service request category mappings
-            CreateMap<ServiceRequestCategoryViewModel, ServiceRequestCategoryDto>()
+            CreateMap<ServiceRequestCategoryViewModel, ServiceRequestCategoryDto>(MemberList.None)
                 .Ignore(x => x.IsNecessary);
-            CreateMap<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDto>()
+            CreateMap<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDto>(MemberList.None)
                 .Ignore(x => x.IsNecessary)
                 .Ignore(x => x.Id);
         }
 
         private void CreateViewModelMappings()
         {
-            CreateMap<ServiceRequestViewModel, ServiceRequest>().ReverseMap();
-            CreateMap<ServiceRequestPostViewModel, ServiceRequest>().ReverseMap();
+            CreateMap<ServiceRequestViewModel, ServiceRequest>(MemberList.None).ReverseMap();
+            CreateMap<ServiceRequestPostViewModel, ServiceRequest>(MemberList.None).ReverseMap();
 
-            CreateMap<ServiceRequestComment, ServiceRequestCommentViewModel>()
+            CreateMap<ServiceRequestComment, ServiceRequestCommentViewModel>(MemberList.None)
                .ForMember(dest => dest.EmployeeFirstName, opt => opt.MapFrom(src => src.Employee.FirstName))
                .ForMember(dest => dest.EmployeeLastName, opt => opt.MapFrom(src => src.Employee.LastName));
         }

@@ -19,23 +19,23 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<RetrievedBookInfoDto, RetrievedBookForPostViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookForPostViewModel>(MemberList.None);
 
-            CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>();
-            CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>();
-            CreateMap<BasicBookUserDto, BasicBookUserViewModel>();
-            CreateMap<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>();
-            CreateMap<BookDetailsDto, BookDetailsViewModel>();
-            CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>();
-            CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>();
-            CreateMap<BookQuantityByOfficeDto, BookQuantityByOfficeViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>(MemberList.None);
+            CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>(MemberList.None);
+            CreateMap<BasicBookUserDto, BasicBookUserViewModel>(MemberList.None);
+            CreateMap<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>(MemberList.None);
+            CreateMap<BookDetailsDto, BookDetailsViewModel>(MemberList.None);
+            CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>(MemberList.None);
+            CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>(MemberList.None);
+            CreateMap<BookQuantityByOfficeDto, BookQuantityByOfficeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<NewBookViewModel, NewBookDto>();
-            CreateMap<NewBookQuantityViewModel, NewBookQuantityDto>();
-            CreateMap<EditBookViewModel, EditBookDto>();
+            CreateMap<NewBookViewModel, NewBookDto>(MemberList.None);
+            CreateMap<NewBookQuantityViewModel, NewBookQuantityDto>(MemberList.None);
+            CreateMap<EditBookViewModel, EditBookDto>(MemberList.None);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Roles;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
 
@@ -13,9 +13,9 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<RoleDto, RoleViewModel>();
-            CreateMap<RoleUserDto, RoleUserViewModel>();
-            CreateMap<RoleDetailsDto, RoleDetailsViewModel>();
+            CreateMap<RoleDto, RoleViewModel>(MemberList.None);
+            CreateMap<RoleUserDto, RoleUserViewModel>(MemberList.None);
+            CreateMap<RoleDetailsDto, RoleDetailsViewModel>(MemberList.None);
         }
     }
 }

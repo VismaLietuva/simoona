@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,6 +50,28 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         {
             // Arrange
             var organization = _mockDbContext.Organizations.First();
+
+            var deletedUsers = new List<ApplicationUser>
+            {
+                new()
+                {
+                    Id = "d1",
+                    OrganizationId = organization.Id,
+                    IsDeleted = true,
+                    IsAnonymized = false,
+                    Modified = DateTime.UtcNow.AddDays(-30)
+                },
+                new()
+                {
+                    Id = "d2",
+                    OrganizationId = organization.Id,
+                    IsDeleted = true,
+                    IsAnonymized = false,
+                    Modified = DateTime.UtcNow.AddDays(-30)
+                }
+            };
+
+            _usersDbSet.SetDbSetDataForAsync(deletedUsers);
 
             // Act
             await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);

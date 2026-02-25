@@ -14,12 +14,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<KudosShopItemDto, KudosShopItemViewModel>();
+            CreateMap<KudosShopItemDto, KudosShopItemViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<KudosShopItemViewModel, KudosShopItemDto>().IgnoreUserOrgDto();
+            CreateMap<KudosShopItemViewModel, KudosShopItemDto>(MemberList.None).IgnoreUserOrgDto();
         }
     }
 }

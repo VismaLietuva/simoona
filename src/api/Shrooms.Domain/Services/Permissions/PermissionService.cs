@@ -94,12 +94,12 @@ namespace Shrooms.Domain.Services.Permissions
             }
 
             // Use join with IdentityUserRole junction table since ApplicationRole.Users navigation property doesn't exist in EF Core
-            var organizationScope = organizationId.ToString();
-            var permissionsQuery = from p in _permissionsDbSet
+            var permissionsQuery = (from p in _permissionsDbSet
                                    from r in p.Roles
                                    join ur in _userRolesDbSet on r.Id equals ur.RoleId
-                                   where ur.UserId == userId && p.Scope == organizationScope
-                                   select p;
+                                   where ur.UserId == userId
+                                   select p)
+                .Where(FilterActiveModules(organizationId));
 
             permissions = (await permissionsQuery.Distinct().ToListAsync()).Select(x => x.Name).ToList();
 

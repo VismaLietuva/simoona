@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Projects;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Projects;
@@ -16,21 +16,21 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<ProjectsListItemDto, ProjectsListItemViewModel>();
-            CreateMap<ProjectsAutoCompleteDto, ProjectsBasicInfoViewModel>();
-            CreateMap<EditProjectDisplayDto, EditProjectDisplayViewModel>();
-            CreateMap<ProjectDetailsDto, ProjectDetailsViewModel>();
+            CreateMap<ProjectsListItemDto, ProjectsListItemViewModel>(MemberList.None);
+            CreateMap<ProjectsAutoCompleteDto, ProjectsBasicInfoViewModel>(MemberList.None);
+            CreateMap<EditProjectDisplayDto, EditProjectDisplayViewModel>(MemberList.None);
+            CreateMap<ProjectDetailsDto, ProjectDetailsViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<NewProjectViewModel, NewProjectDto>();
-            CreateMap<EditProjectViewModel, EditProjectDto>();
+            CreateMap<NewProjectViewModel, NewProjectDto>(MemberList.None);
+            CreateMap<EditProjectViewModel, EditProjectDto>(MemberList.None);
         }
 
         private void CreateEntityToViewModelMappings()
         {
-            CreateMap<Project, ProjectsBasicInfoViewModel>();
+            CreateMap<Project, ProjectsBasicInfoViewModel>(MemberList.None);
         }
     }
 }

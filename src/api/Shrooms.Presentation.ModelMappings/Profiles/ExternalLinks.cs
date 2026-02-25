@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
 
@@ -14,16 +14,16 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<ExternalLinkDto, ExternalLinkViewModel>();
+            CreateMap<ExternalLinkDto, ExternalLinkViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<ManageExternalLinkViewModel, ManageExternalLinkDto>()
+            CreateMap<ManageExternalLinkViewModel, ManageExternalLinkDto>(MemberList.None)
                 .IgnoreUserOrgDto();
-            CreateMap<UpdatedExternalLinkViewModel, ExternalLinkDto>();
-            CreateMap<NewExternalLinkViewModel, NewExternalLinkDto>();
-            CreateMap<NewExternalLinkViewModel, ExternalLinkDto>()
+            CreateMap<UpdatedExternalLinkViewModel, ExternalLinkDto>(MemberList.None);
+            CreateMap<NewExternalLinkViewModel, NewExternalLinkDto>(MemberList.None);
+            CreateMap<NewExternalLinkViewModel, ExternalLinkDto>(MemberList.None)
                 .Ignore(x => x.Id);
         }
     }

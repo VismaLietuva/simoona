@@ -13,7 +13,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<OrganizationalStructureDto, OrganizationalStructureViewModel>();
+            CreateMap<OrganizationalStructureDto, OrganizationalStructureViewModel>(MemberList.None);
         }
     }
 }
