@@ -6,7 +6,6 @@
     <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>
     <AssemblyTitle>Shrooms.Premium.Tests</AssemblyTitle>
     <Product>Shrooms.Premium.Tests</Product>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <DebugType>pdbonly</DebugType>
     <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
     <IsPackable>false</IsPackable>
