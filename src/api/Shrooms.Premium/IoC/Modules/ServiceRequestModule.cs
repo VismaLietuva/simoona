@@ -1,17 +1,17 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.Email.ServiceRequest;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class ServiceRequestModule : Module
+    public static class ServiceRequestModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumServiceRequest(this IServiceCollection services)
         {
-            builder.RegisterType<ServiceRequestService>().As<IServiceRequestService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<ServiceRequestNotificationService>().As<IServiceRequestNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<ServiceRequestExportService>().As<IServiceRequestExportService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IServiceRequestService, ServiceRequestService>();
+            services.AddScoped<IServiceRequestNotificationService, ServiceRequestNotificationService>();
+            services.AddScoped<IServiceRequestExportService, ServiceRequestExportService>();
+            return services;
         }
     }
 }

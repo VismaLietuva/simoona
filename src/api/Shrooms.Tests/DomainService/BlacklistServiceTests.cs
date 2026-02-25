@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Shrooms.Tests.Extensions;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
@@ -178,7 +178,7 @@ namespace Shrooms.Tests.DomainService
             await _blacklistService.CancelAsync(userId, userOrg);
 
             // Assert
-            Assert.AreEqual(BlacklistStatus.Canceled, blacklistEntryToCancel.Status);
+            Assert.That(blacklistEntryToCancel.Status, Is.EqualTo(BlacklistStatus.Canceled));
         }
 
         [Test]
@@ -226,7 +226,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _blacklistService.GetAsync(userId, userOrg);
 
             // Assert
-            Assert.AreEqual(shouldFindThis.UserId, result.UserId);
+            Assert.That(result.UserId, Is.EqualTo(shouldFindThis.UserId));
         }
 
         [Test]
@@ -272,7 +272,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _blacklistService.GetAsync(userId, userOrg);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -410,9 +410,9 @@ namespace Shrooms.Tests.DomainService
             await _blacklistService.UpdateAsync(updateDto, userOrg);
 
             // Assert
-            Assert.AreEqual(updateDto.UserId, updatedBlacklistEntry.UserId);
-            Assert.AreEqual(updateDto.Reason, updatedBlacklistEntry.Reason);
-            Assert.AreEqual(updateDto.EndDate, updatedBlacklistEntry.EndDate);
+            Assert.That(updatedBlacklistEntry.UserId, Is.EqualTo(updateDto.UserId));
+            Assert.That(updatedBlacklistEntry.Reason, Is.EqualTo(updateDto.Reason));
+            Assert.That(updatedBlacklistEntry.EndDate, Is.EqualTo(updateDto.EndDate));
         }
 
         [Test]
@@ -449,9 +449,9 @@ namespace Shrooms.Tests.DomainService
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
-            Assert.AreEqual(foundEntry.UserId, result.UserId);
-            Assert.AreEqual(foundEntry.Reason, result.Reason);
-            Assert.AreEqual(foundEntry.EndDate, result.EndDate);
+            Assert.That(result.UserId, Is.EqualTo(foundEntry.UserId));
+            Assert.That(result.Reason, Is.EqualTo(foundEntry.Reason));
+            Assert.That(result.EndDate, Is.EqualTo(foundEntry.EndDate));
         }
 
         [Test]
@@ -488,7 +488,7 @@ namespace Shrooms.Tests.DomainService
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -501,7 +501,7 @@ namespace Shrooms.Tests.DomainService
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -514,7 +514,7 @@ namespace Shrooms.Tests.DomainService
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -547,7 +547,7 @@ namespace Shrooms.Tests.DomainService
             var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -580,7 +580,7 @@ namespace Shrooms.Tests.DomainService
             _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]

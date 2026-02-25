@@ -12,13 +12,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
-using WebApi.OutputCache.V2;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 {
     [Authorize]
-    [RoutePrefix("Lottery")]
+    [Route("Lottery")]
     public class LotteryController : BaseController
     {
         private readonly IMapper _mapper;
@@ -34,7 +34,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         }
 
         [Route("All")]
-        public async Task<IHttpActionResult> GetAllLotteries()
+        public async Task<IActionResult> GetAllLotteries()
         {
             var lotteriesDto = await _lotteryService.GetLotteriesAsync(GetUserAndOrganization());
 
@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public async Task<IHttpActionResult> GetPagedLotteries([FromUri] LotteryListingArgsViewModel lotteryArgsViewModel)
+        public async Task<IActionResult> GetPagedLotteries([FromQuery] LotteryListingArgsViewModel lotteryArgsViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Details")]
-        public async Task<IHttpActionResult> GetLottery(int id, bool includeBuyer = false)
+        public async Task<IActionResult> GetLottery(int id, bool includeBuyer = false)
         {
             var lottery = await _lotteryService.GetLotteryDetailsAsync(id, includeBuyer, GetUserAndOrganization());
 
@@ -80,8 +80,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPost]
         [Route("Create")]
-        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel createViewModel)
+        public async Task<IActionResult> CreateLottery(CreateLotteryViewModel createViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -104,8 +103,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Abort")]
-        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> Abort(int id)
+        public async Task<IActionResult> Abort(int id)
         {
             var success = await _lotteryService.AbortLotteryAsync(id, GetUserAndOrganization());
 
@@ -119,7 +117,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPost]
         [Route("Enter")]
-        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketsViewModel lotteryTickets)
+        public async Task<IActionResult> BuyLotteryTicket(BuyLotteryTicketsViewModel lotteryTickets)
         {
             if (!ModelState.IsValid)
             {
@@ -146,7 +144,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Refund")]
-        public async Task<IHttpActionResult> RefundParticipants(int id)
+        public async Task<IActionResult> RefundParticipants(int id)
         {
             await _lotteryService.RefundParticipantsAsync(id, GetUserAndOrganization());
 
@@ -155,7 +153,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Status")]
-        public async Task<IHttpActionResult> GetStatus(int id)
+        public async Task<IActionResult> GetStatus(int id)
         {
             var status = await _lotteryService.GetLotteryStatusAsync(id, GetUserAndOrganization());
 
@@ -164,8 +162,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPut]
         [Route("UpdateDrafted")]
-        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
+        public async Task<IActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -188,8 +185,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("UpdateStarted")]
-        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
+        public async Task<IActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -212,8 +208,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Finish")]
-        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> FinishLottery(int id)
+        public async Task<IActionResult> FinishLottery(int id)
         {
             try
             {
@@ -229,7 +224,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Stats")]
-        public async Task<IHttpActionResult> LotteryStats(int id)
+        public async Task<IActionResult> LotteryStats(int id)
         {
             var lotteryStats = await _lotteryService.GetLotteryStatsAsync(id, GetUserAndOrganization());
 
@@ -244,17 +239,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [Route("Export")]
-        public async Task<IHttpActionResult> Export(int lotteryId)
+        public async Task<IActionResult> Export(int lotteryId)
         {
             try
             {
                 var content = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
-                var result = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = content
-                };
-
-                return ResponseMessage(result);
+                var bytes = await content.ReadAsByteArrayAsync();
+                return File(bytes, "application/vnd.ms-excel");
             }
             catch (LotteryException e)
             {

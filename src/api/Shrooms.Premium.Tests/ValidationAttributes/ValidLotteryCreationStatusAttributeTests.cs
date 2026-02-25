@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries;
 using System;
@@ -19,7 +20,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var actual = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsTrue(actual);
+            ClassicAssert.IsTrue(actual);
         }
 
         [Test]
@@ -44,7 +45,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var actual = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsFalse(actual);
+            ClassicAssert.IsFalse(actual);
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var actual = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsFalse(actual);
+            ClassicAssert.IsFalse(actual);
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var actual = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsTrue(actual);
+            ClassicAssert.IsTrue(actual);
         }
     }
 }

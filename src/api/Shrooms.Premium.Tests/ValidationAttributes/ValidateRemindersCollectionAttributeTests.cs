@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
@@ -31,7 +32,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
 
         [Test]
@@ -63,7 +64,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -115,7 +116,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -142,7 +143,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -169,7 +170,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -197,7 +198,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Reminders, context);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
     }
 }

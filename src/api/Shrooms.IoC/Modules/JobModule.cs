@@ -1,14 +1,14 @@
-using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Jobs;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class JobModule : Module
+    public static class JobModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddJobs(this IServiceCollection services)
         {
-            builder.RegisterType<JobService>().As<IJobService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IJobService, JobService>();
+            return services;
         }
     }
 }

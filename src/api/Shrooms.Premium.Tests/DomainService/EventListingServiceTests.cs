@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -72,9 +73,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).ToList();
 
-            Assert.AreEqual(3, result.Count);
-            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, AttendingStatus.Attending);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
+            ClassicAssert.AreEqual(3, result.Count);
+            ClassicAssert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, AttendingStatus.Attending);
+            ClassicAssert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
 
         [Test]
@@ -98,8 +99,8 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).ToList();
 
-            Assert.AreEqual(1, result.Count);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 
         [Test]
@@ -113,9 +114,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var result = await _eventListingService.GetEventOptionsAsync(eventsGuids[1], userOrg);
 
-            Assert.AreEqual(result.Options.Count(), 2);
-            Assert.AreEqual(result.Options.First(o => o.Id == 4).Option, "Option1");
-            Assert.AreEqual(result.Options.First(o => o.Id == 5).Option, "Option2");
+            ClassicAssert.AreEqual(result.Options.Count(), 2);
+            ClassicAssert.AreEqual(result.Options.First(o => o.Id == 4).Option, "Option1");
+            ClassicAssert.AreEqual(result.Options.First(o => o.Id == 5).Option, "Option2");
         }
 
         [Test]
@@ -124,7 +125,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             var startDate = DateTime.Parse("2016-04-28");
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(deadlineDate, startDate));
-            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
+            ClassicAssert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
         }
 
         [Test]
@@ -149,7 +150,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
+            ClassicAssert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         [Test]
@@ -158,7 +159,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
+            ClassicAssert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         [Test]
@@ -186,7 +187,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportListingArgs, userOrg);
 
             // Assert
-            Assert.IsInstanceOf<IPagedList>(result);
+            ClassicAssert.IsInstanceOf<IPagedList>(result);
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.Name.Contains(reportListingArgs.SearchString)));
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate > DateTime.UtcNow));
         }
@@ -218,8 +219,8 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportListingArgs, userOrg);
 
             // Assert
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedCount, result.Count);
+            ClassicAssert.IsInstanceOf<IPagedList>(result);
+            ClassicAssert.AreEqual(expectedCount, result.Count);
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate > DateTime.UtcNow));
         }
 
@@ -254,7 +255,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportListingArgs, userOrg);
 
             // Assert
-            Assert.IsInstanceOf<IPagedList>(result);
+            ClassicAssert.IsInstanceOf<IPagedList>(result);
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => expectedEventIds.Contains(item.Id)));
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate > DateTime.UtcNow));
         }
@@ -291,7 +292,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportListingArgs, userOrg);
 
             // Assert
-            Assert.IsInstanceOf<IPagedList>(result);
+            ClassicAssert.IsInstanceOf<IPagedList>(result);
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => expectedEventIds.Contains(item.Id)));
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate > DateTime.UtcNow));
         }
@@ -329,7 +330,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportListingArgs, userOrg);
 
             // Assert
-            Assert.IsInstanceOf<IPagedList>(result);
+            ClassicAssert.IsInstanceOf<IPagedList>(result);
             Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate > DateTime.UtcNow));
             CollectionAssert.AreEqual(expectedEventIdsByNameOrder, result.Select(item => item.Id));
         }
@@ -362,7 +363,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.AreEqual(expectedParticipantCount, result.Count);
+            ClassicAssert.AreEqual(expectedParticipantCount, result.Count);
         }
 
         [Test]
@@ -393,7 +394,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.AreEqual(expectedVisitedEventsCount, result.First().VisitedEvents.Count);
+            ClassicAssert.AreEqual(expectedVisitedEventsCount, result.First().VisitedEvents.Count);
             Assert.That(result.First().VisitedEvents, Is.All.Matches<EventVisitedReportDto>(visited => visited.TypeName == "Cool type"));
         }
 
@@ -492,7 +493,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.AreEqual(expectedKudosPoints, result.First().Kudos);
+            ClassicAssert.AreEqual(expectedKudosPoints, result.First().Kudos);
         }
 
         [Test]
@@ -523,7 +524,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.AreEqual(expectedKudosPoints, result.First().Kudos);
+            ClassicAssert.AreEqual(expectedKudosPoints, result.First().Kudos);
         }
 
         [Test]
@@ -553,7 +554,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(args, userOrg);
 
             // Assert
-            Assert.AreEqual(expectedCount, result.Count);
+            ClassicAssert.AreEqual(expectedCount, result.Count);
         }
 
         [Test]

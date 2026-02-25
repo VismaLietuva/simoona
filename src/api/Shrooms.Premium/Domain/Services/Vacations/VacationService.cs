@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Excel;
+using ExcelDataReader;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -21,7 +20,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private readonly IUnitOfWork2 _uow;
         private readonly TelemetryClient _telemetryClient;
 
-        private readonly IDbSet<ApplicationUser> _applicationUserDbSet;
+        private readonly DbSet<ApplicationUser> _applicationUserDbSet;
         private readonly IVacationDomainService _vacationDomainService;
 
         private const int CodeColIndex = 0;
@@ -44,10 +43,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         public async Task<VacationImportStatusDto> UploadVacationReportFileAsync(Stream fileStream)
         {
-            var excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
+            using var excelReader = ExcelReaderFactory.CreateReader(fileStream);
 
-            var sheets = GetWorksheetNames(excelReader);
-            var workSheet = GetWorksheetData(excelReader, sheets.First());
+            var rows = ReadFirstSheetRows(excelReader);
 
             var importStatus = new VacationImportStatusDto
             {
@@ -55,8 +53,13 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 Skipped = new List<VacationImportEntryDto>()
             };
 
-            foreach (var row in workSheet)
+            foreach (var row in rows)
             {
+                if (row.Length <= VacationUnusedTimeColIndex)
+                {
+                    continue;
+                }
+
                 var acceptableData = row[CodeColIndex] is string && row[FullnameColIndex] is string
                                           && row[OperationColIndex] is string && row[OfficeColIndex] is string
                                           && row[JobTitleColIndex] is string
@@ -76,9 +79,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
                 if (userToUpdate != null)
                 {
-                    var fullTime = (double)row[VacationTotalTimeColIndex];
-                    var usedTime = (double)row[VacationUsedTimeColIndex];
-                    var unusedTime = (double)row[VacationUnusedTimeColIndex];
+                    var fullTime = Convert.ToDouble(row[VacationTotalTimeColIndex]);
+                    var usedTime = Convert.ToDouble(row[VacationUsedTimeColIndex]);
+                    var unusedTime = Convert.ToDouble(row[VacationUnusedTimeColIndex]);
 
                     userToUpdate.VacationTotalTime = fullTime;
                     userToUpdate.VacationUsedTime = usedTime;
@@ -106,7 +109,6 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             await _uow.SaveChangesAsync();
-            excelReader.Close();
 
             return importStatus;
         }
@@ -125,18 +127,18 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return availableDaysModel;
         }
 
-        private static IEnumerable<string> GetWorksheetNames(IExcelDataReader excelReader)
+        private static IEnumerable<object[]> ReadFirstSheetRows(IExcelDataReader reader)
         {
-            var workbook = excelReader.AsDataSet();
-            var sheets = from DataTable sheet in workbook.Tables select sheet.TableName;
-            return sheets;
-        }
-
-        private static IEnumerable<DataRow> GetWorksheetData(IExcelDataReader excelReader, string sheet, bool firstRowIsColumnNames = false)
-        {
-            excelReader.IsFirstRowAsColumnNames = firstRowIsColumnNames;
-            var workSheet = excelReader.AsDataSet().Tables[sheet];
-            var rows = from DataRow a in workSheet.Rows select a;
+            var rows = new List<object[]>();
+            while (reader.Read())
+            {
+                var row = new object[reader.FieldCount];
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    row[i] = reader.GetValue(i);
+                }
+                rows.Add(row);
+            }
             return rows;
         }
     }

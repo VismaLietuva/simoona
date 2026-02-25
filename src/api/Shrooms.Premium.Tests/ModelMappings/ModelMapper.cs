@@ -8,7 +8,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
     {
         public static IMapper Create()
         {
-            Action<IMapperConfiguration> mappings = cfg =>
+            var configuration = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<OrganizationalStructureProfile>();
                 cfg.AddProfile<ServiceRequestProfile>();
@@ -18,9 +18,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 cfg.AddProfile<EventsProfile>();
                 cfg.AddProfile<VacationsProfile>();
                 cfg.AddProfile<LotteryProfile>();
-            };
-
-            var configuration = new MapperConfiguration(mappings);
+            });
             return configuration.CreateMapper();
         }
     }

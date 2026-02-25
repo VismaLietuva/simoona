@@ -1,17 +1,17 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Resources;
 using System.Collections.Generic;
-using System.Web.Http;
-using System.Web.Http.Cors;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     [AllowAnonymous]
-    public class LocalizationController : ApiController
+    public class LocalizationController : ControllerBase
     {
         [HttpGet]
+        [Route("Localization/GetResource")]
         [PermissionAuthorize(Permission = BasicPermissions.Localization)]
         public object GetResource(string resource, string language)
         {
@@ -19,8 +19,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("Localization/GetResources")]
         [PermissionAuthorize(Permission = BasicPermissions.Localization)]
-        public IEnumerable<object> GetResources([FromUri] string[] resources, string language)
+        public IEnumerable<object> GetResources([FromQuery] string[] resources, string language)
         {
             foreach (var resource in resources)
             {

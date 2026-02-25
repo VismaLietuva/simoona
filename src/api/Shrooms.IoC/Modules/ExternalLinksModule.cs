@@ -1,14 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.ExternalLinks;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class ExternalLinksModule : Module
+    public static class ExternalLinksModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddExternalLinks(this IServiceCollection services)
         {
-            builder.RegisterType<ExternalLinkService>().As<IExternalLinkService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IExternalLinkService, ExternalLinkService>();
+            return services;
         }
     }
 }

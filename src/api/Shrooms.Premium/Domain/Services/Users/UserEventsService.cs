@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.SqlServer;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -17,9 +16,9 @@ namespace Shrooms.Premium.Domain.Services.Users
 {
     public class UserEventsService : IUserEventsService
     {
-        private readonly IDbSet<ApplicationUser> _usersDb;
-        private readonly IDbSet<EventParticipant> _eventParticipantsDb;
-        private readonly IDbSet<EventReminder> _eventRemindersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDb;
+        private readonly DbSet<EventParticipant> _eventParticipantsDb;
+        private readonly DbSet<EventReminder> _eventRemindersDbSet;
 
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
@@ -81,27 +80,28 @@ namespace Shrooms.Premium.Domain.Services.Users
         private Expression<Func<EventReminder, bool>> FilterReadyStartReminders()
         {
             return reminder => reminder.Type == EventReminderType.Start &&
-                               DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
+                               reminder.Event.StartDate.AddDays(-reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
                                reminder.Event.StartDate > _systemClock.UtcNow;
         }
 
         private Expression<Func<EventReminder, bool>> FilterReadyDeadlineReminders()
         {
             return reminder => reminder.Type == EventReminderType.Deadline &&
-                               DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
+                               reminder.Event.RegistrationDeadline.AddDays(-reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
                                reminder.Event.RegistrationDeadline > _systemClock.UtcNow;
         }
 
         private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)
         {
             var now = DateTime.UtcNow;
-            var weekAfter = now.AddDays(7);
+            var startOfWeek = now.Date.AddDays(-(int)now.DayOfWeek);
+            var endOfWeek = startOfWeek.AddDays(7);
 
             var usersToDiscard = _eventParticipantsDb
                 .Where(x => x.AttendStatus == (int)AttendingStatus.Attending &&
                             eventTypeIds.Contains(x.Event.EventTypeId) &&
-                            SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", now) &&
-                            x.Event.StartDate > now && x.Event.StartDate < weekAfter)
+                            x.Event.StartDate >= startOfWeek && x.Event.StartDate < endOfWeek &&
+                            x.Event.StartDate > now && x.Event.StartDate < now.AddDays(7))
                 .Select(x => x.ApplicationUserId);
 
             return _usersDb

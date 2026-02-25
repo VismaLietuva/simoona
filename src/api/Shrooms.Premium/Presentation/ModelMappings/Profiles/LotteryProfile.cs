@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class LotteryProfile : Profile
     {
-        protected override void Configure()
+        public LotteryProfile()
         {
             CreateViewModelToDtoMappings();
             CreateDtoToViewModelMappings();

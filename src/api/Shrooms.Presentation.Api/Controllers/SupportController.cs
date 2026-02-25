@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
 using Shrooms.Domain.Services.Support;
@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -29,20 +29,20 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [PermissionAuthorize(Permission = BasicPermissions.Support)]
         [HttpPost]
-        public async Task<HttpResponseMessage> SubmitTicket(SupportPostViewModel support)
+        public async Task<IActionResult> SubmitTicket(SupportPostViewModel support)
         {
             var maxSupportTypeIndex = Enum.GetValues(typeof(SupportType)).Cast<int>().Max();
 
             if (!ModelState.IsValid || maxSupportTypeIndex < support.Type)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var supportDto = _mapper.Map<SupportPostViewModel, SupportDto>(support);
 
             await _supportService.SubmitTicketAsync(GetUserAndOrganization(), supportDto);
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Support)]

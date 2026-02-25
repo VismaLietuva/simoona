@@ -1,29 +1,21 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Threading;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Results
 {
-    public class ChallengeResult : IHttpActionResult
+    public class ChallengeResult : IActionResult
     {
-        public ChallengeResult(string loginProvider, ApiController controller)
+        public ChallengeResult(string loginProvider)
         {
             LoginProvider = loginProvider;
-            Request = controller.Request;
         }
 
         public string LoginProvider { get; set; }
-        public HttpRequestMessage Request { get; set; }
 
-        public Task<HttpResponseMessage> ExecuteAsync(CancellationToken cancellationToken)
+        public async Task ExecuteResultAsync(ActionContext context)
         {
-            Request.GetOwinContext().Authentication.Challenge(LoginProvider);
-
-            var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            response.RequestMessage = Request;
-            return Task.FromResult(response);
+            await context.HttpContext.ChallengeAsync(LoginProvider);
         }
     }
 }

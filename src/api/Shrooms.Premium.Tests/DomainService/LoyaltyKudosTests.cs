@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -70,16 +71,16 @@ namespace Shrooms.Premium.Tests.DomainService
             var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(oneYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
-            Assert.AreEqual(oneYearEmployee.Id, loyaltyKudosLog.EmployeeId);
-            Assert.AreEqual(20, loyaltyKudosLog.Points);
-            Assert.AreEqual(2, loyaltyKudosLog.MultiplyBy);
-            Assert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
-            Assert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
-            Assert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
-            Assert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
-            Assert.AreEqual("Kudos for 1 year loyalty", loyaltyKudosLog.Comments);
-            Assert.AreEqual(20, oneYearEmployee.RemainingKudos);
-            Assert.AreEqual(30, oneYearEmployee.TotalKudos);
+            ClassicAssert.AreEqual(oneYearEmployee.Id, loyaltyKudosLog.EmployeeId);
+            ClassicAssert.AreEqual(20, loyaltyKudosLog.Points);
+            ClassicAssert.AreEqual(2, loyaltyKudosLog.MultiplyBy);
+            ClassicAssert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
+            ClassicAssert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
+            ClassicAssert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
+            ClassicAssert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
+            ClassicAssert.AreEqual("Kudos for 1 year loyalty", loyaltyKudosLog.Comments);
+            ClassicAssert.AreEqual(20, oneYearEmployee.RemainingKudos);
+            ClassicAssert.AreEqual(30, oneYearEmployee.TotalKudos);
         }
 
         [Test]
@@ -110,16 +111,16 @@ namespace Shrooms.Premium.Tests.DomainService
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
-            Assert.AreEqual(twoYearEmployee.Id, loyaltyKudosLog.EmployeeId);
-            Assert.AreEqual(20, loyaltyKudosLog.Points);
-            Assert.AreEqual(2, loyaltyKudosLog.MultiplyBy);
-            Assert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
-            Assert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
-            Assert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
-            Assert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
-            Assert.AreEqual("Kudos for 2 year loyalty", loyaltyKudosLog.Comments);
-            Assert.AreEqual(20, twoYearEmployee.RemainingKudos);
-            Assert.AreEqual(30, twoYearEmployee.TotalKudos);
+            ClassicAssert.AreEqual(twoYearEmployee.Id, loyaltyKudosLog.EmployeeId);
+            ClassicAssert.AreEqual(20, loyaltyKudosLog.Points);
+            ClassicAssert.AreEqual(2, loyaltyKudosLog.MultiplyBy);
+            ClassicAssert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
+            ClassicAssert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
+            ClassicAssert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
+            ClassicAssert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
+            ClassicAssert.AreEqual("Kudos for 2 year loyalty", loyaltyKudosLog.Comments);
+            ClassicAssert.AreEqual(20, twoYearEmployee.RemainingKudos);
+            ClassicAssert.AreEqual(30, twoYearEmployee.TotalKudos);
         }
 
         [Test]
@@ -150,16 +151,16 @@ namespace Shrooms.Premium.Tests.DomainService
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
-            Assert.AreEqual(threeYearEmployee.Id, loyaltyKudosLog.EmployeeId);
-            Assert.AreEqual(40, loyaltyKudosLog.Points);
-            Assert.AreEqual(4, loyaltyKudosLog.MultiplyBy);
-            Assert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
-            Assert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
-            Assert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
-            Assert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
-            Assert.AreEqual("Kudos for 3 year loyalty", loyaltyKudosLog.Comments);
-            Assert.AreEqual(40, threeYearEmployee.RemainingKudos);
-            Assert.AreEqual(50, threeYearEmployee.TotalKudos);
+            ClassicAssert.AreEqual(threeYearEmployee.Id, loyaltyKudosLog.EmployeeId);
+            ClassicAssert.AreEqual(40, loyaltyKudosLog.Points);
+            ClassicAssert.AreEqual(4, loyaltyKudosLog.MultiplyBy);
+            ClassicAssert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
+            ClassicAssert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
+            ClassicAssert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
+            ClassicAssert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
+            ClassicAssert.AreEqual("Kudos for 3 year loyalty", loyaltyKudosLog.Comments);
+            ClassicAssert.AreEqual(40, threeYearEmployee.RemainingKudos);
+            ClassicAssert.AreEqual(50, threeYearEmployee.TotalKudos);
         }
 
         [Test]
@@ -190,16 +191,16 @@ namespace Shrooms.Premium.Tests.DomainService
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
-            Assert.AreEqual(threeYearEmployee.Id, loyaltyKudosLog.EmployeeId);
-            Assert.AreEqual(40, loyaltyKudosLog.Points);
-            Assert.AreEqual(4, loyaltyKudosLog.MultiplyBy);
-            Assert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
-            Assert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
-            Assert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
-            Assert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
-            Assert.AreEqual("Kudos for 10 year loyalty", loyaltyKudosLog.Comments);
-            Assert.AreEqual(40, threeYearEmployee.RemainingKudos);
-            Assert.AreEqual(50, threeYearEmployee.TotalKudos);
+            ClassicAssert.AreEqual(threeYearEmployee.Id, loyaltyKudosLog.EmployeeId);
+            ClassicAssert.AreEqual(40, loyaltyKudosLog.Points);
+            ClassicAssert.AreEqual(4, loyaltyKudosLog.MultiplyBy);
+            ClassicAssert.AreEqual(KudosStatus.Approved, loyaltyKudosLog.Status);
+            ClassicAssert.AreEqual(loyaltyKudosType.Value, loyaltyKudosLog.KudosTypeValue);
+            ClassicAssert.AreEqual(loyaltyKudosType.Name, loyaltyKudosLog.KudosTypeName);
+            ClassicAssert.AreEqual("KudosLoyaltyBot", loyaltyKudosLog.CreatedBy);
+            ClassicAssert.AreEqual("Kudos for 10 year loyalty", loyaltyKudosLog.Comments);
+            ClassicAssert.AreEqual(40, threeYearEmployee.RemainingKudos);
+            ClassicAssert.AreEqual(50, threeYearEmployee.TotalKudos);
         }
 
         [Test]
@@ -228,9 +229,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
-            Assert.AreEqual(null, loyaltyKudosLog);
-            Assert.AreEqual(0, twoYearEmployee.RemainingKudos);
-            Assert.AreEqual(10, twoYearEmployee.TotalKudos);
+            ClassicAssert.AreEqual(null, loyaltyKudosLog);
+            ClassicAssert.AreEqual(0, twoYearEmployee.RemainingKudos);
+            ClassicAssert.AreEqual(10, twoYearEmployee.TotalKudos);
         }
 
         [Test]
@@ -259,7 +260,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentException>(Action);
-            Assert.AreEqual("yearOfEmployment", e.ParamName);
+            ClassicAssert.AreEqual("yearOfEmployment", e.ParamName);
         }
 
         [Test]
@@ -280,7 +281,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentNullException>(Action);
-            Assert.AreEqual("recipient", e.ParamName);
+            ClassicAssert.AreEqual("recipient", e.ParamName);
         }
 
         [Test]
@@ -303,7 +304,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentNullException>(Action);
-            Assert.AreEqual("loyaltyKudosType", e.ParamName);
+            ClassicAssert.AreEqual("loyaltyKudosType", e.ParamName);
         }
 
         [Test]
@@ -334,7 +335,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentException>(Action);
-            Assert.AreEqual("kudosYearlyMultipliers", e.ParamName);
+            ClassicAssert.AreEqual("kudosYearlyMultipliers", e.ParamName);
         }
 
         [Test]
@@ -364,7 +365,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentException>(Action);
-            Assert.AreEqual("kudosYearlyMultipliers", e.ParamName);
+            ClassicAssert.AreEqual("kudosYearlyMultipliers", e.ParamName);
         }
 
         [Test]
@@ -393,7 +394,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             var e = Assert.Throws<ArgumentException>(Action);
-            Assert.AreEqual("organizationId", e.ParamName);
+            ClassicAssert.AreEqual("organizationId", e.ParamName);
         }
 
         [Test]
@@ -407,7 +408,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
-            Assert.AreEqual(2, yearsToAwardFor.First());
+            ClassicAssert.AreEqual(2, yearsToAwardFor.First());
         }
 
         [Test]
@@ -421,7 +422,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
-            Assert.AreEqual(0, yearsToAwardFor.Count());
+            ClassicAssert.AreEqual(0, yearsToAwardFor.Count());
         }
 
         [Test]
@@ -435,8 +436,8 @@ namespace Shrooms.Premium.Tests.DomainService
             var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived).ToList();
 
             // Assert
-            Assert.AreEqual(3, yearsToAwardFor.First());
-            Assert.AreEqual(4, yearsToAwardFor.Last());
+            ClassicAssert.AreEqual(3, yearsToAwardFor.First());
+            ClassicAssert.AreEqual(4, yearsToAwardFor.Last());
         }
 
         [Test]
@@ -450,7 +451,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
-            Assert.AreEqual(0, yearsToAwardFor.Count());
+            ClassicAssert.AreEqual(0, yearsToAwardFor.Count());
         }
 
         [Test]

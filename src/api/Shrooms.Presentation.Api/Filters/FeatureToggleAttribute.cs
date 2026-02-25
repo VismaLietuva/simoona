@@ -1,8 +1,6 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
-using ReallySimpleFeatureToggle;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Infrastructure.FeatureToggle;
 
 namespace Shrooms.Presentation.Api.Filters
@@ -16,13 +14,13 @@ namespace Shrooms.Presentation.Api.Filters
             _feature = feature;
         }
 
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var configuration = actionContext.Request.GetDependencyScope().GetService(typeof(IFeatureConfiguration)) as IFeatureConfiguration;
+            var configuration = context.HttpContext.RequestServices.GetService<IFeatureConfiguration>();
 
             if (configuration != null && !configuration.IsAvailable(_feature))
             {
-                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.NotFound);
+                context.Result = new NotFoundResult();
             }
         }
     }

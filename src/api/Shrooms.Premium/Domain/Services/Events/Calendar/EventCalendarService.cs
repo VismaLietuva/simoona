@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 {
     public class EventCalendarService : IEventCalendarService
     {
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Organization> _organizationsDbSet;

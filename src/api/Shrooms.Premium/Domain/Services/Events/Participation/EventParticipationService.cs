@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.SqlServer;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -35,8 +34,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private readonly IUnitOfWork2 _uow;
 
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
 
         private readonly IRoleService _roleService;
@@ -615,13 +614,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
+            var refDate = validationDto.StartDate;
+            var startOfRefWeek = refDate.Date.AddDays(-(int)refDate.DayOfWeek);
+            var endOfRefWeek = startOfRefWeek.AddDays(7);
+
             var query = _eventsDbSet
                 .Include(e => e.EventParticipants.Select(x => x.EventOptions))
                 .Include(e => e.EventType)
                 .Where(e =>
                     e.OrganizationId == orgId &&
                     e.Id != validationDto.Id &&
-                    SqlFunctions.DatePart(WeekOfYear, e.StartDate) == SqlFunctions.DatePart(WeekOfYear, validationDto.StartDate) &&
+                    e.StartDate >= startOfRefWeek && e.StartDate < endOfRefWeek &&
                     e.StartDate.Year == validationDto.StartDate.Year &&
                     e.EventParticipants.Any(p => p.ApplicationUserId == userId &&
                                                  (p.AttendStatus == (int)AttendingStatus.Attending ||

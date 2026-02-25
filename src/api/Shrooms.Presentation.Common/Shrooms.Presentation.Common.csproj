@@ -10,17 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- ASP.NET Core SignalR replacement for Microsoft.AspNet.SignalR 2.2.1 -->
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
-    
-    <!-- ASP.NET Core MVC replacement for WebApi.Core and WebApi.Owin -->
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    
-    <!-- ResponseCaching middleware replacement for Strathweb.CacheOutput.WebApi2 -->
-    <PackageReference Include="Microsoft.AspNetCore.ResponseCaching" Version="2.2.0" />
+    <!-- Use the ASP.NET Core framework reference (includes MVC, SignalR, etc.) -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shrooms.Authentification\Shrooms.Authentification.csproj" />
     <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj" />
     <ProjectReference Include="..\Shrooms.Presentation.WebViewModels\Shrooms.Presentation.WebViewModels.csproj" />
   </ItemGroup>

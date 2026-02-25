@@ -8,7 +8,7 @@ namespace Shrooms.Tests.ModelMappings
     {
         public static IMapper Create()
         {
-            Action<IMapperConfiguration> mappings = cfg =>
+            Action<IMapperConfigurationExpression> mappings = cfg =>
             {
                 cfg.AddProfile<Posts>();
                 cfg.AddProfile<KudosBasket>();

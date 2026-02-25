@@ -1,28 +1,26 @@
-using System.Net;
-using System.Web.Http;
-using System.Web.Http.Results;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Presentation.Common.Controllers
 {
-    public class BaseController : ApiController
+    [ApiController]
+    public class BaseController : ControllerBase
     {
         public StatusCodeResult Forbidden()
         {
-            return StatusCode(HttpStatusCode.Forbidden);
+            return StatusCode(403);
         }
 
         public StatusCodeResult UnsupportedMediaType()
         {
-            return StatusCode(HttpStatusCode.UnsupportedMediaType);
+            return StatusCode(415);
         }
 
-        public IHttpActionResult BadRequestWithError(ValidationException ex)
+        public IActionResult BadRequestWithError(ValidationException ex)
         {
-            return Content(HttpStatusCode.BadRequest, new { ErrorCode = ex.ErrorCode, ErrorMessage = ex.ErrorMessage });
+            return BadRequest(new { ErrorCode = ex.ErrorCode, ErrorMessage = ex.ErrorMessage });
         }
 
         public UserAndOrganizationDto GetUserAndOrganization()

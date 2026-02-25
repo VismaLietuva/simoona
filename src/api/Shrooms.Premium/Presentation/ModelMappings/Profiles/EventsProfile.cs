@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Newtonsoft.Json;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -10,7 +10,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class EventsProfile : Profile
     {
-        protected override void Configure()
+        public EventsProfile()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

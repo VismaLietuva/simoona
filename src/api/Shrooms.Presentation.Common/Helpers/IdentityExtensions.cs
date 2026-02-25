@@ -1,5 +1,4 @@
 using System.Security.Principal;
-using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Presentation.Common.Helpers

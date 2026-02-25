@@ -1,5 +1,5 @@
 using System;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 {
     public class ServiceRequestExportService : IServiceRequestExportService
     {
-        private readonly IDbSet<ServiceRequest> _serviceRequestsDbSet;
+        private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
 
         public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)

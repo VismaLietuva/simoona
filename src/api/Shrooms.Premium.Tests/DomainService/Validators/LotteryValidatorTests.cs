@@ -1,10 +1,11 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Tests.Extensions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using System;
 using System.Collections.Generic;
@@ -371,7 +372,7 @@ namespace Shrooms.Premium.Tests.DomainService.Validators
             var actual = _sut.IsValidTicketCount(buyDto);
 
             // Assert
-            Assert.IsFalse(actual);
+            ClassicAssert.IsFalse(actual);
         }
 
         [Test]
@@ -387,7 +388,7 @@ namespace Shrooms.Premium.Tests.DomainService.Validators
             var actual = _sut.IsValidTicketCount(buyDto);
 
             // Assert
-            Assert.IsTrue(actual);
+            ClassicAssert.IsTrue(actual);
         }
     }
 }

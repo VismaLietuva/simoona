@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using NUnit.Framework;
 using Shrooms.Presentation.ModelMappings.Profiles;
 
@@ -18,67 +18,67 @@ namespace Shrooms.Tests.ModelMappings
         [Test]
         public void Mapping_User_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Users>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Wall_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Walls>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_External_Link_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<ExternalLinks>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Monitor_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Monitors>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Role_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Roles>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Permission_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Permissions>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Like_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Likes>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_VacationPage_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<VacationPages>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_FilterPreset_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<FilterPresets>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Employee_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Employees>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_BlacklistUsers_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<BlacklistUsers>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
     }
 }

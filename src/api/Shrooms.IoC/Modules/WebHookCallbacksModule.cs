@@ -1,21 +1,20 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification;
 using Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers;
 using Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class WebHookCallbacksModule : Module
+    public static class WebHookCallbacksModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddWebHookCallbacks(this IServiceCollection services)
         {
-            builder.RegisterType<BirthdaysNotificationWebHookService>().As<IBirthdaysNotificationWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<UsersAnonymizationWebHookService>().As<IUsersAnonymizationWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<BlacklistUserStatusChangeWebHookService>().As<IBlacklistUserStatusChangeWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<WebHookCallbackServices>().As<IWebHookCallbackServices>().InstancePerRequest().PropertiesAutowired().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IBirthdaysNotificationWebHookService, BirthdaysNotificationWebHookService>();
+            services.AddScoped<IUsersAnonymizationWebHookService, UsersAnonymizationWebHookService>();
+            services.AddScoped<IBlacklistUserStatusChangeWebHookService, BlacklistUserStatusChangeWebHookService>();
+            services.AddScoped<IWebHookCallbackServices, WebHookCallbackServices>();
+            return services;
         }
     }
 }

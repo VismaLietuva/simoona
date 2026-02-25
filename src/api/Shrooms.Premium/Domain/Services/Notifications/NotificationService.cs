@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -20,8 +20,8 @@ namespace Shrooms.Premium.Domain.Services.Notifications
     {
         private readonly IUnitOfWork2 _uow;
 
-        private readonly IDbSet<Notification> _notificationDbSet;
-        private readonly IDbSet<Wall> _wallDbSet;
+        private readonly DbSet<Notification> _notificationDbSet;
+        private readonly DbSet<Wall> _wallDbSet;
 
         private readonly IWallService _wallService;
         private readonly IMarkdownConverter _markdownConverter;

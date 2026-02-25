@@ -1,5 +1,4 @@
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Presentation.Common.Helpers;
 

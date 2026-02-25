@@ -1,15 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Banners;
 using Shrooms.Domain.Services.Events;
 
 namespace Shrooms.IoC.Modules
 {
-    public class WidgetModule : Module
+    public static class WidgetModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddWidgets(this IServiceCollection services)
         {
-            builder.RegisterType<EventWidgetService>().As<IEventWidgetService>().InstancePerRequest();
-            builder.RegisterType<BannerWidgetService>().As<IBannerWidgetService>().InstancePerRequest();
+            services.AddScoped<IEventWidgetService, EventWidgetService>();
+            services.AddScoped<IBannerWidgetService, BannerWidgetService>();
+            return services;
         }
     }
 }

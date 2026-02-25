@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class Books : Profile
     {
-        protected override void Configure()
+        public Books()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

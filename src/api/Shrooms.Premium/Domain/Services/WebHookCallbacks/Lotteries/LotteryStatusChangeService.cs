@@ -1,8 +1,8 @@
-﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries
         private readonly ISystemClock _systemClock;
         private readonly IUnitOfWork2 _uow;
 
-        private readonly IDbSet<Lottery> _lotteriesDbSet;
+        private readonly DbSet<Lottery> _lotteriesDbSet;
 
         public LotteryStatusChangeService(ISystemClock systemClock, IUnitOfWork2 uow)
         {

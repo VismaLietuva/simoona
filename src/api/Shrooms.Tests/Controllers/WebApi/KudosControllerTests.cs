@@ -10,10 +10,9 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Common.Controllers.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Tests.Extensions;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -53,7 +52,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _kudosController.GetKudosTypes();
 
-            Assert.IsInstanceOf<IEnumerable<KudosTypeViewModel>>(response);
+            Assert.That(response, Is.InstanceOf<IEnumerable<KudosTypeViewModel>>());
         }
 
         [Test]
@@ -90,7 +89,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             var response = await _kudosController.GetKudosLogs(filter);
 
             // Assert
-            Assert.IsInstanceOf<PagedViewModel<KudosLogViewModel>>(response);
+            Assert.That(response, Is.InstanceOf<PagedViewModel<KudosLogViewModel>>());
         }
 
         [Test]
@@ -109,11 +108,10 @@ namespace Shrooms.Tests.Controllers.WebApi
                 .Returns(true);
 
             // Act
-            var httpActionResult = await _kudosController.AddKudosLog(request);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _kudosController.AddKudosLog(request);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
             await _kudosService.Received(1).AddKudosLogAsync(mappedRequest, explicitAmount);
         }
 
@@ -132,11 +130,10 @@ namespace Shrooms.Tests.Controllers.WebApi
                 .Returns(true);
 
             // Act
-            var response = await _kudosController.AddKudosLog(request);
-            var result = await response.ExecuteAsync(CancellationToken.None);
+            var result = await _kudosController.AddKudosLog(request);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
             await _kudosService.DidNotReceive().AddKudosLogAsync(mappedRequest, explicitAmount);
             await _kudosService.Received(1).AddKudosLogAsync(mappedRequest);
         }
@@ -157,11 +154,10 @@ namespace Shrooms.Tests.Controllers.WebApi
                 .Returns(false);
 
             // Act
-            var response = await _kudosController.AddKudosLog(request);
-            var result = await response.ExecuteAsync(CancellationToken.None);
+            var result = await _kudosController.AddKudosLog(request);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
             await _kudosService.DidNotReceive().AddKudosLogAsync(mappedRequest, explicitAmount);
             await _kudosService.Received(1).AddKudosLogAsync(mappedRequest);
         }

@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -9,11 +9,11 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -29,11 +29,11 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [AllowAnonymous]
-        public override async Task<HttpResponseMessage> Post(AbstractClassifierPostViewModel crudViewModel)
+        public override async Task<IActionResult> Post(AbstractClassifierPostViewModel crudViewModel)
         {
             if (await _repository.GetByIdAsync(crudViewModel.Id) != null)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return StatusCode(409);
             }
 
             var specificType = Type.GetType("DataLayer.Models." + crudViewModel.AbstractClassifierType + ",DataLayer");
@@ -46,16 +46,16 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Insert(_classifierModel);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
-        public override async Task<HttpResponseMessage> Put(AbstractClassifierPostViewModel crudViewModel)
+        public override async Task<IActionResult> Put(AbstractClassifierPostViewModel crudViewModel)
         {
             var model = await _repository.GetByIdAsync(crudViewModel.Id);
 
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var specificType = Type.GetType("DataLayer.Models." + crudViewModel.AbstractClassifierType + ",DataLayer");
@@ -68,7 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Update(model);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         public override async Task<PagedViewModel<AbstractClassifierViewModel>> GetPaged(string includeProperties = null,

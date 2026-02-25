@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -76,7 +76,7 @@ namespace Shrooms.Tests.DomainService
             await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual("user1", (await _commentsDbSet.FirstAsync()).Likes.First().UserId);
+            Assert.That((await _commentsDbSet.FirstAsync()).Likes.First().UserId, Is.EqualTo("user1"));
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace Shrooms.Tests.DomainService
                 await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                     new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
 
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
             await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual(0, (await _commentsDbSet.FirstAsync()).Likes.Count);
+            Assert.That((await _commentsDbSet.FirstAsync()).Likes.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace Shrooms.Tests.DomainService
             _commentsDbSet.Received(1)
                 .Add(Arg.Is<Comment>(c => c.AuthorId == _userId && c.MessageBody == "test" && c.PostId == 1));
 
-            Assert.AreEqual((await _postsDbSet.FirstAsync()).LastActivity, expectedDateTime);
+            Assert.That(expectedDateTime, Is.EqualTo((await _postsDbSet.FirstAsync()).LastActivity));
         }
 
         [Test]
@@ -295,7 +295,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.EditCommentAsync(editCommentDto));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -321,7 +321,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.DeleteCommentAsync(2, userOrg));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -458,7 +458,7 @@ namespace Shrooms.Tests.DomainService
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             // Assert
-            Assert.AreEqual(expectedType, _commentsDbSet.First().Likes.First().Type);
+            Assert.That(_commentsDbSet.First().Likes.First().Type, Is.EqualTo(expectedType));
         }
     }
 }

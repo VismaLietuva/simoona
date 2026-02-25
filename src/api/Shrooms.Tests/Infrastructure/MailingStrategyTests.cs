@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -43,8 +43,8 @@ namespace Shrooms.Tests.Infrastructure
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(1, actualSent.Count);
-            Assert.AreEqual(actualSent[0].To.Select(x => x.Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(1));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].To.Select(x => x.Address)));
         }
 
         [Test]
@@ -61,8 +61,8 @@ namespace Shrooms.Tests.Infrastructure
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(1, actualSent.Count);
-            Assert.AreEqual(actualSent[0].Bcc.Select(x => x.Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(1));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].Bcc.Select(x => x.Address)));
         }
 
         [Test]
@@ -79,8 +79,8 @@ namespace Shrooms.Tests.Infrastructure
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(3, actualSent.Count);
-            Assert.AreEqual(actualSent.Select(x => x.To.Single().Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(3));
+            Assert.That(_recipients, Is.EqualTo(actualSent.Select(x => x.To.Single().Address)));
         }
 
         private void TrackActualSent(List<MailMessage> actualSent)

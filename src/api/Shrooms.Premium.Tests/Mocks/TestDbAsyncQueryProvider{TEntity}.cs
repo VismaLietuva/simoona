@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Shrooms.Premium.Tests.Mocks
 {
-    internal class TestDbAsyncQueryProvider<TEntity> : IDbAsyncQueryProvider
+    internal class TestDbAsyncQueryProvider<TEntity> : IAsyncQueryProvider
     {
         private readonly IQueryProvider _inner;
 
@@ -36,41 +36,36 @@ namespace Shrooms.Premium.Tests.Mocks
             return _inner.Execute<TResult>(expression);
         }
 
-        public Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken)
+        public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(Execute(expression));
-        }
-
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(Execute<TResult>(expression));
+            var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            var executeMethod = typeof(IQueryProvider)
+                .GetMethod(nameof(IQueryProvider.Execute))
+                .MakeGenericMethod(expectedResultType);
+            var result = executeMethod.Invoke(_inner, new object[] { expression });
+            return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
+                .MakeGenericMethod(expectedResultType)
+                .Invoke(null, new[] { result });
         }
     }
 
-    internal class TestDbAsyncEnumerable<T> : EnumerableQuery<T>, IDbAsyncEnumerable<T>, IQueryable<T>
+    internal class TestDbAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
     {
         public TestDbAsyncEnumerable(IEnumerable<T> enumerable)
-            : base(enumerable)
-        { }
+            : base(enumerable) { }
 
         public TestDbAsyncEnumerable(Expression expression)
-            : base(expression)
-        { }
+            : base(expression) { }
 
         IQueryProvider IQueryable.Provider => new TestDbAsyncQueryProvider<T>(this);
 
-        public IDbAsyncEnumerator<T> GetAsyncEnumerator()
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
             return new TestDbAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
         }
-
-        IDbAsyncEnumerator IDbAsyncEnumerable.GetAsyncEnumerator()
-        {
-            return GetAsyncEnumerator();
-        }
     }
 
-    internal class TestDbAsyncEnumerator<T> : IDbAsyncEnumerator<T>
+    internal class TestDbAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _inner;
 
@@ -81,16 +76,15 @@ namespace Shrooms.Premium.Tests.Mocks
 
         public T Current => _inner.Current;
 
-        object IDbAsyncEnumerator.Current => Current;
-
-        public void Dispose()
+        public ValueTask<bool> MoveNextAsync()
         {
-            _inner.Dispose();
+            return new ValueTask<bool>(_inner.MoveNext());
         }
 
-        public Task<bool> MoveNextAsync(CancellationToken cancellationToken)
+        public ValueTask DisposeAsync()
         {
-            return Task.FromResult(_inner.MoveNext());
+            _inner.Dispose();
+            return ValueTask.CompletedTask;
         }
     }
 }

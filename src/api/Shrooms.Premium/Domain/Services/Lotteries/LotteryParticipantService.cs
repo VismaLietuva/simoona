@@ -5,17 +5,18 @@ using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using X.PagedList;
+using X.PagedList.EF;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryParticipantService : ILotteryParticipantService
     {
-        private readonly IDbSet<LotteryParticipant> _participantsDbSet;
+        private readonly DbSet<LotteryParticipant> _participantsDbSet;
 
         public LotteryParticipantService(IUnitOfWork2 unitOfWork)
         {

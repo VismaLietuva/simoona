@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -17,11 +18,12 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 {
     public class ServiceRequestNotificationService : NotificationServiceBase, IServiceRequestNotificationService
     {
-        private readonly IDbSet<Organization> _organizationsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<ApplicationRole> _rolesDbSet;
-        private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
-        private readonly IDbSet<ServiceRequestModel> _serviceRequestDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationRole> _rolesDbSet;
+        private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
+        private readonly DbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
+        private readonly DbSet<ServiceRequestModel> _serviceRequestDbSet;
 
         private readonly IApplicationSettings _appSettings;
 
@@ -35,6 +37,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
+            _userRolesDbSet = uow.GetDbSet<IdentityUserRole<string>>();
             _serviceRequestStatusDbSet = uow.GetDbSet<ServiceRequestStatus>();
             _serviceRequestDbSet = uow.GetDbSet<ServiceRequestModel>();
             _appSettings = appSettings;
@@ -69,8 +72,12 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             var serviceRequest = await _serviceRequestDbSet.SingleAsync(s => s.Id == createdComment.ServiceRequestId);
             var organizationName = await GetOrganizationNameAsync(serviceRequest.OrganizationId);
             var serviceRequestNotificationRoleId = await GetUserNotificationRoleIdAsync();
+            var usersWithRole = await _userRolesDbSet
+                .Where(ur => ur.RoleId == serviceRequestNotificationRoleId)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
             var emails = await _usersDbSet
-                .Where(x => x.Roles.Any(y => y.RoleId == serviceRequestNotificationRoleId) ||
+                .Where(x => usersWithRole.Contains(x.Id) ||
                             x.Id == serviceRequest.EmployeeId)
                 .Where(x => x.Id != createdComment.CommentedEmployeeId)
                 .Select(x => x.Email)

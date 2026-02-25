@@ -1,14 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Net;
-using System.Net.Http;
+using System.IO;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -22,47 +21,33 @@ namespace Shrooms.Presentation.Api.Controllers
             _pictureService = pictureService;
         }
 
+        [HttpPost]
+        [Route("Picture/Upload")]
         [PermissionAuthorize(Permission = BasicPermissions.Picture)]
-        public async Task<IHttpActionResult> Upload()
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (!Request.Content.IsMimeMultipartContent())
+            if (file == null || file.Length == 0)
             {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+                return BadRequest("No file uploaded");
             }
 
-            var provider = new MultipartMemoryStreamProvider();
-            await Request.Content.ReadAsMultipartAsync(provider);
-            var imageContent = provider.Contents[0];
-
-            if (imageContent.Headers.ContentLength >= WebApiConstants.MaximumPictureSizeInBytes)
+            if (file.Length >= WebApiConstants.MaximumPictureSizeInBytes)
             {
                 return BadRequest("File is too large");
             }
 
-            Image image;
-            var imageStream = await provider.Contents[0].ReadAsStreamAsync();
-
-            try
+            var allowedTypes = new[] { "image/png", "image/gif", "image/jpeg", "image/bmp" };
+            if (!Array.Exists(allowedTypes, t => t.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase)))
             {
-                image = Image.FromStream(imageStream);
-            }
-            catch (ArgumentException)
-            {
-                return UnsupportedMediaType();
+                return StatusCode(415, "Unsupported media type");
             }
 
-            if (image.RawFormat.Guid != ImageFormat.Png.Guid && image.RawFormat.Guid != ImageFormat.Gif.Guid
-                    && image.RawFormat.Guid != ImageFormat.Jpeg.Guid && image.RawFormat.Guid != ImageFormat.Bmp.Guid)
-            {
-                return UnsupportedMediaType();
-            }
-
-            imageStream.Position = 0;
-
-            var pictureName = await _pictureService.UploadFromImageAsync(image,
-                    imageContent.Headers.ContentType.ToString(),
-                    imageContent.Headers.ContentDisposition.FileName.Replace("\"", string.Empty),
-                    GetUserAndOrganization().OrganizationId);
+            await using var stream = file.OpenReadStream();
+            var pictureName = await _pictureService.UploadFromStreamAsync(
+                stream,
+                file.ContentType,
+                file.FileName,
+                GetUserAndOrganization().OrganizationId);
 
             return Ok(pictureName);
         }

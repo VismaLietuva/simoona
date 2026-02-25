@@ -1,5 +1,5 @@
-﻿using System;
-using System.Data.Entity;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 {
     public class BookCoverService : IBackgroundWorker, IBookCoverService
     {
-        private readonly IDbSet<Book> _booksDbSet;
+        private readonly DbSet<Book> _booksDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly IBookInfoService _bookService;
         private readonly ILogger _logger;

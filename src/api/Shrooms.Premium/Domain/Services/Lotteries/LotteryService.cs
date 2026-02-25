@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
@@ -13,12 +13,13 @@ using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using X.PagedList.EF;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {

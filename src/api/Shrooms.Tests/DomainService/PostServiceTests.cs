@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -69,7 +69,7 @@ namespace Shrooms.Tests.DomainService
             await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
+            Assert.That(_postsDbSet.First().Likes.First().UserId, Is.EqualTo("user1"));
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Shrooms.Tests.DomainService
             await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
+            Assert.That(_postsDbSet.First().Likes.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace Shrooms.Tests.DomainService
                 await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                     new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
 
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.CreateNewPostAsync(newPostDto));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace Shrooms.Tests.DomainService
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.HideWallPostAsync(1, userOrg));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -282,8 +282,8 @@ namespace Shrooms.Tests.DomainService
 
             await _postService.HideWallPostAsync(1, userOrg);
 
-            Assert.AreEqual(posts[0].IsHidden, true);
-            Assert.AreEqual(posts[1].IsHidden, false);
+            Assert.That(true, Is.EqualTo(posts[0].IsHidden));
+            Assert.That(false, Is.EqualTo(posts[1].IsHidden));
         }
 
         [Test]
@@ -411,7 +411,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.EditPostAsync(editPostDto));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -431,7 +431,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.DeleteWallPostAsync(1, userOrg));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -559,7 +559,7 @@ namespace Shrooms.Tests.DomainService
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             // Assert
-            Assert.AreEqual(expectedType, _postsDbSet.First().Likes.First().Type);
+            Assert.That(_postsDbSet.First().Likes.First().Type, Is.EqualTo(expectedType));
         }
     }
 }

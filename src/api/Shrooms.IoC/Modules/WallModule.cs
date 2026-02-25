@@ -1,24 +1,22 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Domain.ServiceValidators.Validators.Wall;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class WallModule : Module
+    public static class WallModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddWall(this IServiceCollection services)
         {
-            builder.RegisterType<PostService>().As<IPostService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<CommentService>().As<ICommentService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<WallService>().As<IWallService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<WallValidator>().As<IWallValidator>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<BirthdayService>().As<IBirthdayService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IWallService, WallService>();
+            services.AddScoped<IWallValidator, WallValidator>();
+            services.AddScoped<IBirthdayService, BirthdayService>();
+            return services;
         }
     }
 }

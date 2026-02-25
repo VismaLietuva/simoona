@@ -1,33 +1,35 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 
 namespace Shrooms.Presentation.Api.Middlewares
 {
-    public class ImageResizerMiddleware : OwinMiddleware
+    public class ImageResizerMiddleware
     {
-        public ImageResizerMiddleware(OwinMiddleware next)
-            : base(next)
+        private readonly RequestDelegate _next;
+
+        public ImageResizerMiddleware(RequestDelegate next)
         {
+            _next = next;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var request = context.Request;
-            if (request.User == null || request.User.Identity.IsAuthenticated == false)
+            if (context.User == null || context.User.Identity.IsAuthenticated == false)
             {
-                var index = request.Path.Value.LastIndexOf('.');
-                if (index > 0 && IsImage(request.Path.Value.Substring(index + 1)))
+                var pathValue = context.Request.Path.Value ?? string.Empty;
+                var index = pathValue.LastIndexOf('.');
+                if (index > 0 && IsImage(pathValue.Substring(index + 1)))
                 {
-                    Unauthorized(context);
+                    context.Response.StatusCode = 401;
                     return;
                 }
             }
 
             try
             {
-                await Next.Invoke(context);
+                await _next(context);
             }
             catch (OperationCanceledException)
             {
@@ -37,18 +39,7 @@ namespace Shrooms.Presentation.Api.Middlewares
         private static bool IsImage(string extension)
         {
             var validExtensions = new List<string> { "jpg", "jpeg", "bmp", "gif", "png", "tif", "tiff" };
-            if (validExtensions.Contains(extension))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static void Unauthorized(IOwinContext context)
-        {
-            context.Response.StatusCode = 401;
-            context.Response.ReasonPhrase = "Unauthorized";
+            return validExtensions.Contains(extension.ToLowerInvariant());
         }
     }
 }

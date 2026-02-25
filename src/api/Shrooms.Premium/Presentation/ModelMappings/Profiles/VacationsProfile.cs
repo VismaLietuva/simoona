@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Presentation.WebViewModels.Vacations;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class VacationsProfile : Profile
     {
-        protected override void Configure()
+        public VacationsProfile()
         {
             CreateDtoToViewModelMappings();
         }

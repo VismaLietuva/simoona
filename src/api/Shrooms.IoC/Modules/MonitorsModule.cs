@@ -1,14 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Monitors;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class MonitorsModule : Module
+    public static class MonitorsModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddMonitors(this IServiceCollection services)
         {
-            builder.RegisterType<MonitorService>().As<IMonitorService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IMonitorService, MonitorService>();
+            return services;
         }
     }
 }

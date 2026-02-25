@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -105,16 +106,16 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             var result = await _eventService.GetEventForEditingAsync(eventId, userOrg);
-            Assert.AreEqual(2, result.Options.Count());
-            Assert.NotNull(result.Location);
-            Assert.NotNull(result.Name);
-            Assert.NotNull(result.ImageName);
-            Assert.NotNull(result.HostUserFullName);
-            Assert.NotNull(result.Reminders);
-            Assert.NotNull(result.HostUserId);
-            Assert.AreEqual(1, result.MaxOptions);
-            Assert.AreEqual(3, result.MaxParticipants);
-            Assert.NotNull(result.Description);
+            ClassicAssert.AreEqual(2, result.Options.Count());
+            ClassicAssert.NotNull(result.Location);
+            ClassicAssert.NotNull(result.Name);
+            ClassicAssert.NotNull(result.ImageName);
+            ClassicAssert.NotNull(result.HostUserFullName);
+            ClassicAssert.NotNull(result.Reminders);
+            ClassicAssert.NotNull(result.HostUserId);
+            ClassicAssert.AreEqual(1, result.MaxOptions);
+            ClassicAssert.AreEqual(3, result.MaxParticipants);
+            ClassicAssert.NotNull(result.Description);
         }
 
         [Test]
@@ -128,7 +129,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             var result = await _eventService.GetEventForEditingAsync(eventId, userOrg);
-            Assert.AreEqual(3, result.TypeId);
+            ClassicAssert.AreEqual(3, result.TypeId);
         }
 
         [Test]
@@ -775,7 +776,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            Assert.IsFalse(reminder.IsReminded);
+            ClassicAssert.IsFalse(reminder.IsReminded);
         }
 
         [Test]
@@ -833,7 +834,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            Assert.IsFalse(reminder.IsReminded);
+            ClassicAssert.IsFalse(reminder.IsReminded);
         }
 
         [Test]

@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
@@ -11,7 +11,6 @@ using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -47,11 +46,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Act
             _filterPresetController.Validate(updateViewModel);
 
-            var httpActionResult = await _filterPresetController.Update(updateViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.Update(updateViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -64,11 +62,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var updateViewModel = new ManageFilterPresetViewModel();
 
             // Act
-            var httpActionResult = await _filterPresetController.Update(updateViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.Update(updateViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -81,11 +78,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var updateViewModel = new ManageFilterPresetViewModel();
 
             // Act
-            var httpActionResult = await _filterPresetController.Update(updateViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.Update(updateViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -98,11 +94,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var pageType = PageType.EventReportList;
 
             // Act
-            var httpActionResult = await _filterPresetController.GetPresets(pageType);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.GetPresets(pageType);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -115,11 +110,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             const PageType pageType = PageType.EventReportList;
 
             // Act
-            var httpActionResult = await _filterPresetController.GetPresets(pageType);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.GetPresets(pageType);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -136,11 +130,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             // Act
-            var httpActionResult = await _filterPresetController.GetFilters(filterTypes);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.GetFilters(filterTypes);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -157,11 +150,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             // Act
-            var httpActionResult = await _filterPresetController.GetFilters(filterTypes);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _filterPresetController.GetFilters(filterTypes);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
     }
 }

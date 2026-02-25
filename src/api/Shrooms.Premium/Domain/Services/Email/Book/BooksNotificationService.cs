@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -16,8 +16,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
     {
         private readonly IApplicationSettings _appSettings;
 
-        private readonly IDbSet<Organization> _organizationsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         public BooksNotificationService(
             IUnitOfWork2 uow,

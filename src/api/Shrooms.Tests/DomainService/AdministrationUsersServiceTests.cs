@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
@@ -52,7 +51,7 @@ namespace Shrooms.Tests.DomainService
             _administrationUsersNotificationService = Substitute.For<IAdministrationNotificationService>();
             _kudosService = Substitute.For<IKudosService>();
 
-            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             uow2.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
             _wallsDbSet = Substitute.For<DbSet<Wall>>();
@@ -121,7 +120,7 @@ namespace Shrooms.Tests.DomainService
 
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
-            Assert.IsTrue(users[0].IsTutorialComplete);
+            Assert.That(users[0].IsTutorialComplete, Is.True);
         }
     }
 }

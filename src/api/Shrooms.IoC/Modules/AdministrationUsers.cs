@@ -1,16 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class AdministrationUsers : Module
+    public static class AdministrationUsers
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddAdministrationUsers(this IServiceCollection services)
         {
-            builder.RegisterType<AdministrationUsersService>().As<IAdministrationUsersService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<AdministrationUsersNotificationService>().As<IAdministrationNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IAdministrationUsersService, AdministrationUsersService>();
+            services.AddScoped<IAdministrationNotificationService, AdministrationUsersNotificationService>();
+            return services;
         }
     }
 }

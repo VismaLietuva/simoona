@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
@@ -11,6 +9,7 @@ using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.VacationPage;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
+using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {
@@ -37,11 +36,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _vacationPageService.GetVacationPage(Arg.Any<int>()).Returns(new VacationPageDto());
 
             // Act
-            var httpActionResult = await _vacationPageController.GetVacationPage();
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _vacationPageController.GetVacationPage();
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -51,11 +49,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _vacationPageService.GetVacationPage(Arg.Any<int>()).ReturnsNull();
 
             // Act
-            var httpActionResult = await _vacationPageController.GetVacationPage();
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _vacationPageController.GetVacationPage();
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<NotFoundResult>());
         }
 
         [Test]
@@ -64,14 +61,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             var vacationPageViewModel = new VacationPageViewModel();
 
-            // Act
-            _vacationPageController.Validate(vacationPageViewModel);
+            _vacationPageController.ModelState.AddModelError("key", "error");
 
-            var httpActionResult = await _vacationPageController.EditVacationPage(vacationPageViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            // Act
+            var result = await _vacationPageController.EditVacationPage(vacationPageViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -87,13 +83,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             // Act
-            _vacationPageController.Validate(vacationPageViewModel);
-
-            var httpActionResult = await _vacationPageController.EditVacationPage(vacationPageViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _vacationPageController.EditVacationPage(vacationPageViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
         }
     }
 }

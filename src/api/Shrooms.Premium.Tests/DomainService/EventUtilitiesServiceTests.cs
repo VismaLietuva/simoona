@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
@@ -55,8 +56,8 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var result = (await _eventUtilitiesService.GetEventTypesAsync(organizationId)).ToList();
 
-            Assert.AreEqual(result.Count, 3);
-            Assert.AreEqual(result.First(x => x.Id == 1).Name, "type1");
+            ClassicAssert.AreEqual(result.Count, 3);
+            ClassicAssert.AreEqual(result.First(x => x.Id == 1).Name, "type1");
         }
 
         [Test]
@@ -69,11 +70,11 @@ namespace Shrooms.Premium.Tests.DomainService
             var guid = MockParticipantsWithOptionsForExport();
 
             var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(guid, userAndOrg)).ToList();
-            Assert.AreEqual("Option1", options.ToArray()[0].Option);
-            Assert.AreEqual("Option2", options.ToArray()[1].Option);
-            Assert.AreEqual(2, options.ToArray()[0].Count);
-            Assert.AreEqual(1, options.ToArray()[1].Count);
-            Assert.AreEqual(2, options.Count);
+            ClassicAssert.AreEqual("Option1", options.ToArray()[0].Option);
+            ClassicAssert.AreEqual("Option2", options.ToArray()[1].Option);
+            ClassicAssert.AreEqual(2, options.ToArray()[0].Count);
+            ClassicAssert.AreEqual(1, options.ToArray()[1].Count);
+            ClassicAssert.AreEqual(2, options.Count);
         }
 
         [Test]
@@ -86,8 +87,8 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventType = await _eventUtilitiesService.GetEventTypeAsync(3, 4);
 
             // Assert
-            Assert.AreEqual(true, eventType.HasActiveEvents);
-            Assert.AreEqual("type4", eventType.Name);
+            ClassicAssert.AreEqual(true, eventType.HasActiveEvents);
+            ClassicAssert.AreEqual("type4", eventType.Name);
         }
 
         [Test]
@@ -100,8 +101,8 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventType = await _eventUtilitiesService.GetEventTypeAsync(2, 3);
 
             // Assert
-            Assert.AreEqual(false, eventType.HasActiveEvents);
-            Assert.AreEqual("type3", eventType.Name);
+            ClassicAssert.AreEqual(false, eventType.HasActiveEvents);
+            ClassicAssert.AreEqual("type3", eventType.Name);
         }
 
         [TestCase(2, 1)]
@@ -112,7 +113,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var eventTypes = (await _eventUtilitiesService.GetEventTypesToRemindAsync(orgId)).ToList();
 
-            Assert.AreEqual(amount, eventTypes.Count);
+            ClassicAssert.AreEqual(amount, eventTypes.Count);
         }
 
         [Test]
@@ -122,9 +123,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var eventTypes = (await _eventUtilitiesService.GetEventTypesToRemindAsync(4)).ToList();
 
-            Assert.AreEqual(1, eventTypes.Count);
-            Assert.AreEqual(5, eventTypes.First().Id);
-            Assert.AreEqual("type5", eventTypes.First().Name);
+            ClassicAssert.AreEqual(1, eventTypes.Count);
+            ClassicAssert.AreEqual(5, eventTypes.First().Id);
+            ClassicAssert.AreEqual("type5", eventTypes.First().Name);
         }
 
         [Test]

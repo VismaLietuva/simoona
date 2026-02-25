@@ -1,21 +1,21 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Domain.Services.Email.Book;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class BooksModule : Module
+    public static class BooksModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumBooks(this IServiceCollection services)
         {
-            builder.RegisterType<BookMobileService>().As<IBookMobileService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<BookService>().As<IBookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<BookServiceValidator>().As<IBookServiceValidator>().InstancePerRequest();
-            builder.RegisterType<BookMobileServiceValidator>().As<IBookMobileServiceValidator>().InstancePerRequest();
-            builder.RegisterType<BooksNotificationService>().As<IBooksNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<BookCoverService>().As<IBookCoverService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IBookMobileService, BookMobileService>();
+            services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IBookServiceValidator, BookServiceValidator>();
+            services.AddScoped<IBookMobileServiceValidator, BookMobileServiceValidator>();
+            services.AddScoped<IBooksNotificationService, BooksNotificationService>();
+            services.AddScoped<IBookCoverService, BookCoverService>();
+            return services;
         }
     }
 }

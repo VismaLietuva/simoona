@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
@@ -6,7 +6,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;

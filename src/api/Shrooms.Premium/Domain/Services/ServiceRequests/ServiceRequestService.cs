@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -23,12 +23,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         private const string ServiceRequestCategoryKudos = "Kudos";
 
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<ServiceRequest> _serviceRequestsDbSet;
-        private readonly IDbSet<ServiceRequestComment> _serviceRequestCommentsDbSet;
-        private readonly IDbSet<ServiceRequestCategory> _serviceRequestCategoryDbSet;
-        private readonly IDbSet<ServiceRequestPriority> _serviceRequestPriorityDbSet;
-        private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
+        private readonly DbSet<ServiceRequestComment> _serviceRequestCommentsDbSet;
+        private readonly DbSet<ServiceRequestCategory> _serviceRequestCategoryDbSet;
+        private readonly DbSet<ServiceRequestPriority> _serviceRequestPriorityDbSet;
+        private readonly DbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IPermissionService _permissionService;
         private readonly IAsyncRunner _asyncRunner;
 

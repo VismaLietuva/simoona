@@ -1,17 +1,18 @@
-using Shrooms.Presentation.Common.GeneralCode;
-using WebApi.OutputCache.V2;
+using System;
 
 namespace Shrooms.Presentation.Common.Filters
 {
-    public class PermissionAwareCacheOutputFilterAttribute : CacheOutputAttribute
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
+    public class PermissionAwareCacheOutputFilterAttribute : Attribute
     {
         private readonly string[] _permissions;
+
+        public int ServerTimeSpan { get; set; }
 
         public string[] Permissions => _permissions;
 
         public PermissionAwareCacheOutputFilterAttribute(params string[] permissions)
         {
-            CacheKeyGenerator = typeof(PerPermissionCacheKeyGenerator);
             _permissions = permissions;
         }
     }

@@ -1,14 +1,14 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.KudosShop;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class KudosShopModule : Module
+    public static class KudosShopModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumKudosShop(this IServiceCollection services)
         {
-            builder.RegisterType<KudosShopService>().As<IKudosShopService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IKudosShopService, KudosShopService>();
+            return services;
         }
     }
 }

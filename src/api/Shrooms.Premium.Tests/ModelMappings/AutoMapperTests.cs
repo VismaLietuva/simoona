@@ -18,25 +18,25 @@ namespace Shrooms.Premium.Tests.ModelMappings
         [Test]
         public void Mapping_Event_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<EventsProfile>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Kudos_Shop_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<KudosShopProfile>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Organizational_Structure_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<OrganizationalStructureProfile>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
         public void Mapping_Lotteries_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<LotteryProfile>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
     }
 }

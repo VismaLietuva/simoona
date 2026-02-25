@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
@@ -13,7 +14,7 @@ using Shrooms.Presentation.Common.Filters;
 namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 {
     [Authorize]
-    [RoutePrefix("KudosShop")]
+    [Route("KudosShop")]
     public class KudosShopController : BaseController
     {
         private readonly IMapper _mapper;
@@ -28,7 +29,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
-        public async Task<IHttpActionResult> CreateItem(KudosShopItemViewModel kudosShopItemViewModel)
+        public async Task<IActionResult> CreateItem(KudosShopItemViewModel kudosShopItemViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -52,7 +53,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpGet]
         [Route("Get")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
-        public async Task<IHttpActionResult> GetItem(int id)
+        public async Task<IActionResult> GetItem(int id)
         {
             if (id <= 0)
             {
@@ -74,7 +75,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpGet]
         [Route("All")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
-        public async Task<IHttpActionResult> GetAllItems()
+        public async Task<IActionResult> GetAllItems()
         {
             var userOrganization = GetUserAndOrganization();
             var allListDto = await _kudosShopService.GetAllItemsAsync(userOrganization);
@@ -85,7 +86,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
-        public async Task<IHttpActionResult> UpdateItem(KudosShopItemViewModel kudosShopItemViewModel)
+        public async Task<IActionResult> UpdateItem(KudosShopItemViewModel kudosShopItemViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -109,7 +110,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
-        public async Task<IHttpActionResult> DeleteItem(int id)
+        public async Task<IActionResult> DeleteItem(int id)
         {
             if (id <= 0)
             {

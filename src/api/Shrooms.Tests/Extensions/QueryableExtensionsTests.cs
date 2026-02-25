@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
-using System.Data.Entity;
-using System.Linq.Dynamic;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using Shrooms.Infrastructure.Sorting;
 
 namespace Shrooms.Tests.Extensions
@@ -40,7 +40,7 @@ namespace Shrooms.Tests.Extensions
             var actualQuery = _mockDbSet.OrderByPropertyNames(sortable).ToString();
 
             // Assert
-            Assert.AreEqual(expectedQuery, actualQuery);
+            Assert.That(actualQuery, Is.EqualTo(expectedQuery));
         }
 
 
@@ -59,7 +59,7 @@ namespace Shrooms.Tests.Extensions
             var actualQuery = _mockDbSet.OrderByPropertyNames(sortable).ToString();
 
             // Assert
-            Assert.AreEqual(expectedQuery, actualQuery);
+            Assert.That(actualQuery, Is.EqualTo(expectedQuery));
         }
     }
 }

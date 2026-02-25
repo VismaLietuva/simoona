@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Contracts.Enums;
@@ -9,11 +9,12 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.FilterPresets;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
-    [RoutePrefix("FilterPreset")]
+    [Route("FilterPreset")]
     [Authorize]
     public class FilterPresetController : BaseController
     {
@@ -29,7 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> Update(ManageFilterPresetViewModel manageViewModel)
+        public async Task<IActionResult> Update(ManageFilterPresetViewModel manageViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +57,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPresetsForPage")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetPresets(PageType pageType)
+        public async Task<IActionResult> GetPresets(PageType pageType)
         {
             try
             {
@@ -75,7 +76,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetFilters")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetFilters([FromUri] FilterType[] filterTypes)
+        public async Task<IActionResult> GetFilters([FromQuery] FilterType[] filterTypes)
         {
             try
             {

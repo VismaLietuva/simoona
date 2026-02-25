@@ -1,22 +1,18 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Shrooms.Domain.Exceptions.Exceptions.Organization;
 
 namespace Shrooms.Presentation.Api.Filters
 {
     public class OrganizationExceptionFilterAttribute : ExceptionFilterAttribute
     {
-        public override void OnException(HttpActionExecutedContext actionExecutedContext)
+        public override void OnException(ExceptionContext context)
         {
-            if (actionExecutedContext.Exception is InvalidOrganizationException)
+            if (context.Exception is InvalidOrganizationException)
             {
-                var response = new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    ReasonPhrase = "Invalid organization"
-                };
-
-                actionExecutedContext.Response = response;
+                context.Result = new BadRequestObjectResult("Invalid organization");
+                context.ExceptionHandled = true;
             }
         }
     }

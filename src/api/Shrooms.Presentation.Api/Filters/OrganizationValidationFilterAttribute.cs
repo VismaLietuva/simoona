@@ -1,24 +1,22 @@
+using Microsoft.AspNetCore.Mvc.Filters;
 using Shrooms.Domain.Exceptions.Exceptions.Organization;
 using Shrooms.Presentation.Common.Helpers;
 using System.Linq;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
 
 namespace Shrooms.Presentation.Api.Filters
 {
     public class OrganizationValidationFilterAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             var ignoreAttribute =
-                actionContext.ActionDescriptor.GetCustomAttributes<SkipOrganizationValidationFilterAttribute>(false).Any() ||
-                actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<SkipOrganizationValidationFilterAttribute>(false).Any();
+                context.ActionDescriptor.EndpointMetadata.OfType<SkipOrganizationValidationFilterAttribute>().Any();
             if (ignoreAttribute)
             {
                 return;
             }
 
-            var tenant = actionContext.Request.GetRequestedTenant();
+            var tenant = context.HttpContext.GetRequestedTenant();
             if (string.IsNullOrEmpty(tenant))
             {
                 throw new InvalidOrganizationException();

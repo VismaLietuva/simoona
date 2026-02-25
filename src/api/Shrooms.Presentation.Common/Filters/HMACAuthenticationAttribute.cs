@@ -1,66 +1,51 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http.Filters;
-using System.Web.Http.Results;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Presentation.Common.Filters
 {
-    public class HmacAuthenticationAttribute : Attribute, IAuthenticationFilter
+    public class HmacAuthenticationAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private const string OrganizationHeaderName = "Organization";
 
-        public Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var authorizationGuid = GetAuthorizationGuid(context);
+            var unitOfWork = context.HttpContext.RequestServices.GetService<IUnitOfWork2>();
+
+            if (!context.HttpContext.Request.Headers.ContainsKey(OrganizationHeaderName))
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            var organizationName = context.HttpContext.Request.Headers[OrganizationHeaderName].FirstOrDefault();
+            var authorizationGuid = await GetAuthorizationGuidAsync(unitOfWork, organizationName);
 
             if (authorizationGuid == null)
             {
-                context.ErrorResult = new UnauthorizedResult(new AuthenticationHeaderValue[0], context.Request);
-                return Task.FromResult(0);
+                context.Result = new UnauthorizedResult();
+                return;
             }
 
-            if (context.Request.Headers.Authorization == null)
+            if (!context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader) ||
+                authHeader.ToString() != authorizationGuid)
             {
-                context.ErrorResult = new UnauthorizedResult(new AuthenticationHeaderValue[0], context.Request);
-                return Task.FromResult(0);
+                context.Result = new UnauthorizedResult();
             }
-
-            if (context.Request.Headers.Authorization.Parameter != authorizationGuid)
-            {
-                context.ErrorResult = new UnauthorizedResult(new AuthenticationHeaderValue[0], context.Request);
-            }
-
-            return Task.FromResult(0);
         }
 
-        public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
+        private static Task<string> GetAuthorizationGuidAsync(IUnitOfWork2 unitOfWork, string organizationName)
         {
-            return Task.FromResult(0);
-        }
-
-        public bool AllowMultiple => false;
-
-        private string GetAuthorizationGuid(HttpAuthenticationContext context)
-        {
-            var unitOfWork = context.ActionContext.Request.GetDependencyScope().GetService(typeof(IUnitOfWork2)) as IUnitOfWork2;
-
-            if (!context.Request.Headers.Contains(OrganizationHeaderName))
-            {
-                return null;
-            }
-
-            var organizationName = context.Request.Headers.GetValues(OrganizationHeaderName).FirstOrDefault();
-
-            return unitOfWork.GetDbSet<Organization>()
+            var result = unitOfWork.GetDbSet<Organization>()
                 .Where(x => x.ShortName == organizationName)
                 .Select(x => x.BookAppAuthorizationGuid)
                 .FirstOrDefault();
+            return Task.FromResult(result);
         }
     }
 }

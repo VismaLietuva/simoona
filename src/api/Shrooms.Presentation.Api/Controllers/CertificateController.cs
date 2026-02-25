@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
@@ -13,6 +13,8 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using X.PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -55,7 +57,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Post(CertificatePostViewModel crudViewModel)
+        public async Task<IActionResult> Post(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -93,7 +95,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var currentUserId = GetUserAndOrganization().UserId;
             var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.Certificate);
@@ -120,7 +122,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Put(CertificatePostViewModel crudViewModel)
+        public async Task<IActionResult> Put(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {

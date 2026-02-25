@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -23,7 +22,7 @@ namespace Shrooms.Tests.DomainService.Validators
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _wallUsersDbSet = Substitute.For<DbSet<WallMember>, IQueryable<WallMember>, IDbAsyncEnumerable<WallMember>>();
+            _wallUsersDbSet = Substitute.For<DbSet<WallMember>, IQueryable<WallMember>, IAsyncEnumerable<WallMember>>();
             uow.GetDbSet<WallMember>().Returns(_wallUsersDbSet);
 
             _wallValidator = new WallValidator(uow);

@@ -1,22 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class FilterPresetModule : Module
+    public static class FilterPresetModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddFilterPresets(this IServiceCollection services)
         {
-            builder.RegisterType<FilterPresetService>()
-                .As<IFilterPresetService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<FilterPresetValidator>()
-                .As<IFilterPresetValidator>()
-                .InstancePerRequest();
+            services.AddScoped<IFilterPresetService, FilterPresetService>();
+            services.AddScoped<IFilterPresetValidator, FilterPresetValidator>();
+            return services;
         }
     }
 }

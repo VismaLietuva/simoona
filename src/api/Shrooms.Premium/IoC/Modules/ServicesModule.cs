@@ -1,16 +1,16 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.Notifications;
 using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class ServicesModule : Module
+    public static class ServicesModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumServices(this IServiceCollection services)
         {
-            builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<GoogleBookService>().As<IBookInfoService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IBookInfoService, GoogleBookService>();
+            return services;
         }
     }
 }

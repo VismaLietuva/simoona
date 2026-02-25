@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
@@ -32,7 +32,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        public override async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             return await base.Get(id, includeProperties);
         }
@@ -70,7 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override async Task<HttpResponseMessage> Post([FromBody] OrganizationPostViewModel crudViewModel)
+        public override async Task<IActionResult> Post([FromBody] OrganizationPostViewModel crudViewModel)
         {
             return await base.Post(crudViewModel);
         }
@@ -78,21 +78,21 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override async Task<HttpResponseMessage> Put([FromBody] OrganizationPostViewModel crudViewModel)
+        public override async Task<IActionResult> Put([FromBody] OrganizationPostViewModel crudViewModel)
         {
             return await base.Put(crudViewModel);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);
         }
 
         [HttpGet]
         [PermissionAuthorize(AdministrationPermissions.Organization)]
-        public async Task<IHttpActionResult> GetManagingDirector()
+        public async Task<IActionResult> GetManagingDirector()
         {
             var currentManagingDirector = await _organizationService.GetManagingDirectorAsync(GetUserAndOrganization().OrganizationId);
             return Ok(currentManagingDirector);
@@ -100,7 +100,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(AdministrationPermissions.Organization)]
-        public async Task<IHttpActionResult> SetManagingDirector(string userId)
+        public async Task<IActionResult> SetManagingDirector(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {

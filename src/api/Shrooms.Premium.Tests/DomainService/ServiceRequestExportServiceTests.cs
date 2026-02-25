@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Excel;
+using ExcelDataReader;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
-            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
+            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
             _excelBuilder = new ExcelBuilderFactory();
@@ -50,20 +50,17 @@ namespace Shrooms.Premium.Tests.DomainService
             var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
             var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
             {
-                excelReader.IsFirstRowAsColumnNames = true;
-                var excelData = excelReader.AsDataSet();
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
                 var excelColumns = excelData.Tables[0].Columns;
 
-                Assert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameTitle, excelColumns[0].ColumnName);
-                Assert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameDescription, excelColumns[1].ColumnName);
-                Assert.AreEqual("Need 1", excelRows[0].ItemArray[0]);
-                Assert.AreEqual("Description 1", excelRows[0].ItemArray[1]);
-                Assert.AreEqual(3, excelRows.Count);
-
-                excelReader.Close();
+                ClassicAssert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameTitle, excelColumns[0].ColumnName);
+                ClassicAssert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameDescription, excelColumns[1].ColumnName);
+                ClassicAssert.AreEqual("Need 1", excelRows[0].ItemArray[0]);
+                ClassicAssert.AreEqual("Description 1", excelRows[0].ItemArray[1]);
+                ClassicAssert.AreEqual(3, excelRows.Count);
             }
         }
 
@@ -81,17 +78,14 @@ namespace Shrooms.Premium.Tests.DomainService
             var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
             var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
             {
-                excelReader.IsFirstRowAsColumnNames = true;
-                var excelData = excelReader.AsDataSet();
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
 
-                Assert.AreEqual("Need 2", excelRows[0].ItemArray[0]);
-                Assert.AreEqual("Description 2", excelRows[0].ItemArray[1]);
-                Assert.AreEqual(1, excelRows.Count);
-
-                excelReader.Close();
+                ClassicAssert.AreEqual("Need 2", excelRows[0].ItemArray[0]);
+                ClassicAssert.AreEqual("Description 2", excelRows[0].ItemArray[1]);
+                ClassicAssert.AreEqual(1, excelRows.Count);
             }
         }
 

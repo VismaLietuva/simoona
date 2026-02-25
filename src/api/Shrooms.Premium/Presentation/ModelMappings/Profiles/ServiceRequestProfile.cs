@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
@@ -7,7 +7,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class ServiceRequestProfile : Profile
     {
-        protected override void Configure()
+        public ServiceRequestProfile()
         {
             CreateViewModelToDtoMappings();
             CreateViewModelMappings();

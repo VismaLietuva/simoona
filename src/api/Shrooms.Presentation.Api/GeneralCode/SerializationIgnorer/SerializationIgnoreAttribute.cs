@@ -1,16 +1,12 @@
-﻿using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Shrooms.Presentation.Api.GeneralCode.SerializationIgnorer
 {
     public class SerializationIgnoreAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        public override void OnActionExecuted(ActionExecutedContext context)
         {
-            var response = actionExecutedContext.Response; //.Content as ObjectContent;
-            if (response != null)
-            {
-                SerializationIgnorer.ModifyViewModel(response.Content);
-            }
+            // TODO: Hook into response serialization if needed
         }
     }
 }

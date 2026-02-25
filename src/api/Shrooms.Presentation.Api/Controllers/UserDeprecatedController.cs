@@ -1,15 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Script.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -39,13 +35,15 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.Presentation.WebViewModels.Models.User;
-using WebApi.OutputCache.V2;
 using X.PagedList;
+using X.PagedList.Extensions;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("ApplicationUser")]
+    [Route("ApplicationUser")]
     public partial class UserDeprecatedController
     {
         private readonly IMapper _mapper;
@@ -116,9 +114,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        [InvalidateCacheOutput("GetKudosStats", typeof(KudosController))]
-        public async Task<IHttpActionResult> DeleteUser(string id)
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]        public async Task<IActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -129,7 +125,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (canNotBeDeleted)
             {
-                return Content(HttpStatusCode.MethodNotAllowed, "Employee has pending kudos");
+                return StatusCode(405, "Employee has pending kudos");
             }
 
             await _userService.DeleteAsync(id, GetUserAndOrganization());
@@ -138,23 +134,24 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUsersAsExcel")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> GetUsersAsExcel()
+        public async Task<IActionResult> GetUsersAsExcel()
         {
             var content = await _administrationUsersService.GetAllUsersExcelAsync("Users", GetOrganizationId());
 
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = content
-            };
-
-            return ResponseMessage(result);
+            // TODO: Return file content as download
+            return Ok(content);
         }
 
         #region private methods
 
         private async Task UpdateRolesAsync(ApplicationUser user, IEnumerable<string> roleIds)
         {
-            user.Roles.Clear();
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (currentRoles.Any())
+            {
+                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            }
+
             if (roleIds == null)
             {
                 return;
@@ -168,7 +165,7 @@ namespace Shrooms.Presentation.Api.Controllers
                     throw new Exception(string.Format(Resources.Common.DoesNotExist + " Id: {1}", "Role", id));
                 }
 
-                user.Roles.Add(new IdentityUserRole { RoleId = id, UserId = user.Id });
+                await _userManager.AddToRoleAsync(user, role.Name);
             }
         }
 
@@ -184,18 +181,18 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("Get")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> Get(string id, string includeProperties = "")
+        public async Task<IActionResult> Get(string id, string includeProperties = "")
         {
             var user = await _applicationUserRepository.Get(e => e.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName));
+                return StatusCode(404, string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName));
             }
 
             var model = _mapper.Map<ApplicationUser, ApplicationUserViewModel>(user);
             model.IsAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), "APPLICATIONUSER_ADMINISTRATION");
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetByRoom")]
@@ -249,10 +246,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                filterModel = new JavaScriptSerializer().Deserialize<FilterDto[]>(filter);
+                filterModel = System.Text.Json.JsonSerializer.Deserialize<FilterDto[]>(filter);
                 includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Projects";
 
-                filterModel ??= new[] { new JavaScriptSerializer().Deserialize<FilterDto>(filter) };
+                filterModel ??= new[] { System.Text.Json.JsonSerializer.Deserialize<FilterDto>(filter) };
             }
 
             var administrationUsersDto = await _administrationUsersService.GetAllUsersAsync(sortQuery, s, filterModel, includeProperties);
@@ -263,7 +260,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private static async Task<PagedViewModel<T>> PagedViewModel<T>(int page, int pageSize, IEnumerable<T> officeUsers)
             where T : class
         {
-            var officeUserPagedViewModel = await officeUsers.ToPagedListAsync(page, pageSize);
+            var officeUserPagedViewModel = officeUsers.ToPagedList(page, pageSize);
 
             var pagedModel = new PagedViewModel<T>
             {
@@ -294,7 +291,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetDetails/{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetDetails(string id)
+        public async Task<IActionResult> GetDetails(string id)
         {
             var user = await _applicationUserRepository
                 .Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserDetails)
@@ -302,7 +299,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[]
+                return StatusCode(404, new[]
                 {
                     string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName)
                 });
@@ -312,7 +309,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             await InfoWithAdditionalPermissionsAsync(user, model);
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         private async Task InfoWithAdditionalPermissionsAsync(ApplicationUser user, ApplicationUserDetailsViewModel model)
@@ -346,7 +343,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("ConfirmUser")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> ConfirmUser(string id)
+        public async Task<IActionResult> ConfirmUser(string id)
         {
             if (!ModelState.IsValid)
             {
@@ -372,7 +369,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUserProfile(string id)
+        public async Task<IActionResult> GetUserProfile(string id)
         {
             var user = await _applicationUserRepository
                 .Get(e => e.Id == id,
@@ -382,7 +379,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[]
+                return StatusCode(404, new[]
                 {
                     string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName)
                 });
@@ -397,42 +394,42 @@ namespace Shrooms.Presentation.Api.Controllers
                 ShroomsInfo = MapShroomsInfo(user)
             };
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetUserProfile/{id}/Personal")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUserPersonalInfo(string id)
+        public async Task<IActionResult> GetUserPersonalInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var user = await _applicationUserRepository.GetByIdAsync(id);
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = await MapPersonalInfoAsync(user);
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetUserProfile/{id}/Job")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUserJobInfo(string id)
+        public async Task<IActionResult> GetUserJobInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var user = await _applicationUserRepository.Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserJobInfo).FirstOrDefaultAsync();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = await MapJobInfoAsync(user);
@@ -449,72 +446,72 @@ namespace Shrooms.Presentation.Api.Controllers
                 .OrderBy(p => p.Title)
                 .ToListAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetUserProfile/{id}/Office")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUserOfficeInfo(string id)
+        public async Task<IActionResult> GetUserOfficeInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var user = await _applicationUserRepository.Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserOfficeInfo).FirstOrDefaultAsync();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapOfficeInfo(user);
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetUserProfile/{id}/Shrooms")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUserShroomsInfo(string id)
+        public async Task<IActionResult> GetUserShroomsInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var user = await _applicationUserRepository.Get(u => u.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapShroomsInfo(user);
 
-            return Request.CreateResponse(HttpStatusCode.OK, model);
+            return Ok(model);
         }
 
         [Route("GetProfile")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetProfile()
+        public async Task<IActionResult> GetProfile()
         {
             return await GetUserProfile(User.Identity.GetUserId());
         }
 
         [Route("GetProfile/Personal")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetPersonalInfo()
+        public async Task<IActionResult> GetPersonalInfo()
         {
             return await GetUserPersonalInfo(User.Identity.GetUserId());
         }
 
         [Route("GetProfile/Job")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetJobInfo()
+        public async Task<IActionResult> GetJobInfo()
         {
             return await GetUserJobInfo(User.Identity.GetUserId());
         }
 
         [Route("GetProfile/Office")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetOfficeInfo()
+        public async Task<IActionResult> GetOfficeInfo()
         {
             return await GetUserOfficeInfo(User.Identity.GetUserId());
         }
@@ -529,7 +526,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("PutExams")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> PutExams(ApplicationUserExamsPostModel userExams)
+        public async Task<IActionResult> PutExams(ApplicationUserExamsPostModel userExams)
         {
             if (!ModelState.IsValid)
             {
@@ -547,7 +544,7 @@ namespace Shrooms.Presentation.Api.Controllers
             if (applicationUser == null)
             {
                 var errorMessage = string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName);
-                return Content(HttpStatusCode.NotFound, errorMessage);
+                return StatusCode(404, errorMessage);
             }
 
             applicationUser.Exams = await _examsRepository.Get(e => userExams.ExamIds.Contains(e.Id)).ToListAsync();
@@ -561,22 +558,22 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("PutJobInfo")]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> PutJobInfo(ApplicationUserPutJobInfoViewModel model)
+        public async Task<IActionResult> PutJobInfo(ApplicationUserPutJobInfoViewModel model)
         {
             var userOrg = GetUserAndOrganization();
             var editorIsAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.ApplicationUser);
             if (editorIsAdministrator && !model.EmploymentDate.HasValue)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             if (!(editorIsAdministrator || model.Id == User.Identity.GetUserId()))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var validatedModelInfo = await ValidateModelInfoAsync(model);
-            if (!validatedModelInfo.IsSuccessStatusCode)
+            if (validatedModelInfo != null)
             {
                 return validatedModelInfo;
             }
@@ -590,7 +587,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (applicationUser == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName));
+                return StatusCode(404, string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName));
             }
 
             _mapper.Map(model, applicationUser);
@@ -612,55 +609,46 @@ namespace Shrooms.Presentation.Api.Controllers
             await _unitOfWork.SaveAsync();
             _permissionsCache.TryRemoveEntry(applicationUser.Id);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
-        private async Task<HttpResponseMessage> ValidateModelInfoAsync(ApplicationUserPutJobInfoViewModel model)
+        private async Task<IActionResult> ValidateModelInfoAsync(ApplicationUserPutJobInfoViewModel model)
         {
             if (model.ManagerId != null)
             {
-                var managerRole = await _rolesRepository.Get().FirstOrDefaultAsync(role => role.Name == Roles.Manager);
-
-                var manager = await _applicationUserRepository
-                    .Get(x => x.Id == model.ManagerId && x.Roles.Any(y => y.RoleId == managerRole.Id))
-                    .FirstOrDefaultAsync();
-
-                if (manager == null)
+                var manager = await _applicationUserRepository.GetByIdAsync(model.ManagerId);
+                if (manager == null || !await _userManager.IsInRoleAsync(manager, Roles.Manager))
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound,
-                        string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.Manager, model.ManagerId));
+                    return StatusCode(404, string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.Manager, model.ManagerId));
                 }
 
                 if (!await _projectService.ValidateManagerIdAsync(model.Id, model.ManagerId))
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.WrongManager);
+                    return BadRequest(Resources.Common.WrongManager);
                 }
             }
 
             if (model.QualificationLevelId == null)
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return null;
             }
 
             var qualificationLevel = await _qualificationLevelRepository.GetByIdAsync(model.QualificationLevelId);
             if (qualificationLevel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound,
-                    string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.QualificationLevelName, model.QualificationLevelId));
+                return StatusCode(404, string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.QualificationLevelName, model.QualificationLevelId));
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return null;
         }
 
         [Route("PutPersonalInfo")]
         [ValidationFilter]
         [HttpPut]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.GetKudosBasketWidgetAsync), typeof(WallWidgetsController))]
-        public async Task<HttpResponseMessage> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]        public async Task<IActionResult> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
         {
             var validatedModel = await ValidateModelAsync(model);
-            if (!validatedModel.IsSuccessStatusCode)
+            if (validatedModel != null)
             {
                 return validatedModel;
             }
@@ -670,17 +658,17 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             if ((user.FirstName != model.FirstName || user.LastName != model.LastName) && !await HasPermissionAsync(userOrg, AdministrationPermissions.ApplicationUser))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             if (await _applicationUserRepository.Get(u => u.Email == model.Email && u.Id != user.Id).AnyAsync())
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
+                return BadRequest(new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
             }
 
             if (user.PictureId != model.PictureId && !string.IsNullOrEmpty(user.PictureId))
@@ -692,12 +680,12 @@ namespace Shrooms.Presentation.Api.Controllers
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            if (!User.IsInRole(Roles.NewUser) || !await _userManager.IsInRoleAsync(user.Id, Roles.FirstLogin))
+            if (!User.IsInRole(Roles.NewUser) || !await _userManager.IsInRoleAsync(user, Roles.FirstLogin))
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Ok();
             }
 
-            await _userManager.RemoveFromRoleAsync(User.Identity.GetUserId(), Roles.FirstLogin);
+            await _userManager.RemoveFromRoleAsync(user, Roles.FirstLogin);
 
             await _administrationUsersService.NotifyAboutNewUserAsync(user, userOrg.OrganizationId);
             var requiresConfirmation = await _organizationService.RequiresUserConfirmationAsync(userOrg.OrganizationId);
@@ -709,60 +697,60 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var response = new { requiresConfirmation };
 
-            return Request.CreateResponse(HttpStatusCode.OK, response);
+            return Ok(response);
         }
 
-        private async Task<HttpResponseMessage> ValidateModelAsync(ApplicationUserPutPersonalInfoViewModel model)
+        private async Task<IActionResult> ValidateModelAsync(ApplicationUserPutPersonalInfoViewModel model)
         {
             if (!await CanAccessAsync(model))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             if (model.BirthDay != null)
             {
                 if (model.BirthDay.Value.Year < WebApiConstants.LowestBirthdayYear)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Common.BirthdayDateIsTooOld) });
+                    return BadRequest(new[] { string.Format(Resources.Common.BirthdayDateIsTooOld) });
                 }
 
                 if (model.BirthDay > DateTime.UtcNow)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Common.BirthdayDateValidationError) });
+                    return BadRequest(new[] { string.Format(Resources.Common.BirthdayDateValidationError) });
                 }
             }
 
-            if (!await _organizationService.IsOrganizationHostValidAsync(model.Email, Request.GetRequestedTenant()))
+            if (!await _organizationService.IsOrganizationHostValidAsync(model.Email, HttpContext.GetRequestedTenant()))
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.WrongEmailDomain) });
+                return BadRequest(new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.WrongEmailDomain) });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return null;
         }
 
         [Route("PutOfficeInfo")]
         [ValidationFilter]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> PutOfficeInfo(ApplicationUserPutOfficeInfoViewModel model)
+        public async Task<IActionResult> PutOfficeInfo(ApplicationUserPutOfficeInfoViewModel model)
         {
             var userId = GetUserAndOrganization().UserId;
             var isUserAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
             if (!isUserAdmin && userId != model.Id)
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var room = await _roomRepository.GetByIdAsync(model.RoomId);
             if (room == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist + " Id: " + model.RoomId, Resources.Models.Room.Room.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist + " Id: " + model.RoomId, Resources.Models.Room.Room.EntityName) });
             }
 
             var user = await _applicationUserRepository.GetByIdAsync(model.Id);
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             if (user.RoomId != model.RoomId)
@@ -774,22 +762,22 @@ namespace Shrooms.Presentation.Api.Controllers
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [Route("PutShroomsInfo")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> PutShroomsInfo(ApplicationUserShroomsInfoViewModel model)
+        public async Task<IActionResult> PutShroomsInfo(ApplicationUserShroomsInfoViewModel model)
         {
             if (!await CanAccessAsync(model))
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden);
+                return StatusCode(403);
             }
 
             var user = await _applicationUserRepository.Get(u => u.Id == model.Id).FirstOrDefaultAsync();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             _mapper.Map(model, user);
@@ -797,7 +785,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [Route("GetForAutoComplete")]
@@ -842,12 +830,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
             s = s.ToLowerInvariant();
 
-            var managerRole = await _rolesRepository.Get().FirstOrDefaultAsync(role => role.Name == Roles.Manager);
+            var managersInRole = await _userManager.GetUsersInRoleAsync(Roles.Manager);
+            var managerIds = managersInRole.Select(u => u.Id).ToHashSet();
 
             if (WebApiConstants.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 var managersWithMantas = await _applicationUserRepository
-                    .Get(m => m.Roles.Any(r => r.RoleId == managerRole.Id) && (m.UserName.ToLower().StartsWith(s)
+                    .Get(m => managerIds.Contains(m.Id) && (m.UserName.ToLower().StartsWith(s)
                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                || (m.FirstName != null && m.LastName != null && (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
@@ -858,7 +847,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var managers = await _applicationUserRepository
-                .Get(m => m.Roles.Any(r => r.RoleId == managerRole.Id) && (m.Id != userId) && (m.UserName.ToLower().StartsWith(s)
+                .Get(m => managerIds.Contains(m.Id) && (m.Id != userId) && (m.UserName.ToLower().StartsWith(s)
                                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                                || (m.FirstName != null && m.LastName != null &&
@@ -871,7 +860,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("CompleteTutorial")]
-        public async Task<IHttpActionResult> SetUserTutorialStatusToComplete()
+        public async Task<IActionResult> SetUserTutorialStatusToComplete()
         {
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync(GetUserAndOrganization().UserId);
             return Ok();
@@ -879,7 +868,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("TutorialStatus")]
-        public async Task<IHttpActionResult> GetUserTutorialStatus()
+        public async Task<IActionResult> GetUserTutorialStatus()
         {
             var tutorialStatus = await _administrationUsersService.GetUserTutorialStatusAsync(GetUserAndOrganization().UserId);
             return Ok(tutorialStatus);
@@ -887,7 +876,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task<IEnumerable<ApplicationRole>> GetUserRolesAsync(string userId)
         {
-            return await _rolesRepository.Get(r => r.Users.Any(u => u.UserId == userId)).ToListAsync();
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return Enumerable.Empty<ApplicationRole>();
+            var roleNames = await _userManager.GetRolesAsync(user);
+            return await _rolesRepository.Get(r => roleNames.Contains(r.Name)).ToListAsync();
         }
 
         public async Task<ApplicationUserPersonalInfoViewModel> MapPersonalInfoAsync(ApplicationUser user)
@@ -908,7 +900,8 @@ namespace Shrooms.Presentation.Api.Controllers
         private async Task<ApplicationUserJobInfoViewModel> MapJobInfoAsync(ApplicationUser user)
         {
             var jobInfo = _mapper.Map<ApplicationUserJobInfoViewModel>(user);
-            var roles = await _rolesRepository.Get(r => r.Users.Any(u => u.UserId == user.Id)).ToListAsync();
+            var roleNames = await _userManager.GetRolesAsync(user);
+            var roles = await _rolesRepository.Get(r => roleNames.Contains(r.Name)).ToListAsync();
             jobInfo.Roles = _mapper.Map<IEnumerable<ApplicationRoleMiniViewModel>>(roles);
 
             return jobInfo;

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,10 +22,10 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
         private const string LoyaltyKudosTypeName = "Loyalty";
 
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<KudosLog> _kudosLogsDbSet;
-        private readonly IDbSet<KudosType> _kudosTypesDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<KudosLog> _kudosLogsDbSet;
+        private readonly DbSet<KudosType> _kudosTypesDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
         private readonly ILogger _logger;
         private readonly IAsyncRunner _asyncRunner;
         private readonly IMapper _mapper;
@@ -87,7 +87,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                                            KudosAddedDate = kl == null ? (DateTime?)null : kl.Created
                                        }).ToListAsync();
 
-                var employeesReceivedLoyaltyKudos = await loyaltyKudosLog
+                var employeesReceivedLoyaltyKudos = loyaltyKudosLog
                     .GroupBy(l => l.Employee)
                     .Select(l => new EmployeeLoyaltyKudosDto
                     {
@@ -98,7 +98,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
                         AwardedLoyaltyKudosCount = l.Count(log => log.KudosAddedDate != null)
                     })
-                    .ToListAsync();
+                    .ToList();
 
                 foreach (var employeeLoyaltyKudos in employeesReceivedLoyaltyKudos)
                 {

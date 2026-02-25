@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Presentation.WebViewModels.Map;
@@ -7,7 +7,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class OfficeMapProfile : Profile
     {
-        protected override void Configure()
+        public OfficeMapProfile()
         {
             CreateOfficeMapMappings();
             CreateMapViewModelMappings();

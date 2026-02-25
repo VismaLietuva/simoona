@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Shrooms.Infrastructure.Sorting;
 using Shrooms.Domain.Extensions;
 using Shrooms.Contracts.Enums;
@@ -22,7 +22,7 @@ namespace Shrooms.Tests.Extensions
             var actual = sortable.AddSortablePropertiesToStart((classPropertyName, SortDirection.Descending));
 
             // Assert
-            Assert.AreEqual(expected, actual.SortByProperties);
+            Assert.That(actual.SortByProperties, Is.EqualTo(expected));
         }
     }
 }

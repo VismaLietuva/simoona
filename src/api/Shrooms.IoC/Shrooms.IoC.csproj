@@ -2,26 +2,14 @@
   <Import Project="..\Targets\shared.targets" />
 
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <ProjectGuid>{6E972BA4-C333-4441-A9DE-CEDB0AA3C7FF}</ProjectGuid>
     <AssemblyTitle>Shrooms.IoC</AssemblyTitle>
     <Product>Shrooms.IoC</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.SignalR2" Version="5.0.0" />
-    <PackageReference Include="Autofac.WebApi2" Version="5.0.0" />
-    <PackageReference Include="ReallySimpleFeatureToggle" Version="1.1.63.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

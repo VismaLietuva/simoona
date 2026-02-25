@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -50,19 +50,19 @@ namespace Shrooms.Premium.Tests.DomainService
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IDbAsyncEnumerable<BookOffice>>();
+            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IAsyncEnumerable<BookOffice>>();
             uow.GetDbSet<BookOffice>().Returns(_bookOfficesDbSet);
 
-            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IDbAsyncEnumerable<BookLog>>();
+            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IAsyncEnumerable<BookLog>>();
             uow.GetDbSet<BookLog>().Returns(_bookLogsDbSet);
 
-            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IDbAsyncEnumerable<Book>>();
+            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IAsyncEnumerable<Book>>();
             uow.GetDbSet<Book>().Returns(_booksDbSet);
 
-            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IDbAsyncEnumerable<Office>>();
+            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IAsyncEnumerable<Office>>();
             uow.GetDbSet<Office>().Returns(_officesDbSet);
 
-            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             uow.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
             _appSettings = Substitute.For<IApplicationSettings>();
@@ -90,9 +90,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "asd"
             };
             var result = await _bookService.FindBookByIsbnAsync("123", 2);
-            Assert.AreEqual(expected.Title, result.Title);
-            Assert.AreEqual(expected.Url, result.Url);
-            Assert.AreEqual(expected.Author, result.Author);
+            ClassicAssert.AreEqual(expected.Title, result.Title);
+            ClassicAssert.AreEqual(expected.Url, result.Url);
+            ClassicAssert.AreEqual(expected.Author, result.Author);
         }
 
         [Test]
@@ -101,10 +101,10 @@ namespace Shrooms.Premium.Tests.DomainService
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
             var res = await _bookService.GetBooksByOfficeAsync(options);
-            Assert.AreEqual(res.ItemCount, 2);
-            Assert.AreEqual(res.Entries.First().QuantityLeft, 1);
-            Assert.AreEqual(res.Entries.First().Readers.First().Id, "testUserId");
-            Assert.IsTrue(res.Entries.First().TakenByCurrentUser);
+            ClassicAssert.AreEqual(res.ItemCount, 2);
+            ClassicAssert.AreEqual(res.Entries.First().QuantityLeft, 1);
+            ClassicAssert.AreEqual(res.Entries.First().Readers.First().Id, "testUserId");
+            ClassicAssert.IsTrue(res.Entries.First().TakenByCurrentUser);
         }
 
         [Test]
@@ -113,8 +113,8 @@ namespace Shrooms.Premium.Tests.DomainService
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId", SearchString = "search" };
             var res = await _bookService.GetBooksByOfficeAsync(options);
-            Assert.AreEqual(res.ItemCount, 1);
-            Assert.AreEqual(res.Entries.First().Title, "Test2search");
+            ClassicAssert.AreEqual(res.ItemCount, 1);
+            ClassicAssert.AreEqual(res.Entries.First().Title, "Test2search");
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var options = new BooksByOfficeOptionsDto { OrganizationId = 2, Page = 1 };
             var res = await _bookService.GetBooksByOfficeAsync(options);
 
-            Assert.AreEqual(res.ItemCount, 3);
+            ClassicAssert.AreEqual(res.ItemCount, 3);
         }
 
         [Test]
@@ -137,11 +137,11 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "testUser2"
             };
             var res = await _bookService.GetBookDetailsAsync(2, userOrg);
-            Assert.AreEqual(2, res.BookLogs.Count());
-            Assert.AreEqual(2, res.BookOfficeId);
-            Assert.AreEqual(1, res.Id);
-            Assert.AreEqual(1, res.BookLogs.First().LogId);
-            Assert.AreEqual("name1 surname1", res.BookLogs.First().FullName);
+            ClassicAssert.AreEqual(2, res.BookLogs.Count());
+            ClassicAssert.AreEqual(2, res.BookOfficeId);
+            ClassicAssert.AreEqual(1, res.Id);
+            ClassicAssert.AreEqual(1, res.BookLogs.First().LogId);
+            ClassicAssert.AreEqual("name1 surname1", res.BookLogs.First().FullName);
         }
 
         [Test]
@@ -154,9 +154,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "testUser2"
             };
             var res = await _bookService.GetBookDetailsWithOfficesAsync(2, userOrg);
-            Assert.AreEqual(2, res.QuantityByOffice.Count());
-            Assert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 1));
-            Assert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 2));
+            ClassicAssert.AreEqual(2, res.QuantityByOffice.Count());
+            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 1));
+            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 2));
         }
 
         [Test]
@@ -359,9 +359,9 @@ namespace Shrooms.Premium.Tests.DomainService
             await _bookService.EditBookAsync(bookDto);
             var bookOffices = (await _booksDbSet.FirstAsync()).BookOffices;
 
-            Assert.AreEqual(0, bookOffices.First(x => x.OfficeId == 1).Quantity);
-            Assert.AreEqual(50, bookOffices.First(x => x.OfficeId == 2).Quantity);
-            Assert.AreEqual("test1", _booksDbSet.First().Author);
+            ClassicAssert.AreEqual(0, bookOffices.First(x => x.OfficeId == 1).Quantity);
+            ClassicAssert.AreEqual(50, bookOffices.First(x => x.OfficeId == 2).Quantity);
+            ClassicAssert.AreEqual("test1", _booksDbSet.First().Author);
         }
 
         #region Mocks

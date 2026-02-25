@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -49,11 +49,11 @@ namespace Shrooms.Premium.Domain.Services.Books
         private readonly IBookServiceValidator _bookServiceValidator;
         private readonly IBookMobileServiceValidator _serviceValidator;
         private readonly IAsyncRunner _asyncRunner;
-        private readonly IDbSet<Book> _booksDbSet;
-        private readonly IDbSet<Office> _officesDbSet;
-        private readonly IDbSet<BookLog> _bookLogsDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
-        private readonly IDbSet<BookOffice> _bookOfficesDbSet;
+        private readonly DbSet<Book> _booksDbSet;
+        private readonly DbSet<Office> _officesDbSet;
+        private readonly DbSet<BookLog> _bookLogsDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<BookOffice> _bookOfficesDbSet;
 
         public BookService(IUnitOfWork2 uow,
             IApplicationSettings appSettings,
@@ -100,8 +100,8 @@ namespace Shrooms.Premium.Domain.Services.Books
             var totalBooksCount = await allBooks.CountAsync();
             var entriesCountToSkip = EntriesCountToSkip(options.Page);
             var books = await allBooks
-                .Skip(() => entriesCountToSkip)
-                .Take(() => BusinessLayerConstants.BooksPerPage)
+                .Skip(entriesCountToSkip)
+                .Take(BusinessLayerConstants.BooksPerPage)
                 .ToListAsync();
 
             var pageDto = new LazyPaged<BooksByOfficeDto>(books, options.Page, BusinessLayerConstants.BooksPerPage, totalBooksCount);

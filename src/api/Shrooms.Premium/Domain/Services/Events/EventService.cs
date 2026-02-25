@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.SqlServer;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -46,7 +45,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
         private readonly DbSet<EventReminder> _eventRemindersDbSet;
-        private readonly IDbSet<Office> _officeDbSet;
+        private readonly DbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
             IPermissionService permissionService,
@@ -130,7 +129,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             // ReSharper disable once PossibleNullReferenceException
             @event.Offices.OfficeNames = await _officeDbSet
-                .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
+                .Where(p => @event.Offices.Value.Contains(p.Id.ToString()))
                 .Select(p => p.Name)
                 .ToListAsync();
 

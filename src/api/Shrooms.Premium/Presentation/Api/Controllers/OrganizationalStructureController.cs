@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.OrganizationalStructure;
@@ -24,7 +25,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.OrganizationalStructure)]
-        public async Task<IHttpActionResult> GetOrganizationalStructure()
+        public async Task<IActionResult> GetOrganizationalStructure()
         {
             var organizationDto = await _organizationalStructureService.GetOrganizationalStructureAsync(GetUserAndOrganization());
             var resultViewModel = _mapper.Map<OrganizationalStructureDto, OrganizationalStructureViewModel>(organizationDto);

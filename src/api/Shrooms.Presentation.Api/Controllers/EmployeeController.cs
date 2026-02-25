@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Contracts.Exceptions;
@@ -9,11 +9,12 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Employees;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
-    [RoutePrefix("Employees")]
+    [Route("Employees")]
     [Authorize]
     public class EmployeeController : BaseController
     {
@@ -29,7 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("")]
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
-        public virtual async Task<IHttpActionResult> GetPagedEmployees([FromUri] EmployeeListingArgsViewModel employeeArgsViewModel)
+        public virtual async Task<IActionResult> GetPagedEmployees([FromQuery] EmployeeListingArgsViewModel employeeArgsViewModel)
         {
             if (!ModelState.IsValid)
             {

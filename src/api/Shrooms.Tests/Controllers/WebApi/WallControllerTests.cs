@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http.Results;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -37,7 +37,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             var permissionService = Substitute.For<IPermissionService>();
             permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>()).Returns(true);
 
-            _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService);
+            _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService, Substitute.For<Microsoft.AspNetCore.SignalR.IHubContext<Shrooms.Presentation.Common.Hubs.NotificationHub>>());
             _wallController.SetUpControllerForTesting();
         }
 
@@ -64,7 +64,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetWallList(WallsListFilter.All);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<WallListViewModel>>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetWall(wallId);
 
-            Assert.IsInstanceOf<BadRequestResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetWall(wallId);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<WallListViewModel>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.JoinWall(wallId);
 
-            Assert.IsInstanceOf<BadRequestResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.JoinWall(wallId);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<ApplicationUserMinimalViewModel>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetWallMembers(wallId);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<WallMemberViewModel>>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -151,7 +151,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetPagedWall(wallId, page);
 
-            Assert.IsInstanceOf<BadRequestResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetPagedWall(wallId, page);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedWallViewModel<WallPostViewModel>>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.GetAllPagedWall(WallsListFilter.None, page);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedWallViewModel<WallPostViewModel>>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -199,7 +199,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.SearchWall(searchString, page);
 
-            Assert.IsInstanceOf<BadRequestResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -210,7 +210,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.SearchWall(searchString, page);
 
-            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedWallViewModel<WallPostViewModel>>>(response);
+            Assert.That(response, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -224,7 +224,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.CreateWall(wall);
 
-            Assert.IsInstanceOf<InvalidModelStateResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -238,7 +238,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.EditWall(wall);
 
-            Assert.IsInstanceOf<InvalidModelStateResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.EditWall(wall);
 
-            Assert.IsInstanceOf<OkResult>(response);
+            Assert.That(response, Is.InstanceOf<OkResult>());
         }
 
         [Test]
@@ -274,7 +274,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.DeleteWall(id);
 
-            Assert.IsInstanceOf<BadRequestResult>(response);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -284,7 +284,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var response = await _wallController.DeleteWall(id);
 
-            Assert.IsInstanceOf<OkResult>(response);
+            Assert.That(response, Is.InstanceOf<OkResult>());
         }
     }
 }

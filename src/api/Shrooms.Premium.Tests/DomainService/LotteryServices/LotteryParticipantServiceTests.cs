@@ -1,5 +1,6 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
@@ -7,7 +8,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService.LotteryServices
@@ -48,7 +49,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             var result = await _participantService.GetPagedParticipantsAsync(lotteryId, page, pageSize);
 
-            Assert.IsTrue(result.Count == pageSize);
+            ClassicAssert.IsTrue(result.Count == pageSize);
         }
 
         private IEnumerable<LotteryParticipant> GetParticipants()

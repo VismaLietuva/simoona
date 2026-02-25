@@ -9,7 +9,12 @@
   <Project Path="Shrooms.Domain/Shrooms.Domain.csproj" />
   <Project Path="Shrooms.Infrastructure/Shrooms.Infrastructure.csproj" />
   <Project Path="Shrooms.Presentation.Common/Shrooms.Presentation.Common.csproj" />
+  <Project Path="Shrooms.Premium/Shrooms.Premium.csproj" />
   <Project Path="Shrooms.Presentation.ModelMappings/Shrooms.Presentation.ModelMappings.csproj" />
   <Project Path="Shrooms.Presentation.WebViewModels/Shrooms.Presentation.WebViewModels.csproj" />
   <Project Path="Shrooms.Resources/Shrooms.Resources.csproj" />
+  <Project Path="Shrooms.IoC/Shrooms.IoC.csproj" />
+  <Project Path="Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj" />
+  <Project Path="Shrooms.Tests/Shrooms.Tests.csproj" />
+  <Project Path="Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj" />
 </Solution>

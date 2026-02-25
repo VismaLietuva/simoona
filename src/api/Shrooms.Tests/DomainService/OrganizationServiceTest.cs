@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -43,8 +43,8 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetOrganizationByIdAsync(1);
 
-            Assert.AreEqual(response.Id, 1);
-            Assert.AreEqual(response.ShortName, "Organization1");
+            Assert.That(1, Is.EqualTo(response.Id));
+            Assert.That("Organization1", Is.EqualTo(response.ShortName));
         }
 
         [Test]
@@ -61,8 +61,8 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetOrganizationByNameAsync("Organization2");
 
-            Assert.AreEqual(response.Id, 2);
-            Assert.AreEqual(response.ShortName, "Organization2");
+            Assert.That(2, Is.EqualTo(response.Id));
+            Assert.That("Organization2", Is.EqualTo(response.ShortName));
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetOrganizationHostNameAsync("Organization2");
 
-            Assert.AreEqual(response, "Host2");
+            Assert.That("Host2", Is.EqualTo(response));
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetOrganizationHostNameAsync("Organization2");
 
-            Assert.AreEqual(response, "Host2");
+            Assert.That("Host2", Is.EqualTo(response));
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetUserOrganizationAsync(new ApplicationUser { Id = "user1" });
 
-            Assert.AreEqual(response.ShortName, "Organization1");
+            Assert.That("Organization1", Is.EqualTo(response.ShortName));
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1c.om", "Organization1");
 
-            Assert.IsFalse(response);
+            Assert.That(response, Is.False);
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1.com", "Organization1");
 
-            Assert.IsTrue(response);
+            Assert.That(response, Is.True);
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.RequiresUserConfirmationAsync(1);
 
-            Assert.IsTrue(response);
+            Assert.That(response, Is.True);
         }
 
         [Test]
@@ -187,8 +187,8 @@ namespace Shrooms.Tests.DomainService
 
             var response = await _organizationService.GetManagingDirectorAsync(1);
 
-            Assert.AreEqual(response.UserId, "user1");
-            Assert.AreEqual(response.FullName, "John Doe");
+            Assert.That("user1", Is.EqualTo(response.UserId));
+            Assert.That("John Doe", Is.EqualTo(response.FullName));
         }
 
         [Test]
@@ -220,9 +220,9 @@ namespace Shrooms.Tests.DomainService
 
             await _organizationService.SetManagingDirectorAsync("user1", userAndOrg);
 
-            Assert.IsTrue(users[0].IsManagingDirector);
-            Assert.IsFalse(users[1].IsManagingDirector);
-            Assert.IsFalse(users[2].IsManagingDirector);
+            Assert.That(users[0].IsManagingDirector, Is.True);
+            Assert.That(users[1].IsManagingDirector, Is.False);
+            Assert.That(users[2].IsManagingDirector, Is.False);
         }
     }
 }

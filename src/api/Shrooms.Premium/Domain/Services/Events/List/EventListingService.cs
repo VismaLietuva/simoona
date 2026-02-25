@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -15,6 +15,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using X.PagedList.EF;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
@@ -32,11 +33,11 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private readonly IEventValidationService _eventValidationService;
 
-        private readonly IDbSet<Event> _eventsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<KudosLog> _kudosLogDbSet;
         private readonly DbSet<KudosType> _kudosTypesDbSet;
         private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
-        private readonly IDbSet<Office> _officeDbSet;
+        private readonly DbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {

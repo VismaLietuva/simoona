@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Jobs;
 using Shrooms.Contracts.Exceptions;
@@ -8,12 +8,13 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Jobs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("JobType")]
+    [Route("JobType")]
     public class JobTypeController : BaseController
     {
         private readonly IMapper _mapper;
@@ -28,7 +29,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
         [Route("Types")]
-        public async Task<IHttpActionResult> GetJobTypes()
+        public async Task<IActionResult> GetJobTypes()
         {
             var jobTypeDto = await _jobService.GetJobTypesAsync(GetUserAndOrganization());
             var jobTypeViewModel = _mapper.Map<IEnumerable<JobTypeDto>, IEnumerable<JobTypeViewModel>>(jobTypeDto);
@@ -39,7 +40,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
         [Route("Get")]
-        public async Task<IHttpActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             if (id <= 0)
             {
@@ -62,7 +63,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
-        public async Task<IHttpActionResult> Create(NewJobTypeViewModel jobTypeViewModel)
+        public async Task<IActionResult> Create(NewJobTypeViewModel jobTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -86,7 +87,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
-        public async Task<IHttpActionResult> Update(JobTypeViewModel jobTypeViewModel)
+        public async Task<IActionResult> Update(JobTypeViewModel jobTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -110,7 +111,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
-        public async Task<IHttpActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (id < 1)
             {

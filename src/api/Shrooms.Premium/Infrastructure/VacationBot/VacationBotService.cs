@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
@@ -49,8 +49,7 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
                     throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
                 }
 
-                var serializer = new JavaScriptSerializer();
-                var result = serializer.Deserialize<VacationInfo[]>(json);
+                var result = JsonSerializer.Deserialize<VacationInfo[]>(json);
 
                 return result;
             }

@@ -1,14 +1,14 @@
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Controllers.Kudos;
 using Shrooms.Presentation.Common.Filters;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
-    [RoutePrefix("ExternalPremiumJobs")]
+    [Route("ExternalPremiumJobs")]
     [IdentityBasicAuthentication]
     public class ExternalPremiumJobsController : BaseController
     {
@@ -35,7 +35,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("GiveLoyaltyKudos")]
-        [InvalidateCacheOutput("GetLastKudosLogRecords", typeof(KudosController))]
         public async Task GiveLoyaltyKudos()
         {
             var organizationName = GetOrganizationName();

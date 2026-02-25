@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -121,7 +121,7 @@ namespace Shrooms.Tests.Infrastructure
             var result = _sut.Generate(viewModel, templateKey);
 
             // Assert
-            Assert.IsFalse(string.IsNullOrEmpty(result));
+            Assert.That(string.IsNullOrEmpty(result), Is.False);
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace Shrooms.Tests.Infrastructure
             var result = _sut.Generate(viewModel, templateKey, timeZoneKey);
 
             // Assert
-            Assert.AreEqual(expectedDate, DateTime.Parse(result));
+            Assert.That(DateTime.Parse(result), Is.EqualTo(expectedDate));
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace Shrooms.Tests.Infrastructure
             var result = _sut.Generate(viewModel, templateKey, timeZoneKey);
 
             // Assert
-            Assert.AreEqual(date, DateTime.Parse(result));
+            Assert.That(DateTime.Parse(result), Is.EqualTo(date));
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace Shrooms.Tests.Infrastructure
             var result = _sut.Generate(viewModel, templateKey, timeZoneKeys);
 
             // Assert
-            Assert.AreEqual(expectedDate, DateTime.Parse(result.Values[timeZoneKeys[0]]));
+            Assert.That(DateTime.Parse(result.Values[timeZoneKeys[0]]), Is.EqualTo(expectedDate));
         }
 
         private static string CompileMockEmailTemplate<TEmailTemplate>(string template) where TEmailTemplate : BaseEmailTemplateViewModel

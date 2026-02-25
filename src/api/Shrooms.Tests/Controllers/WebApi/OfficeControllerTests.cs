@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
@@ -45,37 +44,37 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Office_GetAll_Should_Return_All_Offices()
         {
             var result = (await _officeController.GetAll()) as List<OfficeViewModel>;
-            Assert.IsNotNull(result);
-            Assert.AreEqual(result.Count, 4);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(4, Is.EqualTo(result.Count));
         }
 
         [Test]
         public async Task Office_Get_Returns_Correct_Office()
         {
             var result = await _officeController.Get(1);
-            var model = await result.Content.ReadAsAsync<OfficeViewModel>();
-            Assert.AreEqual(model.Name, "B-Office");
+            var model = result.GetContent<OfficeViewModel>();
+            Assert.That("B-Office", Is.EqualTo(model.Name));
         }
 
         [Test]
         public async Task Office_Get_Should_Return_Bad_Request_If_Giving_Incorrect_Id()
         {
             var result = await _officeController.Get(0);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
         public async Task Office_GetDefault_Should_Return_View_Model()
         {
             var model = await _officeController.GetDefault();
-            Assert.IsInstanceOf<OfficeViewModel>(model);
+            Assert.That(model, Is.InstanceOf<OfficeViewModel>());
         }
 
         [Test]
         public async Task Office_GetPaged_Should_Return_List_Of_All_Offices()
         {
             var result = await _officeController.GetPaged();
-            Assert.AreEqual(4, result.PagedList.Count);
+            Assert.That(result.PagedList.Count, Is.EqualTo(4));
         }
 
         [Test]
@@ -84,15 +83,15 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Office_GetPaged_Should_Return_Sorted_List(string sort, int amountResult, string officeNameResult)
         {
             var result = await _officeController.GetPaged(sort: sort);
-            Assert.AreEqual(result.PagedList.FirstOrDefault()?.Name, officeNameResult);
+            Assert.That(officeNameResult, Is.EqualTo(result.PagedList.FirstOrDefault()?.Name));
         }
 
         [Test]
         public async Task Office_GetPaged_Should_Return_Searched_Offices()
         {
             var result = await _officeController.GetPaged(s: "B-Office");
-            Assert.AreEqual(result.PagedList.Count, 1);
-            Assert.AreEqual(result.PagedList.FirstOrDefault()?.Name, "B-Office");
+            Assert.That(1, Is.EqualTo(result.PagedList.Count));
+            Assert.That("B-Office", Is.EqualTo(result.PagedList.FirstOrDefault()?.Name));
         }
 
         [Test]
@@ -100,21 +99,21 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             _officeController.ModelState.AddModelError("key", "error message");
             var result = await _officeController.Put(null);
-            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
+            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.GetStatusCode()));
         }
 
         [Test]
         public async Task Office_Put_Should_Return_Bad_Request_If()
         {
             var result = await _officeController.Put(null);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
         public async Task Office_Delete_Should_Return_Not_Found_If_Office_Was_Deleted()
         {
             var result = await _officeController.Delete(default);
-            Assert.AreEqual(result.StatusCode, HttpStatusCode.NotFound);
+            Assert.That(HttpStatusCode.NotFound, Is.EqualTo(result.GetStatusCode()));
         }
 
         [Test]
@@ -140,7 +139,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             var result = await _officeController.Post(testOffice);
-            Assert.AreEqual(result.StatusCode, HttpStatusCode.Created);
+            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.GetStatusCode()));
         }
 
         [Test]
@@ -148,14 +147,14 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             _officeController.ModelState.AddModelError("key", "error message");
             var result = await _officeController.Post(null);
-            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
+            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.GetStatusCode()));
         }
 
         [Test]
         public async Task Office_Post_Should_Return_Conflict_Message_If()
         {
             var result = await _officeController.Post(null);
-            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
+            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.GetStatusCode()));
         }
 
         [Test]
@@ -173,7 +172,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             await _officeController.Post(newDefaultOfficePostModel);
             var changedDefaultOffice = await _officeController.GetDefault();
 
-            Assert.AreNotEqual(previousDefaultOffice.Id, changedDefaultOffice.Id);
+            Assert.That(changedDefaultOffice.Id, Is.Not.EqualTo(previousDefaultOffice.Id));
         }
     }
 }

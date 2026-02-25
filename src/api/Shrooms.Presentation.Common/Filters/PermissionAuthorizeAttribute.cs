@@ -1,17 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Presentation.Common.Filters
 {
-    public class PermissionAuthorizeAttribute : AuthorizeAttribute
+    public class PermissionAuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         private readonly List<string> _permissions;
 
@@ -31,30 +30,35 @@ namespace Shrooms.Presentation.Common.Filters
             _permissions = permissions.ToList();
         }
 
-        protected override bool IsAuthorized(HttpActionContext actionContext)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var permissionService = actionContext.Request.GetDependencyScope().GetService(typeof(IPermissionService)) as IPermissionService;
+            if (!context.HttpContext.User.Identity.IsAuthenticated)
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            var permissionService = context.HttpContext.RequestServices.GetService<IPermissionService>();
 
             if (permissionService == null)
             {
-                return false;
+                context.Result = new ObjectResult("Missing permission") { StatusCode = 403 };
+                return;
             }
 
             var userAndOrg = new UserAndOrganizationDto
             {
-                UserId = actionContext.Request.GetRequestContext().Principal.Identity.GetUserId(),
-                OrganizationId = actionContext.Request.GetRequestContext().Principal.Identity.GetOrganizationId()
+                UserId = context.HttpContext.User.Identity.GetUserId(),
+                OrganizationId = context.HttpContext.User.Identity.GetOrganizationId()
             };
 
             var isPermitted = _permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
-                && (Permission != null && permissionService.UserHasPermission(userAndOrg, Permission) || Permission == null);
-            return isPermitted;
-        }
+                && (Permission == null || permissionService.UserHasPermission(userAndOrg, Permission));
 
-        protected override void HandleUnauthorizedRequest(HttpActionContext actionContext)
-        {
-            // Always throwing 403/Forbidden status is easier to catch with AngularJS. Otherwise on 401/Unauthorized status it would show login dialog.
-            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Missing permission");
+            if (!isPermitted)
+            {
+                context.Result = new ObjectResult("Missing permission") { StatusCode = 403 };
+            }
         }
     }
 }

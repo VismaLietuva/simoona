@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -23,17 +22,20 @@ namespace Shrooms.Tests.DomainService
         private ICustomCache<string, IList<string>> _permissionCache;
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<Permission> _permissionsDbSet;
+        private DbSet<IdentityUserRole<string>> _userRolesDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
-            _permissionsDbSet = Substitute.For<DbSet<Permission>, IQueryable<Permission>, IDbAsyncEnumerable<Permission>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
+            _permissionsDbSet = Substitute.For<DbSet<Permission>, IQueryable<Permission>, IAsyncEnumerable<Permission>>();
+            _userRolesDbSet = Substitute.For<DbSet<IdentityUserRole<string>>, IQueryable<IdentityUserRole<string>>, IAsyncEnumerable<IdentityUserRole<string>>>();
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             uow.GetDbSet<Permission>().Returns(_permissionsDbSet);
+            uow.GetDbSet<IdentityUserRole<string>>().Returns(_userRolesDbSet);
 
             _permissionCache = Substitute.For<ICustomCache<string, IList<string>>>();
 
@@ -46,9 +48,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetGroupNamesAsync(1)).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count);
-            Assert.AreEqual("test1", permissionGroups.ToArray()[0].Name);
-            Assert.AreEqual("test2", permissionGroups.ToArray()[1].Name);
+            Assert.That(permissionGroups.Count, Is.EqualTo(2));
+            Assert.That(permissionGroups.ToArray()[0].Name, Is.EqualTo("test1"));
+            Assert.That(permissionGroups.ToArray()[1].Name, Is.EqualTo("test2"));
         }
 
         [Test]
@@ -57,9 +59,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetGroupNamesAsync(2)).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count);
-            Assert.AreEqual("test2", permissionGroups.ToArray()[0].Name);
-            Assert.AreEqual("test3", permissionGroups.ToArray()[1].Name);
+            Assert.That(permissionGroups.Count, Is.EqualTo(2));
+            Assert.That(permissionGroups.ToArray()[0].Name, Is.EqualTo("test2"));
+            Assert.That(permissionGroups.ToArray()[1].Name, Is.EqualTo("test3"));
         }
 
         [Test]
@@ -68,9 +70,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId1", 1)).ToList();
 
-            Assert.AreEqual(4, permissionGroups.Count);
-            Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
-            Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1]);
+            Assert.That(permissionGroups.Count, Is.EqualTo(4));
+            Assert.That(permissionGroups.ToArray()[0], Is.EqualTo("TEST1_BASIC"));
+            Assert.That(permissionGroups.ToArray()[1], Is.EqualTo("TEST1_ADMIN"));
         }
 
         [Test]
@@ -88,9 +90,9 @@ namespace Shrooms.Tests.DomainService
 
             var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId1", 1)).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count);
-            Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
-            Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1]);
+            Assert.That(permissionGroups.Count, Is.EqualTo(2));
+            Assert.That(permissionGroups.ToArray()[0], Is.EqualTo("TEST1_BASIC"));
+            Assert.That(permissionGroups.ToArray()[1], Is.EqualTo("TEST1_ADMIN"));
         }
 
         [Test]
@@ -107,9 +109,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId2", 1)).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count);
-            Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
-            Assert.AreEqual("TEST2_BASIC", permissionGroups.ToArray()[1]);
+            Assert.That(permissionGroups.Count, Is.EqualTo(2));
+            Assert.That(permissionGroups.ToArray()[0], Is.EqualTo("TEST1_BASIC"));
+            Assert.That(permissionGroups.ToArray()[1], Is.EqualTo("TEST2_BASIC"));
         }
 
         [Test]
@@ -118,9 +120,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetRolePermissionsAsync("AdminId", 1)).ToList();
 
-            Assert.AreEqual(4, permissionGroups.Count);
-            Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
-            Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1].Name);
+            Assert.That(permissionGroups.Count, Is.EqualTo(4));
+            Assert.That(permissionGroups.ToArray()[0].Name, Is.EqualTo("TEST1_BASIC"));
+            Assert.That(permissionGroups.ToArray()[1].Name, Is.EqualTo("TEST1_ADMIN"));
         }
 
         [Test]
@@ -129,9 +131,9 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = (await _permissionService.GetRolePermissionsAsync("UserId", 1)).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count);
-            Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
-            Assert.AreEqual("TEST2_BASIC", permissionGroups.ToArray()[1].Name);
+            Assert.That(permissionGroups.Count, Is.EqualTo(2));
+            Assert.That(permissionGroups.ToArray()[0].Name, Is.EqualTo("TEST1_BASIC"));
+            Assert.That(permissionGroups.ToArray()[1].Name, Is.EqualTo("TEST2_BASIC"));
         }
 
         [Test]
@@ -147,7 +149,7 @@ namespace Shrooms.Tests.DomainService
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
-            Assert.AreEqual(true, hasPermission);
+            Assert.That(hasPermission, Is.EqualTo(true));
         }
 
         [Test]
@@ -163,19 +165,12 @@ namespace Shrooms.Tests.DomainService
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
-            Assert.AreEqual(false, hasPermission);
+            Assert.That(hasPermission, Is.EqualTo(false));
         }
 
         private void MockUserPermission()
         {
-            var adminRole = Substitute.For<ApplicationRole>();
-            adminRole.Users.Returns(new List<IdentityUserRole>
-            {
-                new()
-                {
-                    UserId = "userId"
-                }
-            });
+            var adminRole = new ApplicationRole { Id = "adminRoleId" };
 
             var organizationId1 = new List<Organization>
             {
@@ -204,32 +199,25 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
+            var userRoles = new List<IdentityUserRole<string>>
+            {
+                new() { UserId = "userId", RoleId = "adminRoleId" }
+            }.AsQueryable();
+
             _permissionsDbSet.SetDbSetDataForAsync(permissions);
+            _userRolesDbSet.SetDbSetDataForAsync(userRoles);
         }
 
         private void MockPermissions()
         {
-            var adminRole = Substitute.For<ApplicationRole>();
-            adminRole.Id = "AdminId";
-            adminRole.Users.Returns(new List<IdentityUserRole>
-            {
-                new()
-                {
-                    RoleId = "AdminId",
-                    UserId = "UserId1"
-                }
-            });
+            var adminRole = new ApplicationRole { Id = "AdminId" };
+            var userRole = new ApplicationRole { Id = "UserId" };
 
-            var userRole = Substitute.For<ApplicationRole>();
-            userRole.Id = "UserId";
-            userRole.Users.Returns(new List<IdentityUserRole>
+            var userRoles = new List<IdentityUserRole<string>>
             {
-                new()
-                {
-                    RoleId = "UserId",
-                    UserId = "UserId2"
-                }
-            });
+                new() { RoleId = "AdminId", UserId = "UserId1" },
+                new() { RoleId = "UserId", UserId = "UserId2" }
+            }.AsQueryable();
 
             var organizationId1 = new List<Organization>
             {
@@ -335,6 +323,7 @@ namespace Shrooms.Tests.DomainService
             }.AsQueryable();
 
             _permissionsDbSet.SetDbSetDataForAsync(permissions);
+            _userRolesDbSet.SetDbSetDataForAsync(userRoles);
         }
     }
 }

@@ -1,14 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Support;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class SupportModule : Module
+    public static class SupportModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddSupport(this IServiceCollection services)
         {
-            builder.RegisterType<SupportService>().As<ISupportService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<ISupportService, SupportService>();
+            return services;
         }
     }
 }

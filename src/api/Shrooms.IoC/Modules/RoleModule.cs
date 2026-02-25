@@ -1,14 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Roles;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class RoleModule : Module
+    public static class RoleModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddRoles(this IServiceCollection services)
         {
-            builder.RegisterType<RoleService>().As<IRoleService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IRoleService, RoleService>();
+            return services;
         }
     }
 }

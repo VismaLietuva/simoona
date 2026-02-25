@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class LoyaltyKudosProfile : Profile
     {
-        protected override void Configure()
+        public LoyaltyKudosProfile()
         {
             CreateLoyaltyKudosMappings();
         }

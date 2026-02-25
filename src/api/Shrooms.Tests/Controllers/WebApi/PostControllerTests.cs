@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Enums;
@@ -12,6 +10,7 @@ using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
+using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {
@@ -48,14 +47,13 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Type = (LikeTypeEnum)int.MaxValue
             };
 
-            _postController.Validate(addLikeViewModel);
+            _postController.ModelState.AddModelError("Type", "Invalid value");
 
             // Act
-            var httpActionResult = await _postController.ToggleLike(addLikeViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _postController.ToggleLike(addLikeViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -68,14 +66,11 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Type = LikeTypeEnum.Like
             };
 
-            _postController.Validate(addLikeViewModel);
-
             // Act
-            var httpActionResult = await _postController.ToggleLike(addLikeViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _postController.ToggleLike(addLikeViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
         }
     }
 }

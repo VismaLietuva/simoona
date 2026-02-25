@@ -1,14 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.RefreshTokens;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class RefreshTokenModule : Module
+    public static class RefreshTokenModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddRefreshTokens(this IServiceCollection services)
         {
-            builder.RegisterType<RefreshTokenService>().As<IRefreshTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            return services;
         }
     }
 }

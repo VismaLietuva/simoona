@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
@@ -12,12 +13,11 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Controllers.Wall;
 using Shrooms.Presentation.Common.Filters;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("EventType")]
+    [Route("EventType")]
     public class EventTypeController : BaseController
     {
         private readonly IEventUtilitiesService _eventUtilitiesService;
@@ -32,7 +32,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Types")]
-        public async Task<IHttpActionResult> GetEventTypes()
+        public async Task<IActionResult> GetEventTypes()
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
             var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Get")]
-        public async Task<IHttpActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             if (id == 0)
             {
@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> Create(CreateEventTypeViewModel eventTypeViewModel)
+        public async Task<IActionResult> Create(CreateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -94,8 +94,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
+        public async Task<IActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -121,7 +120,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -141,7 +140,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Groups")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetSingleJoinGroupNames()
+        public async Task<IActionResult> GetSingleJoinGroupNames()
         {
             try
             {

@@ -1,5 +1,6 @@
 using AutoMapper;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.Enums;
@@ -24,19 +25,22 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
         private readonly INotificationService _notificationService;
         private readonly ICommentNotificationService _commentNotificationService;
         private readonly IPostService _postService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public CommentNotifier(
             IMapper mapper,
             IWallService wallService,
             INotificationService notificationService,
             ICommentNotificationService commentEmailNotificationService,
-            IPostService postService)
+            IPostService postService,
+            IHubContext<NotificationHub> hubContext)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
             _commentNotificationService = commentEmailNotificationService;
             _postService = postService;
+            _hubContext = hubContext;
         }
 
         public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
@@ -44,7 +48,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             await _commentNotificationService.NotifyAboutNewCommentAsync(commentDto);
 
             var membersToNotify = await _wallService.GetWallMembersIdsAsync(commentDto.WallId, userHubDto);
-            await NotificationHub.SendWallNotificationAsync(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
+            await NotificationHub.SendWallNotificationAsync(_hubContext, commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
             var postWatchers = await _postService.GetPostWatchersForAppNotificationsAsync(commentDto.PostId);
 
@@ -74,7 +78,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
             var notification = _mapper.Map<NotificationViewModel>(notificationAuthorDto);
 
-            await NotificationHub.SendNotificationToParticularUsersAsync(notification, userHubDto, watchers);
+            await NotificationHub.SendNotificationToParticularUsersAsync(_hubContext, notification, userHubDto, watchers);
         }
     }
 }

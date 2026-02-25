@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -15,6 +14,7 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -28,18 +28,18 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override async Task<HttpResponseMessage> Post([FromBody] RoomTypePostViewModel crudViewModel)
+        public override async Task<IActionResult> Post([FromBody] RoomTypePostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var foundRoomType = await GetByIdOrNameAsync(crudViewModel.Name, crudViewModel.Id);
 
             if (foundRoomType != null)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict, new[] { Resources.Models.RoomType.RoomType.RoomTypePutError1 });
+                return StatusCode(409, new[] { Resources.Models.RoomType.RoomType.RoomTypePutError1 });
             }
 
             var roomType = _mapper.Map<RoomTypePostViewModel, RoomType>(crudViewModel);
@@ -47,17 +47,17 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Insert(roomType);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override async Task<HttpResponseMessage> Put([FromBody] RoomTypePostViewModel crudViewModel)
+        public override async Task<IActionResult> Put([FromBody] RoomTypePostViewModel crudViewModel)
         {
             var roomTypeModel = await GetByIdOrNameAsync(crudViewModel.Name, crudViewModel.Id, "Rooms");
 
             if (roomTypeModel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.RoomType.RoomType.RoomTypePostError1 });
+                return StatusCode(404, new[] { Resources.Models.RoomType.RoomType.RoomTypePostError1 });
             }
 
             _mapper.Map(crudViewModel, roomTypeModel);
@@ -65,17 +65,17 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Update(roomTypeModel);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        public override async Task<IActionResult> Delete(int id)
         {
             var roomType = await _repository.Get(maxResults: 1, filter: r => r.Id.Equals(id), includeProperties: "Rooms").FirstOrDefaultAsync();
 
             if (roomType == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             if (roomType.Rooms != null)
@@ -90,7 +90,7 @@ namespace Shrooms.Presentation.Api.Controllers
             await _repository.DeleteByIdAsync(roomType.Id);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]

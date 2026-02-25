@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Extensions;
@@ -19,7 +19,7 @@ namespace Shrooms.Tests.Extensions
             var actual = SortDirection.Ascending.GetString();
 
             // Assert
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Shrooms.Tests.Extensions
             var actual = SortDirection.Descending.GetString();
 
             // Assert
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]

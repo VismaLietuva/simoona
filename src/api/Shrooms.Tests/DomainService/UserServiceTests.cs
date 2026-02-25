@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
@@ -78,8 +78,8 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             var result = _usersDbSet.First();
-            Assert.AreEqual("lt-LT", result.CultureCode);
-            Assert.AreEqual("Pacific Standard Time", result.TimeZone);
+            Assert.That(result.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(result.TimeZone, Is.EqualTo("Pacific Standard Time"));
         }
 
         [Test]
@@ -103,9 +103,9 @@ namespace Shrooms.Tests.DomainService
             // Act, Assert
             var result = _usersDbSet.First();
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
-            Assert.AreEqual(ErrorCodes.CultureUnsupported, ex.ErrorCode);
-            Assert.AreEqual("en-US", result.CultureCode);
-            Assert.AreEqual("FLE Standard Time", result.TimeZone);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.CultureUnsupported));
+            Assert.That(result.CultureCode, Is.EqualTo("en-US"));
+            Assert.That(result.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         [Test]
@@ -129,9 +129,9 @@ namespace Shrooms.Tests.DomainService
             // Act, Assert
             var result = _usersDbSet.First();
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
-            Assert.AreEqual(ErrorCodes.TimezoneUnsupported, ex.ErrorCode);
-            Assert.AreEqual("en-US", result.CultureCode);
-            Assert.AreEqual("FLE Standard Time", result.TimeZone);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.TimezoneUnsupported));
+            Assert.That(result.CultureCode, Is.EqualTo("en-US"));
+            Assert.That(result.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         [Test]
@@ -156,9 +156,9 @@ namespace Shrooms.Tests.DomainService
             var result = await _userService.GetUserLocalizationSettingsAsync(userOrg);
 
             // Assert
-            Assert.IsInstanceOf<LocalizationSettingsDto>(result);
-            Assert.AreEqual(CultureInfo.GetCultureInfo("en-US").DisplayName, result.Languages.First(x => x.IsSelected).DisplayName);
-            Assert.AreEqual(TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time").DisplayName, result.TimeZones.First(x => x.IsSelected).DisplayName);
+            Assert.That(result, Is.InstanceOf<LocalizationSettingsDto>());
+            Assert.That(result.Languages.First(x => x.IsSelected).DisplayName, Is.EqualTo(CultureInfo.GetCultureInfo("en-US").DisplayName));
+            Assert.That(result.TimeZones.First(x => x.IsSelected).DisplayName, Is.EqualTo(TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time").DisplayName));
         }
 
         [Test]
@@ -202,9 +202,9 @@ namespace Shrooms.Tests.DomainService
             var deletedUser = _usersDbSet.First(x => x.Id == "userToDelete");
 
             // Assert
-            Assert.AreEqual(deletedUser.RemainingKudos, 0);
-            Assert.AreEqual(deletedUser.SpentKudos, 0);
-            Assert.AreEqual(deletedUser.TotalKudos, 0);
+            Assert.That(0, Is.EqualTo(deletedUser.RemainingKudos));
+            Assert.That(0, Is.EqualTo(deletedUser.SpentKudos));
+            Assert.That(0, Is.EqualTo(deletedUser.TotalKudos));
             _usersDbSet.Received(1).Remove(Arg.Any<ApplicationUser>());
             _wallModeratorsDbSet.Received(1).Remove(Arg.Is<WallModerator>(m => m.UserId == "userToDelete"));
             _wallUsersDbSet.Received(2).Remove(Arg.Is<WallMember>(m => m.UserId == "userToDelete"));
@@ -217,8 +217,8 @@ namespace Shrooms.Tests.DomainService
 
             var userEmails = await _userService.GetUserEmailsWithPermissionAsync("TEST1_BASIC", 2);
 
-            Assert.AreEqual(1, userEmails.Count);
-            Assert.AreEqual("user1", userEmails.First());
+            Assert.That(userEmails.Count, Is.EqualTo(1));
+            Assert.That(userEmails.First(), Is.EqualTo("user1"));
         }
 
         [Test]
@@ -268,9 +268,9 @@ namespace Shrooms.Tests.DomainService
             _userService.ChangeWallNotificationSettingsAsync(userSettings, userAndOrg);
 
             // Assert
-            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 1).EmailNotificationsEnabled);
-            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 3).EmailNotificationsEnabled);
-            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 4).EmailNotificationsEnabled);
+            Assert.That(_wallUsersDbSet.First(x => x.WallId == 1).EmailNotificationsEnabled, Is.EqualTo(true));
+            Assert.That(_wallUsersDbSet.First(x => x.WallId == 3).EmailNotificationsEnabled, Is.EqualTo(true));
+            Assert.That(_wallUsersDbSet.First(x => x.WallId == 4).EmailNotificationsEnabled, Is.EqualTo(true));
         }
 
         [Test]
@@ -320,7 +320,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -350,7 +350,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -383,7 +383,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _userService.GetReceiversWithEventEmailNotificationAsync(organizationId);
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
         }
 
         #region Mocks
@@ -434,36 +434,13 @@ namespace Shrooms.Tests.DomainService
 
             var user1 = Substitute.For<ApplicationUser>();
             user1.Email = "user1";
-            user1.Roles.Returns(
-                new List<IdentityUserRole>
-                {
-                    new()
-                    {
-                        RoleId = "roleId1"
-                    }
-                });
 
             var user2 = Substitute.For<ApplicationUser>();
             user2.Email = "user2";
-            user2.Roles.Returns(
-                new List<IdentityUserRole>
-                {
-                    new()
-                    {
-                        RoleId = "roleId2"
-                    }
-                });
 
             var user3 = Substitute.For<ApplicationUser>();
             user3.Email = "user3";
-            user3.Roles.Returns(
-                new List<IdentityUserRole>
-                {
-                    new()
-                    {
-                        RoleId = "roleId3"
-                    }
-                });
+
 
             var users = new List<ApplicationUser>
             {

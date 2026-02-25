@@ -1,11 +1,11 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
 using System.Threading.Tasks;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using System.Linq;
@@ -93,9 +93,9 @@ namespace Shrooms.Tests
                 .Received(1)
                 .CheckIfPageTypeExists(Arg.Is(pageType));
 
-            Assert.AreEqual(actualResult.Count, expectedCount);
-            Assert.AreEqual(actualResult[0].Id, expectedFirstItemId);
-            Assert.AreEqual(actualResult[1].Id, expectedSecondItemId);
+            Assert.That(expectedCount, Is.EqualTo(actualResult.Count));
+            Assert.That(expectedFirstItemId, Is.EqualTo(actualResult[0].Id));
+            Assert.That(expectedSecondItemId, Is.EqualTo(actualResult[1].Id));
         }
 
         [TestCase(new FilterType[] { FilterType.Kudos })]
@@ -222,7 +222,7 @@ namespace Shrooms.Tests
             await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(typeId, type, organizationId);
 
             // Assert
-            Assert.IsFalse(presets.Any(preset => preset.Preset.Contains($"{{\"FilterType\":{type},\"Types\":[\"{typeId}\"]}}")));
+            Assert.That(presets.Any(preset => preset.Preset.Contains($"{{\"FilterType\":{type},\"Types\":[\"{typeId}\"]}}")), Is.False);
         }
 
         [TestCase(4, 0)]
@@ -358,18 +358,18 @@ namespace Shrooms.Tests
                 .Received(2)
                 .CheckIfFilterPresetsContainUniqueNames(Arg.Any<IEnumerable<FilterPresetDto>>());
 
-            Assert.NotNull(result.CreatedPresets
+            Assert.That(result.CreatedPresets
                 .FirstOrDefault(preset => preset.IsDefault == presetToCreate.IsDefault &&
                                           preset.Id == presetToCreate.Id &&
-                                          preset.Name == presetToCreate.Name));
+                                          preset.Name == presetToCreate.Name), Is.Not.Null);
 
-            Assert.NotNull(result.UpdatedPresets
+            Assert.That(result.UpdatedPresets
                 .FirstOrDefault(preset => preset.IsDefault == presetToUpdate.IsDefault &&
                                           preset.Id == presetToUpdate.Id &&
-                                          preset.Name == presetToUpdate.Name));
+                                          preset.Name == presetToUpdate.Name), Is.Not.Null);
 
-            Assert.NotNull(result.DeletedPresets
-                .FirstOrDefault(preset => preset.Id == presetToDeleteId));
+            Assert.That(result.DeletedPresets
+                .FirstOrDefault(preset => preset.Id == presetToDeleteId), Is.Not.Null);
         }
     }
 }

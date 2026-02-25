@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Tests.Mocks
 {
-    public class MockPasswordHasher : IPasswordHasher
+    public class MockPasswordHasher : IPasswordHasher<ApplicationUser>
     {
         public bool Hashed { get; set; }
 
@@ -12,13 +13,13 @@ namespace Shrooms.Tests.Mocks
 
         public PasswordVerificationResult VerifyHashedPasswordResult { get; set; }
 
-        public string HashPassword(string password)
+        public string HashPassword(ApplicationUser user, string password)
         {
             Hashed = true;
             return HashPasswordResult;
         }
 
-        public PasswordVerificationResult VerifyHashedPassword(string hashedPassword, string providedPassword)
+        public PasswordVerificationResult VerifyHashedPassword(ApplicationUser user, string hashedPassword, string providedPassword)
         {
             VerifiedHashedPassword = true;
             return VerifyHashedPasswordResult;

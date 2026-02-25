@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class KudosShopProfile : Profile
     {
-        protected override void Configure()
+        public KudosShopProfile()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();

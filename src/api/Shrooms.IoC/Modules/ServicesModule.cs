@@ -1,20 +1,20 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.VacationPages;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class ServicesModule : Module
+    public static class ServicesModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddShroomsServices(this IServiceCollection services)
         {
-            builder.RegisterType<PictureService>().As<IPictureService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<UserService>().As<IUserService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<VacationPageService>().As<IVacationPageService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IPictureService, PictureService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IVacationPageService, VacationPageService>();
+            return services;
         }
     }
 }

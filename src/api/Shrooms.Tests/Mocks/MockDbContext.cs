@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NSubstitute;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -12,7 +13,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.Tests.Mocks
 {
-    public class MockDbContext : DbContext, IDbContext
+    public class MockDbContext : IDbContext
     {
         public List<ApplicationUser> ApplicationUsers { get; set; }
 
@@ -521,15 +522,15 @@ namespace Shrooms.Tests.Mocks
             return list;
         }
 
-        private static DbSet<T> CreateMock<T>(IQueryable<T> list)
-            where T : class
+        private static DbSet<T> CreateMock<T>(IQueryable<T> list) where T : class
         {
-            var mockedDbSet = Substitute.For<DbSet<T>, IQueryable<T>, IDbAsyncEnumerable<T>>();
+            var mockedDbSet = Substitute.For<DbSet<T>, IQueryable<T>, IAsyncEnumerable<T>>();
 
             var queryableMockSet = (IQueryable<T>)mockedDbSet;
-            var dbAsyncEnumerableMockSet = (IDbAsyncEnumerable<T>)mockedDbSet;
-            dbAsyncEnumerableMockSet.GetAsyncEnumerator().Returns(_ => new MockDbAsyncEnumerator<T>(list.GetEnumerator()));
-            queryableMockSet.Provider.Returns(new MockDbAsyncQueryProvider<T>(list.Provider));
+            var asyncEnumerableMockSet = (IAsyncEnumerable<T>)mockedDbSet;
+            asyncEnumerableMockSet.GetAsyncEnumerator(Arg.Any<CancellationToken>())
+                .Returns(_ => new MockAsyncEnumerator<T>(list.GetEnumerator()));
+            queryableMockSet.Provider.Returns(new MockAsyncQueryProvider<T>(list.Provider));
 
             queryableMockSet.Expression.Returns(list.Expression);
             queryableMockSet.ElementType.Returns(list.ElementType);
@@ -541,8 +542,7 @@ namespace Shrooms.Tests.Mocks
             return mockedDbSet;
         }
 
-        public new DbSet<T> Set<T>()
-            where T : class
+        public DbSet<T> Set<T>() where T : class
         {
             DbSet<T> dbSet = null;
 
@@ -554,6 +554,11 @@ namespace Shrooms.Tests.Mocks
             }
 
             return dbSet;
+        }
+
+        public EntityEntry<T> Entry<T>(T entity) where T : class
+        {
+            throw new NotImplementedException();
         }
 
         public int SaveChanges(bool useMetaTracking = true)
@@ -571,9 +576,13 @@ namespace Shrooms.Tests.Mocks
             throw new NotImplementedException();
         }
 
-        public Task<int> SaveChangesAsync(bool useMetaTracking)
+        public Task<int> SaveChangesAsync(bool useMetaTracking = true)
         {
             throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

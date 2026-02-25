@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
@@ -29,13 +28,12 @@ using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Domain.Extensions;
-using WebApi.OutputCache.V2;
 using Shrooms.Presentation.Common.Controllers.Wall;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("Events")]
+    [Route("Events")]
     public class EventController : BaseController
     {
         private readonly IMapper _mapper;
@@ -75,7 +73,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Recurrences")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventRecurrenceOptions()
+        public IActionResult GetEventRecurrenceOptions()
         {
             var recurrences = _eventUtilitiesService.GetRecurrenceOptions();
             return Ok(recurrences);
@@ -83,7 +81,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Types")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventTypes()
+        public async Task<IActionResult> GetEventTypes()
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
             var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
@@ -93,7 +91,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Offices")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetOffices()
+        public async Task<IActionResult> GetOffices()
         {
             var offices = await _officeMapService.GetOfficesAsync();
             var result = _mapper.Map<IEnumerable<OfficeDto>, IEnumerable<EventOfficeViewModel>>(offices);
@@ -103,7 +101,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventsFiltered([FromUri] EventFilteredArgsViewModel filteredArgsViewModel)
+        public async Task<IActionResult> GetEventsFiltered([FromQuery] EventFilteredArgsViewModel filteredArgsViewModel)
         {
             EventFilteredArgsDto filteredArgsDto;
 
@@ -147,8 +145,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> CreateEvent(CreateEventViewModel eventViewModel)
+        public async Task<IActionResult> CreateEvent(CreateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -181,8 +178,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> UpdateEvent(UpdateEventViewModel eventViewModel)
+        public async Task<IActionResult> UpdateEvent(UpdateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -208,7 +204,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetMyEvents([FromUri] MyEventsOptionsViewModel options)
+        public async Task<IActionResult> GetMyEvents([FromQuery] MyEventsOptionsViewModel options)
         {
             if (options == null || !ModelState.IsValid)
             {
@@ -234,7 +230,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventOptions(Guid eventId)
+        public async Task<IActionResult> GetEventOptions(Guid eventId)
         {
             try
             {
@@ -251,7 +247,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPatch]
         [Route("Pin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> ToggleEventPin(Guid eventId)
+        public async Task<IActionResult> ToggleEventPin(Guid eventId)
         {
             try
             {
@@ -266,14 +262,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Download")]
-        public async Task<IHttpActionResult> DownloadEvent(Guid eventId)
+        public async Task<IActionResult> DownloadEvent(Guid eventId)
         {
             try
             {
                 var userOrg = GetUserAndOrganization();
-                var stream = new ByteArrayContent(await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId));
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
-                return ResponseMessage(result);
+                var bytes = await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId);
+                return File(bytes, "text/calendar");
             }
             catch (EventException e)
             {
@@ -284,7 +279,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("AddColleague")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> AddColleague(EventJoinMultipleViewModel eventJoinModel)
+        public async Task<IActionResult> AddColleague(EventJoinMultipleViewModel eventJoinModel)
         {
             var eventJoinDto = _mapper.Map<EventJoinMultipleViewModel, EventJoinDto>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDto);
@@ -303,7 +298,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Join")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> Join(EventJoinViewModel joinOptions)
+        public async Task<IActionResult> Join(EventJoinViewModel joinOptions)
         {
             if (!ModelState.IsValid)
             {
@@ -328,7 +323,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("UpdateAttendStatus")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
+        public async Task<IActionResult> UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -352,7 +347,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventDetails(Guid eventId)
+        public async Task<IActionResult> GetEventDetails(Guid eventId)
         {
             try
             {
@@ -372,7 +367,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("GetPagedReportParticipants")]
-        public async Task<IHttpActionResult> GetPagedReportParticipants([FromUri] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
+        public async Task<IActionResult> GetPagedReportParticipants([FromQuery] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -396,7 +391,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPagedVisitedReportEvents")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetPagedVisitedReportEvents([FromUri] EventParticipantVisitedEventsListingArgsViewModel visitedArgsViewModel)
+        public async Task<IActionResult> GetPagedVisitedReportEvents([FromQuery] EventParticipantVisitedEventsListingArgsViewModel visitedArgsViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -420,7 +415,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventForUpdate(Guid eventId)
+        public async Task<IActionResult> GetEventForUpdate(Guid eventId)
         {
             try
             {
@@ -437,8 +432,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.Get), typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> Delete(Guid eventId)
+        public async Task<IActionResult> Delete(Guid eventId)
         {
             try
             {
@@ -454,7 +448,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Leave")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> Leave(Guid eventId, string leaveComment)
+        public async Task<IActionResult> Leave(Guid eventId, string leaveComment)
         {
             try
             {
@@ -474,7 +468,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Expel")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> Expel(Guid eventId, string userId)
+        public async Task<IActionResult> Expel(Guid eventId, string userId)
         {
             try
             {
@@ -494,7 +488,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetUsersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> SearchUser(string s, Guid eventId)
+        public async Task<IActionResult> SearchUser(string s, Guid eventId)
         {
             var searchResultDto = await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, s, GetUserAndOrganization());
             var searchResult = _mapper.Map<IEnumerable<EventUserSearchResultDto>, IEnumerable<EventUserSearchResultViewModel>>(searchResultDto);
@@ -504,7 +498,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("ResetAttendees")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> ResetAttendees(Guid eventId)
+        public async Task<IActionResult> ResetAttendees(Guid eventId)
         {
             try
             {
@@ -520,14 +514,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [Route("Export")]
-        public async Task<IHttpActionResult> Export(Guid eventId)
+        public async Task<IActionResult> Export(Guid eventId)
         {
             try
             {
                 var content = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
-
-                return ResponseMessage(result);
+                var bytes = await content.ReadAsByteArrayAsync();
+                return File(bytes, "application/vnd.ms-excel");
             }
             catch (EventException e)
             {
@@ -538,7 +531,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [Route("MaxParticipants")]
-        public async Task<IHttpActionResult> GetMaxEventParticipants()
+        public async Task<IActionResult> GetMaxEventParticipants()
         {
             var maxParticipants = await _eventParticipationService.GetMaxParticipantsCountAsync(GetUserAndOrganization());
             return Ok(new { value = maxParticipants });
@@ -547,7 +540,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Share")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> ShareEvent(ShareEventViewModel shareEventViewModel)
+        public async Task<IActionResult> ShareEvent(ShareEventViewModel shareEventViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -587,7 +580,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> UpdateSelectedOptions(EventChangeOptionViewModel viewModel)
+        public async Task<IActionResult> UpdateSelectedOptions(EventChangeOptionViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -611,7 +604,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetReportEventDetails")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetReportEventDetails(Guid eventId)
+        public async Task<IActionResult> GetReportEventDetails(Guid eventId)
         {
             try
             {
@@ -629,7 +622,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetEventsByTitle")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventsByTitle([FromUri] EventReportListingArgsViewModel reportArgsViewModel)
+        public async Task<IActionResult> GetEventsByTitle([FromQuery] EventReportListingArgsViewModel reportArgsViewModel)
         {
             if (!ModelState.IsValid)
             {

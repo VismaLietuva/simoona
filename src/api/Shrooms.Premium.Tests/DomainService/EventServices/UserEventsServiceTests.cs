@@ -1,5 +1,6 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -9,7 +10,7 @@ using Shrooms.Premium.Domain.Services.Users;
 using Shrooms.Tests.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -78,7 +79,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = await _sut.GetReadyNotCompletedRemindersAsync(_defaultOrganization);
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            ClassicAssert.AreEqual(1, result.Count());
         }
 
         [Test]
@@ -108,7 +109,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = await _sut.GetReadyNotCompletedRemindersAsync(_defaultOrganization);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            ClassicAssert.IsFalse(result.Any());
         }
 
         [Test]
@@ -138,7 +139,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = await _sut.GetReadyNotCompletedRemindersAsync(_defaultOrganization);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            ClassicAssert.IsFalse(result.Any());
         }
 
         [Test]
@@ -168,7 +169,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = await _sut.GetReadyNotCompletedRemindersAsync(_defaultOrganization);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            ClassicAssert.IsFalse(result.Any());
         }
 
         [TestCase(0)]
@@ -206,7 +207,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = await _sut.GetReadyNotCompletedRemindersAsync(new Organization { Id = organizationId });
 
             // Assert
-            Assert.AreEqual(1, result.Count());
+            ClassicAssert.AreEqual(1, result.Count());
         }
 
         [Test]
@@ -237,8 +238,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await _sut.SetRemindersAsCompleteAsync(reminders);
 
             // Assert
-            Assert.IsTrue(reminder.IsReminded);
-            Assert.AreEqual(1, reminder.RemindedCount);
+            ClassicAssert.IsTrue(reminder.IsReminded);
+            ClassicAssert.AreEqual(1, reminder.RemindedCount);
             await _uow.Received(1).SaveChangesAsync(Arg.Any<bool>());
         }
 

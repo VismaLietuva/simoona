@@ -1,18 +1,18 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.Vacations;
 using Shrooms.Premium.Infrastructure.VacationBot;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class VacationModule : Module
+    public static class VacationModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumVacation(this IServiceCollection services)
         {
-            builder.RegisterType<VacationHistoryService>().As<IVacationHistoryService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<VacationService>().As<IVacationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<VacationBotService>().As<IVacationBotService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<VacationDomainService>().As<IVacationDomainService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IVacationHistoryService, VacationHistoryService>();
+            services.AddScoped<IVacationService, VacationService>();
+            services.AddScoped<IVacationBotService, VacationBotService>();
+            services.AddScoped<IVacationDomainService, VacationDomainService>();
+            return services;
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -26,7 +25,7 @@ namespace Shrooms.Tests.DomainService
         [SetUp]
         public void TestInitializer()
         {
-            _monitorsDbSet = Substitute.For<DbSet<Monitor>, IQueryable<Monitor>, IDbAsyncEnumerable<Monitor>>();
+            _monitorsDbSet = Substitute.For<DbSet<Monitor>, IQueryable<Monitor>, IAsyncEnumerable<Monitor>>();
 
             _uow = Substitute.For<IUnitOfWork2>();
 
@@ -41,8 +40,8 @@ namespace Shrooms.Tests.DomainService
             MockExternalLinks();
 
             var result = (await _monitorService.GetMonitorListAsync(2)).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("Test1", result.First().Name);
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.First().Name, Is.EqualTo("Test1"));
         }
 
         [Test]
@@ -51,7 +50,7 @@ namespace Shrooms.Tests.DomainService
             MockExternalLinks();
 
             var result = await _monitorService.GetMonitorDetailsAsync(2, 2);
-            Assert.AreEqual("Test2", result.Name);
+            Assert.That(result.Name, Is.EqualTo("Test2"));
         }
 
         [Test]

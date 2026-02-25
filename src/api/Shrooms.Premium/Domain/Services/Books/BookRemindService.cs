@@ -1,5 +1,5 @@
-﻿using System;
-using System.Data.Entity;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.Books
         private readonly IMailTemplate _mailTemplate;
         private readonly IMailingService _mailingService;
         private readonly IOrganizationService _organizationService;
-        private readonly IDbSet<BookLog> _booksDbSet;
+        private readonly DbSet<BookLog> _booksDbSet;
         private readonly ILogger _logger;
 
         public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService, ILogger logger)

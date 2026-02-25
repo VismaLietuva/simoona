@@ -1,8 +1,8 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataLayer.EntityModels.Models;
 using System;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Tests.Extensions;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;

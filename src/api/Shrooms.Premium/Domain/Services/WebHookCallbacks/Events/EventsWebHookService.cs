@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -23,8 +23,8 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             { EventRecurrenceOptions.EveryMonth, e => e.AddMonths(1) }
         };
 
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<EventOption> _eventOptionsDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IWallService _wallService;
