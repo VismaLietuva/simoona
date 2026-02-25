@@ -1,55 +1,35 @@
-﻿using System.Configuration;
-using Hangfire.Annotations;
+﻿using Hangfire.Annotations;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Presentation.Api.GeneralCode
 {
     public class UnwantedTelemetryFilter : ITelemetryProcessor
     {
-        private static bool _backgroundJobsDbNameSet;
-        private static string _backgroundJobsDbName;
-
-        private static string BackgroundJobsDbName
-        {
-            get
-            {
-                if (_backgroundJobsDbNameSet)
-                {
-                    return _backgroundJobsDbName;
-                }
-
-                _backgroundJobsDbNameSet = true;
-
-                if (_backgroundJobsDbName != null)
-                {
-                    return _backgroundJobsDbName;
-                }
-
-                if (ConfigurationManager.ConnectionStrings.Count <= 0)
-                {
-                    return _backgroundJobsDbName;
-                }
-
-                var connectionString = ConfigurationManager.ConnectionStrings[DataLayerConstants.ConnectionStringNameBackgroundJobs].ConnectionString;
-
-                if (connectionString != null)
-                {
-                    var builder = new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
-                    _backgroundJobsDbName = builder.InitialCatalog;
-                }
-
-                return _backgroundJobsDbName;
-            }
-        }
+        private readonly string _backgroundJobsDbName;
 
         private ITelemetryProcessor Next { get; set; }
 
-        public UnwantedTelemetryFilter(ITelemetryProcessor next)
+        public UnwantedTelemetryFilter(ITelemetryProcessor next, IConfiguration configuration)
         {
             Next = next;
+            _backgroundJobsDbName = ResolveBackgroundJobsDbName(configuration);
+        }
+
+        private static string ResolveBackgroundJobsDbName(IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString(DataLayerConstants.ConnectionStringNameBackgroundJobs);
+            if (connectionString == null)
+            {
+                return null;
+            }
+
+            var builder = new SqlConnectionStringBuilder(connectionString);
+            return builder.InitialCatalog;
         }
 
         public void Process(ITelemetry item)
@@ -123,19 +103,19 @@ namespace Shrooms.Presentation.Api.GeneralCode
             return false;
         }
 
-        private static bool IsHangfireBackgroundJobs(DependencyTelemetry dependency)
+        private bool IsHangfireBackgroundJobs(DependencyTelemetry dependency)
         {
-            if (BackgroundJobsDbName == null || dependency.Type != "SQL" || !dependency.Success.GetValueOrDefault(false))
+            if (_backgroundJobsDbName == null || dependency.Type != "SQL" || !dependency.Success.GetValueOrDefault(false))
             {
                 return false;
             }
 
-            if (dependency.Name.Contains(BackgroundJobsDbName))
+            if (dependency.Name.Contains(_backgroundJobsDbName))
             {
                 return true;
             }
 
-            if (dependency.Target.Contains(BackgroundJobsDbName)
+            if (dependency.Target.Contains(_backgroundJobsDbName)
                 && (dependency.Name.Equals("sp_getapplock") || dependency.Name.Equals("sp_releaseapplock")))
             {
                 return true;

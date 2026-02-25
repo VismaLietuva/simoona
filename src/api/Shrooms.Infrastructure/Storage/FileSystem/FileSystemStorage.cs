@@ -1,6 +1,4 @@
-using System.Drawing;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
@@ -24,18 +22,6 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
             {
                 fileInfo.Delete();
             }
-
-            return Task.CompletedTask;
-        }
-
-        [SupportedOSPlatform("windows")]
-        public Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
-        {
-            var directoryPath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer);
-            var fullPath = Path.Combine(directoryPath, blobKey);
-            Directory.CreateDirectory(directoryPath);
-
-            image.Save(fullPath);
 
             return Task.CompletedTask;
         }

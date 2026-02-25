@@ -1,7 +1,5 @@
 using System;
-using System.Drawing;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -28,32 +26,10 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
             }
         }
 
-        [SupportedOSPlatform("windows")]
-        public async Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
-        {
-            var blobClient = GetBlobClient(blobKey, tenantPicturesContainer);
-
-            using (var stream = new MemoryStream())
-            {
-                image.Save(stream, image.RawFormat);
-                stream.Position = 0;
-                
-                var uploadOptions = new BlobUploadOptions
-                {
-                    HttpHeaders = new BlobHttpHeaders
-                    {
-                        ContentType = mimeType
-                    }
-                };
-                
-                await blobClient.UploadAsync(stream, uploadOptions);
-            }
-        }
-
         public async Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var blobClient = GetBlobClient(blobKey, tenantPicturesContainer);
-            
+
             var uploadOptions = new BlobUploadOptions
             {
                 HttpHeaders = new BlobHttpHeaders
@@ -61,7 +37,7 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
                     ContentType = mimeType
                 }
             };
-            
+
             await blobClient.UploadAsync(stream, uploadOptions);
         }
 
