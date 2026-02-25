@@ -35,9 +35,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <!-- Exclude EF6 migrations from compilation - these won't work with EF Core -->
   <ItemGroup>
-    <Compile Remove="Migrations\**\*.cs" />
     <Compile Remove="Providers\ApplicationOAuthProvider.cs" />
     <Compile Remove="DAL\ShroomsContextConfiguration.cs" />
   </ItemGroup>
