@@ -55,20 +55,28 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.Entity<NotificationsSettings>()
                 .HasQueryFilter(e => !e.IsDeleted);
 
-            _modelBuilder.Entity<LikesCollection>()
-                .Property(x => x.Serialized)
-                .HasColumnName("Likes");
-            _modelBuilder.Entity<ImageCollection>()
-                .Property(x => x.Serialized)
-                .HasColumnName("Images");
-            _modelBuilder.Entity<Sources>()
-                .Property(x => x.Serialized)
-                .HasColumnName("Sources");
-            _modelBuilder.Entity<Sources>()
-                .Ignore(x => x.EventId)
-                .Ignore(x => x.PostId)
-                .Ignore(x => x.ProjectId)
-                .Ignore(x => x.WallId);
+            // LikesCollection is an owned type stored as a JSON column on Post and Comment
+            _modelBuilder.Entity<Post>()
+                .OwnsOne(p => p.Likes, b => b.Property(x => x.Serialized).HasColumnName("Likes"));
+            _modelBuilder.Entity<Comment>()
+                .OwnsOne(c => c.Likes, b => b.Property(x => x.Serialized).HasColumnName("Likes"));
+
+            // ImageCollection is an owned type stored as a JSON column on Post and Comment
+            _modelBuilder.Entity<Post>()
+                .OwnsOne(p => p.Images, b => b.Property(x => x.Serialized).HasColumnName("Images"));
+            _modelBuilder.Entity<Comment>()
+                .OwnsOne(c => c.Images, b => b.Property(x => x.Serialized).HasColumnName("Images"));
+
+            // Sources is an owned type on Notification stored as a JSON column
+            _modelBuilder.Entity<Notification>()
+                .OwnsOne(n => n.Sources, b =>
+                {
+                    b.Property(x => x.Serialized).HasColumnName("Sources");
+                    b.Ignore(x => x.EventId);
+                    b.Ignore(x => x.PostId);
+                    b.Ignore(x => x.ProjectId);
+                    b.Ignore(x => x.WallId);
+                });
 
             _modelBuilder.Entity<Exam>()
                 .HasOne(a => a.Organization)
@@ -128,6 +136,12 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            _modelBuilder.Entity<Project>()
+                .HasOne(p => p.Owner)
+                .WithMany(u => u.OwnedProjects)
+                .HasForeignKey(p => p.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             _modelBuilder.Entity<Project>()

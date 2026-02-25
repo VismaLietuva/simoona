@@ -14,6 +14,14 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .WithMany()
                 .HasForeignKey(o => o.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.OwnsOne(o => o.Address, a =>
+            {
+                a.Property(x => x.Country).HasColumnName("Country");
+                a.Property(x => x.City).HasColumnName("City");
+                a.Property(x => x.Street).HasColumnName("Street");
+                a.Property(x => x.Building).HasColumnName("Building");
+            });
         }
     }
 }

@@ -40,7 +40,8 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             _pictureService = Substitute.For<IPictureService>();
 
-            _usersAnonymizationWebHookService = new UsersAnonymizationWebHookService(_uow, _pictureService);
+            var configuration = Substitute.For<Microsoft.Extensions.Configuration.IConfiguration>();
+            _usersAnonymizationWebHookService = new UsersAnonymizationWebHookService(_uow, _pictureService, configuration);
         }
 
         [Test]

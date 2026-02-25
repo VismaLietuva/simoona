@@ -52,6 +52,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasForeignKey(ul => ul.UserId);
             */
 
+            // Map EF Core Identity v3 column name to old Identity v2 column name
+            builder.Property(u => u.LockoutEnd)
+                .HasColumnName("LockoutEndDateUtc");
+
             builder.Property(u => u.UserName)
                 .IsRequired()
                 .HasMaxLength(256);
@@ -81,12 +85,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             builder.HasOne(u => u.Organization)
                 .WithMany()
                 .HasForeignKey(u => u.OrganizationId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // One-to-many: ApplicationUser -> OwnedProjects
-            builder.HasMany(u => u.OwnedProjects)
-                .WithOne()
-                .HasForeignKey(p => p.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Many-to-many: ApplicationUser <-> Committee (Members)

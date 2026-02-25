@@ -172,6 +172,59 @@ builder.Services.AddShrooms();
 
 var app = builder.Build();
 
+// Apply pending EF Core migrations at startup.
+// For existing databases (migrated from EF6), the InitialBaseline migration is skipped
+// by marking it as already applied — it only needs to run on fresh installs.
+using (var scope = app.Services.CreateScope())
+{
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var connStr = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
+    var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+        .UseSqlServer(connStr)
+        .Options;
+    using var db = new ShroomsDbContext(options);
+    ApplyMigrationsForBrownfieldDatabase(db);
+}
+
+static void ApplyMigrationsForBrownfieldDatabase(ShroomsDbContext db)
+{
+    // Check whether __EFMigrationsHistory exists
+    var historyTableCount = db.Database.SqlQueryRaw<int>(
+        "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '__EFMigrationsHistory'")
+        .First();
+
+    if (historyTableCount == 0)
+    {
+        // No EF Core history table → this is either a fresh DB or a brownfield EF6 DB.
+        // Check if AspNetUsers already exists (brownfield indicator).
+        var usersTableCount = db.Database.SqlQueryRaw<int>(
+            "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'AspNetUsers'")
+            .First();
+
+        if (usersTableCount > 0)
+        {
+            // Brownfield EF6 database: create history table and mark InitialBaseline applied
+            // so EF Core doesn't try to re-create all existing tables.
+            db.Database.ExecuteSqlRaw(
+                "CREATE TABLE [__EFMigrationsHistory] (" +
+                "[MigrationId] nvarchar(150) NOT NULL, " +
+                "[ProductVersion] nvarchar(32) NOT NULL, " +
+                "CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId]))");
+
+            var baselineMigration = db.Database.GetPendingMigrations()
+                .FirstOrDefault(m => m.EndsWith("InitialBaseline"));
+            if (baselineMigration != null)
+            {
+                db.Database.ExecuteSqlRaw(
+                    $"INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES ('{baselineMigration}', '10.0.0')");
+            }
+        }
+    }
+
+    // Apply any remaining pending migrations (e.g. AddIdentityV3Columns on brownfield DBs)
+    db.Database.Migrate();
+}
+
 // Middleware pipeline
 app.UseRouting();
 app.UseCors();

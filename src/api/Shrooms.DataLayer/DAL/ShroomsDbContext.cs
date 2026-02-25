@@ -240,6 +240,26 @@ namespace Shrooms.DataLayer.DAL
             // modelBuilder.Conventions.Add(convention);
 
             new OtherEntitiesConfig(modelBuilder).Add();
+
+            // EntityModels uses Nullable: enable, so non-nullable string properties (string without ?)
+            // are treated by EF Core as required by convention. But the legacy database allows NULL in
+            // most string columns. This pass relaxes string properties that were made required ONLY by
+            // convention (not via explicit fluent config or [Required] annotation).
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(string) && !p.IsKey() && !p.IsNullable
+                                && p.PropertyInfo != null)) // skip shadow properties (e.g. TPH discriminator)
+                {
+                    var conventionProperty = (Microsoft.EntityFrameworkCore.Metadata.IConventionProperty)property;
+                    var source = conventionProperty.GetIsNullableConfigurationSource();
+                    // Only relax properties whose nullability was set by convention (not explicit config)
+                    if (source == null || source == Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)
+                    {
+                        conventionProperty.SetIsNullable(true);
+                    }
+                }
+            }
         }
 
         // TODO: HttpContext.Current is not available in ASP.NET Core

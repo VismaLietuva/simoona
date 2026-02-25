@@ -1,21 +1,21 @@
-﻿using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
+using Microsoft.Extensions.Configuration;
 using Shrooms.Premium.DataTransferObjects;
 
 namespace Shrooms.Premium.Infrastructure.GoogleBookApiService
 {
     public class GoogleBookService : IBookInfoService
     {
-        private BooksService _service;
+        private readonly BooksService _service;
 
-        public GoogleBookService()
+        public GoogleBookService(IConfiguration configuration)
         {
             _service = new BooksService(new BaseClientService.Initializer
             {
-                ApiKey = ConfigurationManager.AppSettings["GoogleAccountApiKey"]
+                ApiKey = configuration["GoogleAccountApiKey"]
             });
         }
 

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -20,10 +20,10 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
 
-        public UsersAnonymizationWebHookService(IUnitOfWork2 uow, IPictureService pictureService)
+        public UsersAnonymizationWebHookService(IUnitOfWork2 uow, IPictureService pictureService, IConfiguration configuration)
         {
-            _anonymizeUsersAfterDays = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersAfterDays"]);
-            _anonymizeUsersPerRequest = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersPerRequest"]);
+            _anonymizeUsersAfterDays = int.TryParse(configuration["AnonymizeUsersAfterDays"], out var days) ? days : 14;
+            _anonymizeUsersPerRequest = int.TryParse(configuration["AnonymizeUsersPerRequest"], out var perReq) ? perReq : 10;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();

@@ -9,6 +9,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<PostWatcher> builder)
         {
             builder.ToTable("PostWatchers", "dbo");
+            builder.HasKey(pw => new { pw.PostId, pw.UserId });
         }
     }
 }
