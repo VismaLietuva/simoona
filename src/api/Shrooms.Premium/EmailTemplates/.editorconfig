@@ -1,0 +1,6 @@
+# Email templates use table-based layouts with deprecated HTML attributes
+# for compatibility with email clients (Outlook, Gmail, etc.)
+# Suppress IDE HTML validation warnings for this folder.
+[*.cshtml]
+dotnet_diagnostic.IDE0055.severity = none
+generated_code = true
