@@ -2,5 +2,10 @@
 # for compatibility with email clients (Outlook, Gmail, etc.)
 # Suppress IDE HTML validation warnings for this folder.
 [*.cshtml]
-dotnet_diagnostic.IDE0055.severity = none
 generated_code = true
+
+# Rider/ReSharper: suppress deprecated HTML attribute/element warnings
+# (align, border, cellpadding, cellspacing, bgcolor, <font>, etc.)
+resharper_html_deprecated_attribute_highlighting = none
+resharper_html_deprecated_element_highlighting = none
+resharper_html_unknown_attribute_highlighting = none
