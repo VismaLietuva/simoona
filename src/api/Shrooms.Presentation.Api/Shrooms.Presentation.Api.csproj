@@ -42,23 +42,4 @@
     <ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Exclude OWIN/Web API specific files that don't compile in ASP.NET Core -->
-    <Compile Remove="Providers\**\*.cs" />
-    <Compile Remove="Handlers\**\*.cs" />
-    <Compile Remove="GeneralCode\ApplicationInsightsExceptionsLogger.cs" />
-    <Compile Remove="GeneralCode\NLogExceptionLogger.cs" />
-    <Compile Remove="GeneralCode\UnwantedTelemetryFilter.cs" />
-    <Compile Remove="Filters\ApplicationInsightsHandleErrorAttribute.cs" />
-    <Compile Remove="Filters\QueryStringBearerAuthorizeAttribute.cs" />
-    <Compile Remove="App_Start\**\*.cs" />
-    <Compile Remove="Global.asax.cs" />
-    <Compile Remove="Startup.cs" />
-    <Compile Remove="ImageResizerPlugins\**\*.cs" />
-    <Content Remove="Global.asax" />
-    <Content Remove="Web.config" />
-    <None Remove="ApplicationInsights.config" />
-    <Content Remove="Service References\**" />
-  </ItemGroup>
-
 </Project>
