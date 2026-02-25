@@ -1,8 +1,6 @@
 ﻿@using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
-@using RazorEngine.Templating
 @using Shrooms.Contracts.Constants
-
-@inherits TemplateBase<UserConfirmationEmailTemplateViewModel>
+@model UserConfirmationEmailTemplateViewModel
 
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
@@ -32,7 +30,7 @@
             <tbody>
                 <tr>
                     <td style="padding: 20px; max-width: 600px; color: #282828; font-size: 14px; font-weight: 400; overflow-wrap: break-word; font-family: 'Segoe UI', Helvetica, Arial, sans-serif;">
-                        @Raw(Model.Content)
+                        @Html.Raw(Model.Content)
                     </td>
                 </tr>
                 <tr>

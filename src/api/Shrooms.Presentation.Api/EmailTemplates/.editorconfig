@@ -9,3 +9,9 @@ generated_code = true
 resharper_html_deprecated_attribute_highlighting = none
 resharper_html_deprecated_element_highlighting = none
 resharper_html_unknown_attribute_highlighting = none
+
+# Suppress Razor view resolution warnings for email templates
+resharper_razor_unknown_identifier_highlighting = none
+resharper_unresolved_reference_highlighting = none
+resharper_inconsistent_naming_highlighting = none
+

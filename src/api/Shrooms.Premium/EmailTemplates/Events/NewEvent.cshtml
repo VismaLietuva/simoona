@@ -1,7 +1,5 @@
 ﻿@using Shrooms.Contracts.Constants
 @using Shrooms.Domain.Helpers
-@using RazorEngine.Templating
-@using Shrooms.Contracts.Constants
 @model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.NewEventEmailTemplateViewModel
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
@@ -50,7 +48,7 @@
                                         }
                                         else
                                         {
-                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</i></p>
+                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</i></p>
                                         }
                                     </td>
                                 </tr>
