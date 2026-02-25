@@ -6,6 +6,7 @@ using Shrooms.Presentation.Common.Helpers;
 namespace Shrooms.Presentation.Common.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public class BaseController : ControllerBase
     {
         public StatusCodeResult Forbidden()

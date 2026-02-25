@@ -28,6 +28,7 @@ namespace Shrooms.IoC
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IAsyncRunner, AsyncRunner>();
+            services.AddScoped<ITenantNameContainer, TenantNameContainer>();
 
             services.AddScoped<IMailingService, MailingService>();
             services.AddScoped<IMailSendingService, SmtpService>();

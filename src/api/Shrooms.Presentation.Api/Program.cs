@@ -8,6 +8,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Constants;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
@@ -21,6 +22,11 @@ builder.Services.AddScoped<ShroomsDbContext>(sp =>
 {
     var httpContext = sp.GetService<IHttpContextAccessor>()?.HttpContext;
     var tenantName = httpContext?.Items["tenantName"] as string;
+    // Fallback: check ITenantNameContainer for background tasks (AsyncRunner)
+    if (string.IsNullOrEmpty(tenantName))
+    {
+        tenantName = sp.GetService<ITenantNameContainer>()?.TenantName;
+    }
     var configuration = sp.GetRequiredService<IConfiguration>();
     var connStr = !string.IsNullOrEmpty(tenantName)
         ? configuration.GetConnectionString(tenantName)

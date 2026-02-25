@@ -1,39 +1,40 @@
 using System;
 using System.Threading.Tasks;
-using Autofac;
-using Autofac.Core.Lifetime;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.FireAndForget
 {
     public class AsyncRunner : IAsyncRunner
     {
-        public ILifetimeScope LifetimeScope { get; set; }
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public AsyncRunner(ILifetimeScope lifetimeScope)
+        public AsyncRunner(IServiceScopeFactory scopeFactory)
         {
-            LifetimeScope = lifetimeScope;
+            _scopeFactory = scopeFactory;
         }
 
         public void Run<T>(Func<T, Task> action, string tenantName)
         {
-            // ASP.NET Core equivalent: use Task.Run for background work
-            // In production, consider using IHostedService or BackgroundService
             Task.Run(async () =>
             {
-                using (var container = LifetimeScope.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag,
-                    builder => { builder.RegisterInstance(new TenantNameContainer(tenantName)).As<ITenantNameContainer>().SingleInstance(); }))
+                using var scope = _scopeFactory.CreateScope();
+
+                var tenantContainer = scope.ServiceProvider.GetService<ITenantNameContainer>();
+                if (tenantContainer != null)
                 {
-                    var logger = container.Resolve<ILogger>();
-                    var service = container.Resolve<T>();
-                    try
-                    {
-                        await action(service);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(ex);
-                    }
+                    tenantContainer.TenantName = tenantName;
+                }
+
+                var logger = scope.ServiceProvider.GetService<ILogger>();
+                var service = scope.ServiceProvider.GetRequiredService<T>();
+                try
+                {
+                    await action(service);
+                }
+                catch (Exception ex)
+                {
+                    logger?.Error(ex);
                 }
             });
         }
