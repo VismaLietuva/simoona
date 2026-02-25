@@ -13,7 +13,7 @@
 using System.Data.SqlClient;
 using Path = System.IO.Path;
 
-var target = Argument("activity", "Start");
+var target = Argument("target", "Start");
 var organization = Argument("organization", "test");
 var email = Argument("email", "");
 var connectionString = Argument("connectionString", "");
@@ -39,7 +39,7 @@ TaskSetup(setupContext =>
 });
 
 Task("CreateDatabase")
-    .Does(() => 
+    .Does(() =>
 {
     using (var connection = OpenSqlConnection(connectionString))
     {
@@ -74,7 +74,7 @@ Task("CreateDatabase")
             ExecuteSqlCommand(connection, "USE \"" + jobsDbName + "\"");
             ExecuteSqlFile(connection, "background_jobs.sql");
         }
-        else 
+        else
         {
             LogMessage(logFile, string.Format("Database {0} already exists", jobsDbName));
         }
@@ -100,7 +100,7 @@ Task("ExecuteMigrations")
     Information("Migrate.exe path: {0}", migrateExePath);
     Information("Assembly bin path: {0}", assemblyBinPath);
 
-    var settings = new ProcessSettings 
+    var settings = new ProcessSettings
     {
         Arguments = new ProcessArgumentBuilder()
             .Append(assemblyName)
@@ -115,7 +115,7 @@ Task("ExecuteMigrations")
 
 Task("AddOrganization")
     .IsDependentOn("CreateDatabase")
-    .Does(() => 
+    .Does(() =>
 {
     string xmlFile = APIpath + "Shrooms.Presentation.Api/Web.config";
     System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
@@ -153,7 +153,7 @@ Task("AddOrganization")
 });
 
 Task("Restore")
-    .Does(() => 
+    .Does(() =>
 {
     NuGetRestore(APIpath + "Shrooms.sln");
     LogMessage(logFile, "Task Restore is finished successfully");
@@ -168,7 +168,7 @@ Task("BuildAPI")
     .IsDependentOn("CreateDatabase")
     .IsDependentOn("AddOrganization")
     .IsDependentOn("Restore")
-    .Does(ctx => 
+    .Does(ctx =>
 {
     var fileLogger = new MSBuildFileLogger() {
         AppendToLogFile = true,
@@ -185,7 +185,7 @@ Task("BuildAPI")
 
     var msbuildPath = GetMSBuildPath(ctx.FileSystem, ctx.Environment, MSBuildPlatform.Automatic);
 
-    if (msbuildPath != null) 
+    if (msbuildPath != null)
     {
         settings.ToolPath = msbuildPath;
     }
@@ -198,7 +198,7 @@ Task("BuildAPI")
 
 
 Task("BuildWebApp")
-    .Does(() => 
+    .Does(() =>
 {
     NpmInstall(settings => settings.FromPath(webAppPath).WithLogLevel(NpmLogLevel.Error));
     Gulp.Local.Execute(settings => settings.WithArguments("wiredep --silent").WorkingDirectory = webAppPath);
@@ -279,9 +279,9 @@ Task("CreateWebAppWebsite")
 });
 
 Task("CreateHostsRecord")
-    .Does(() => 
+    .Does(() =>
 {
-    if(!HostsRecordExists("127.0.0.1", webAppHostName)) 
+    if(!HostsRecordExists("127.0.0.1", webAppHostName))
     {
         AddHostsRecord("127.0.0.1", webAppHostName);
     }
@@ -304,7 +304,7 @@ Task("Start")
     .IsDependentOn("BuildAPI")
     .IsDependentOn("BuildWebApp")
     .IsDependentOn("ExecuteMigrations")
-    .Does(() => 
+    .Does(() =>
 {
     System.Diagnostics.Process.Start("http://" + webAppHostName);
     LogMessage(logFile, "Task Start is finished successfully");
@@ -325,7 +325,7 @@ Task("OnlyDbAndDependencies")
 {
     LogMessage(logFile, "Task OnlyDbAndDependencies is finished successfully");
 })
-.OnError(exception => 
+.OnError(exception =>
 {
     LogMessage(logFile, exception.Message);
     throw exception;
@@ -368,63 +368,63 @@ private void AlterJobsDb(SqlConnection connection)
     END
     GO
 
-    ALTER DATABASE [{0}] SET ANSI_NULL_DEFAULT OFF 
+    ALTER DATABASE [{0}] SET ANSI_NULL_DEFAULT OFF
     GO
-    ALTER DATABASE [{0}] SET ANSI_NULLS OFF 
+    ALTER DATABASE [{0}] SET ANSI_NULLS OFF
     GO
-    ALTER DATABASE [{0}] SET ANSI_PADDING OFF 
+    ALTER DATABASE [{0}] SET ANSI_PADDING OFF
     GO
-    ALTER DATABASE [{0}] SET ANSI_WARNINGS OFF 
+    ALTER DATABASE [{0}] SET ANSI_WARNINGS OFF
     GO
-    ALTER DATABASE [{0}] SET ARITHABORT OFF 
+    ALTER DATABASE [{0}] SET ARITHABORT OFF
     GO
-    ALTER DATABASE [{0}] SET AUTO_CLOSE OFF 
+    ALTER DATABASE [{0}] SET AUTO_CLOSE OFF
     GO
-    ALTER DATABASE [{0}] SET AUTO_SHRINK OFF 
+    ALTER DATABASE [{0}] SET AUTO_SHRINK OFF
     GO
-    ALTER DATABASE [{0}] SET AUTO_UPDATE_STATISTICS ON 
+    ALTER DATABASE [{0}] SET AUTO_UPDATE_STATISTICS ON
     GO
-    ALTER DATABASE [{0}] SET CURSOR_CLOSE_ON_COMMIT OFF 
+    ALTER DATABASE [{0}] SET CURSOR_CLOSE_ON_COMMIT OFF
     GO
-    ALTER DATABASE [{0}] SET CURSOR_DEFAULT  GLOBAL 
+    ALTER DATABASE [{0}] SET CURSOR_DEFAULT  GLOBAL
     GO
-    ALTER DATABASE [{0}] SET CONCAT_NULL_YIELDS_NULL OFF 
+    ALTER DATABASE [{0}] SET CONCAT_NULL_YIELDS_NULL OFF
     GO
-    ALTER DATABASE [{0}] SET NUMERIC_ROUNDABORT OFF 
+    ALTER DATABASE [{0}] SET NUMERIC_ROUNDABORT OFF
     GO
-    ALTER DATABASE [{0}] SET QUOTED_IDENTIFIER OFF 
+    ALTER DATABASE [{0}] SET QUOTED_IDENTIFIER OFF
     GO
-    ALTER DATABASE [{0}] SET RECURSIVE_TRIGGERS OFF 
+    ALTER DATABASE [{0}] SET RECURSIVE_TRIGGERS OFF
     GO
-    ALTER DATABASE [{0}] SET  DISABLE_BROKER 
+    ALTER DATABASE [{0}] SET  DISABLE_BROKER
     GO
-    ALTER DATABASE [{0}] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+    ALTER DATABASE [{0}] SET AUTO_UPDATE_STATISTICS_ASYNC OFF
     GO
-    ALTER DATABASE [{0}] SET DATE_CORRELATION_OPTIMIZATION OFF 
+    ALTER DATABASE [{0}] SET DATE_CORRELATION_OPTIMIZATION OFF
     GO
-    ALTER DATABASE [{0}] SET TRUSTWORTHY OFF 
+    ALTER DATABASE [{0}] SET TRUSTWORTHY OFF
     GO
-    ALTER DATABASE [{0}] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+    ALTER DATABASE [{0}] SET ALLOW_SNAPSHOT_ISOLATION OFF
     GO
-    ALTER DATABASE [{0}] SET PARAMETERIZATION SIMPLE 
+    ALTER DATABASE [{0}] SET PARAMETERIZATION SIMPLE
     GO
-    ALTER DATABASE [{0}] SET READ_COMMITTED_SNAPSHOT OFF 
+    ALTER DATABASE [{0}] SET READ_COMMITTED_SNAPSHOT OFF
     GO
-    ALTER DATABASE [{0}] SET HONOR_BROKER_PRIORITY OFF 
+    ALTER DATABASE [{0}] SET HONOR_BROKER_PRIORITY OFF
     GO
-    ALTER DATABASE [{0}] SET RECOVERY SIMPLE 
+    ALTER DATABASE [{0}] SET RECOVERY SIMPLE
     GO
-    ALTER DATABASE [{0}] SET  MULTI_USER 
+    ALTER DATABASE [{0}] SET  MULTI_USER
     GO
-    ALTER DATABASE [{0}] SET PAGE_VERIFY CHECKSUM  
+    ALTER DATABASE [{0}] SET PAGE_VERIFY CHECKSUM
     GO
-    ALTER DATABASE [{0}] SET DB_CHAINING OFF 
+    ALTER DATABASE [{0}] SET DB_CHAINING OFF
     GO
-    ALTER DATABASE [{0}] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+    ALTER DATABASE [{0}] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF )
     GO
-    ALTER DATABASE [{0}] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+    ALTER DATABASE [{0}] SET TARGET_RECOVERY_TIME = 60 SECONDS
     GO
-    ALTER DATABASE [{0}] SET DELAYED_DURABILITY = DISABLED 
+    ALTER DATABASE [{0}] SET DELAYED_DURABILITY = DISABLED
     GO
     ALTER DATABASE [{0}] SET QUERY_STORE = OFF
     GO
