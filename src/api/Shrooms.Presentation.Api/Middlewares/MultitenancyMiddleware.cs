@@ -22,7 +22,7 @@ namespace Shrooms.Presentation.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var requestPath = context.Request.Path.ToString();
+            var requestPath = "/" + context.Request.Path.ToString().TrimStart('/');
 
             if (requestPath.StartsWith("/signin-google", StringComparison.OrdinalIgnoreCase) ||
                 requestPath.StartsWith("/signin-facebook", StringComparison.OrdinalIgnoreCase) ||
@@ -62,7 +62,7 @@ namespace Shrooms.Presentation.Api.Middlewares
         private static string ExtractTenant(HttpContext context)
         {
             var tenantKey = default(string);
-            var requestPath = context.Request.Path.ToString();
+            var requestPath = "/" + context.Request.Path.ToString().TrimStart('/');
 
             if (requestPath.StartsWith("/storage", StringComparison.OrdinalIgnoreCase))
             {

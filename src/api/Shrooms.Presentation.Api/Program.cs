@@ -194,9 +194,9 @@ using (var scope = app.Services.CreateScope())
 // Middleware pipeline
 app.UseRouting();
 app.UseCors();
+app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
 app.UseMiddleware<ImageResizerMiddleware>();
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwagger();
