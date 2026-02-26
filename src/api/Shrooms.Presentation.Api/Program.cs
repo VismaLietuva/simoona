@@ -82,6 +82,12 @@ builder.Services.AddAuthentication(options =>
                 context.Token = accessToken;
             }
             return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(context.Exception, "JWT authentication failed for {Path}", context.Request.Path);
+            return Task.CompletedTask;
         }
     };
 });
@@ -118,9 +124,11 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        if (string.IsNullOrEmpty(corsOrigins))
+        if (string.IsNullOrEmpty(corsOrigins) || corsOrigins == "*")
         {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            // AllowAnyOrigin() cannot be combined with AllowCredentials() per CORS spec.
+            // SetIsOriginAllowed echoes the actual request origin, satisfying withCredentials.
+            policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
         }
         else
         {

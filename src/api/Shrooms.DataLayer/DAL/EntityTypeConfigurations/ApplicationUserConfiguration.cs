@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
@@ -90,17 +91,26 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             // Many-to-many: ApplicationUser <-> Committee (Members)
             builder.HasMany(u => u.Committees)
                 .WithMany(c => c.Members)
-                .UsingEntity(j => j.ToTable("CommitteesUsersMembership"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersMembership",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
             // Many-to-many: ApplicationUser <-> Committee (Delegates)
             builder.HasMany(u => u.DelegatingCommittees)
                 .WithMany(c => c.Delegates)
-                .UsingEntity(j => j.ToTable("CommitteesUsersDelegates"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersDelegates",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
             // Many-to-many: ApplicationUser <-> Committee (Leads)
             builder.HasMany(u => u.LeadingCommittees)
                 .WithMany(c => c.Leads)
-                .UsingEntity(j => j.ToTable("CommitteesUsersLeadership"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersLeadership",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
             // One-to-one: ApplicationUser -> NotificationsSettings
             builder.HasOne(u => u.NotificationsSettings)

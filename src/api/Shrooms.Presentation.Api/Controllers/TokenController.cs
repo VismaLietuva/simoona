@@ -33,17 +33,30 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Token([FromForm] LoginRequestModel model)
+        public async Task<IActionResult> Token()
         {
-            if (string.IsNullOrEmpty(model?.UserName) || string.IsNullOrEmpty(model.Password))
+            // The SPA sends Content-Type: application/json but a form-encoded body.
+            // Read the raw body and parse form fields regardless of Content-Type.
+            Request.EnableBuffering();
+            string body;
+            using (var reader = new System.IO.StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true))
+            {
+                body = await reader.ReadToEndAsync();
+            }
+
+            var form = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(body);
+            var userName = form.TryGetValue("username", out var u) ? u.ToString() : null;
+            var password = form.TryGetValue("password", out var pw) ? pw.ToString() : null;
+
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
                 return BadRequest(new { error = "invalid_request" });
             }
 
-            var user = await _userManager.FindByNameAsync(model.UserName)
-                ?? await _userManager.FindByEmailAsync(model.UserName);
+            var user = await _userManager.FindByNameAsync(userName)
+                ?? await _userManager.FindByEmailAsync(userName);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
                 return BadRequest(new { error = "invalid_grant", error_description = "The user name or password is incorrect" });
             }
@@ -99,12 +112,5 @@ namespace Shrooms.Presentation.Api.Controllers
                 userIdentifier = user.Id
             };
         }
-    }
-
-    public class LoginRequestModel
-    {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string ClientId { get; set; }
     }
 }

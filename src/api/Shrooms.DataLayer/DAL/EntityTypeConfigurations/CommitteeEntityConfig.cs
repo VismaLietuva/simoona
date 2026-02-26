@@ -12,7 +12,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.HasMany(a => a.Suggestions)
                 .WithMany()
-                .UsingEntity(j => j.ToTable("CommitteeSuggestionsIDs"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteeSuggestionsIDs",
+                    j => j.HasOne<CommitteeSuggestion>().WithMany().HasForeignKey("CommitteeSuggestions_Id"),
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committees_Id"));
 
             builder.HasOne(c => c.Organization)
                 .WithMany()

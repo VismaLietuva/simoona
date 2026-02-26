@@ -10,9 +10,12 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
         {
             builder.HasQueryFilter(e => !e.IsDeleted);
 
-            builder.HasMany(r => r.Roles)
+            builder.HasMany(p => p.Roles)
                 .WithMany(r => r.Permissions)
-                .UsingEntity(j => j.ToTable("RolePermissions"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "RolePermissions",
+                    j => j.HasOne<ApplicationRole>().WithMany().HasForeignKey("RoleId"),
+                    j => j.HasOne<Permission>().WithMany().HasForeignKey("PermissionId"));
         }
     }
 }

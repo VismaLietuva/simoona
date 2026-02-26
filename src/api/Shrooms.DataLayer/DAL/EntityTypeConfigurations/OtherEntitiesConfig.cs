@@ -146,11 +146,35 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             _modelBuilder.Entity<Project>()
                 .HasMany(p => p.Attributes)
-                .WithMany(s => s.Projects);
+                .WithMany(s => s.Projects)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ProjectSkills",
+                    j => j.HasOne<Skill>().WithMany().HasForeignKey("Skill_Id"),
+                    j => j.HasOne<Project>().WithMany().HasForeignKey("Project_Id"));
 
             _modelBuilder.Entity<Project>()
                 .HasMany(p => p.Members)
-                .WithMany(u => u.Projects);
+                .WithMany(u => u.Projects)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ProjectApplicationUsers",
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"),
+                    j => j.HasOne<Project>().WithMany().HasForeignKey("Project_Id"));
+
+            _modelBuilder.Entity<Exam>()
+                .HasMany(e => e.Certificates)
+                .WithMany(c => c.Exams)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ExamCertificates",
+                    j => j.HasOne<Certificate>().WithMany().HasForeignKey("Certificate_Id"),
+                    j => j.HasOne<Exam>().WithMany().HasForeignKey("Exam_Id"));
+
+            _modelBuilder.Entity<ServiceRequestCategory>()
+                .HasMany(s => s.Assignees)
+                .WithMany(u => u.ServiceRequestCategoriesAssigned)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ServiceRequestCategoryApplicationUsers",
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"),
+                    j => j.HasOne<ServiceRequestCategory>().WithMany().HasForeignKey("ServiceRequestCategory_Id"));
 
             _modelBuilder.Entity<Project>()
                 .ToTable("Projects");

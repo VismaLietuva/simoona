@@ -14,6 +14,13 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .WithMany()
                 .HasForeignKey(x => x.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(e => e.EventOptions)
+                .WithMany(o => o.EventParticipants)
+                .UsingEntity<Dictionary<string, object>>(
+                    "EventParticipantEventOptions",
+                    j => j.HasOne<EventOption>().WithMany().HasForeignKey("EventOption_Id"),
+                    j => j.HasOne<EventParticipant>().WithMany().HasForeignKey("EventParticipant_Id"));
         }
     }
 }

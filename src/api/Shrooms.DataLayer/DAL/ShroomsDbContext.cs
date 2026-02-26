@@ -202,6 +202,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new RoomEntityConfig());
             modelBuilder.ApplyConfiguration(new PageEntityConfig());
             modelBuilder.ApplyConfiguration(new PermissionEntityConfig());
+            modelBuilder.ApplyConfiguration(new ModuleEntityConfig());
             modelBuilder.ApplyConfiguration(new EventEntityConfig());
             modelBuilder.ApplyConfiguration(new EventTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
