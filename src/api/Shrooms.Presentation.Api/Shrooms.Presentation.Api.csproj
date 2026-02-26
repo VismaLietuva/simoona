@@ -42,4 +42,13 @@
     <ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
   </ItemGroup>
 
+  <Target Name="TakeAppOffline" BeforeTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Debug'">
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)\app_offline.htm" Lines="&lt;!-- Deploying... --&gt;" Overwrite="true" />
+    <Exec Command="ping -n 6 127.0.0.1 &gt; nul" />
+  </Target>
+
+  <Target Name="BringAppOnline" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <Delete Files="$(MSBuildProjectDirectory)\app_offline.htm" />
+  </Target>
+
 </Project>
