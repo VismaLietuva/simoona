@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web" InitialTargets="TakeAppOffline">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -42,9 +42,9 @@
     <ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
   </ItemGroup>
 
-  <Target Name="TakeAppOffline" BeforeTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Debug'">
+  <Target Name="TakeAppOffline" Condition="'$(Configuration)' == 'Debug'">
     <WriteLinesToFile File="$(MSBuildProjectDirectory)\app_offline.htm" Lines="&lt;!-- Deploying... --&gt;" Overwrite="true" />
-    <Exec Command="ping -n 6 127.0.0.1 &gt; nul" />
+    <Exec Command="ping -n 11 127.0.0.1 &gt; nul" />
   </Target>
 
   <Target Name="BringAppOnline" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">

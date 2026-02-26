@@ -192,6 +192,17 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
+// Normalize double-slash paths (e.g. //Account/Foo → /Account/Foo) sent by the SPA
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+    if (path != null && path.StartsWith("//"))
+    {
+        context.Request.Path = "/" + path.TrimStart('/');
+    }
+    await next();
+});
+
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
