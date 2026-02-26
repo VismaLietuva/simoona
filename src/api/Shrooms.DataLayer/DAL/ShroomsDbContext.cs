@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
@@ -23,7 +24,7 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL
 {
-    public class ShroomsDbContext : DbContext, IDbContext
+    public class ShroomsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IDbContext
     {
         public ShroomsDbContext()
         {
@@ -37,10 +38,6 @@ namespace Shrooms.DataLayer.DAL
 
         // For backward compatibility - connection string based initialization
         public string ConnectionName { get; private set; }
-
-        public virtual DbSet<ApplicationUser> Users { get; set; }
-
-        public virtual DbSet<ApplicationRole> Roles { get; set; }
 
         public virtual DbSet<Office> Offices { get; set; }
 

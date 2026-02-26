@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
-using Shrooms.Presentation.Common.Helpers;
+using Shrooms.DataLayer.DAL;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +23,13 @@ namespace Shrooms.Presentation.Api.Controllers
     {
         private readonly ShroomsUserManager _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ShroomsDbContext _dbContext;
 
-        public TokenController(ShroomsUserManager userManager, IConfiguration configuration)
+        public TokenController(ShroomsUserManager userManager, IConfiguration configuration, ShroomsDbContext dbContext)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _dbContext = dbContext;
         }
 
         [HttpPost]
@@ -60,12 +64,17 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            var orgShortName = await _dbContext.Set<Shrooms.DataLayer.EntityModels.Models.Organization>()
+                .Where(o => o.Id == user.OrganizationId)
+                .Select(o => o.ShortName)
+                .FirstOrDefaultAsync() ?? user.OrganizationId.ToString();
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(WebApiConstants.ClaimOrganizationId, user.OrganizationId.ToString()),
-                new Claim(WebApiConstants.ClaimOrganizationName, user.OrganizationId.ToString()),
+                new Claim(WebApiConstants.ClaimOrganizationName, orgShortName),
             };
 
             foreach (var role in roles)

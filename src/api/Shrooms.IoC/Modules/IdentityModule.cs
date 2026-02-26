@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Authentification.BasicAuth;
 using Shrooms.Authentification.Membership;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Auth;using Shrooms.Infrastructure.Email;
 
 namespace Shrooms.IoC.Modules
 {
@@ -16,6 +17,7 @@ namespace Shrooms.IoC.Modules
             services.AddScoped<ShroomsUserManager>();
             services.AddScoped<ShroomsClaimsIdentityFactory>();
             services.AddScoped<IBasicAuthValidator, BasicAuthValidator>();
+            services.AddScoped<IPasswordHasher<ApplicationUser>, LegacyPasswordHasher<ApplicationUser>>();
             return services;
         }
     }
