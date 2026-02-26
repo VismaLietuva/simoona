@@ -32,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="EmailTemplates\**\*.cshtml" />
-    <Content Update="EmailTemplates\**\*.cshtml">
+    <Content Remove="EmailTemplates\**\*.cshtml" />
+    <None Include="EmailTemplates\**\*.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
