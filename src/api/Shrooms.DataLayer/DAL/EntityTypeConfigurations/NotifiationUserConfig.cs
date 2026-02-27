@@ -8,6 +8,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<NotificationUser> builder)
         {
+            builder.ToTable("NotificationUsers");
+
             builder.HasKey(x => new { x.NotificationId, x.UserId });
 
             builder.HasIndex(x => x.IsAlreadySeen)

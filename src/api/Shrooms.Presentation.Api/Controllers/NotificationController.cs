@@ -24,6 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public async Task<IEnumerable<NotificationViewModel>> GetAll()
         {
             var result = await _notificationService.GetAllAsync(GetUserAndOrganization());

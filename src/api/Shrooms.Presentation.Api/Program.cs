@@ -180,8 +180,7 @@ builder.Services.AddShrooms();
 
 var app = builder.Build();
 
-// Guard: fail fast if the database has unapplied migrations.
-// Migrations must be applied as a separate deployment step — see EFCoreMigrations/DEPLOYMENT.md.
+// Apply pending migrations automatically (brownfield + new migrations).
 using (var scope = app.Services.CreateScope())
 {
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -190,13 +189,7 @@ using (var scope = app.Services.CreateScope())
         .UseSqlServer(connStr)
         .Options;
     using var db = new ShroomsDbContext(options);
-    var pending = db.Database.GetPendingMigrations().ToList();
-    if (pending.Count > 0)
-    {
-        throw new InvalidOperationException(
-            $"The database has {pending.Count} unapplied migration(s): {string.Join(", ", pending)}. " +
-            "Run migrations before starting the application. See EFCoreMigrations/DEPLOYMENT.md.");
-    }
+    db.Database.Migrate();
 }
 
 // Middleware pipeline

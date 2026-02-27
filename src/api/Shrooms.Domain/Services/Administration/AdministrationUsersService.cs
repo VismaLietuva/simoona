@@ -300,7 +300,7 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task<IEnumerable<AdministrationUserDto>> GetAllUsersAsync(string sortQuery, string search, FilterDto[] filterModel, string includeProperties)
         {
-            includeProperties = $"{includeProperties}{(includeProperties != string.Empty ? "," : string.Empty)}Roles,Skills,JobPosition,Projects";
+            includeProperties = $"{includeProperties}{(includeProperties != string.Empty ? "," : string.Empty)}Skills,JobPosition,Projects";
 
             var applicationUsers = await _applicationUserRepository
                 .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)

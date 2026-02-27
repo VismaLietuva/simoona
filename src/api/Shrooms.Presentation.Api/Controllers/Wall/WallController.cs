@@ -214,7 +214,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         }
 
         [HttpGet]
-        [Route("AllPosts")]
+        [Route("AllPostsLegacy")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         public async Task<IActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1)
         {

@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
@@ -96,6 +98,11 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            _modelBuilder.Entity<Floor>()
+                .HasOne(f => f.Picture)
+                .WithMany()
+                .HasForeignKey("Picture_Id");
+
             _modelBuilder.Entity<Picture>()
                 .HasOne(a => a.Organization)
                 .WithMany()
@@ -178,6 +185,22 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             _modelBuilder.Entity<Project>()
                 .ToTable("Projects");
+
+            // These entities inherit from BaseModel (which has IsDeleted) but their DB tables
+            // do not have the IsDeleted column, so the property must be ignored.
+            _modelBuilder.Entity<QualificationLevel>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<Skill>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<BadgeLog>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<BadgeType>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<BadgeCategory>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<Lottery>().Ignore(e => e.IsDeleted);
+            _modelBuilder.Entity<LotteryParticipant>().Ignore(e => e.IsDeleted);
+
+            // DbSet property names don't match the DB table names for these entities.
+            // Add explicit ToTable mappings to use the correct plural table names.
+            _modelBuilder.Entity<JobPosition>().ToTable("JobPositions");
+            _modelBuilder.Entity<ServiceRequestStatus>().ToTable("ServiceRequestStatus");
+            _modelBuilder.Entity<BadgeCategoryKudosType>().ToTable("BadgeCategoryKudosTypes");
         }
     }
 }

@@ -24,12 +24,18 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             // Many-to-many: ApplicationUser <-> Exam
             builder.HasMany(u => u.Exams)
                 .WithMany(e => e.ApplicationUsers)
-                .UsingEntity(j => j.ToTable("ApplicationUserExams"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "ApplicationUserExams",
+                    j => j.HasOne<Exam>().WithMany().HasForeignKey("ExamId"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUserId"));
 
             // Many-to-many: ApplicationUser <-> Skill
             builder.HasMany(u => u.Skills)
                 .WithMany(s => s.ApplicationUsers)
-                .UsingEntity(j => j.ToTable("ApplicationUserSkills"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "ApplicationUserSkills",
+                    j => j.HasOne<Skill>().WithMany().HasForeignKey("SkillId"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUserId"));
 
             // Self-referencing: Manager -> ManagedUsers
             builder.HasMany(u => u.ManagedUsers)

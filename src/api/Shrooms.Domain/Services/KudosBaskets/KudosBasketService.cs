@@ -206,10 +206,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 Id = b.Id,
                 Title = b.Title,
                 Description = b.Description,
-                KudosDonated = b.KudosLogs
-                    .Select(log => log.Points)
-                    .DefaultIfEmpty(0)
-                    .Sum(),
+                KudosDonated = b.KudosLogs.Sum(log => log.Points),
                 IsActive = b.IsActive
             };
         }

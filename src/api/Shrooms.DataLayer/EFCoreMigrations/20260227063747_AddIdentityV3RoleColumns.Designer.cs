@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shrooms.DataLayer.DAL;
 
@@ -11,9 +12,11 @@ using Shrooms.DataLayer.DAL;
 namespace Shrooms.DataLayer.EFCoreMigrations
 {
     [DbContext(typeof(ShroomsDbContext))]
-    partial class ShroomsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227063747_AddIdentityV3RoleColumns")]
+    partial class AddIdentityV3RoleColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

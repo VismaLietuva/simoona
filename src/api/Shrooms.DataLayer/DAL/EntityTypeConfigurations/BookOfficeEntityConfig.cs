@@ -8,6 +8,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<BookOffice> builder)
         {
+            builder.ToTable("BookOffices");
+
             builder.HasQueryFilter(e => !e.IsDeleted);
 
             builder.HasOne(u => u.Book)

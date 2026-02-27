@@ -8,6 +8,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
+            builder.ToTable("Notifications");
+
             builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }

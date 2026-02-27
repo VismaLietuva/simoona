@@ -17,10 +17,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.OwnsOne(o => o.Address, a =>
             {
-                a.Property(x => x.Country).HasColumnName("Country");
-                a.Property(x => x.City).HasColumnName("City");
-                a.Property(x => x.Street).HasColumnName("Street");
-                a.Property(x => x.Building).HasColumnName("Building");
+                a.Property(x => x.Country).HasColumnName("Address_Country");
+                a.Property(x => x.City).HasColumnName("Address_City");
+                a.Property(x => x.Street).HasColumnName("Address_Street");
+                a.Property(x => x.Building).HasColumnName("Address_Building");
             });
         }
     }
