@@ -71,15 +71,19 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
     // Allow token from query string for SignalR
+    // Old client sends "token"; new @microsoft/signalr client sends "access_token"
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
-            var accessToken = context.Request.Query["token"];
             var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/signalr"))
+            if (path.StartsWithSegments("/signalr"))
             {
-                context.Token = accessToken;
+                var accessToken = context.Request.Query["access_token"].ToString();
+                if (string.IsNullOrEmpty(accessToken))
+                    accessToken = context.Request.Query["token"].ToString();
+                if (!string.IsNullOrEmpty(accessToken))
+                    context.Token = accessToken;
             }
             return Task.CompletedTask;
         },
