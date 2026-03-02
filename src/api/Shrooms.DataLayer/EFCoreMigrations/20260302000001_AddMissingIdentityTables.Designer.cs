@@ -57,15 +57,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             modelBuilder.Entity("CommitteeSuggestionsIDs", b =>
                 {
-                    b.Property<int>("CommitteeSuggestions_Id")
-                        .HasColumnType("int");
-
                     b.Property<int>("Committees_Id")
                         .HasColumnType("int");
 
-                    b.HasKey("CommitteeSuggestions_Id", "Committees_Id");
+                    b.Property<int>("CommitteeSuggestions_Id")
+                        .HasColumnType("int");
 
-                    b.HasIndex("Committees_Id");
+                    b.HasKey("Committees_Id", "CommitteeSuggestions_Id");
+
+                    b.HasIndex("CommitteeSuggestions_Id");
 
                     b.ToTable("CommitteeSuggestionsIDs");
                 });
@@ -87,30 +87,30 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             modelBuilder.Entity("CommitteesUsersLeadership", b =>
                 {
-                    b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Committee_Id")
                         .HasColumnType("int");
 
-                    b.HasKey("ApplicationUser_Id", "Committee_Id");
+                    b.Property<string>("ApplicationUser_Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("Committee_Id");
+                    b.HasKey("Committee_Id", "ApplicationUser_Id");
+
+                    b.HasIndex("ApplicationUser_Id");
 
                     b.ToTable("CommitteesUsersLeadership");
                 });
 
             modelBuilder.Entity("CommitteesUsersMembership", b =>
                 {
-                    b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Committee_Id")
                         .HasColumnType("int");
 
-                    b.HasKey("ApplicationUser_Id", "Committee_Id");
+                    b.Property<string>("ApplicationUser_Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("Committee_Id");
+                    b.HasKey("Committee_Id", "ApplicationUser_Id");
+
+                    b.HasIndex("ApplicationUser_Id");
 
                     b.ToTable("CommitteesUsersMembership");
                 });
@@ -250,15 +250,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             modelBuilder.Entity("ModuleOrganizations", b =>
                 {
-                    b.Property<int>("Module_Id")
-                        .HasColumnType("int");
-
                     b.Property<int>("Organization_Id")
                         .HasColumnType("int");
 
-                    b.HasKey("Module_Id", "Organization_Id");
+                    b.Property<int>("Module_Id")
+                        .HasColumnType("int");
 
-                    b.HasIndex("Organization_Id");
+                    b.HasKey("Organization_Id", "Module_Id");
+
+                    b.HasIndex("Module_Id");
 
                     b.ToTable("ModuleOrganizations");
                 });
@@ -280,15 +280,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             modelBuilder.Entity("ProjectSkills", b =>
                 {
-                    b.Property<int>("Project_Id")
-                        .HasColumnType("int");
-
                     b.Property<int>("Skill_Id")
                         .HasColumnType("int");
 
-                    b.HasKey("Project_Id", "Skill_Id");
+                    b.Property<int>("Project_Id")
+                        .HasColumnType("int");
 
-                    b.HasIndex("Skill_Id");
+                    b.HasKey("Skill_Id", "Project_Id");
+
+                    b.HasIndex("Project_Id");
 
                     b.ToTable("ProjectSkills");
                 });
@@ -676,7 +676,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("KudosTypeId")
                         .IsUnique();
 
-                    b.ToTable("BadgeCategoryKudosTypes", (string)null);
+                    b.ToTable("BadgeCategoryKudosType", (string)null);
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Badges.BadgeLog", b =>
@@ -947,8 +947,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("BookOfficeId")
                         .HasColumnType("int");
@@ -1128,7 +1128,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommitteeSuggestion");
+                    b.ToTable("CommitteeSuggestions");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.Event", b =>
@@ -2334,7 +2334,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotificationUsers", (string)null);
+                    b.ToTable("NotificationUsers");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Notifications.NotificationsSettings", b =>

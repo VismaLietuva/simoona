@@ -55,7 +55,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<QualificationLevel> QualificationLevels { get; set; }
 
-        public virtual DbSet<AbstractClassifier> Classificators { get; set; }
+        public virtual DbSet<AbstractClassifier> AbstractClassifiers { get; set; }
 
         public virtual DbSet<Picture> Pictures { get; set; }
 
@@ -79,7 +79,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<EventReminder> EventReminders { get; set; }
 
-        public virtual DbSet<EventParticipant> EventsParticipants { get; set; }
+        public virtual DbSet<EventParticipant> EventParticipants { get; set; }
 
         public virtual DbSet<EventOption> EventOptions { get; set; }
 
@@ -89,7 +89,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<ServiceRequestPriority> ServiceRequestPriorities { get; set; }
 
-        public virtual DbSet<ServiceRequestStatus> ServiceRequestStatuses { get; set; }
+        public virtual DbSet<ServiceRequestStatus> ServiceRequestStatus { get; set; }
 
         public virtual DbSet<ServiceRequestComment> ServiceRequestComments { get; set; }
 
@@ -99,7 +99,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<BookLog> BookLogs { get; set; }
 
-        public virtual DbSet<BookOffice> BookOffice { get; set; }
+        public virtual DbSet<BookOffice> BookOffices { get; set; }
 
         public virtual DbSet<SyncToken> SyncTokens { get; set; }
 
@@ -119,7 +119,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<EntityModels.Models.Monitors.Monitor> Monitors { get; set; }
 
-        public virtual DbSet<JobPosition> JobPosition { get; set; }
+        public virtual DbSet<JobPosition> JobPositions { get; set; }
 
         public virtual DbSet<Project> Projects { get; set; }
 
@@ -146,6 +146,12 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<BlacklistUser> BlacklistUsers { get; set; }
 
         public virtual DbSet<Banner> Banners { get; set; }
+
+        public virtual DbSet<CommitteeSuggestion> CommitteeSuggestions { get; set; }
+
+        public virtual DbSet<NotificationUser> NotificationUsers { get; set; }
+
+        public virtual DbSet<PostWatcher> PostWatchers { get; set; }
 
         public int SaveChanges(string userId)
         {

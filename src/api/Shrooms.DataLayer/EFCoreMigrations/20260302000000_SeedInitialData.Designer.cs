@@ -676,7 +676,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("KudosTypeId")
                         .IsUnique();
 
-                    b.ToTable("BadgeCategoryKudosTypes", (string)null);
+                    b.ToTable("BadgeCategoryKudosType", (string)null);
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Badges.BadgeLog", b =>
@@ -947,8 +947,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("BookOfficeId")
                         .HasColumnType("int");
@@ -1128,7 +1128,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommitteeSuggestion");
+                    b.ToTable("CommitteeSuggestions");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.Event", b =>
@@ -2334,7 +2334,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotificationUsers", (string)null);
+                    b.ToTable("NotificationUsers");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Notifications.NotificationsSettings", b =>

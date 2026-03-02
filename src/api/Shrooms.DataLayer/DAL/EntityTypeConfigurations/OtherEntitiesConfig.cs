@@ -52,6 +52,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasQueryFilter(e => !e.IsDeleted);
             _modelBuilder.Entity<CommitteeSuggestion>()
                 .HasQueryFilter(m => !m.IsDeleted);
+            _modelBuilder.Entity<CommitteeSuggestion>()
+                .Property<string>("UserId").IsRequired();
             _modelBuilder.Entity<Project>()
                 .HasQueryFilter(m => !m.IsDeleted);
             _modelBuilder.Entity<NotificationsSettings>()
@@ -183,9 +185,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                     j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"),
                     j => j.HasOne<ServiceRequestCategory>().WithMany().HasForeignKey("ServiceRequestCategory_Id"));
 
-            _modelBuilder.Entity<Project>()
-                .ToTable("Projects");
-
             // These entities inherit from BaseModel (which has IsDeleted) but their DB tables
             // do not have the IsDeleted column, so the property must be ignored.
             _modelBuilder.Entity<QualificationLevel>().Ignore(e => e.IsDeleted);
@@ -196,11 +195,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.Entity<Lottery>().Ignore(e => e.IsDeleted);
             _modelBuilder.Entity<LotteryParticipant>().Ignore(e => e.IsDeleted);
 
-            // DbSet property names don't match the DB table names for these entities.
-            // Add explicit ToTable mappings to use the correct plural table names.
-            _modelBuilder.Entity<JobPosition>().ToTable("JobPositions");
-            _modelBuilder.Entity<ServiceRequestStatus>().ToTable("ServiceRequestStatus");
-            _modelBuilder.Entity<BadgeCategoryKudosType>().ToTable("BadgeCategoryKudosTypes");
+            // DbSet property names now match the DB table names for these entities.
         }
     }
 }

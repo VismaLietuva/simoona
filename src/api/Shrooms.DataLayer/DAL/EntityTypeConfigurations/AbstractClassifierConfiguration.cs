@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<AbstractClassifier> builder)
         {
-            builder.ToTable("AbstractClassifiers");
-
             builder.HasDiscriminator<string>("ClassificatorType")
                 .HasValue<Language>("Language")
                 .HasValue<Certificate>("Certificate");

@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<EventParticipant> builder)
         {
-            builder.ToTable("EventParticipants");
-
             builder.HasQueryFilter(e => !e.IsDeleted);
 
             builder.HasOne(e => e.ApplicationUser)

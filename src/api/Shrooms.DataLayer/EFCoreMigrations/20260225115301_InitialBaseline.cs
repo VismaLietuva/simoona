@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -139,7 +139,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceRequestStatuses",
+                name: "ServiceRequestStatus",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -153,7 +153,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceRequestStatuses", x => x.Id);
+                    table.PrimaryKey("PK_ServiceRequestStatus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -465,7 +465,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "JobPosition",
+                name: "JobPositions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -480,9 +480,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobPosition", x => x.Id);
+                    table.PrimaryKey("PK_JobPositions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_JobPosition_Organizations_OrganizationId",
+                        name: "FK_JobPositions_Organizations_OrganizationId",
                         column: x => x.OrganizationId,
                         principalTable: "Organizations",
                         principalColumn: "Id",
@@ -577,24 +577,24 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModuleOrganization",
+                name: "ModuleOrganizations",
                 columns: table => new
                 {
-                    OrganizationsId = table.Column<int>(type: "int", nullable: false),
-                    ShroomsModulesId = table.Column<int>(type: "int", nullable: false)
+                    Organization_Id = table.Column<int>(type: "int", nullable: false),
+                    Module_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ModuleOrganization", x => new { x.OrganizationsId, x.ShroomsModulesId });
+                    table.PrimaryKey("PK_ModuleOrganizations", x => new { x.Organization_Id, x.Module_Id });
                     table.ForeignKey(
-                        name: "FK_ModuleOrganization_Modules_ShroomsModulesId",
-                        column: x => x.ShroomsModulesId,
+                        name: "FK_ModuleOrganizations_Modules_Module_Id",
+                        column: x => x.Module_Id,
                         principalTable: "Modules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ModuleOrganization_Organizations_OrganizationsId",
-                        column: x => x.OrganizationsId,
+                        name: "FK_ModuleOrganizations_Organizations_Organization_Id",
+                        column: x => x.Organization_Id,
                         principalTable: "Organizations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -916,21 +916,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "RolePermissions",
                 columns: table => new
                 {
-                    PermissionsId = table.Column<int>(type: "int", nullable: false),
-                    RolesId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    PermissionId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RolePermissions", x => new { x.PermissionsId, x.RolesId });
+                    table.PrimaryKey("PK_RolePermissions", x => new { x.PermissionId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_RolePermissions_AspNetRoles_RolesId",
-                        column: x => x.RolesId,
+                        name: "FK_RolePermissions_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RolePermissions_Permissions_PermissionsId",
-                        column: x => x.PermissionsId,
+                        name: "FK_RolePermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
                         principalTable: "Permissions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1083,7 +1083,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     table.ForeignKey(
                         name: "FK_AspNetUsers_JobPosition_JobPositionId",
                         column: x => x.JobPositionId,
-                        principalTable: "JobPosition",
+                        principalTable: "JobPositions",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Organizations_OrganizationId",
@@ -1108,45 +1108,45 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ApplicationUserExams",
                 columns: table => new
                 {
-                    ApplicationUsersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExamsId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUserExams", x => new { x.ApplicationUsersId, x.ExamsId });
+                    table.PrimaryKey("PK_ApplicationUserExams", x => new { x.ApplicationUserId, x.ExamId });
                     table.ForeignKey(
-                        name: "FK_ApplicationUserExams_AspNetUsers_ApplicationUsersId",
-                        column: x => x.ApplicationUsersId,
+                        name: "FK_ApplicationUserExams_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserExams_Exams_ExamsId",
-                        column: x => x.ExamsId,
+                        name: "FK_ApplicationUserExams_Exams_ExamId",
+                        column: x => x.ExamId,
                         principalTable: "Exams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUserServiceRequestCategory",
+                name: "ServiceRequestCategoryApplicationUsers",
                 columns: table => new
                 {
-                    AssigneesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ServiceRequestCategoriesAssignedId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ServiceRequestCategory_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUserServiceRequestCategory", x => new { x.AssigneesId, x.ServiceRequestCategoriesAssignedId });
+                    table.PrimaryKey("PK_ServiceRequestCategoryApplicationUsers", x => new { x.ApplicationUser_Id, x.ServiceRequestCategory_Id });
                     table.ForeignKey(
-                        name: "FK_ApplicationUserServiceRequestCategory_AspNetUsers_AssigneesId",
-                        column: x => x.AssigneesId,
+                        name: "FK_ServiceRequestCategoryApplicationUsers_AspNetUsers_ApplicationUser_Id",
+                        column: x => x.ApplicationUser_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserServiceRequestCategory_ServiceRequestCategories_ServiceRequestCategoriesAssignedId",
-                        column: x => x.ServiceRequestCategoriesAssignedId,
+                        name: "FK_ServiceRequestCategoryApplicationUsers_ServiceRequestCategories_ServiceRequestCategory_Id",
+                        column: x => x.ServiceRequestCategory_Id,
                         principalTable: "ServiceRequestCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1156,21 +1156,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ApplicationUserSkills",
                 columns: table => new
                 {
-                    ApplicationUsersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SkillsId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SkillId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUserSkills", x => new { x.ApplicationUsersId, x.SkillsId });
+                    table.PrimaryKey("PK_ApplicationUserSkills", x => new { x.ApplicationUserId, x.SkillId });
                     table.ForeignKey(
-                        name: "FK_ApplicationUserSkills_AspNetUsers_ApplicationUsersId",
-                        column: x => x.ApplicationUsersId,
+                        name: "FK_ApplicationUserSkills_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserSkills_Skills_SkillsId",
-                        column: x => x.SkillsId,
+                        name: "FK_ApplicationUserSkills_Skills_SkillId",
+                        column: x => x.SkillId,
                         principalTable: "Skills",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1298,7 +1298,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Classificators",
+                name: "AbstractClassifiers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -1319,19 +1319,19 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Classificators", x => x.Id);
+                    table.PrimaryKey("PK_AbstractClassifiers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Classificators_AspNetUsers_ApplicationUserId",
+                        name: "FK_AbstractClassifiers_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Classificators_Classificators_ParentId",
+                        name: "FK_AbstractClassifiers_AbstractClassifiers_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "Classificators",
+                        principalTable: "AbstractClassifiers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Classificators_Organizations_OrganizationId",
+                        name: "FK_AbstractClassifiers_Organizations_OrganizationId",
                         column: x => x.OrganizationId,
                         principalTable: "Organizations",
                         principalColumn: "Id",
@@ -1339,7 +1339,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CommitteeSuggestion",
+                name: "CommitteeSuggestions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -1356,9 +1356,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommitteeSuggestion", x => x.Id);
+                    table.PrimaryKey("PK_CommitteeSuggestions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CommitteeSuggestion_AspNetUsers_UserId",
+                        name: "FK_CommitteeSuggestions_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -1369,21 +1369,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteesUsersDelegates",
                 columns: table => new
                 {
-                    DelegatesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DelegatingCommitteesId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Committee_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommitteesUsersDelegates", x => new { x.DelegatesId, x.DelegatingCommitteesId });
+                    table.PrimaryKey("PK_CommitteesUsersDelegates", x => new { x.ApplicationUser_Id, x.Committee_Id });
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersDelegates_AspNetUsers_DelegatesId",
-                        column: x => x.DelegatesId,
+                        name: "FK_CommitteesUsersDelegates_AspNetUsers_ApplicationUser_Id",
+                        column: x => x.ApplicationUser_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersDelegates_Committees_DelegatingCommitteesId",
-                        column: x => x.DelegatingCommitteesId,
+                        name: "FK_CommitteesUsersDelegates_Committees_Committee_Id",
+                        column: x => x.Committee_Id,
                         principalTable: "Committees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1393,21 +1393,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteesUsersLeadership",
                 columns: table => new
                 {
-                    LeadingCommitteesId = table.Column<int>(type: "int", nullable: false),
-                    LeadsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Committee_Id = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommitteesUsersLeadership", x => new { x.LeadingCommitteesId, x.LeadsId });
+                    table.PrimaryKey("PK_CommitteesUsersLeadership", x => new { x.Committee_Id, x.ApplicationUser_Id });
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersLeadership_AspNetUsers_LeadsId",
-                        column: x => x.LeadsId,
+                        name: "FK_CommitteesUsersLeadership_AspNetUsers_ApplicationUser_Id",
+                        column: x => x.ApplicationUser_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersLeadership_Committees_LeadingCommitteesId",
-                        column: x => x.LeadingCommitteesId,
+                        name: "FK_CommitteesUsersLeadership_Committees_Committee_Id",
+                        column: x => x.Committee_Id,
                         principalTable: "Committees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1417,21 +1417,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteesUsersMembership",
                 columns: table => new
                 {
-                    CommitteesId = table.Column<int>(type: "int", nullable: false),
-                    MembersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Committee_Id = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommitteesUsersMembership", x => new { x.CommitteesId, x.MembersId });
+                    table.PrimaryKey("PK_CommitteesUsersMembership", x => new { x.Committee_Id, x.ApplicationUser_Id });
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersMembership_AspNetUsers_MembersId",
-                        column: x => x.MembersId,
+                        name: "FK_CommitteesUsersMembership_AspNetUsers_ApplicationUser_Id",
+                        column: x => x.ApplicationUser_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommitteesUsersMembership_Committees_CommitteesId",
-                        column: x => x.CommitteesId,
+                        name: "FK_CommitteesUsersMembership_Committees_Committee_Id",
+                        column: x => x.Committee_Id,
                         principalTable: "Committees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1630,7 +1630,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationUser",
+                name: "NotificationUsers",
                 columns: table => new
                 {
                     NotificationId = table.Column<int>(type: "int", nullable: false),
@@ -1639,15 +1639,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NotificationUser", x => new { x.NotificationId, x.UserId });
+                    table.PrimaryKey("PK_NotificationUsers", x => new { x.NotificationId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_NotificationUser_AspNetUsers_UserId",
+                        name: "FK_NotificationUsers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_NotificationUser_Notifications_NotificationId",
+                        name: "FK_NotificationUsers_Notifications_NotificationId",
                         column: x => x.NotificationId,
                         principalTable: "Notifications",
                         principalColumn: "Id",
@@ -1780,9 +1780,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServiceRequests_ServiceRequestStatuses_StatusId",
+                        name: "FK_ServiceRequests_ServiceRequestStatus_StatusId",
                         column: x => x.StatusId,
-                        principalTable: "ServiceRequestStatuses",
+                        principalTable: "ServiceRequestStatus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1887,7 +1887,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookOffice",
+                name: "BookOffices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -1904,21 +1904,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookOffice", x => x.Id);
+                    table.PrimaryKey("PK_BookOffices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BookOffice_Books_BookId",
+                        name: "FK_BookOffices_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookOffice_Offices_OfficeId",
+                        name: "FK_BookOffices_Offices_OfficeId",
                         column: x => x.OfficeId,
                         principalTable: "Offices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BookOffice_Organizations_OrganizationId",
+                        name: "FK_BookOffices_Organizations_OrganizationId",
                         column: x => x.OrganizationId,
                         principalTable: "Organizations",
                         principalColumn: "Id",
@@ -1926,24 +1926,24 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CertificateExam",
+                name: "ExamCertificates",
                 columns: table => new
                 {
-                    CertificatesId = table.Column<int>(type: "int", nullable: false),
-                    ExamsId = table.Column<int>(type: "int", nullable: false)
+                    Certificate_Id = table.Column<int>(type: "int", nullable: false),
+                    Exam_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CertificateExam", x => new { x.CertificatesId, x.ExamsId });
+                    table.PrimaryKey("PK_ExamCertificates", x => new { x.Certificate_Id, x.Exam_Id });
                     table.ForeignKey(
-                        name: "FK_CertificateExam_Classificators_CertificatesId",
-                        column: x => x.CertificatesId,
-                        principalTable: "Classificators",
+                        name: "FK_ExamCertificates_AbstractClassifiers_Certificate_Id",
+                        column: x => x.Certificate_Id,
+                        principalTable: "AbstractClassifiers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CertificateExam_Exams_ExamsId",
-                        column: x => x.ExamsId,
+                        name: "FK_ExamCertificates_Exams_Exam_Id",
+                        column: x => x.Exam_Id,
                         principalTable: "Exams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1953,21 +1953,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteeSuggestionsIDs",
                 columns: table => new
                 {
-                    CommitteeId = table.Column<int>(type: "int", nullable: false),
-                    SuggestionsId = table.Column<int>(type: "int", nullable: false)
+                    Committees_Id = table.Column<int>(type: "int", nullable: false),
+                    CommitteeSuggestions_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommitteeSuggestionsIDs", x => new { x.CommitteeId, x.SuggestionsId });
+                    table.PrimaryKey("PK_CommitteeSuggestionsIDs", x => new { x.Committees_Id, x.CommitteeSuggestions_Id });
                     table.ForeignKey(
-                        name: "FK_CommitteeSuggestionsIDs_CommitteeSuggestion_SuggestionsId",
-                        column: x => x.SuggestionsId,
-                        principalTable: "CommitteeSuggestion",
+                        name: "FK_CommitteeSuggestionsIDs_CommitteeSuggestions_CommitteeSuggestions_Id",
+                        column: x => x.CommitteeSuggestions_Id,
+                        principalTable: "CommitteeSuggestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommitteeSuggestionsIDs_Committees_CommitteeId",
-                        column: x => x.CommitteeId,
+                        name: "FK_CommitteeSuggestionsIDs_Committees_Committees_Id",
+                        column: x => x.Committees_Id,
                         principalTable: "Committees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -2028,7 +2028,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventsParticipants",
+                name: "EventParticipants",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -2045,15 +2045,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventsParticipants", x => x.Id);
+                    table.PrimaryKey("PK_EventParticipants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventsParticipants_AspNetUsers_ApplicationUserId",
+                        name: "FK_EventParticipants_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EventsParticipants_Events_EventId",
+                        name: "FK_EventParticipants_Events_EventId",
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "Id",
@@ -2121,48 +2121,48 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUserProject",
+                name: "ProjectApplicationUsers",
                 columns: table => new
                 {
-                    MembersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProjectsId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Project_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUserProject", x => new { x.MembersId, x.ProjectsId });
+                    table.PrimaryKey("PK_ProjectApplicationUsers", x => new { x.ApplicationUser_Id, x.Project_Id });
                     table.ForeignKey(
-                        name: "FK_ApplicationUserProject_AspNetUsers_MembersId",
-                        column: x => x.MembersId,
+                        name: "FK_ProjectApplicationUsers_AspNetUsers_ApplicationUser_Id",
+                        column: x => x.ApplicationUser_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserProject_Projects_ProjectsId",
-                        column: x => x.ProjectsId,
+                        name: "FK_ProjectApplicationUsers_Projects_Project_Id",
+                        column: x => x.Project_Id,
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProjectSkill",
+                name: "ProjectSkills",
                 columns: table => new
                 {
-                    AttributesId = table.Column<int>(type: "int", nullable: false),
-                    ProjectsId = table.Column<int>(type: "int", nullable: false)
+                    Skill_Id = table.Column<int>(type: "int", nullable: false),
+                    Project_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectSkill", x => new { x.AttributesId, x.ProjectsId });
+                    table.PrimaryKey("PK_ProjectSkills", x => new { x.Skill_Id, x.Project_Id });
                     table.ForeignKey(
-                        name: "FK_ProjectSkill_Projects_ProjectsId",
-                        column: x => x.ProjectsId,
+                        name: "FK_ProjectSkills_Projects_Project_Id",
+                        column: x => x.Project_Id,
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProjectSkill_Skills_AttributesId",
-                        column: x => x.AttributesId,
+                        name: "FK_ProjectSkills_Skills_Skill_Id",
+                        column: x => x.Skill_Id,
                         principalTable: "Skills",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -2235,7 +2235,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     table.ForeignKey(
                         name: "FK_BookLogs_BookOffice_BookOfficeId",
                         column: x => x.BookOfficeId,
-                        principalTable: "BookOffice",
+                        principalTable: "BookOffices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -2247,48 +2247,48 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventOptionEventParticipant",
+                name: "EventParticipantEventOptions",
                 columns: table => new
                 {
-                    EventOptionsId = table.Column<int>(type: "int", nullable: false),
-                    EventParticipantsId = table.Column<int>(type: "int", nullable: false)
+                    EventOption_Id = table.Column<int>(type: "int", nullable: false),
+                    EventParticipant_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventOptionEventParticipant", x => new { x.EventOptionsId, x.EventParticipantsId });
+                    table.PrimaryKey("PK_EventParticipantEventOptions", x => new { x.EventOption_Id, x.EventParticipant_Id });
                     table.ForeignKey(
-                        name: "FK_EventOptionEventParticipant_EventOptions_EventOptionsId",
-                        column: x => x.EventOptionsId,
+                        name: "FK_EventParticipantEventOptions_EventOptions_EventOption_Id",
+                        column: x => x.EventOption_Id,
                         principalTable: "EventOptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EventOptionEventParticipant_EventsParticipants_EventParticipantsId",
-                        column: x => x.EventParticipantsId,
-                        principalTable: "EventsParticipants",
+                        name: "FK_EventParticipantEventOptions_EventParticipants_EventParticipant_Id",
+                        column: x => x.EventParticipant_Id,
+                        principalTable: "EventParticipants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserExams_ExamsId",
+                name: "IX_ApplicationUserExams_ExamId",
                 table: "ApplicationUserExams",
-                column: "ExamsId");
+                column: "ExamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserProject_ProjectsId",
-                table: "ApplicationUserProject",
-                column: "ProjectsId");
+                name: "IX_ProjectApplicationUsers_Project_Id",
+                table: "ProjectApplicationUsers",
+                column: "Project_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserServiceRequestCategory_ServiceRequestCategoriesAssignedId",
-                table: "ApplicationUserServiceRequestCategory",
-                column: "ServiceRequestCategoriesAssignedId");
+                name: "IX_ServiceRequestCategoryApplicationUsers_ServiceRequestCategory_Id",
+                table: "ServiceRequestCategoryApplicationUsers",
+                column: "ServiceRequestCategory_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserSkills_SkillsId",
+                name: "IX_ApplicationUserSkills_SkillId",
                 table: "ApplicationUserSkills",
-                column: "SkillsId");
+                column: "SkillId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoles_OrganizationId",
@@ -2410,18 +2410,18 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             migrationBuilder.CreateIndex(
                 name: "BookId_OfficeId",
-                table: "BookOffice",
+                table: "BookOffices",
                 columns: new[] { "BookId", "OfficeId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookOffice_OfficeId",
-                table: "BookOffice",
+                name: "IX_BookOffices_OfficeId",
+                table: "BookOffices",
                 column: "OfficeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookOffice_OrganizationId",
-                table: "BookOffice",
+                name: "IX_BookOffices_OrganizationId",
+                table: "BookOffices",
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
@@ -2435,23 +2435,23 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CertificateExam_ExamsId",
-                table: "CertificateExam",
-                column: "ExamsId");
+                name: "IX_ExamCertificates_Exam_Id",
+                table: "ExamCertificates",
+                column: "Exam_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classificators_ApplicationUserId",
-                table: "Classificators",
+                name: "IX_AbstractClassifiers_ApplicationUserId",
+                table: "AbstractClassifiers",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classificators_OrganizationId",
-                table: "Classificators",
+                name: "IX_AbstractClassifiers_OrganizationId",
+                table: "AbstractClassifiers",
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classificators_ParentId",
-                table: "Classificators",
+                name: "IX_AbstractClassifiers_ParentId",
+                table: "AbstractClassifiers",
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
@@ -2470,34 +2470,34 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommitteeSuggestion_UserId",
-                table: "CommitteeSuggestion",
+                name: "IX_CommitteeSuggestions_UserId",
+                table: "CommitteeSuggestions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommitteeSuggestionsIDs_SuggestionsId",
+                name: "IX_CommitteeSuggestionsIDs_CommitteeSuggestions_Id",
                 table: "CommitteeSuggestionsIDs",
-                column: "SuggestionsId");
+                column: "CommitteeSuggestions_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommitteesUsersDelegates_DelegatingCommitteesId",
+                name: "IX_CommitteesUsersDelegates_Committee_Id",
                 table: "CommitteesUsersDelegates",
-                column: "DelegatingCommitteesId");
+                column: "Committee_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommitteesUsersLeadership_LeadsId",
+                name: "IX_CommitteesUsersLeadership_ApplicationUser_Id",
                 table: "CommitteesUsersLeadership",
-                column: "LeadsId");
+                column: "ApplicationUser_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommitteesUsersMembership_MembersId",
+                name: "IX_CommitteesUsersMembership_ApplicationUser_Id",
                 table: "CommitteesUsersMembership",
-                column: "MembersId");
+                column: "ApplicationUser_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventOptionEventParticipant_EventParticipantsId",
-                table: "EventOptionEventParticipant",
-                column: "EventParticipantsId");
+                name: "IX_EventParticipantEventOptions_EventParticipant_Id",
+                table: "EventParticipantEventOptions",
+                column: "EventParticipant_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventOptions_EventId",
@@ -2550,13 +2550,13 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "StartDate");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventsParticipants_ApplicationUserId",
-                table: "EventsParticipants",
+                name: "IX_EventParticipants_ApplicationUserId",
+                table: "EventParticipants",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventsParticipants_EventId",
-                table: "EventsParticipants",
+                name: "IX_EventParticipants_EventId",
+                table: "EventParticipants",
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
@@ -2605,8 +2605,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "PictureId1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_JobPosition_OrganizationId",
-                table: "JobPosition",
+                name: "IX_JobPositions_OrganizationId",
+                table: "JobPositions",
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
@@ -2650,9 +2650,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleOrganization_ShroomsModulesId",
-                table: "ModuleOrganization",
-                column: "ShroomsModulesId");
+                name: "IX_ModuleOrganizations_Module_Id",
+                table: "ModuleOrganizations",
+                column: "Module_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Monitors_OrganizationId",
@@ -2677,12 +2677,12 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             migrationBuilder.CreateIndex(
                 name: "ix_notification_IsAlreadySeen",
-                table: "NotificationUser",
+                table: "NotificationUsers",
                 column: "IsAlreadySeen");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationUser_UserId",
-                table: "NotificationUser",
+                name: "IX_NotificationUsers_UserId",
+                table: "NotificationUsers",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -2747,9 +2747,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "WallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectSkill_ProjectsId",
-                table: "ProjectSkill",
-                column: "ProjectsId");
+                name: "IX_ProjectSkills_Project_Id",
+                table: "ProjectSkills",
+                column: "Project_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QualificationLevels_OrganizationId",
@@ -2768,9 +2768,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RolePermissions_RolesId",
+                name: "IX_RolePermissions_RoleId",
                 table: "RolePermissions",
-                column: "RolesId");
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_FloorId",
@@ -2891,10 +2891,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ApplicationUserExams");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUserProject");
+                name: "ProjectApplicationUsers");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUserServiceRequestCategory");
+                name: "ServiceRequestCategoryApplicationUsers");
 
             migrationBuilder.DropTable(
                 name: "ApplicationUserSkills");
@@ -2915,7 +2915,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "BookLogs");
 
             migrationBuilder.DropTable(
-                name: "CertificateExam");
+                name: "ExamCertificates");
 
             migrationBuilder.DropTable(
                 name: "Comments");
@@ -2933,7 +2933,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteesUsersMembership");
 
             migrationBuilder.DropTable(
-                name: "EventOptionEventParticipant");
+                name: "EventParticipantEventOptions");
 
             migrationBuilder.DropTable(
                 name: "EventReminders");
@@ -2951,7 +2951,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "LotteryParticipants");
 
             migrationBuilder.DropTable(
-                name: "ModuleOrganization");
+                name: "ModuleOrganizations");
 
             migrationBuilder.DropTable(
                 name: "Monitors");
@@ -2960,7 +2960,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "NotificationsSettings");
 
             migrationBuilder.DropTable(
-                name: "NotificationUser");
+                name: "NotificationUsers");
 
             migrationBuilder.DropTable(
                 name: "Pages");
@@ -2970,7 +2970,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "ProjectSkill");
+                name: "ProjectSkills");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
@@ -3006,16 +3006,16 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "BadgeTypes");
 
             migrationBuilder.DropTable(
-                name: "BookOffice");
+                name: "BookOffices");
 
             migrationBuilder.DropTable(
-                name: "Classificators");
+                name: "AbstractClassifiers");
 
             migrationBuilder.DropTable(
                 name: "Exams");
 
             migrationBuilder.DropTable(
-                name: "CommitteeSuggestion");
+                name: "CommitteeSuggestions");
 
             migrationBuilder.DropTable(
                 name: "Committees");
@@ -3024,7 +3024,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "EventOptions");
 
             migrationBuilder.DropTable(
-                name: "EventsParticipants");
+                name: "EventParticipants");
 
             migrationBuilder.DropTable(
                 name: "KudosBaskets");
@@ -3072,7 +3072,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ServiceRequestPriorities");
 
             migrationBuilder.DropTable(
-                name: "ServiceRequestStatuses");
+                name: "ServiceRequestStatus");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
@@ -3084,7 +3084,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "Walls");
 
             migrationBuilder.DropTable(
-                name: "JobPosition");
+                name: "JobPositions");
 
             migrationBuilder.DropTable(
                 name: "QualificationLevels");

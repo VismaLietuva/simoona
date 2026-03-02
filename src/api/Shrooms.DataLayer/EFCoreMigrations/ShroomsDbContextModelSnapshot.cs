@@ -369,7 +369,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("AbstractClassifiers", (string)null);
+                    b.ToTable("AbstractClassifiers");
 
                     b.HasDiscriminator<string>("ClassificatorType").HasValue("AbstractClassifier");
 
@@ -673,7 +673,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("KudosTypeId")
                         .IsUnique();
 
-                    b.ToTable("BadgeCategoryKudosTypes", (string)null);
+                    b.ToTable("BadgeCategoryKudosType");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Badges.BadgeLog", b =>
@@ -1034,7 +1034,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .IsUnique()
                         .HasDatabaseName("BookId_OfficeId");
 
-                    b.ToTable("BookOffices", (string)null);
+                    b.ToTable("BookOffices");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Committee.Committee", b =>
@@ -1125,7 +1125,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommitteeSuggestion");
+                    b.ToTable("CommitteeSuggestions");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.Event", b =>
@@ -1323,7 +1323,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventParticipants", (string)null);
+                    b.ToTable("EventParticipants");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventReminder", b =>
@@ -1648,7 +1648,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("JobPositions", (string)null);
+                    b.ToTable("JobPositions");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Kudos.KudosLog", b =>
@@ -2310,7 +2310,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Notifications.NotificationUser", b =>
@@ -2331,7 +2331,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotificationUsers", (string)null);
+                    b.ToTable("NotificationUsers");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Notifications.NotificationsSettings", b =>
@@ -2719,7 +2719,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("WallId");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.QualificationLevel", b =>
@@ -3106,7 +3106,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceRequestStatus", (string)null);
+                    b.ToTable("ServiceRequestStatus");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Skill", b =>

@@ -75,9 +75,9 @@ END
 
             migrationBuilder.Sql(@"
 -- ModuleOrganization (FK: OrganizationsId → Organizations, ShroomsModulesId → Modules)
-IF NOT EXISTS (SELECT 1 FROM dbo.ModuleOrganization WHERE OrganizationsId = 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.ModuleOrganizations WHERE Organization_Id = 1)
 BEGIN
-    INSERT dbo.ModuleOrganization ([ShroomsModulesId], [OrganizationsId]) VALUES
+    INSERT dbo.ModuleOrganizations ([Module_Id], [Organization_Id]) VALUES
         (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)
 END
 ");
@@ -151,7 +151,7 @@ END
 -- RolePermissions
 IF NOT EXISTS (SELECT 1 FROM dbo.RolePermissions)
 BEGIN
-    INSERT dbo.RolePermissions ([PermissionsId], [RolesId]) VALUES
+    INSERT dbo.RolePermissions ([PermissionId], [RoleId]) VALUES
         -- External role
         (23, N'2c83f542-b496-4ea0-b4d5-5601f303ab28'),
         -- User role (permissions 1-29)
@@ -245,16 +245,16 @@ END
 
             migrationBuilder.Sql(@"
 -- ServiceRequestStatuses
-IF NOT EXISTS (SELECT 1 FROM dbo.ServiceRequestStatuses)
+IF NOT EXISTS (SELECT 1 FROM dbo.ServiceRequestStatus)
 BEGIN
-    SET IDENTITY_INSERT dbo.ServiceRequestStatuses ON
-    INSERT dbo.ServiceRequestStatuses ([Id], [Title], [IsDeleted], [Created], [CreatedBy], [Modified], [ModifiedBy]) VALUES
+    SET IDENTITY_INSERT dbo.ServiceRequestStatus ON
+    INSERT dbo.ServiceRequestStatus ([Id], [Title], [IsDeleted], [Created], [CreatedBy], [Modified], [ModifiedBy]) VALUES
         (1, N'Open',        0, '1900-01-01', NULL, '1900-01-01', NULL),
         (2, N'In Progress', 0, '1900-01-01', NULL, '1900-01-01', NULL),
         (3, N'Cancelled',   0, '1900-01-01', NULL, '1900-01-01', NULL),
         (4, N'Done',        0, '1900-01-01', NULL, '1900-01-01', NULL),
         (5, N'Purchased',   0, '1900-01-01', NULL, '1900-01-01', NULL)
-    SET IDENTITY_INSERT dbo.ServiceRequestStatuses OFF
+    SET IDENTITY_INSERT dbo.ServiceRequestStatus OFF
 END
 ");
 
