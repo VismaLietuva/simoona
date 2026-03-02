@@ -1,0 +1,44 @@
+name: simoona
+
+services:
+  db:
+    container_name: simoona-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password!123"
+    ports:
+      - "1434:1433"
+    volumes:
+      - ./db/init-db.sh:/init-db.sh
+    entrypoint: /bin/bash /init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Password!123' -Q 'SELECT 1' -b -No"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    container_name: simoona-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "50321:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_HTTP_PORTS: "8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  webapp:
+    container_name: simoona-webapp
+    build:
+      context: ../webapp
+      dockerfile: Dockerfile
+    ports:
+      - "3000:7203"
+    depends_on:
+      - api

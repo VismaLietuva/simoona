@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+**/.vs/
+Shrooms.Tests/
+Shrooms.Premium.Tests/
+.git/
+.gitignore
+*.md

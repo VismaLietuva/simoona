@@ -27,7 +27,7 @@ module.exports = class extends Generator {
     prompting() {
         return this.prompt([{
           type: 'list',
-          name: 'activity',
+          name: 'target',
           message: 'Choose an option:',
           choices: [{
               name: 'do everything',
@@ -109,7 +109,7 @@ module.exports = class extends Generator {
             '-email="' + this.props.email + '"',
             '-connectionString="' + this.props.connectionString + '"',
             '-dbName="'+ this.props.dbName +'"',
-            '-activity="' + this.props.activity + '"',
+            '-target="' + this.props.target+ '"',
             '-dropdb="' + this.props.dropdb + '"'
           ]
         );

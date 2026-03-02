@@ -1,0 +1,31 @@
+# Local development override (Fast Mode)
+# API and webapp are built on the host machine; containers mount the output.
+#
+# Before starting:
+#   API:    dotnet build src/api/Shrooms.Presentation.Api -c Debug
+#   Webapp: cd src/webapp && gulp build-dev
+#
+# Start:
+#   docker compose -f docker-compose.yml -f docker-compose.override.yml up
+
+services:
+  api:
+    build: !reset null
+    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    volumes:
+      - ./Shrooms.Presentation.Api/bin/Debug/net10.0:/app
+    working_dir: /app
+    command: ["dotnet", "Shrooms.Presentation.Api.dll"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+  webapp:
+    build: !reset null
+    image: node:18-slim
+    volumes:
+      - ../webapp/build:/app/build
+      - ../webapp/src/server:/app/src/server
+      - ../webapp/package.json:/app/package.json
+      - ../webapp/node_modules:/app/node_modules
+    working_dir: /app
+    command: node src/server/app.js

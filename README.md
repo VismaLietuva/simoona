@@ -51,14 +51,18 @@ Simoona consists of two main parts:
 * Front-end webapp - purely AngularJS application (no server-side code),
 * Back-end app - ASP.NET MVC+WebApi project, with EntityFramework code-first database.
 
+## Quick Start with Docker
+
+The fastest way to run Simoona locally is with Docker. See the **[Docker Setup Guide](DOCKER_SETUP.md)**.
+
 ## Install from Binaries
 
 The easiest way to install and try out Simoona is from pre-compiled binaries.
 To do it, please follow the [Install from binaries guidelines](LocalSetup.md).
 
-## Install from Source Code
+## Install from Source Code (IIS)
 
-If you are planning to contribute or change Simoona code, we suggest following the [Installation from source code guidelines](build/README.md). Just head over there and follow the instructions.
+If you are planning to contribute or change Simoona code using the classic IIS setup, follow the [Installation from source code guidelines](build/README.md).
 
 ## Developing and Contributing
 

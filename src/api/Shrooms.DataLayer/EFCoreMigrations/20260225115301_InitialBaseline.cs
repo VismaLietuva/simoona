@@ -1057,9 +1057,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     FacebookEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MicrosoftEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2212,7 +2212,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     TakenFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Returned = table.Column<DateTime>(type: "datetime2", nullable: true),
                     BookOfficeId = table.Column<int>(type: "int", nullable: false),
