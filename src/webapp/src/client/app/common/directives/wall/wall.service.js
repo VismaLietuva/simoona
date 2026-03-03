@@ -158,7 +158,10 @@
                 if (isWallModule && !settings.wallId) {
                     setWallSettings(response, isWallModule);
                 }
-            }, errorHandler.handleErrorMessage);
+            }, function(err) {
+                wallServiceData.isWallListLoading = false;
+                errorHandler.handleErrorMessage(err);
+            });
         }
 
         function getWallDetails(wallId) {

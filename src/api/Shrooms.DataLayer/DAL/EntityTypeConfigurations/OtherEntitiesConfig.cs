@@ -102,8 +102,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             _modelBuilder.Entity<Floor>()
                 .HasOne(f => f.Picture)
-                .WithMany()
-                .HasForeignKey("Picture_Id");
+                .WithMany();
 
             _modelBuilder.Entity<Picture>()
                 .HasOne(a => a.Organization)

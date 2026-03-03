@@ -3,11 +3,10 @@
     Sets up a fresh Simoona database: seeds reference data and creates the first admin user.
 
 .DESCRIPTION
-    1. Runs seed.sql against the target SQL Server using sqlcmd.
+    1. Runs seed.sql against the target SQL Server.
     2. Computes an ASP.NET Core Identity V3 (PBKDF2-SHA256) password hash in PowerShell.
     3. Inserts the admin user + assigns the Admin role + adds them to the Official wall.
 
-    Requires sqlcmd to be installed on the host.
     EF Core migrations must be applied before running this script.
 
 .PARAMETER ConnectionString
@@ -38,30 +37,49 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Parse connection string into sqlcmd arguments (avoid DbConnectionStringBuilder type issues)
-$dict = @{}
-$ConnectionString -split ';' | ForEach-Object {
-    $kv = $_ -split '=', 2
-    if ($kv.Count -eq 2) { $dict[$kv[0].Trim()] = $kv[1].Trim() }
-}
-$Server   = if ($dict['Server'])       { $dict['Server'] }       else { $dict['Data Source'] }
-$Database = if ($dict['Database'])     { $dict['Database'] }     else { $dict['Initial Catalog'] }
-$User     = if ($dict['User Id'])      { $dict['User Id'] }      elseif ($dict['User ID']) { $dict['User ID'] } else { $dict['UID'] }
-$DbPass   = if ($dict['Password'])     { $dict['Password'] }     else { $dict['PWD'] }
+Add-Type -AssemblyName System.Data
 
-$SqlArgs = @("-S", $Server, "-d", $Database, "-b", "-No")
-if ($User) { $SqlArgs += @("-U", $User, "-P", $DbPass) } else { $SqlArgs += "-E" }  # -E = Windows auth
+function Invoke-SqlBatches([string]$Sql) {
+    $conn = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)
+    $conn.Open()
+    try {
+        # Split on GO statements (T-SQL batch separator)
+        $batches = $Sql -split '(?m)^\s*GO\s*$'
+        foreach ($batch in $batches) {
+            $trimmed = $batch.Trim()
+            if ($trimmed -eq '') { continue }
+            $cmd = $conn.CreateCommand()
+            $cmd.CommandText = $trimmed
+            $cmd.CommandTimeout = 120
+            $cmd.ExecuteNonQuery() | Out-Null
+        }
+    } finally {
+        $conn.Close()
+    }
+}
 
 function Invoke-Sql([string]$Query) {
-    & sqlcmd @SqlArgs -Q $Query
-    if ($LASTEXITCODE -ne 0) { throw "sqlcmd failed (exit $LASTEXITCODE)" }
+    Invoke-SqlBatches -Sql $Query
+}
+
+function Invoke-SqlScalar([string]$Query) {
+    $conn = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)
+    $conn.Open()
+    try {
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandText = $Query
+        $cmd.CommandTimeout = 30
+        return $cmd.ExecuteScalar()
+    } finally {
+        $conn.Close()
+    }
 }
 
 # ── 1. Seed reference data ────────────────────────────────────────────────────
 Write-Host "→ Seeding reference data..." -ForegroundColor Cyan
 $ScriptDir = Split-Path $MyInvocation.MyCommand.Path
-& sqlcmd @SqlArgs -i "$ScriptDir\seed.sql"
-if ($LASTEXITCODE -ne 0) { throw "seed.sql failed" }
+$seedSql = Get-Content "$ScriptDir\seed.sql" -Raw
+Invoke-SqlBatches -Sql $seedSql
 Write-Host "  Reference data seeded." -ForegroundColor Green
 
 # ── 2. Update organisation name (optional) ───────────────────────────────────
@@ -98,8 +116,8 @@ $normalised    = $Email.ToUpperInvariant()
 # ── 4. Insert admin user ──────────────────────────────────────────────────────
 Write-Host "→ Creating admin user '$Email'..." -ForegroundColor Cyan
 
-$checkExists = (& sqlcmd @SqlArgs -h -1 -Q "SET NOCOUNT ON; SELECT COUNT(1) FROM dbo.AspNetUsers WHERE NormalizedEmail='$normalised'")
-if ($checkExists.Trim() -ne "0") {
+$checkExists = Invoke-SqlScalar "SELECT COUNT(1) FROM dbo.AspNetUsers WHERE NormalizedEmail='$normalised'"
+if ([int]$checkExists -ne 0) {
     Write-Host "  User '$Email' already exists – skipping." -ForegroundColor Yellow
     exit 0
 }

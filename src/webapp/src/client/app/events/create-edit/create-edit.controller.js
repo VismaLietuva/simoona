@@ -151,6 +151,12 @@
 
             eventRepository.getEventOffices().then(function (response) {
                 vm.eventOffices = response;
+                if (!$stateParams.id && vm.eventOffices.length) {
+                    vm.eventOffices.forEach(function (office) {
+                        vm.event && vm.event.offices && vm.event.offices.push(office.id);
+                    });
+                    validateOfficeSelection();
+                }
             });
 
             eventRepository.getEventTypes().then(function (response) {

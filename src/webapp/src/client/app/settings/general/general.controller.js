@@ -42,7 +42,7 @@
                 vm.generalSettings.languageCode = alreadySelectedLang.name
 
                 var alreadySelectedTz = _.find(response.timeZones, function(tz) { return tz.isSelected });
-                vm.generalSettings.timeZoneId = alreadySelectedTz.id;
+                vm.generalSettings.timeZoneId = alreadySelectedTz ? alreadySelectedTz.id : null;
 
                 vm.isLoading = false;
             }, errorHandler.handleErrorMessage);

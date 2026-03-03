@@ -35,7 +35,11 @@
         ////////
 
         function init() {
-            notificationHub.initHubConnection();
+            try {
+                notificationHub.initHubConnection();
+            } catch (e) {
+                console.warn('SignalR hub connection failed:', e.message);
+            }
 
             if (!$state.includes(appConfig.homeStateName)) {
                 wallService.getChosenWallList(false);

@@ -79,9 +79,9 @@ END
 -- ---------------------------------------------------------------------------
 -- ModuleOrganization  (FK → Modules, Organizations)
 -- ---------------------------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM dbo.ModuleOrganization WHERE OrganizationsId = 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.ModuleOrganizations WHERE Organization_Id = 1)
 BEGIN
-    INSERT dbo.ModuleOrganization ([ShroomsModulesId],[OrganizationsId]) VALUES
+    INSERT dbo.ModuleOrganizations ([Module_Id],[Organization_Id]) VALUES
         (1,1),(2,1),(3,1),(4,1),(5,1),(6,1)
 END
 
@@ -146,7 +146,9 @@ BEGIN
         (52, N'SERVICEREQUESTS_ADMINISTRATION',   '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', 2),
         (53, N'MONITOR_ADMINISTRATION',           '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', 4),
         (54, N'KUDOSSHOP_ADMINISTRATION',         '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL),
-        (55, N'JOB_ADMINISTRATION',               '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL)
+        (55, N'JOB_ADMINISTRATION',               '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL),
+        (56, N'LOTTERY_BASIC',                    '2018-05-15', NULL, '2018-05-15', NULL, 0, N'basic', NULL),
+        (57, N'LOTTERY_ADMINISTRATION',           '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL)
     SET IDENTITY_INSERT dbo.Permissions OFF
 END
 
@@ -155,7 +157,7 @@ END
 -- ---------------------------------------------------------------------------
 IF NOT EXISTS (SELECT 1 FROM dbo.RolePermissions)
 BEGIN
-    INSERT dbo.RolePermissions ([PermissionsId],[RolesId]) VALUES
+    INSERT dbo.RolePermissions ([PermissionId],[RoleId]) VALUES
         -- External
         (23, N'2c83f542-b496-4ea0-b4d5-5601f303ab28'),
         -- User (1-29)
@@ -174,7 +176,8 @@ BEGIN
         (25,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),(26,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),
         (27,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),(28,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),
         (29,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),
-        -- Administration (30-35, 38-55)
+        (56,N'3b926ec0-88a0-4761-b8c2-869f98f78327'),
+        -- Administration (30-35, 38-55, 57)
         (30,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),(31,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (32,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),(33,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (34,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),(35,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
@@ -187,7 +190,8 @@ BEGIN
         (50,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),(51,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (53,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),(54,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (55,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
-        -- Admin (all 55)
+        (57,N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
+        -- Admin (all 57)
         (1,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),(2,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (3,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),(4,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (5,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),(6,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
@@ -216,6 +220,8 @@ BEGIN
         (51,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),(52,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (53,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),(54,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (55,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
+        (56,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
+        (57,N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         -- ServiceRequestNotification
         (52,N'902462b2-52a4-40d5-8c15-1924681e1c43'),
         -- EventsManagement
@@ -249,16 +255,16 @@ END
 -- ---------------------------------------------------------------------------
 -- ServiceRequestStatuses
 -- ---------------------------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM dbo.ServiceRequestStatuses)
+IF NOT EXISTS (SELECT 1 FROM dbo.ServiceRequestStatus)
 BEGIN
-    SET IDENTITY_INSERT dbo.ServiceRequestStatuses ON
-    INSERT dbo.ServiceRequestStatuses ([Id],[Title],[IsDeleted],[Created],[CreatedBy],[Modified],[ModifiedBy]) VALUES
+    SET IDENTITY_INSERT dbo.ServiceRequestStatus ON
+    INSERT dbo.ServiceRequestStatus ([Id],[Title],[IsDeleted],[Created],[CreatedBy],[Modified],[ModifiedBy]) VALUES
         (1, N'Open',        0, '1900-01-01', NULL, '1900-01-01', NULL),
         (2, N'In Progress', 0, '1900-01-01', NULL, '1900-01-01', NULL),
         (3, N'Cancelled',   0, '1900-01-01', NULL, '1900-01-01', NULL),
         (4, N'Done',        0, '1900-01-01', NULL, '1900-01-01', NULL),
         (5, N'Purchased',   0, '1900-01-01', NULL, '1900-01-01', NULL)
-    SET IDENTITY_INSERT dbo.ServiceRequestStatuses OFF
+    SET IDENTITY_INSERT dbo.ServiceRequestStatus OFF
 END
 
 -- ---------------------------------------------------------------------------
@@ -270,4 +276,41 @@ BEGIN
     INSERT dbo.Walls ([Id],[Name],[Description],[OrganizationId],[Created],[CreatedBy],[Modified],[ModifiedBy],[IsDeleted],[Type],[Access],[Logo],[IsHiddenFromAllWalls],[AddForNewUsers])
     VALUES (1, N'Official', N'Official wall', 1, GETDATE(), NULL, GETDATE(), NULL, 0, 0, 0, NULL, 0, 0)
     SET IDENTITY_INSERT dbo.Walls OFF
+END
+
+-- ---------------------------------------------------------------------------
+-- Offices
+-- ---------------------------------------------------------------------------
+IF NOT EXISTS (SELECT 1 FROM dbo.Offices WHERE OrganizationId = 1)
+BEGIN
+    SET IDENTITY_INSERT dbo.Offices ON
+    INSERT dbo.Offices ([Id],[Name],[IsDefault],[Country],[City],[Street],[Building],[OrganizationId],[Created],[CreatedBy],[Modified],[ModifiedBy],[IsDeleted]) VALUES
+        (1, N'Main Office', 1, N'Lithuania', N'Vilnius', N'Example Street', N'1', 1, GETUTCDATE(), NULL, GETUTCDATE(), NULL, 0)
+    SET IDENTITY_INSERT dbo.Offices OFF
+END
+
+-- ---------------------------------------------------------------------------
+-- EventTypes
+-- ---------------------------------------------------------------------------
+IF NOT EXISTS (SELECT 1 FROM dbo.EventTypes WHERE OrganizationId = 1)
+BEGIN
+    SET IDENTITY_INSERT dbo.EventTypes ON
+    INSERT dbo.EventTypes ([Id],[Name],[IsSingleJoin],[SingleJoinGroupName],[SendWeeklyReminders],[IsShownWithMainEvents],[SendEmailToManager],[CanBeDisplayedInUpcomingEventsWidget],[OrganizationId],[Created],[CreatedBy],[Modified],[ModifiedBy],[IsDeleted]) VALUES
+        (1, N'General',       0, NULL, 0, 1, 0, 1, 1, GETUTCDATE(), NULL, GETUTCDATE(), NULL, 0),
+        (2, N'Training',      0, NULL, 0, 1, 0, 1, 1, GETUTCDATE(), NULL, GETUTCDATE(), NULL, 0),
+        (3, N'Team Building', 0, NULL, 0, 1, 0, 1, 1, GETUTCDATE(), NULL, GETUTCDATE(), NULL, 0),
+        (4, N'Meeting',       0, NULL, 0, 1, 0, 0, 1, GETUTCDATE(), NULL, GETUTCDATE(), NULL, 0)
+    SET IDENTITY_INSERT dbo.EventTypes OFF
+END
+
+-- ---------------------------------------------------------------------------
+-- ExternalLinks
+-- ---------------------------------------------------------------------------
+IF NOT EXISTS (SELECT 1 FROM dbo.ExternalLinks)
+BEGIN
+    SET IDENTITY_INSERT dbo.ExternalLinks ON
+    INSERT dbo.ExternalLinks ([Id],[Name],[Url],[Type],[Priority],[OrganizationId],[Created],[CreatedBy],[Modified],[ModifiedBy],[IsDeleted]) VALUES
+        (1, N'Company Website', N'https://example.com',      2, 1, 1, '1900-01-01', NULL, '1900-01-01', NULL, 0),
+        (2, N'Documentation',   N'https://docs.example.com', 1, 2, 1, '1900-01-01', NULL, '1900-01-01', NULL, 0)
+    SET IDENTITY_INSERT dbo.ExternalLinks OFF
 END

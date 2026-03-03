@@ -7,7 +7,7 @@ This guide explains how to get Simoona running from a clean repository checkout 
 | Tool | Purpose |
 |------|---------|
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Runs all containers |
-| [sqlcmd](https://learn.microsoft.com/en-us/sql/tools/sqlcmd/sqlcmd-utility) | Used by the seed script to connect to the database |
+
 | .NET 10 SDK | Only needed for [local fast-mode development](#local-development-fast-mode) |
 | Node.js + gulp | Only needed for [local fast-mode development](#local-development-fast-mode) |
 
@@ -138,7 +138,7 @@ After a full reset (`-v`), repeat steps 1–2.
 | File | Purpose |
 |------|---------|
 | `build/seed.sql` | Idempotent SQL that inserts all reference data (roles, permissions, modules, walls, etc.). Run by `setup.ps1/sh`. |
-| `build/setup.ps1` | Windows: seeds the DB and creates the first admin user via direct `sqlcmd` connection. |
+| `build/setup.ps1` | Windows: seeds the DB and creates the first admin user using System.Data.SqlClient (no external tools required). |
 | `build/setup.sh` | Linux/macOS equivalent of `setup.ps1`. Requires Python 3 for password hashing. |
 | `src/api/docker-compose.yml` | Production-style Docker Compose (images built from source). |
 | `src/api/docker-compose.override.yml` | Local dev override (bind-mounts host build output). |

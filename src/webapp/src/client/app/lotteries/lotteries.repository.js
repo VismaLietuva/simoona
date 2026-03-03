@@ -104,7 +104,7 @@
         }
 
         function getLotteryWidgetInfo(){
-            return $resource(lotteryWidgetUrl + 'Get')
+            return $resource(lotteryWidgetUrl)
                 .query().$promise;
         }
 

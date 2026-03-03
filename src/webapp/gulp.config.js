@@ -29,7 +29,7 @@ module.exports = function () {
         ],
         build: './build/',
         defaultBuildConfig: {
-            endpoint: 'http://localhost:50321/',
+            endpoint: 'http://localhost:50321',
             chatBotEndpoint: 'chatBotEndpointValue',
             chatBotAgentId: 'chatBotAgentIdValue',
             impersonate: false,
@@ -37,7 +37,7 @@ module.exports = function () {
             environment: 'dev'
         },
         productionBuildConfig: {
-            endpoint:  'http://localhost:50321/',
+            endpoint:  'http://localhost:50321',
             chatBotEndpoint: 'chatBotEndpointValue',
             chatBotAgentId: 'chatBotAgentIdValue',
             impersonate: false,

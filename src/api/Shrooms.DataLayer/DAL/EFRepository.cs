@@ -58,7 +58,7 @@ namespace Shrooms.DataLayer.DAL
             {
                 foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    queryableSet = queryableSet.Include(includeProperty);
+                    queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
             }
 
@@ -94,7 +94,7 @@ namespace Shrooms.DataLayer.DAL
             {
                 foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    queryableSet = queryableSet.Include(includeProperty);
+                    queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
             }
 

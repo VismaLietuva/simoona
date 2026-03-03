@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Constants;
 using Shrooms.DataLayer.DAL;
@@ -34,6 +35,7 @@ builder.Services.AddScoped<ShroomsDbContext>(sp =>
     connStr ??= configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
     var optionsBuilder = new DbContextOptionsBuilder<ShroomsDbContext>();
     optionsBuilder.UseSqlServer(connStr);
+    optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
     return new ShroomsDbContext(optionsBuilder.Options);
 });
 builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbContext>());
@@ -191,6 +193,7 @@ using (var scope = app.Services.CreateScope())
     var connStr = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
     var options = new DbContextOptionsBuilder<ShroomsDbContext>()
         .UseSqlServer(connStr)
+        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
         .Options;
     using var db = new ShroomsDbContext(options);
     db.Database.Migrate();
