@@ -84,7 +84,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             // One-to-many: ApplicationUser -> Events
             builder.HasMany(e => e.Events)
-                .WithOne()
+                .WithOne(e => e.ResponsibleUser)
                 .HasForeignKey(e => e.ResponsibleUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 

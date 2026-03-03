@@ -142,7 +142,9 @@ BEGIN
         (52, N'SERVICEREQUESTS_ADMINISTRATION',   '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', 2),
         (53, N'MONITOR_ADMINISTRATION',           '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', 4),
         (54, N'KUDOSSHOP_ADMINISTRATION',         '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL),
-        (55, N'JOB_ADMINISTRATION',               '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL)
+        (55, N'JOB_ADMINISTRATION',               '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL),
+        (56, N'LOTTERY_ADMINISTRATION',           '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL),
+        (57, N'BLACKLIST_ADMINISTRATION',         '2018-05-15', NULL, '2018-05-15', NULL, 0, N'admin', NULL)
     SET IDENTITY_INSERT dbo.Permissions OFF
 END
 ");
@@ -183,7 +185,8 @@ BEGIN
         (50, N'6c3442bd-b22e-4e57-a316-23753d59c95c'), (51, N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (53, N'6c3442bd-b22e-4e57-a316-23753d59c95c'), (54, N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (55, N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
-        -- Admin role (all 55 permissions)
+        (56, N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
+        (57, N'6c3442bd-b22e-4e57-a316-23753d59c95c'),
         (1,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'), (2,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (3,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'), (4,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (5,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'), (6,  N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
@@ -212,6 +215,8 @@ BEGIN
         (51, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'), (52, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (53, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'), (54, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         (55, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
+        (56, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
+        (57, N'808fa2cd-28b7-4b8c-beec-433e3ce1a15a'),
         -- ServiceRequestNotification role
         (52, N'902462b2-52a4-40d5-8c15-1924681e1c43'),
         -- EventsManagement role

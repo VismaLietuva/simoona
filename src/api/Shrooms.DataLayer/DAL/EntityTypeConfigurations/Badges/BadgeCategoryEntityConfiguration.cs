@@ -24,12 +24,12 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
                 .HasMaxLength(50);
 
             builder.HasMany(x => x.RelationshipsWithKudosTypes)
-                .WithOne()
+                .WithOne(x => x.BadgeCategory)
                 .HasForeignKey(x => x.BadgeCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(x => x.BadgeTypes)
-                .WithOne()
+                .WithOne(x => x.BadgeCategory)
                 .HasForeignKey(x => x.BadgeCategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

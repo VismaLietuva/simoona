@@ -10,10 +10,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
         {
             builder.HasQueryFilter(e => !e.IsDeleted);
 
-            builder.HasOne(x => x.BadgeCategory)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.Property(u => u.Title)
                 .IsRequired()
                 .HasMaxLength(50);

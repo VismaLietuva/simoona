@@ -207,7 +207,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var kudosLog in kudosLogs)
                 {
@@ -266,7 +266,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var userLog in userLogs)
                 {
@@ -317,7 +317,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var kudosLog in kudosLogs)
                 {
@@ -350,7 +350,7 @@ namespace Shrooms.Domain.Services.Kudos
                 return kudosTypes;
             }
 
-            var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+            var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
             foreach (var kudosType in kudosTypes)
             {

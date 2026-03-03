@@ -8,12 +8,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
     {
         public void Configure(EntityTypeBuilder<BadgeCategoryKudosType> builder)
         {
-            builder.HasOne(x => x.BadgeCategory)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasOne(x => x.KudosType)
-                .WithOne()
+                .WithMany()
+                .HasForeignKey(x => x.KudosTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasKey(type => type.Id);

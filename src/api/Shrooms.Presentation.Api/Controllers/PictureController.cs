@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
+    [Route("Picture")]
     public class PictureController : BaseController
     {
         private readonly IPictureService _pictureService;
@@ -22,7 +23,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Picture/Upload")]
+        [Route("Upload")]
         [PermissionAuthorize(Permission = BasicPermissions.Picture)]
         public async Task<IActionResult> Upload(IFormFile file)
         {

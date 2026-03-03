@@ -61,8 +61,15 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Ok(new ExternalUserInfoViewModel { HasRegistered = false });
             }
 
-            var loggedUser = await GetLoggedInUserInfoAsync();
-            return Ok(loggedUser);
+            try
+            {
+                var loggedUser = await GetLoggedInUserInfoAsync();
+                return Ok(loggedUser);
+            }
+            catch (InvalidOperationException)
+            {
+                return Unauthorized();
+            }
         }
 
         [AllowAnonymous]
@@ -238,6 +245,11 @@ namespace Shrooms.Presentation.Api.Controllers
             var claimsIdentity = User.Identity as ClaimsIdentity;
 
             var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"Authenticated user '{userId}' not found in the database. The token may be stale.");
+            }
+
             var permissions = await _permissionService.GetUserPermissionsAsync(userId, organizationId);
 
             var userInfo = new LoggedInUserInfoViewModel
