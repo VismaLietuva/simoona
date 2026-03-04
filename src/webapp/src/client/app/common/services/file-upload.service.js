@@ -73,7 +73,7 @@
             var authData = localStorageService.get('authorizationData');
 
             for (var i = 0; i < files.length; i++) {
-                formData.append('file' + i, files[i], files[i].name);
+                formData.append('file', files[i], files[i].name);
             }
 
             return $http.post(uploadUrl, formData, {
