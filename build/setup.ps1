@@ -28,7 +28,7 @@
     .\setup.ps1 -ConnectionString "Server=localhost,1434;Database=SimoonaDB;User Id=sa;Password=Password!123;TrustServerCertificate=True" -Email admin@company.com -Password 'S3cur3P@ss!' -OrgName acme
 #>
 param(
-    [Parameter(Mandatory)][string]$ConnectionString,
+    [string]$ConnectionString = $env:ConnectionStrings__DefaultConnection,
     [Parameter(Mandatory)][string]$Email,
     [Parameter(Mandatory)][string]$Password,
     [string]$OrgName = ""

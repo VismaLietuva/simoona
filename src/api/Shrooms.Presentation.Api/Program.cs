@@ -17,6 +17,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHealthChecks();
+
 // DbContext with per-request tenant-aware connection string
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ShroomsDbContext>(sp =>
@@ -225,5 +227,6 @@ app.UseHangfireDashboard();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
+app.MapHealthChecks("/healthz");
 
 app.Run();

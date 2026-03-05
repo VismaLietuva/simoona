@@ -17,4 +17,5 @@
   <Project Path="Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj" />
   <Project Path="Shrooms.Tests/Shrooms.Tests.csproj" />
   <Project Path="Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj" />
+  <Project Path="Simoona.AppHost/Simoona.AppHost.csproj" />
 </Solution>

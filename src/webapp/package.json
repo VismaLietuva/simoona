@@ -18,7 +18,8 @@
   "scripts": {
     "init": "npm install",
     "install": "bower install",
-    "start": "node src/server/app.js"
+    "start": "node src/server/app.js",
+    "start:aspire": "gulp build-dev && node src/server/app.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
