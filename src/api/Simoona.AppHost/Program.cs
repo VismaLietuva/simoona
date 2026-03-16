@@ -25,8 +25,7 @@ var api = builder.AddProject<Projects.Shrooms_Presentation_Api>("api")
 // Run build/setup.ps1 after the API has started (migrations already applied).
 // ConnectionStrings__DefaultConnection is injected by WithReference(simoonaDb).
 // Admin credentials come from the admin-email / admin-password parameters.
-builder.AddExecutable("db-setup", "cmd", "../../../build",
-    "/c", "pwsh.exe",
+builder.AddExecutable("db-setup", "pwsh", "../../build",
     "-ExecutionPolicy", "Bypass",
     "-File", "setup.ps1",
     "-Email", adminEmail,
