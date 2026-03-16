@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using Shrooms.Domain.Helpers;
 
@@ -53,6 +54,36 @@ namespace Shrooms.Tests.Helpers
         public void ConvertToHtml_EmptyString_ReturnsEmpty()
         {
             var result = _sut.ConvertToHtml(string.Empty);
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void ConvertToHtml_Null_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => _sut.ConvertToHtml(null));
+        }
+
+        [Test]
+        public void ConvertToHtml_WhitespaceOnly_ReturnsEmpty()
+        {
+            var result = _sut.ConvertToHtml("   ");
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void ConvertToHtml_TabsOnly_ReturnsEmpty()
+        {
+            var result = _sut.ConvertToHtml("\t\t");
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void ConvertToHtml_MixedWhitespace_ReturnsEmpty()
+        {
+            var result = _sut.ConvertToHtml(" \t \n ");
 
             Assert.That(result, Is.EqualTo(string.Empty));
         }
