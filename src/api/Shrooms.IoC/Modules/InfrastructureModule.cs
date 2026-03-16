@@ -34,11 +34,11 @@ namespace Shrooms.IoC.Modules
             services.AddScoped<IApplicationSettings, ApplicationSettings>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddScoped<IExcelBuilderFactory, ExcelBuilderFactory>();
-            services.AddSingleton<IRazorLightEngine>(sp =>
-            {
-                var basePath = Path.Combine(AppContext.BaseDirectory, "EmailTemplates");
-                return RazorLightEngineFactory.Create(basePath);
-            });
+            services.AddSingleton<IRazorLightEngine>(_ =>
+                new RazorLightEngineBuilder()
+                    .UseFileSystemProject(Path.Combine(AppContext.BaseDirectory, "EmailTemplates"), ".html")
+                    .UseMemoryCachingProvider()
+                    .Build());
             services.AddSingleton<IMailTemplate, MailTemplate>();
             services.AddScoped<IDailyMailingService, DailyMailingService>();
             services.AddScoped<IJobScheduler, HangFireScheduler>();
