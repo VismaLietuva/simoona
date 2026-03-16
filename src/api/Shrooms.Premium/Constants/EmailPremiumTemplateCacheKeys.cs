@@ -1,25 +1,25 @@
-﻿namespace Shrooms.Premium.Constants
+namespace Shrooms.Premium.Constants
 {
     public static class EmailPremiumTemplateCacheKeys
     {
-        public const string BookRemind = nameof(BookRemind);
-        public const string BookReport = nameof(BookReport);
-        public const string BookTaken = nameof(BookTaken);
-        public const string EventParticipantExpelled = nameof(EventParticipantExpelled);
-        public const string EventJoinRemind = nameof(EventJoinRemind);
-        public const string LoyaltyKudosReceived = nameof(LoyaltyKudosReceived);
-        public const string LoyaltyKudosDecreased = nameof(LoyaltyKudosDecreased);
-        public const string CommitteeSuggestion = nameof(CommitteeSuggestion);
-        public const string ServiceRequestComment = nameof(ServiceRequestComment);
-        public const string ServiceRequest = nameof(ServiceRequest);
-        public const string ServiceRequestUpdate = nameof(ServiceRequestUpdate);
-        public const string CoacheeJoinedEvent = nameof(CoacheeJoinedEvent);
-        public const string CoacheeLeftEvent = nameof(CoacheeLeftEvent);
-        public const string StartedLottery = nameof(StartedLottery);
-        public const string LotteryTicketGifted = nameof(LotteryTicketGifted);
-        public const string EventStartRemind = nameof(EventStartRemind);
-        public const string EventDeadlineRemind = nameof(EventDeadlineRemind);
-        public const string EventShared = nameof(EventShared);
-        public const string EventNew = nameof(EventNew);
+        public const string BookRemind = "Books/BookRemind.html";
+        public const string BookReport = "Books/BookReport.html";
+        public const string BookTaken = "Books/BookTaken.html";
+        public const string EventParticipantExpelled = "Events/ParticipantExpelled.html";
+        public const string EventJoinRemind = "Events/RemindToJoin.html";
+        public const string LoyaltyKudosReceived = "LoyaltyKudos/LoyaltyKudosReceived.html";
+        public const string LoyaltyKudosDecreased = "LoyaltyKudos/LoyaltyKudosDecreased.html";
+        public const string CommitteeSuggestion = "Committees/CommitteesSuggestion.html";
+        public const string ServiceRequestComment = "ServiceRequests/ServiceRequestComment.html";
+        public const string ServiceRequest = "ServiceRequests/NewServiceRequest.html";
+        public const string ServiceRequestUpdate = "ServiceRequests/UpdateServiceRequest.html";
+        public const string CoacheeJoinedEvent = "Events/CoacheeJoinedEvent.html";
+        public const string CoacheeLeftEvent = "Events/CoacheeLeftEvent.html";
+        public const string StartedLottery = "Lotteries/StartedLottery.html";
+        public const string LotteryTicketGifted = "Lotteries/LotteryTicketGifted.html";
+        public const string EventStartRemind = "Events/RemindStartDate.html";
+        public const string EventDeadlineRemind = "Events/RemindDeadlineDate.html";
+        public const string EventShared = "Events/SharedEvent.html";
+        public const string EventNew = "Events/NewEvent.html";
     }
 }

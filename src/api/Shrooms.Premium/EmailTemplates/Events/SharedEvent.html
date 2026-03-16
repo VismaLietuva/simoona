@@ -2,7 +2,7 @@
 @using Shrooms.Domain.Helpers
 @model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.SharedEventEmailTemplateViewModel
 @{
-    Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
+    Layout = "../HeaderFooter";
 }
 <tr>
     <td align="center">
@@ -30,7 +30,7 @@
                     <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
                         <p style="color: #337ab7;text-align: left;font-size: 18px;padding-bottom: 10px;padding-left: 10px;font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word;line-height: 15px;margin: 0 0 0 0;">@HtmlSanitizerHelper.Sanitize(Model.SharerFullName)</p>
                         <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                            @Html.Raw(HtmlSanitizerHelper.Sanitize(Model.PostBody))
+                            @Raw(HtmlSanitizerHelper.Sanitize(Model.PostBody))
                         </p>
                     </td>
                 </tr>
@@ -55,7 +55,7 @@
                                         }
                                         else
                                         {
-                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</i></p>
+                                            <p style="word-break: break-word; text-overflow: ellipsis; color: #787878;"><i>@Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</i></p>
                                         }
                                     </td>
                                 </tr>

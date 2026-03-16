@@ -35,6 +35,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>EmailTemplates\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="..\Shrooms.Presentation.Api\EmailTemplates\**\_ViewImports.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>EmailTemplates\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
