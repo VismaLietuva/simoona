@@ -18,7 +18,6 @@
     <PackageReference Include="MoreLinq" Version="4.4.0" />
     <PackageReference Include="System.DirectoryServices" Version="9.0.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.0" />
-    <PackageReference Include="System.Runtime.Caching" Version="9.0.0" />
     <PackageReference Include="X.PagedList" Version="10.5.9" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="9.1.2" />
   </ItemGroup>
