@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="CommonMark.NET" Version="0.15.1" />
+    <PackageReference Include="Markdig" Version="1.1.1" />
     <PackageReference Include="EPPlus" Version="7.5.3" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.873" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="9.0.6" />

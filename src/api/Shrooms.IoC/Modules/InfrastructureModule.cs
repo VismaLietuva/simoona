@@ -25,7 +25,7 @@ namespace Shrooms.IoC.Modules
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             services.AddScoped<ILogger, Logger>();
-            services.AddScoped<IMarkdownConverter, CommonMarkMarkdownConverter>();
+            services.AddSingleton<IMarkdownConverter, MarkdigMarkdownConverter>();
             services.AddScoped<IMailingService, MailingService>();
             services.AddSingleton(typeof(ICustomCache<,>), typeof(CustomCache<,>));
             services.AddScoped<IApplicationSettings, ApplicationSettings>();
