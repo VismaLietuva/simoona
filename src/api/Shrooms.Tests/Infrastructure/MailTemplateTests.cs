@@ -77,8 +77,8 @@ namespace Shrooms.Tests.Infrastructure
 
             for (var i = 0; i < retries; i++)
             {
-                await _sut.GenerateAsync(newWallPostEmailTemplateViewModel, "Wall/NewPost.html");
-                await _sut.GenerateAsync(kudosSentEmailTemplateViewModel, "Kudos/KudosSent.html");
+                await _sut.GenerateAsync(newWallPostEmailTemplateViewModel, "Wall/NewPost.cshtml");
+                await _sut.GenerateAsync(kudosSentEmailTemplateViewModel, "Kudos/KudosSent.cshtml");
             }
         }
 
