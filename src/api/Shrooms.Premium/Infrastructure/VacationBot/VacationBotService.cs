@@ -13,46 +13,43 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
     {
         private readonly IApplicationSettings _appSettings;
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
-        public VacationBotService(IApplicationSettings appSettings, ILogger logger)
+        public VacationBotService(HttpClient httpClient, IApplicationSettings appSettings, ILogger logger)
         {
+            _httpClient = httpClient;
             _appSettings = appSettings;
             _logger = logger;
         }
 
         public async Task<VacationInfo[]> GetVacationHistory(string email)
         {
-            using (var client = new HttpClient())
+            var url = string.Format(_appSettings.VacationsBotHistoryUrl, email);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue(
+                "Basic", _appSettings.VacationsBotAuthToken);
+
+            HttpResponseMessage response;
+            try
             {
-                HttpResponseMessage response;
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    "Basic", _appSettings.VacationsBotAuthToken);
-
-                var url = string.Format(_appSettings.VacationsBotHistoryUrl, email);
-
-                try
-                {
-                    response = await client.PostAsync(url, null);
-                }
-                catch (HttpRequestException e)
-                {
-                    _logger.Error(e);
-                    throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.Error(new Exception(json));
-                    throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
-                }
-
-                var result = JsonSerializer.Deserialize<VacationInfo[]>(json);
-
-                return result;
+                response = await _httpClient.SendAsync(request);
             }
+            catch (HttpRequestException e)
+            {
+                _logger.Error(e);
+                throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.Error(new Exception(json));
+                throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
+            }
+
+            return JsonSerializer.Deserialize<VacationInfo[]>(json);
         }
     }
 }
