@@ -32,10 +32,10 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private const int VacationUsedTimeColIndex = 7;
         private const int VacationUnusedTimeColIndex = 8;
 
-        public VacationService(IUnitOfWork2 unitOfWork2, IVacationDomainService vacationDomainService)
+        public VacationService(IUnitOfWork2 unitOfWork2, IVacationDomainService vacationDomainService, TelemetryClient telemetryClient)
         {
             _uow = unitOfWork2;
-            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
+            _telemetryClient = telemetryClient;
 
             _applicationUserDbSet = unitOfWork2.GetDbSet<ApplicationUser>();
             _vacationDomainService = vacationDomainService;

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Moq;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
@@ -37,7 +39,7 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
@@ -55,7 +57,7 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
@@ -73,7 +75,7 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);

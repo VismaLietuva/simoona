@@ -14,8 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="8.2.0" />
-    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="7.1.0" />
     <PackageReference Include="EPPlus" Version="7.5.2" />
     <PackageReference Include="Hangfire.Core" Version="1.8.18" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
