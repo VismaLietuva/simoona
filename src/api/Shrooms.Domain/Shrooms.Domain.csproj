@@ -7,7 +7,7 @@
     <AssemblyTitle>Shrooms.Domain</AssemblyTitle>
     <Product>Shrooms.Domain</Product>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Markdig" Version="1.1.1" />
@@ -16,8 +16,6 @@
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
     <PackageReference Include="MoreLinq" Version="4.4.0" />
-    <PackageReference Include="System.DirectoryServices" Version="9.0.0" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.0" />
     <PackageReference Include="X.PagedList" Version="10.5.9" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="9.1.2" />
   </ItemGroup>
