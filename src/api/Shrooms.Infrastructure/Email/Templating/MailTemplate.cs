@@ -1,42 +1,49 @@
-﻿using RazorEngine;
-using RazorEngine.Templating;
+using RazorLight;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Attributes;
+using Shrooms.Infrastructure.Email.Extensions;
+using Shrooms.Infrastructure.Email.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Shrooms.Infrastructure.Email.Extensions;
-using Shrooms.Infrastructure.Email.Models;
+using System.Threading.Tasks;
 
 namespace Shrooms.Infrastructure.Email.Templating
 {
     public class MailTemplate : IMailTemplate
     {
-        public string Generate<TEmailTemplate>(TEmailTemplate viewModel, string key, string timeZoneKey = null)
+        private readonly IRazorLightEngine _razorLightEngine;
+
+        public MailTemplate(IRazorLightEngine razorLightEngine)
+        {
+            _razorLightEngine = razorLightEngine ?? throw new ArgumentNullException(nameof(razorLightEngine));
+        }
+
+        public async Task<string> GenerateAsync<TEmailTemplate>(TEmailTemplate viewModel, string key, string timeZoneKey = null)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
             if (string.IsNullOrEmpty(timeZoneKey))
             {
-                return GenerateInternal(viewModel, key);
+                return await GenerateInternalAsync(viewModel, key);
             }
 
             var timeZonePropertiesWithInitialValues = ExtractPropertiesMarkedWithApplyTimeZoneChangesAttribute(viewModel);
             if (!timeZonePropertiesWithInitialValues.Any())
             {
-                return GenerateInternal(viewModel, key);
+                return await GenerateInternalAsync(viewModel, key);
             }
 
-            return ApplyTimeZoneChangesToSingleTemplate(viewModel, key, timeZonePropertiesWithInitialValues, timeZoneKey);
+            return await ApplyTimeZoneChangesToSingleTemplateAsync(viewModel, key, timeZonePropertiesWithInitialValues, timeZoneKey);
         }
 
-        public ITimeZoneEmailGroup Generate<TEmailTemplate>(TEmailTemplate viewModel, string key, IEnumerable<string> timeZoneKeys)
+        public async Task<ITimeZoneEmailGroup> GenerateAsync<TEmailTemplate>(TEmailTemplate viewModel, string key, IEnumerable<string> timeZoneKeys)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
             if (!timeZoneKeys.Any())
             {
-                throw new ArgumentException($"This method cannot be used without time zone keys.");
+                throw new ArgumentException("This method cannot be used without time zone keys.");
             }
 
             var timeZonePropertiesWithInitialValues = ExtractPropertiesMarkedWithApplyTimeZoneChangesAttribute(viewModel);
@@ -45,10 +52,10 @@ namespace Shrooms.Infrastructure.Email.Templating
                 throw new ArgumentException($"Template {typeof(TEmailTemplate)} does not contain properties that require time zone changes.");
             }
 
-            return new TimeZoneEmailGroup(ApplyTimeZoneChangesToMultipleTemplates(viewModel, key, timeZoneKeys, timeZonePropertiesWithInitialValues));
+            return new TimeZoneEmailGroup(await ApplyTimeZoneChangesToMultipleTemplatesAsync(viewModel, key, timeZoneKeys, timeZonePropertiesWithInitialValues));
         }
 
-        private string ApplyTimeZoneChangesToSingleTemplate<TEmailTemplate>(
+        private async Task<string> ApplyTimeZoneChangesToSingleTemplateAsync<TEmailTemplate>(
             TEmailTemplate viewModel,
             string key,
             List<(PropertyInfo, DateTime)> timeZonePropertiesWithInitialValues,
@@ -59,7 +66,8 @@ namespace Shrooms.Infrastructure.Email.Templating
                 var zonedDate = propertyWithInitialValue.Item2.ConvertUtcToTimeZone(timeZoneKey);
                 propertyWithInitialValue.Item1.SetValue(viewModel, zonedDate);
             }
-            var compiledTemplate = GenerateInternal(viewModel, key);
+
+            var compiledTemplate = await GenerateInternalAsync(viewModel, key);
             RestoreInitialValuesToTemplate(viewModel, timeZonePropertiesWithInitialValues);
 
             return compiledTemplate;
@@ -76,7 +84,7 @@ namespace Shrooms.Infrastructure.Email.Templating
             }
         }
 
-        private Dictionary<string, string> ApplyTimeZoneChangesToMultipleTemplates<TEmailTemplate>(
+        private async Task<Dictionary<string, string>> ApplyTimeZoneChangesToMultipleTemplatesAsync<TEmailTemplate>(
             TEmailTemplate viewModel,
             string key,
             IEnumerable<string> timeZoneKeys,
@@ -91,7 +99,7 @@ namespace Shrooms.Infrastructure.Email.Templating
                     var zonedDate = propertyWithInitialValue.Item2.ConvertUtcToTimeZone(timeZoneKey);
                     propertyWithInitialValue.Item1.SetValue(viewModel, zonedDate);
                 }
-                compiledTemplates[timeZoneKey] = GenerateInternal(viewModel, key);
+                compiledTemplates[timeZoneKey] = await GenerateInternalAsync(viewModel, key);
             }
             RestoreInitialValuesToTemplate(viewModel, timeZonePropertiesWithInitialValues);
             return compiledTemplates;
@@ -115,10 +123,10 @@ namespace Shrooms.Infrastructure.Email.Templating
             return timeZonePropertiesWithInitialValues;
         }
 
-        private string GenerateInternal<TEmailTemplate>(TEmailTemplate viewModel, string key)
+        private async Task<string> GenerateInternalAsync<TEmailTemplate>(TEmailTemplate viewModel, string key)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            return Engine.Razor.Run(key, typeof(TEmailTemplate), viewModel);
+            return await _razorLightEngine.CompileRenderAsync(key, viewModel);
         }
     }
 }

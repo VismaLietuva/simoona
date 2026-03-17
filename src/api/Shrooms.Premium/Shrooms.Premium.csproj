@@ -31,8 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="EmailTemplates\**\*.html" />
-    <None Include="EmailTemplates\**\*.html">
+    <None Include="EmailTemplates\**\*.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
