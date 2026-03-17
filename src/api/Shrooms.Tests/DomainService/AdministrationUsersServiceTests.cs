@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,13 @@ namespace Shrooms.Tests.DomainService
         private IKudosService _kudosService;
         private DbSet<ApplicationUser> _userDbSet;
         private DbSet<Wall> _wallsDbSet;
+        private HttpClient _httpClient;
+
+        [TearDown]
+        public void TearDown()
+        {
+            _httpClient?.Dispose();
+        }
 
         [SetUp]
         public void TestInitializer()
@@ -59,8 +67,10 @@ namespace Shrooms.Tests.DomainService
 
             var excelBuilder = Substitute.For<IExcelBuilderFactory>();
 
+            _httpClient = new HttpClient(new HttpClientHandler());
+
             _userAdministrationValidator = new UserAdministrationValidator();
-            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
+            _administrationUsersService = new AdministrationUsersService(_httpClient, ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
         }
 
         [Test]
