@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
             request.Headers.Authorization = new AuthenticationHeaderValue(
                 "Basic", _appSettings.VacationsBotAuthToken);
 
-            using HttpResponseMessage response;
+            HttpResponseMessage response;
             try
             {
                 response = await _httpClient.SendAsync(request);
@@ -41,15 +41,18 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
                 throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
             }
 
-            var json = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
+            using (response)
             {
-                _logger.Error(new Exception(json));
-                throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
-            }
+                var json = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<VacationInfo[]>(json);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.Error(new Exception(json));
+                    throw new ValidationException(PremiumErrorCodes.VacationBotError, "Vacation bot error");
+                }
+
+                return JsonSerializer.Deserialize<VacationInfo[]>(json);
+            }
         }
     }
 }
