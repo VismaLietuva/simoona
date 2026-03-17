@@ -3,8 +3,9 @@ using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Enums;
+using Microsoft.Extensions.Logging;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Premium.Domain.Services.Lotteries;
@@ -33,7 +34,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _kudosService = Substitute.For<IKudosService>();
             _lotteryParticipantService = Substitute.For<ILotteryParticipantService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
-            var logger = Substitute.For<ILogger>();
+            var logger = Substitute.For<ILogger<LotteryAbortJob>>();
 
             _sut = new LotteryAbortJob(_kudosService, _lotteryParticipantService, logger, _asyncRunner, _unitOfWork, _lotteryService);
         }

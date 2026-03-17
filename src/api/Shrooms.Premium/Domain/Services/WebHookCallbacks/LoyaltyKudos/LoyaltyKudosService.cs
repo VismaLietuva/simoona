@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.DAL;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -26,12 +27,12 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
         private readonly DbSet<KudosType> _kudosTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<Organization> _organizationsDbSet;
-        private readonly ILogger _logger;
+        private readonly ILogger<LoyaltyKudosService> _logger;
         private readonly IAsyncRunner _asyncRunner;
         private readonly IMapper _mapper;
         private readonly ILoyaltyKudosCalculator _loyaltyKudosCalculator;
 
-        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger, IAsyncRunner asyncRunner, IMapper mapper, ILoyaltyKudosCalculator loyaltyKudosCalculator)
+        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger<LoyaltyKudosService> logger, IAsyncRunner asyncRunner, IMapper mapper, ILoyaltyKudosCalculator loyaltyKudosCalculator)
         {
             _logger = logger;
             _asyncRunner = asyncRunner;
@@ -112,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     }
                     catch (ArgumentException e)
                     {
-                        _logger.Error(e);
+                        _logger.LogError(e, e.Message);
                     }
                 }
 
