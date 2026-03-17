@@ -86,6 +86,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.GivenName, $"{user.FirstName} {user.LastName}"),
                 new Claim(WebApiConstants.ClaimOrganizationId, user.OrganizationId.ToString()),
                 new Claim(WebApiConstants.ClaimOrganizationName, orgShortName),
             };
