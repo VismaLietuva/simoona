@@ -18,10 +18,6 @@ using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.DomainService
 {
-    /// <summary>
-    /// Tests for BirthdaysNotificationWebHookService to verify email generation and sending
-    /// for birthday notifications using the async IMailTemplate interface.
-    /// </summary>
     [TestFixture]
     public class BirthdaysNotificationWebHookServiceTests
     {

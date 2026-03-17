@@ -20,10 +20,6 @@ using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.Tests.DomainService
 {
-    /// <summary>
-    /// Tests for BookRemindService to verify email generation and sending for book reminders
-    /// using the async IMailTemplate interface.
-    /// </summary>
     [TestFixture]
     public class BookRemindServiceTests
     {
