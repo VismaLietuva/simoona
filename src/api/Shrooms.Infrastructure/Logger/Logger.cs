@@ -11,10 +11,10 @@ namespace Shrooms.Infrastructure.Logger
         private readonly TelemetryClient _telemetryClient;
         private readonly NLog.Logger _logger;
 
-        public Logger()
+        public Logger(TelemetryClient telemetryClient)
         {
             _logger = LogManager.GetCurrentClassLogger();
-            _telemetryClient = new TelemetryClient(Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.CreateDefault());
+            _telemetryClient = telemetryClient;
         }
 
         public void Debug(string log, Exception e = null)

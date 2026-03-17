@@ -183,6 +183,9 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Application Insights
+builder.Services.AddApplicationInsightsTelemetry();
+
 // Application services (IoC bootstrapper)
 builder.Services.AddShrooms();
 
