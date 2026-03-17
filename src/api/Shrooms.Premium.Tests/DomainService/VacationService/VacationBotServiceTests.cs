@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Exceptions;
@@ -18,7 +19,7 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
     public class VacationBotServiceTests
     {
         private IApplicationSettings _appSettings;
-        private ILogger _logger;
+        private ILogger<VacationBotService> _logger;
         private FakeHttpMessageHandler _handler;
         private HttpClient _httpClient;
         private VacationBotService _vacationBotService;
@@ -31,7 +32,7 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
         public void SetUp()
         {
             _appSettings = Substitute.For<IApplicationSettings>();
-            _logger = Substitute.For<ILogger>();
+            _logger = Substitute.For<ILogger<VacationBotService>>();
 
             _appSettings.VacationsBotAuthToken.Returns(TestAuthToken);
             _appSettings.VacationsBotHistoryUrl.Returns(TestHistoryUrlTemplate);
@@ -96,7 +97,12 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
             try { await _vacationBotService.GetVacationHistory(TestEmail); }
             catch (ValidationException) { }
 
-            _logger.Received(1).Error(Arg.Any<Exception>());
+            _logger.Received(1).Log(
+                LogLevel.Error,
+                Arg.Any<EventId>(),
+                Arg.Any<object>(),
+                Arg.Any<Exception>(),
+                Arg.Any<Func<object, Exception, string>>());
         }
 
         [Test]
@@ -119,7 +125,12 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
             try { await _vacationBotService.GetVacationHistory(TestEmail); }
             catch (ValidationException) { }
 
-            _logger.Received(1).Error(networkException);
+            _logger.Received(1).Log(
+                LogLevel.Error,
+                Arg.Any<EventId>(),
+                Arg.Any<object>(),
+                networkException,
+                Arg.Any<Func<object, Exception, string>>());
         }
 
         [Test]
