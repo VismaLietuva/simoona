@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\Targets\shared.targets" />
 
-  <!-- Override shared.targets net472 with net10.0 -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>

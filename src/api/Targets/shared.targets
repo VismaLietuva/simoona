@@ -1,23 +1,8 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>9</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <Copyright>Copyright ©  2015</Copyright>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
-    <StyleCopEnabled>True</StyleCopEnabled>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugType>full</DebugType>
-    <OutputPath>bin\Debug\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>pdbonly</DebugType>
-    <OutputPath>bin\Release\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,7 +14,6 @@
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
   </ItemGroup>
 </Project>
