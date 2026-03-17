@@ -152,7 +152,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             await _mailingService.Received(1)
                 .SendEmailAsync(Arg.Is<EmailDto>(email =>
-                    email.RecipientEmail == "user@test.com" &&
+                    email.Receivers.Contains("user@test.com") &&
                     email.Body == expectedEmailContent));
         }
 

@@ -413,16 +413,13 @@ namespace Shrooms.Premium.Tests.DomainService
             var adminEmails = new List<string> { "admin@test.com" };
             var expectedEmailContent = "<html>Book Report Email</html>";
 
-            _bookOfficesDbSet
-                .FirstAsync(Arg.Is<System.Linq.Expressions.Expression<Func<BookOffice, bool>>>(
-                    x => x.Compile()(reportedOfficeBook)))
-                .Returns(Task.FromResult(reportedOfficeBook));
+            _bookOfficesDbSet.SetDbSetDataForAsync(new List<BookOffice> { reportedOfficeBook });
 
             _userService.GetApplicationUserAsync(userId)
-                .Returns(Task.FromResult(new ApplicationUser { Id = userId, FullName = "Test User" }));
+                .Returns(Task.FromResult(new ApplicationUser { Id = userId, FirstName = "Test", LastName = "User" }));
 
             _roleService.GetAdministrationRoleEmailsAsync(organizationId)
-                .Returns(Task.FromResult(adminEmails.AsEnumerable()));
+                .Returns(Task.FromResult<IList<string>>(adminEmails));
 
             _organizationService.GetOrganizationByIdAsync(organizationId)
                 .Returns(Task.FromResult(organization));
@@ -449,7 +446,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             await _mailingService.Received(1)
                 .SendEmailAsync(Arg.Is<EmailDto>(email =>
-                    email.Recipients.SequenceEqual(adminEmails) &&
+                    email.Receivers.SequenceEqual(adminEmails) &&
                     email.Body == expectedEmailContent));
         }
 
