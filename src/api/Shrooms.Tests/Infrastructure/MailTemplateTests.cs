@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
+using NSubstitute;
 using NUnit.Framework;
-using RazorEngine;
-using RazorEngine.Templating;
-using Shrooms.Contracts.Constants;
+using RazorLight;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Attributes;
 using Shrooms.Infrastructure.Email.Templating;
 
@@ -17,8 +16,7 @@ namespace Shrooms.Tests.Infrastructure
     public class EmailViewModelWithoutTimeZoneableProperties : BaseEmailTemplateViewModel
     {
         public EmailViewModelWithoutTimeZoneableProperties(DateTime date, string userNotificationSettingsUrl = null)
-            :
-            base(userNotificationSettingsUrl)
+            : base(userNotificationSettingsUrl)
         {
             Date = date;
         }
@@ -29,8 +27,7 @@ namespace Shrooms.Tests.Infrastructure
     public class EmailViewModelWithTimeZoneableProperties : BaseEmailTemplateViewModel
     {
         public EmailViewModelWithTimeZoneableProperties(DateTime date, string userNotificationSettingsUrl = null)
-            :
-            base(userNotificationSettingsUrl)
+            : base(userNotificationSettingsUrl)
         {
             Date = date;
         }
@@ -42,47 +39,21 @@ namespace Shrooms.Tests.Infrastructure
     [TestFixture]
     public class MailTemplateTests
     {
-        private Stopwatch _stopWatch;
-
+        private IRazorLightEngine _razorLightEngine;
         private MailTemplate _sut;
-
-        [OneTimeSetUp]
-        public void TestOneTimeInitializer()
-        {
-            _stopWatch = Stopwatch.StartNew();
-            TestContext.Progress.WriteLine("Started templates compilation");
-
-            Assembly.Load("Shrooms.Contracts");
-            Assembly.Load("Shrooms.Contracts.DataTransferObjects");
-            Assembly.Load("Shrooms.Domain");
-
-            var emailTemplatesConfig = new EmailTemplatesCompiler();
-            emailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
-
-            _stopWatch.Stop();
-            TestContext.Progress.WriteLine("Finished templates compilation.");
-            TestContext.Progress.WriteLine($"Duration: {_stopWatch.Elapsed}");
-        }
 
         [SetUp]
         public void TestInitializer()
         {
-            _stopWatch = Stopwatch.StartNew();
-            _sut = new MailTemplate();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _stopWatch.Stop();
-            TestContext.Progress.WriteLine($"Duration: {_stopWatch.Elapsed}");
+            _razorLightEngine = Substitute.For<IRazorLightEngine>();
+            _sut = new MailTemplate(_razorLightEngine);
         }
 
         [Test]
         [TestCase(1)]
         [TestCase(3)]
         [TestCase(10)]
-        public void Should_Generate_NewPost_EmailContent(int retries)
+        public async Task Should_Generate_NewPost_EmailContent(int retries)
         {
             var newWallPostEmailTemplateViewModel = new NewWallPostEmailTemplateViewModel(
                 "WallTitle",
@@ -100,122 +71,133 @@ namespace Shrooms.Tests.Infrastructure
                 "New kudos for you!",
                 "http://profile.example.com/1");
 
+            _razorLightEngine
+                .CompileRenderAsync(Arg.Any<string>(), Arg.Any<object>())
+                .Returns(Task.FromResult("<html>rendered</html>"));
+
             for (var i = 0; i < retries; i++)
             {
-                TestContext.Progress.WriteLine($"Generating {i + 1}/{retries}");
-
-                _sut.Generate(newWallPostEmailTemplateViewModel, EmailTemplateCacheKeys.NewWallPost);
-                _sut.Generate(kudosSentEmailTemplateViewModel, EmailTemplateCacheKeys.KudosSent);
+                await _sut.GenerateAsync(newWallPostEmailTemplateViewModel, "Wall/NewPost.cshtml");
+                await _sut.GenerateAsync(kudosSentEmailTemplateViewModel, "Kudos/KudosSent.cshtml");
             }
         }
 
         [Test]
-        public void Generate_WithoutTimeZoneKey_GeneratesEmailBody()
+        public async Task GenerateAsync_WithoutTimeZoneKey_GeneratesEmailBody()
         {
             // Arrange
             var viewModel = new EmailViewModelWithTimeZoneableProperties(DateTime.UtcNow);
-            var template = CreateTemplate<EmailViewModelWithTimeZoneableProperties>($"@Model.{nameof(EmailViewModelWithTimeZoneableProperties.Date)}");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithTimeZoneableProperties>(template);
+            var templateKey = Guid.NewGuid().ToString();
+            const string expectedBody = "2024-01-15";
+
+            _razorLightEngine
+                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .Returns(Task.FromResult(expectedBody));
 
             // Act
-            var result = _sut.Generate(viewModel, templateKey);
+            var result = await _sut.GenerateAsync(viewModel, templateKey);
 
             // Assert
             Assert.That(string.IsNullOrEmpty(result), Is.False);
         }
 
         [Test]
-        public void Generate_WithTimeZoneKey_GeneratesEmailBodyWithTransformedDate()
+        public async Task GenerateAsync_WithTimeZoneKey_GeneratesEmailBodyWithTransformedDate()
         {
             // Arrange
-            var date = DateTime.UtcNow;
+            var date = RemoveMilliseconds(DateTime.UtcNow);
             var timeZoneKey = GetLastAvailableTimeZoneKey();
             var viewModel = new EmailViewModelWithTimeZoneableProperties(date);
-            var template = CreateTemplate<EmailViewModelWithTimeZoneableProperties>($"@Model.{nameof(EmailViewModelWithTimeZoneableProperties.Date)}");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithTimeZoneableProperties>(template);
+            var templateKey = Guid.NewGuid().ToString();
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKey);
 
+            _razorLightEngine
+                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .Returns(callInfo =>
+                {
+                    // Capture the date that was on the model when render was called
+                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.Arg<object>();
+                    return Task.FromResult(model.Date.ToString("o"));
+                });
+
             // Act
-            var result = _sut.Generate(viewModel, templateKey, timeZoneKey);
+            var result = await _sut.GenerateAsync(viewModel, templateKey, timeZoneKey);
 
             // Assert
             Assert.That(DateTime.Parse(result), Is.EqualTo(expectedDate));
         }
 
         [Test]
-        public void Generate_WithTimeZoneKeyAndWithoutMarkedProperties_GeneratesDefaultEmailBody()
+        public async Task GenerateAsync_WithTimeZoneKeyAndWithoutMarkedProperties_GeneratesDefaultEmailBody()
         {
             // Arrange
             var date = RemoveMilliseconds(DateTime.UtcNow);
             var timeZoneKey = GetLastAvailableTimeZoneKey();
             var viewModel = new EmailViewModelWithoutTimeZoneableProperties(date);
-            var template = CreateTemplate<EmailViewModelWithoutTimeZoneableProperties>($"@Model.{nameof(EmailViewModelWithoutTimeZoneableProperties.Date)}");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithoutTimeZoneableProperties>(template);
+            var templateKey = Guid.NewGuid().ToString();
+
+            _razorLightEngine
+                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .Returns(callInfo =>
+                {
+                    var model = (EmailViewModelWithoutTimeZoneableProperties)callInfo.Arg<object>();
+                    return Task.FromResult(model.Date.ToString("o"));
+                });
 
             // Act
-            var result = _sut.Generate(viewModel, templateKey, timeZoneKey);
+            var result = await _sut.GenerateAsync(viewModel, templateKey, timeZoneKey);
 
             // Assert
             Assert.That(DateTime.Parse(result), Is.EqualTo(date));
         }
 
         [Test]
-        public void Generate_WithoutTimeZoneKeys_Throws()
+        public void GenerateAsync_WithoutTimeZoneKeys_Throws()
         {
             // Arrange
             var viewModel = new EmailViewModelWithTimeZoneableProperties(DateTime.UtcNow);
-            var template = CreateTemplate<EmailViewModelWithTimeZoneableProperties>("");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithTimeZoneableProperties>(template);
-
-            // ReSharper disable once CollectionNeverUpdated.Local
+            var templateKey = Guid.NewGuid().ToString();
             var timeZoneKeys = new List<string>();
 
             // Assert
-            Assert.Throws<ArgumentException>(() => _sut.Generate(viewModel, templateKey, timeZoneKeys));
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.GenerateAsync(viewModel, templateKey, timeZoneKeys));
         }
 
         [Test]
-        public void Generate_WithTimeZoneKeysAndWithoutMarkedProperties_Throws()
+        public void GenerateAsync_WithTimeZoneKeysAndWithoutMarkedProperties_Throws()
         {
             // Arrange
             var viewModel = new EmailViewModelWithoutTimeZoneableProperties(DateTime.UtcNow);
-            var template = CreateTemplate<EmailViewModelWithoutTimeZoneableProperties>("");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithoutTimeZoneableProperties>(template);
+            var templateKey = Guid.NewGuid().ToString();
             var timeZoneKeys = new List<string> { GetLastAvailableTimeZoneKey() };
 
             // Assert
-            Assert.Throws<ArgumentException>(() => _sut.Generate(viewModel, templateKey, timeZoneKeys));
+            Assert.ThrowsAsync<ArgumentException>(() => _sut.GenerateAsync(viewModel, templateKey, timeZoneKeys));
         }
 
         [Test]
-        public void Generate_WithTimeZoneKeys_GeneratesEmailBodyWithTransformedDate()
+        public async Task GenerateAsync_WithTimeZoneKeys_GeneratesEmailBodyWithTransformedDate()
         {
             // Arrange
             var date = DateTime.UtcNow;
             var timeZoneKeys = new List<string> { GetLastAvailableTimeZoneKey() };
             var viewModel = new EmailViewModelWithTimeZoneableProperties(date);
-            var template = CreateTemplate<EmailViewModelWithTimeZoneableProperties>($"@Model.{nameof(EmailViewModelWithTimeZoneableProperties.Date)}");
-            var templateKey = CompileMockEmailTemplate<EmailViewModelWithTimeZoneableProperties>(template);
+            var templateKey = Guid.NewGuid().ToString();
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKeys[0]);
 
+            _razorLightEngine
+                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .Returns(callInfo =>
+                {
+                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.Arg<object>();
+                    return Task.FromResult(model.Date.ToString("o"));
+                });
+
             // Act
-            var result = _sut.Generate(viewModel, templateKey, timeZoneKeys);
+            var result = await _sut.GenerateAsync(viewModel, templateKey, timeZoneKeys);
 
             // Assert
-            Assert.That(DateTime.Parse(result.Values[timeZoneKeys[0]]), Is.EqualTo(expectedDate));
-        }
-
-        private static string CompileMockEmailTemplate<TEmailTemplate>(string template) where TEmailTemplate : BaseEmailTemplateViewModel
-        {
-            var templateKey = Guid.NewGuid().ToString();
-            Engine.Razor.AddTemplate(templateKey, template);
-            Engine.Razor.Compile(templateKey, typeof(TEmailTemplate));
-            return templateKey;
-        }
-
-        private static string CreateTemplate<TEmailTemplate>(string body) where TEmailTemplate : BaseEmailTemplateViewModel
-        {
-            return body;
+            Assert.That(DateTime.Parse(result.Values[timeZoneKeys[0]]), Is.EqualTo(expectedDate).Within(TimeSpan.FromSeconds(1)));
         }
 
         private static string GetLastAvailableTimeZoneKey()

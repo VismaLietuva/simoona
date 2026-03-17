@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Authentification.BasicAuth;
 using Shrooms.Authentification.Membership;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Infrastructure.Auth;using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Auth;
+using Shrooms.Infrastructure.Email;
 
 namespace Shrooms.IoC.Modules
 {

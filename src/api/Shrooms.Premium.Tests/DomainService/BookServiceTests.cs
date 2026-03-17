@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects;
+using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
@@ -362,6 +363,94 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(0, bookOffices.First(x => x.OfficeId == 1).Quantity);
             ClassicAssert.AreEqual(50, bookOffices.First(x => x.OfficeId == 2).Quantity);
             ClassicAssert.AreEqual("test1", _booksDbSet.First().Author);
+        }
+
+        [Test]
+        public async Task Should_Report_Book_With_Generated_Email()
+        {
+            // Arrange
+            MockBooksByOffice();
+            MockApplicationUsers();
+
+            var organizationId = 2;
+            var bookOfficeId = 1;
+            var userId = "testUser1";
+
+            var reportedOfficeBook = new BookOffice
+            {
+                Id = bookOfficeId,
+                BookId = 1,
+                OfficeId = 1,
+                OrganizationId = organizationId,
+                Book = new Book
+                {
+                    Id = 1,
+                    Title = "Test Book",
+                    Author = "Test Author",
+                    OrganizationId = organizationId
+                }
+            };
+
+            var bookReport = new BookReportDto
+            {
+                BookOfficeId = bookOfficeId,
+                Report = "Book is damaged",
+                Comment = "Pages are torn"
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId,
+                OrganizationId = organizationId
+            };
+
+            var organization = new Organization
+            {
+                Id = organizationId,
+                ShortName = "TestOrg"
+            };
+
+            var adminEmails = new List<string> { "admin@test.com" };
+            var expectedEmailContent = "<html>Book Report Email</html>";
+
+            _bookOfficesDbSet
+                .FirstAsync(Arg.Is<System.Linq.Expressions.Expression<Func<BookOffice, bool>>>(
+                    x => x.Compile()(reportedOfficeBook)))
+                .Returns(Task.FromResult(reportedOfficeBook));
+
+            _userService.GetApplicationUserAsync(userId)
+                .Returns(Task.FromResult(new ApplicationUser { Id = userId, FullName = "Test User" }));
+
+            _roleService.GetAdministrationRoleEmailsAsync(organizationId)
+                .Returns(Task.FromResult(adminEmails.AsEnumerable()));
+
+            _organizationService.GetOrganizationByIdAsync(organizationId)
+                .Returns(Task.FromResult(organization));
+
+            _appSettings.UserNotificationSettingsUrl("TestOrg")
+                .Returns("http://settings.test.com");
+
+            _appSettings.BookUrl("TestOrg", bookOfficeId, 1)
+                .Returns("http://books.test.com/1");
+
+            _mailTemplate.GenerateAsync(
+                Arg.Any<BookReportEmailTemplateViewModel>(),
+                Arg.Any<string>())
+                .Returns(Task.FromResult(expectedEmailContent));
+
+            // Act
+            await _bookService.ReportBookAsync(bookReport, userOrg);
+
+            // Assert
+            await _mailTemplate.Received(1)
+                .GenerateAsync(
+                    Arg.Any<BookReportEmailTemplateViewModel>(),
+                    Arg.Any<string>());
+
+            await _mailingService.Received(1)
+                .SendEmailAsync(Arg.Is<EmailDto>(email =>
+                    email.Recipients.SequenceEqual(adminEmails) &&
+                    email.Body == expectedEmailContent));
         }
 
         #region Mocks
