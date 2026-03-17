@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     var formattedDate = $"{bookToRemind.TakenFrom:D}";
 
                     var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
-                    var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
+                    var content = await _mailTemplate.GenerateAsync(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
 
                     var emailData = new EmailDto(user.Email, subject, content);
                     await _mailingService.SendEmailAsync(emailData);

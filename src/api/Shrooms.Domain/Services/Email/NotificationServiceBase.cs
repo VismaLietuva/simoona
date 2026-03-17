@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Email
             }
 
             var receiverTimeZoneGroup = receivers.CreateTimeZoneGroup();
-            var emailTimeZoneGroup = _mailTemplate.Generate(template, templateCacheKey, receiverTimeZoneGroup.GetTimeZoneKeys());
+            var emailTimeZoneGroup = await _mailTemplate.GenerateAsync(template, templateCacheKey, receiverTimeZoneGroup.GetTimeZoneKeys());
             await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
         }
 
@@ -94,7 +94,7 @@ namespace Shrooms.Domain.Services.Email
                 return;
             }
 
-            var body = _mailTemplate.Generate(template, templateCacheKey);
+            var body = await _mailTemplate.GenerateAsync(template, templateCacheKey);
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
 

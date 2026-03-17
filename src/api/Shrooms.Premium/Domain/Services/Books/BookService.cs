@@ -272,7 +272,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
                 bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
 
-            var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailPremiumTemplateCacheKeys.BookReport);
+            var content = await _mailTemplate.GenerateAsync(bookReportTemplateViewModel, EmailPremiumTemplateCacheKeys.BookReport);
             var emailData = new EmailDto(receivers, subject, content);
 
             await _mailingService.SendEmailAsync(emailData);
