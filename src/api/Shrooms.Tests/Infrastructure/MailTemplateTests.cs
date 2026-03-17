@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -72,7 +73,7 @@ namespace Shrooms.Tests.Infrastructure
                 "http://profile.example.com/1");
 
             _razorLightEngine
-                .CompileRenderAsync(Arg.Any<string>(), Arg.Any<object>())
+                .CompileRenderAsync(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<ExpandoObject>())
                 .Returns(Task.FromResult("<html>rendered</html>"));
 
             for (var i = 0; i < retries; i++)
@@ -91,7 +92,7 @@ namespace Shrooms.Tests.Infrastructure
             const string expectedBody = "2024-01-15";
 
             _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
                 .Returns(Task.FromResult(expectedBody));
 
             // Act
@@ -112,11 +113,11 @@ namespace Shrooms.Tests.Infrastructure
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKey);
 
             _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
                 .Returns(callInfo =>
                 {
                     // Capture the date that was on the model when render was called
-                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.Arg<object>();
+                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.ArgAt<object>(1);
                     return Task.FromResult(model.Date.ToString("o"));
                 });
 
@@ -137,10 +138,10 @@ namespace Shrooms.Tests.Infrastructure
             var templateKey = Guid.NewGuid().ToString();
 
             _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
                 .Returns(callInfo =>
                 {
-                    var model = (EmailViewModelWithoutTimeZoneableProperties)callInfo.Arg<object>();
+                    var model = (EmailViewModelWithoutTimeZoneableProperties)callInfo.ArgAt<object>(1);
                     return Task.FromResult(model.Date.ToString("o"));
                 });
 
@@ -186,10 +187,10 @@ namespace Shrooms.Tests.Infrastructure
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKeys[0]);
 
             _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>())
+                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
                 .Returns(callInfo =>
                 {
-                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.Arg<object>();
+                    var model = (EmailViewModelWithTimeZoneableProperties)callInfo.ArgAt<object>(1);
                     return Task.FromResult(model.Date.ToString("o"));
                 });
 

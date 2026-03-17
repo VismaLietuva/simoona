@@ -92,7 +92,7 @@ namespace Shrooms.Tests.DomainService
             _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { organization }.AsQueryable());
 
             _roleService.GetAdministrationRoleEmailsAsync(1)
-                .Returns(Task.FromResult(adminEmails.AsEnumerable()));
+                .Returns(Task.FromResult<IList<string>>(adminEmails));
 
             _appSettings.UserNotificationSettingsUrl(organizationName)
                 .Returns("http://settings.test.com");
@@ -119,7 +119,7 @@ namespace Shrooms.Tests.DomainService
 
             await _mailingService.Received(1)
                 .SendEmailAsync(Arg.Is<EmailDto>(email =>
-                    email.Recipients.SequenceEqual(adminEmails) &&
+                    email.Receivers.SequenceEqual(adminEmails) &&
                     email.Body == expectedEmailContent));
         }
 
@@ -161,7 +161,7 @@ namespace Shrooms.Tests.DomainService
             _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { organization }.AsQueryable());
 
             _roleService.GetAdministrationRoleEmailsAsync(1)
-                .Returns(Task.FromResult(adminEmails.AsEnumerable()));
+                .Returns(Task.FromResult<IList<string>>(adminEmails));
 
             _appSettings.UserNotificationSettingsUrl(organizationName)
                 .Returns("http://settings.test.com");
