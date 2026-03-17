@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
             request.Headers.Authorization = new AuthenticationHeaderValue(
                 "Basic", _appSettings.VacationsBotAuthToken);
 
-            HttpResponseMessage response;
+            using HttpResponseMessage response;
             try
             {
                 response = await _httpClient.SendAsync(request);
