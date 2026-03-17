@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
@@ -67,7 +69,7 @@ namespace Shrooms.Tests.DomainService
 
             var excelBuilder = Substitute.For<IExcelBuilderFactory>();
 
-            _httpClient = new HttpClient(new HttpClientHandler());
+            _httpClient = new HttpClient(new StubHttpMessageHandler());
 
             _userAdministrationValidator = new UserAdministrationValidator();
             _administrationUsersService = new AdministrationUsersService(_httpClient, ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
@@ -131,6 +133,13 @@ namespace Shrooms.Tests.DomainService
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
             Assert.That(users[0].IsTutorialComplete, Is.True);
+        }
+
+        private sealed class StubHttpMessageHandler : HttpMessageHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(
+                HttpRequestMessage request, CancellationToken cancellationToken)
+                => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
         }
     }
 }
