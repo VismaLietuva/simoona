@@ -9,7 +9,6 @@ using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -67,14 +66,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             var calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
             var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate.ToString("d")}", string.Empty);
 
-            var attachment = new MimePart("text", "calendar")
-            {
-                Content = new MimeContent(new MemoryStream(calByteArray)),
-                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
-                ContentTransferEncoding = ContentEncoding.Base64,
-                FileName = "invite.ics",
-            };
-            emailDto.Attachment = attachment;
+            emailDto.Attachment = new EmailAttachment(calByteArray, "invite.ics", "text/calendar");
             await this.mailingService.SendEmailAsync(emailDto);
         }
 

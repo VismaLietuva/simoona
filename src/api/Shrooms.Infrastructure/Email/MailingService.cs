@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MailKit;
 using MailKit.Net.Smtp;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -56,6 +59,22 @@ namespace Shrooms.Infrastructure.Email
                 await _mailSendingService.SendAsync(messages);
             }
             catch (SmtpCommandException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (SmtpProtocolException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (ServiceNotConnectedException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (ServiceNotAuthenticatedException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (IOException ex)
             {
                 LogSendFailure(ex);
             }
@@ -121,7 +140,10 @@ namespace Shrooms.Infrastructure.Email
             var builder = new BodyBuilder { HtmlBody = email.Body };
             if (email.Attachment != null)
             {
-                builder.Attachments.Add(email.Attachment);
+                builder.Attachments.Add(
+                    email.Attachment.FileName,
+                    email.Attachment.Content,
+                    ContentType.Parse(email.Attachment.ContentType));
             }
 
             mimeMessage.Body = builder.ToMessageBody();
@@ -129,7 +151,7 @@ namespace Shrooms.Infrastructure.Email
             return mimeMessage;
         }
 
-        private void LogSendFailure(SmtpCommandException ex)
+        private void LogSendFailure(Exception ex)
         {
             var exceptionTelemetry = new ExceptionTelemetry
             {
