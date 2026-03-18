@@ -7,6 +7,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -30,7 +31,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IMailTemplate _mailTemplate;
         private IMailingService _mailingService;
         private IOrganizationService _organizationService;
-        private ILogger _logger;
+        private ILogger<BookRemindService> _logger;
         private IBookRemindService _sut;
 
         [SetUp]
@@ -46,7 +47,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _mailTemplate = Substitute.For<IMailTemplate>();
             _mailingService = Substitute.For<IMailingService>();
             _organizationService = Substitute.For<IOrganizationService>();
-            _logger = Substitute.For<ILogger>();
+            _logger = Substitute.For<ILogger<BookRemindService>>();
 
             _sut = new BookRemindService(
                 _uow,
