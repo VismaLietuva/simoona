@@ -53,9 +53,13 @@ namespace Shrooms.Authentification.Membership
             //if user is impersonated add additional claims
             if (contextUser != null && contextUser.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) && contextUser.Claims.First(c => c.Type == WebApiConstants.ClaimOriginalUsername).Value != user.UserName)
             {
-                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimUserImpersonation));
-                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimOriginalUsername));
-                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid));
+                var impersonationClaim = contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimUserImpersonation);
+                var originalUsernameClaim = contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimOriginalUsername);
+                var primarySidClaim = contextUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid);
+
+                if (impersonationClaim != null) claimsIdentity.AddClaim(impersonationClaim);
+                if (originalUsernameClaim != null) claimsIdentity.AddClaim(originalUsernameClaim);
+                if (primarySidClaim != null) claimsIdentity.AddClaim(primarySidClaim);
             }
 
             return claimsIdentity;
