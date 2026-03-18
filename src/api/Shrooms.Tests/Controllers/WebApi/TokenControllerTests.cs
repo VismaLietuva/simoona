@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +9,11 @@ using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Domain.Services.Jwt;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {
@@ -23,7 +23,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         private ShroomsDbContext _dbContext;
         private ShroomsUserManager _userManager;
         private IConfiguration _configuration;
-        private TokenController _controller;
+        private JwtTokenService _jwtTokenService;
 
         [SetUp]
         public void TestInitializer()
@@ -54,7 +54,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _configuration["JwtSecret"].Returns("test-secret-key-for-unit-tests-min32chars!!");
             _configuration["AccessTokenLifeTimeInHours"].Returns("1");
 
-            _controller = new TokenController(_userManager, _configuration, _dbContext);
+            var uow = Substitute.For<IUnitOfWork2>();
+            uow.GetDbSet<Organization>().Returns(_dbContext.Set<Organization>());
+
+            _jwtTokenService = new JwtTokenService(_userManager, _configuration, uow);
         }
 
         [TearDown]
@@ -67,7 +70,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GivenName_WhenBothNamesPopulated_ClaimContainsFullName()
         {
             var user = CreateUser("Jane", "Doe");
-            var givenName = await InvokeGenerateJwtAndExtractGivenName(user);
+            var givenName = await GenerateTokenAndExtractGivenName(user);
             Assert.That(givenName, Is.EqualTo("Jane Doe"));
         }
 
@@ -75,7 +78,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GivenName_WhenFirstNameIsNull_ClaimContainsLastNameOnly()
         {
             var user = CreateUser(null, "Doe");
-            var givenName = await InvokeGenerateJwtAndExtractGivenName(user);
+            var givenName = await GenerateTokenAndExtractGivenName(user);
             Assert.That(givenName, Is.EqualTo("Doe"));
         }
 
@@ -83,7 +86,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GivenName_WhenLastNameIsNull_ClaimContainsFirstNameOnly()
         {
             var user = CreateUser("Jane", null);
-            var givenName = await InvokeGenerateJwtAndExtractGivenName(user);
+            var givenName = await GenerateTokenAndExtractGivenName(user);
             Assert.That(givenName, Is.EqualTo("Jane"));
         }
 
@@ -91,7 +94,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GivenName_WhenBothNamesAreNull_ClaimValueIsEmpty()
         {
             var user = CreateUser(null, null);
-            var givenName = await InvokeGenerateJwtAndExtractGivenName(user);
+            var givenName = await GenerateTokenAndExtractGivenName(user);
             Assert.That(givenName, Is.EqualTo(string.Empty));
         }
 
@@ -108,22 +111,14 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
         }
 
-        private async Task<string> InvokeGenerateJwtAndExtractGivenName(ApplicationUser user)
+        private async Task<string> GenerateTokenAndExtractGivenName(ApplicationUser user)
         {
-            var method = typeof(TokenController).GetMethod(
-                "GenerateJwtTokenAsync",
-                BindingFlags.NonPublic | BindingFlags.Instance);
-            Assert.That(method, Is.Not.Null, "GenerateJwtTokenAsync method not found via reflection");
-
-            var result = await (Task<object>)method.Invoke(_controller, new object[] { user });
-            var token = (string)result.GetType().GetProperty("access_token").GetValue(result);
+            var result = await _jwtTokenService.GenerateTokenAsync(user);
 
             var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-            var givenName = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value
+            var jwt = handler.ReadJwtToken(result.Token);
+            return jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value
                 ?? jwt.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-
-            return givenName;
         }
     }
 }
