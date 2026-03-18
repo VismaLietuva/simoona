@@ -8,7 +8,7 @@ namespace Shrooms.IoC.Modules
     {
         public static IServiceCollection AddAdministrationUsers(this IServiceCollection services)
         {
-            services.AddScoped<IAdministrationUsersService, AdministrationUsersService>();
+            services.AddHttpClient<IAdministrationUsersService, AdministrationUsersService>();
             services.AddScoped<IAdministrationNotificationService, AdministrationUsersNotificationService>();
             return services;
         }

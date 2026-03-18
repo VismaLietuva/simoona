@@ -19,7 +19,4 @@
     <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Membership\ShroomsSignInManager.cs" />
-  </ItemGroup>
 </Project>

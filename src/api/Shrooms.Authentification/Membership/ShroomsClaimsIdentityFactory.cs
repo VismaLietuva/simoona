@@ -36,7 +36,7 @@ namespace Shrooms.Authentification.Membership
 
             if (!claimsIdentity.HasClaim(claim => claim.Type == ClaimTypes.GivenName))
             {
-                claimsIdentity.AddClaim(new Claim(ClaimTypes.GivenName, $"{user.FirstName} {user.LastName}"));
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.GivenName, $"{user.FirstName ?? string.Empty} {user.LastName ?? string.Empty}".Trim()));
             }
 
             if (!claimsIdentity.HasClaim(organizationIdClaim.Type, organizationIdClaim.Value))

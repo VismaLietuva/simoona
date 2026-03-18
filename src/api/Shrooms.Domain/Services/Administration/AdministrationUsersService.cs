@@ -55,8 +55,10 @@ namespace Shrooms.Domain.Services.Administration
         private readonly IKudosService _kudosService;
         private readonly IUnitOfWork2 _uow;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
+        private readonly HttpClient _httpClient;
 
-        public AdministrationUsersService(IMapper mapper,
+        public AdministrationUsersService(HttpClient httpClient,
+            IMapper mapper,
             IUnitOfWork unitOfWork,
             IUnitOfWork2 uow,
             IUserAdministrationValidator userAdministrationValidator,
@@ -68,6 +70,7 @@ namespace Shrooms.Domain.Services.Administration
             IKudosService kudosService,
             IExcelBuilderFactory excelBuilderFactory)
         {
+            _httpClient = httpClient;
             _uow = uow;
             _mapper = mapper;
             _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
@@ -156,7 +159,7 @@ namespace Shrooms.Domain.Services.Administration
             var user = await _usersDbSet.FirstAsync(u => u.Id == userId);
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
-                byte[] data = data = await new HttpClient().GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
+                byte[] data = await _httpClient.GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
                 user.PictureId = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
                 await _uow.SaveChangesAsync(userId);
             }
@@ -229,7 +232,7 @@ namespace Shrooms.Domain.Services.Administration
 
             if (externalIdentity.FindFirst("picture") != null)
             {
-                var data = await new HttpClient().GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
+                var data = await _httpClient.GetByteArrayAsync(externalIdentity.FindFirst("picture").Value);
                 var picture = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
                 user.PictureId = picture;
             }

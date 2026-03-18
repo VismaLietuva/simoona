@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
@@ -35,6 +38,13 @@ namespace Shrooms.Tests.DomainService
         private IKudosService _kudosService;
         private DbSet<ApplicationUser> _userDbSet;
         private DbSet<Wall> _wallsDbSet;
+        private HttpClient _httpClient;
+
+        [TearDown]
+        public void TearDown()
+        {
+            _httpClient?.Dispose();
+        }
 
         [SetUp]
         public void TestInitializer()
@@ -59,8 +69,10 @@ namespace Shrooms.Tests.DomainService
 
             var excelBuilder = Substitute.For<IExcelBuilderFactory>();
 
+            _httpClient = new HttpClient(new StubHttpMessageHandler());
+
             _userAdministrationValidator = new UserAdministrationValidator();
-            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
+            _administrationUsersService = new AdministrationUsersService(_httpClient, ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
         }
 
         [Test]
@@ -121,6 +133,13 @@ namespace Shrooms.Tests.DomainService
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
             Assert.That(users[0].IsTutorialComplete, Is.True);
+        }
+
+        private sealed class StubHttpMessageHandler : HttpMessageHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(
+                HttpRequestMessage request, CancellationToken cancellationToken)
+                => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
         }
     }
 }

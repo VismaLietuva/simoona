@@ -14,7 +14,6 @@ using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.FeatureToggle;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Infrastructure.Logger;
 using Shrooms.Infrastructure.Storage;
 using Shrooms.Infrastructure.Storage.AzureBlob;
 using Shrooms.Infrastructure.Storage.FileSystem;
@@ -27,7 +26,6 @@ namespace Shrooms.IoC.Modules
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<ILogger, Logger>();
             services.AddSingleton<IMarkdownConverter, MarkdigMarkdownConverter>();
             services.AddScoped<IMailingService, MailingService>();
             services.AddSingleton(typeof(ICustomCache<,>), typeof(CustomCache<,>));
