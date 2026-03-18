@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,8 @@ using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
+using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -18,87 +19,93 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
-using MailAttachment = System.Net.Mail.Attachment;
 
 namespace Shrooms.Premium.Domain.Services.Events.Calendar
 {
+    /// <summary>
+    /// Service for managing event calendar operations such as sending invitations and downloading events.
+    /// </summary>
     public class EventCalendarService : IEventCalendarService
     {
-        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> usersDbSet;
+        private readonly DbSet<Event> eventsDbSet;
+        private readonly DbSet<Organization> organizationsDbSet;
+        private readonly IMailingService mailingService;
+        private readonly IApplicationSettings appSettings;
+        private readonly IEventValidationService eventValidationService;
 
-        private readonly DbSet<Event> _eventsDbSet;
-        private readonly DbSet<Organization> _organizationsDbSet;
-        private readonly IMailingService _mailingService;
-        private readonly IApplicationSettings _appSettings;
-        private IEventValidationService _eventValidationService;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventCalendarService"/> class.
+        /// </summary>
         public EventCalendarService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IEventValidationService eventValidationService)
         {
-            _usersDbSet = uow.GetDbSet<ApplicationUser>();
-            _eventsDbSet = uow.GetDbSet<Event>();
-            _organizationsDbSet = uow.GetDbSet<Organization>();
-            _mailingService = mailingService;
-            _appSettings = appSettings;
-            _eventValidationService = eventValidationService;
+            this.usersDbSet = uow.GetDbSet<ApplicationUser>();
+            this.eventsDbSet = uow.GetDbSet<Event>();
+            this.organizationsDbSet = uow.GetDbSet<Organization>();
+            this.mailingService = mailingService;
+            this.appSettings = appSettings;
+            this.eventValidationService = eventValidationService;
         }
 
+        /// <summary>
+        /// Sends a calendar invitation email to the specified users for the given event.
+        /// </summary>
         public async Task SendInvitationAsync(EventJoinValidationDto @event, IEnumerable<string> userIds, int orgId)
         {
-            var emails = await _usersDbSet
+            var emails = await this.usersDbSet
                 .Where(u => userIds.Contains(u.Id))
                 .Select(u => u.Email)
                 .ToListAsync();
 
             var calendarEvent = MapToCalendarEvent(@event);
-            await AddEventLinkToDescriptionAsync(calendarEvent, @event.Id, orgId);
+            await this.AddEventLinkToDescriptionAsync(calendarEvent, @event.Id, orgId);
 
             var calendar = new Ical.Net.Calendar();
             calendar.Events.Add(calendarEvent);
 
             var serializedCalendar = new CalendarSerializer().SerializeToString(calendar);
             var calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
-            var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate.ToString("d")}", "");
+            var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate.ToString("d")}", string.Empty);
 
-            using (var stream = new MemoryStream(calByteArray))
+            var attachment = new MimePart("text", "calendar")
             {
-                emailDto.Attachment = new MailAttachment(stream, "invite.ics");
-                await _mailingService.SendEmailAsync(emailDto);
-            }
+                Content = new MimeContent(new MemoryStream(calByteArray)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = "invite.ics",
+            };
+            emailDto.Attachment = attachment;
+            await this.mailingService.SendEmailAsync(emailDto);
         }
 
+        /// <summary>
+        /// Downloads the calendar event data as a byte array for the specified event.
+        /// </summary>
         public async Task<byte[]> DownloadEventAsync(Guid eventId, int orgId)
         {
-            var @event = await _eventsDbSet.FindAsync(eventId);
+            var @event = await this.eventsDbSet.FindAsync(eventId);
 
-            _eventValidationService.CheckIfEventExists(@event);
+            this.eventValidationService.CheckIfEventExists(@event);
 
             var calEvent = new CalendarEvent
             {
-                // ReSharper disable once PossibleNullReferenceException
-                Uid = @event.Id.ToString(),
+                Uid = @event!.Id.ToString(),
                 Location = @event.Place,
                 Summary = @event.Name,
                 Description = @event.Description,
                 Organizer = new Organizer { CommonName = BusinessLayerConstants.EmailSenderName, Value = new Uri($"mailto:{BusinessLayerConstants.FromEmailAddress}") },
                 Start = new CalDateTime(@event.StartDate, "UTC"),
                 End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed
+                Status = EventStatus.Confirmed,
             };
 
-            await AddEventLinkToDescriptionAsync(calEvent, eventId, orgId);
+            await this.AddEventLinkToDescriptionAsync(calEvent, eventId, orgId);
             var cal = new Ical.Net.Calendar();
             cal.Events.Add(calEvent);
             var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
             var calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
 
             return calByteArray;
-        }
-
-        private async Task AddEventLinkToDescriptionAsync(CalendarEvent calEvent, Guid eventId, int orgId)
-        {
-            var orgShortName = (await _organizationsDbSet.FindAsync(orgId))?.ShortName;
-            var eventUrl = _appSettings.EventUrl(orgShortName, eventId.ToString());
-            calEvent.Description += $"\n\n{eventUrl}";
         }
 
         private static CalendarEvent MapToCalendarEvent(EventJoinValidationDto @event)
@@ -112,10 +119,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 Organizer = new Organizer { CommonName = BusinessLayerConstants.DefaultEmailLinkName, Value = new Uri($"mailto:{BusinessLayerConstants.FromEmailAddress}") },
                 Start = new CalDateTime(@event.StartDate, "UTC"),
                 End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed
+                Status = EventStatus.Confirmed,
             };
 
             return calEvent;
+        }
+
+        private async Task AddEventLinkToDescriptionAsync(CalendarEvent calEvent, Guid eventId, int orgId)
+        {
+            var orgShortName = (await this.organizationsDbSet.FindAsync(orgId))?.ShortName;
+            var eventUrl = this.appSettings.EventUrl(orgShortName, eventId.ToString());
+            calEvent.Description += $"\n\n{eventUrl}";
         }
     }
 }
