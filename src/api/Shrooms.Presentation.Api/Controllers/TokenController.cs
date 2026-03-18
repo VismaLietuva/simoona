@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Shrooms.Authentification.Membership;
 using Shrooms.Domain.Services.Jwt;
-using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,13 +13,11 @@ namespace Shrooms.Presentation.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly ShroomsUserManager _userManager;
-        private readonly IConfiguration _configuration;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public TokenController(ShroomsUserManager userManager, IConfiguration configuration, IJwtTokenService jwtTokenService)
+        public TokenController(ShroomsUserManager userManager, IJwtTokenService jwtTokenService)
         {
             _userManager = userManager;
-            _configuration = configuration;
             _jwtTokenService = jwtTokenService;
         }
 
@@ -59,14 +55,13 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(new { error = "not_verified", error_description = "E-mail address is not verified" });
             }
 
-            var hours = int.TryParse(_configuration["AccessTokenLifeTimeInHours"], out var h) ? h : 24;
-            var accessToken = await _jwtTokenService.GenerateTokenAsync(user);
+            var result = await _jwtTokenService.GenerateTokenAsync(user);
 
             return Ok(new
             {
-                access_token = accessToken,
+                access_token = result.Token,
                 token_type = "bearer",
-                expires_in = (int)TimeSpan.FromHours(hours).TotalSeconds,
+                expires_in = result.ExpiresIn,
                 userIdentifier = user.Id
             });
         }

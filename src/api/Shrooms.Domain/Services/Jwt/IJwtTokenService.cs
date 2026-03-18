@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.Jwt
 {
+    public record JwtTokenResult(string Token, int ExpiresIn);
+
     public interface IJwtTokenService
     {
-        Task<string> GenerateTokenAsync(ApplicationUser user, IEnumerable<Claim> extraClaims = null);
+        Task<JwtTokenResult> GenerateTokenAsync(ApplicationUser user, IEnumerable<Claim> extraClaims = null);
     }
 }

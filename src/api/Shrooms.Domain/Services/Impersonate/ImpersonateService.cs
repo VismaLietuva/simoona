@@ -43,7 +43,7 @@ namespace Shrooms.Domain.Services.Impersonate
                 new Claim(DataLayerConstants.ClaimOriginalUsername, principal.Identity.Name)
             };
 
-            return await _jwtTokenService.GenerateTokenAsync(targetUser, extraClaims);
+            return (await _jwtTokenService.GenerateTokenAsync(targetUser, extraClaims)).Token;
         }
 
         public async Task<string> RevertImpersonationAsync(string originalUserName)
@@ -59,7 +59,7 @@ namespace Shrooms.Domain.Services.Impersonate
                 throw new ServiceException($"User '{originalUserName}' was not found.");
             }
 
-            return await _jwtTokenService.GenerateTokenAsync(originalUser);
+            return (await _jwtTokenService.GenerateTokenAsync(originalUser)).Token;
         }
     }
 }

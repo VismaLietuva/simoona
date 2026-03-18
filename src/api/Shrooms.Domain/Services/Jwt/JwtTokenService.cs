@@ -28,7 +28,7 @@ namespace Shrooms.Domain.Services.Jwt
             _uow = uow;
         }
 
-        public async Task<string> GenerateTokenAsync(ApplicationUser user, IEnumerable<Claim> extraClaims = null)
+        public async Task<JwtTokenResult> GenerateTokenAsync(ApplicationUser user, IEnumerable<Claim> extraClaims = null)
         {
             var jwtKey = _configuration["JwtSecret"]
                 ?? throw new InvalidOperationException("JwtSecret is not configured.");
@@ -68,7 +68,9 @@ namespace Shrooms.Domain.Services.Jwt
                 expires: expires,
                 signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtTokenResult(
+                new JwtSecurityTokenHandler().WriteToken(token),
+                (int)TimeSpan.FromHours(hours).TotalSeconds);
         }
     }
 }
