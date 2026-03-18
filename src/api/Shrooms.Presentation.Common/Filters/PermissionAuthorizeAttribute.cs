@@ -1,3 +1,7 @@
+// <copyright file="PermissionAuthorizeAttribute.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +16,23 @@ namespace Shrooms.Presentation.Common.Filters
 {
     public class PermissionAuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        private readonly List<string> _permissions;
-
-        public string Permission { get; set; }
+        private readonly List<string> permissions;
 
         public PermissionAuthorizeAttribute(string permission = null)
         {
-            _permissions = new List<string>();
+            this.permissions = new List<string>();
             if (permission != null)
             {
-                _permissions.Add(permission);
+                this.permissions.Add(permission);
             }
         }
 
         public PermissionAuthorizeAttribute(params string[] permissions)
         {
-            _permissions = permissions.ToList();
+            this.permissions = permissions.ToList();
         }
+
+        public string Permission { get; set; }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -49,11 +53,11 @@ namespace Shrooms.Presentation.Common.Filters
             var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = context.HttpContext.User.Identity.GetUserId(),
-                OrganizationId = context.HttpContext.User.Identity.GetOrganizationId()
+                OrganizationId = context.HttpContext.User.Identity.GetOrganizationId(),
             };
 
-            var isPermitted = _permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
-                && (Permission == null || permissionService.UserHasPermission(userAndOrg, Permission));
+            var isPermitted = this.permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
+                && (this.Permission == null || permissionService.UserHasPermission(userAndOrg, this.Permission));
 
             if (!isPermitted)
             {
