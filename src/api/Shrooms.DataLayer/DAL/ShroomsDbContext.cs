@@ -10,7 +10,6 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
-using Shrooms.DataLayer.EntityModels.Attributes;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -239,10 +238,6 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new BadgeLogEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BadgeTypeEntityConfiguration());
 
-            // TODO: SqlDefaultValue attribute convention needs to be reimplemented for EF Core
-            // var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
-            // modelBuilder.Conventions.Add(convention);
-
             new OtherEntitiesConfig(modelBuilder).Add();
 
             // EntityModels uses Nullable: enable, so non-nullable string properties (string without ?)
@@ -266,18 +261,8 @@ namespace Shrooms.DataLayer.DAL
             }
         }
 
-        // TODO: HttpContext.Current is not available in ASP.NET Core
-        // This method needs to be updated to receive IHttpContextAccessor through dependency injection
-        // For now, userId must be explicitly passed
         private static void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = "")
         {
-            // TODO: In ASP.NET Core, inject IHttpContextAccessor instead of using HttpContext.Current
-            // Example:
-            // if (string.IsNullOrEmpty(userId) && _httpContextAccessor.HttpContext?.User != null)
-            // {
-            //     userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            // }
-
             var now = DateTime.UtcNow;
             var items = entries
                 .Where(p => p.Entity is ITrackable && p.Entity is ISoftDelete)
