@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Providers\ApplicationOAuthProvider.cs" />
     <Compile Remove="DAL\ShroomsContextConfiguration.cs" />
   </ItemGroup>
 </Project>
