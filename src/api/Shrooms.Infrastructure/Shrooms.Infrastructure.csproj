@@ -20,7 +20,7 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
-<PackageReference Include="RazorLight" Version="2.3.1" />
+    <PackageReference Include="RazorLight" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
