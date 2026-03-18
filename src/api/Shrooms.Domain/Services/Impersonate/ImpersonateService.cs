@@ -46,11 +46,17 @@ namespace Shrooms.Domain.Services.Impersonate
             return (await _jwtTokenService.GenerateTokenAsync(targetUser, extraClaims)).Token;
         }
 
-        public async Task<string> RevertImpersonationAsync(string originalUserName)
+        public async Task<string> RevertImpersonationAsync(ClaimsPrincipal principal)
         {
+            if (principal == null || !principal.HasClaim(DataLayerConstants.ClaimUserImpersonation, true.ToString()))
+            {
+                throw new ServiceException("Revert is only valid during an active impersonation session.");
+            }
+
+            var originalUserName = principal.FindFirstValue(DataLayerConstants.ClaimOriginalUsername);
             if (string.IsNullOrEmpty(originalUserName))
             {
-                throw new ServiceException("Original username must not be empty. Revert is only valid after an active impersonation.");
+                throw new ServiceException("Original username claim is missing from the impersonation token.");
             }
 
             var originalUser = await _userManager.FindByNameAsync(originalUserName);

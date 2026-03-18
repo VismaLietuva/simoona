@@ -31,7 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Authorize]
         public async Task<IActionResult> RevertImpersonate()
         {
-            var accessToken = await _impersonateService.RevertImpersonationAsync(User.GetOriginalUsername());
+            var accessToken = await _impersonateService.RevertImpersonationAsync(User as ClaimsPrincipal);
 
             return Ok(new { access_token = accessToken });
         }

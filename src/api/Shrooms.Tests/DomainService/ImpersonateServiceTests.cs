@@ -137,7 +137,9 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task RevertImpersonationAsync_SuccessPath_ReturnsCleanTokenWithoutImpersonationClaims()
         {
-            var tokenString = await this.service.RevertImpersonationAsync(AdminUser.UserName);
+            var impersonatedPrincipal = BuildImpersonatedPrincipal(TargetUser.UserName, AdminUser.UserName);
+
+            var tokenString = await this.service.RevertImpersonationAsync(impersonatedPrincipal);
 
             Assert.That(tokenString, Is.Not.Null.And.Not.Empty);
 
@@ -160,19 +162,22 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void RevertImpersonationAsync_EmptyOriginalUsername_ThrowsServiceException()
+        public void RevertImpersonationAsync_CallerNotImpersonating_ThrowsServiceException()
         {
+            var regularPrincipal = BuildAuthenticatedPrincipal(AdminUser.UserName);
+
             Assert.ThrowsAsync<ServiceException>(() =>
-                this.service.RevertImpersonationAsync(string.Empty));
+                this.service.RevertImpersonationAsync(regularPrincipal));
         }
 
         [Test]
         public void RevertImpersonationAsync_OriginalUserNotFound_ThrowsServiceException()
         {
+            var impersonatedPrincipal = BuildImpersonatedPrincipal(TargetUser.UserName, "ghost");
             this.userManager.FindByNameAsync("ghost").Returns(Task.FromResult<ApplicationUser>(null));
 
             Assert.ThrowsAsync<ServiceException>(() =>
-                this.service.RevertImpersonationAsync("ghost"));
+                this.service.RevertImpersonationAsync(impersonatedPrincipal));
         }
 
         // ── helpers ──────────────────────────────────────────────────────────
@@ -180,6 +185,19 @@ namespace Shrooms.Tests.DomainService
         {
             var identity = new ClaimsIdentity(
                 new[] { new Claim(ClaimTypes.Name, userName) },
+                authenticationType: "TestAuth");
+            return new ClaimsPrincipal(identity);
+        }
+
+        private static ClaimsPrincipal BuildImpersonatedPrincipal(string currentUserName, string originalUserName)
+        {
+            var identity = new ClaimsIdentity(
+                new[]
+                {
+                    new Claim(ClaimTypes.Name, currentUserName),
+                    new Claim(DataLayerConstants.ClaimUserImpersonation, true.ToString()),
+                    new Claim(DataLayerConstants.ClaimOriginalUsername, originalUserName),
+                },
                 authenticationType: "TestAuth");
             return new ClaimsPrincipal(identity);
         }
