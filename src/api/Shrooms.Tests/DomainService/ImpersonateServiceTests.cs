@@ -18,6 +18,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Domain.Services.Impersonate;
+using Shrooms.Domain.Services.Jwt;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.Mocks;
 
@@ -76,7 +77,8 @@ namespace Shrooms.Tests.DomainService
             this.userManager.GetRolesAsync(Arg.Any<ApplicationUser>())
                 .Returns(Task.FromResult<IList<string>>(new List<string> { "User" }));
 
-            this.service = new ImpersonateService(this.userManager, this.configuration, this.uow);
+            var jwtTokenService = new JwtTokenService(this.userManager, this.configuration, this.uow);
+            this.service = new ImpersonateService(this.userManager, jwtTokenService);
         }
 
         // ── ImpersonateUserAsync ──────────────────────────────────────────────
