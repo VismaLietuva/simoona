@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Net.Mail;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using MimeKit;
 
 namespace Shrooms.Infrastructure.Email
 {
@@ -14,7 +14,7 @@ namespace Shrooms.Infrastructure.Email
         /// </summary>
         /// <param name="messages">Message collection for sending.</param>
         /// <returns>A <see cref="Task"/> that represents asynchronous operation.</returns>
-        Task SendAsync(IEnumerable<MailMessage> messages);
+        Task SendAsync(IEnumerable<MimeMessage> messages);
 
         /// <summary>
         /// Determines if mail sender service is configured and ready.

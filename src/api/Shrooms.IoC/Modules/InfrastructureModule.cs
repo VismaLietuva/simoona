@@ -37,7 +37,7 @@ namespace Shrooms.IoC.Modules
                     .UseFileSystemProject(Path.Combine(AppContext.BaseDirectory, "EmailTemplates"), ".cshtml")
                     .UseMemoryCachingProvider()
                     .Build());
-            services.AddSingleton<IMailTemplate, MailTemplate>();
+            services.AddScoped<IMailTemplate, MailTemplate>();
             services.AddScoped<IDailyMailingService, DailyMailingService>();
             services.AddScoped<IJobScheduler, HangFireScheduler>();
             services.AddSingleton<IFeatureConfiguration, AlwaysEnabledFeatureConfiguration>();

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net.Mail;
 using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Contracts.DataTransferObjects
@@ -16,7 +15,7 @@ namespace Shrooms.Contracts.DataTransferObjects
 
         public string Body { get; private set; }
 
-        public Attachment Attachment { get; set; }
+        public EmailAttachment Attachment { get; set; }
 
         public EmailDto(string senderFullName, string senderEmail, IEnumerable<string> receivers, string subject, string body)
         {

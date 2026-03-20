@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
+using MailKit;
+using MailKit.Net.Smtp;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using MimeKit;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -51,10 +55,26 @@ namespace Shrooms.Infrastructure.Email
 
             try
             {
-                IEnumerable<MailMessage> messages = BuildMessages(email, skipDomainChange);
+                IEnumerable<MimeMessage> messages = BuildMessages(email, skipDomainChange);
                 await _mailSendingService.SendAsync(messages);
             }
-            catch (SmtpException ex)
+            catch (SmtpCommandException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (SmtpProtocolException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (ServiceNotConnectedException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (ServiceNotAuthenticatedException ex)
+            {
+                LogSendFailure(ex);
+            }
+            catch (IOException ex)
             {
                 LogSendFailure(ex);
             }
@@ -62,11 +82,11 @@ namespace Shrooms.Infrastructure.Email
 
         private string ChangeEmailDomain(string senderEmail, string senderFullName)
         {
-            var mailAddress = new MailAddress(senderEmail);
-            return $"{senderFullName} <{mailAddress.User}@simoona.com>";
+            var mailAddress = MailboxAddress.Parse(senderEmail);
+            return $"{senderFullName} <{mailAddress.Address.Split('@')[0]}@simoona.com>";
         }
 
-        private IEnumerable<MailMessage> BuildMessages(EmailDto email, bool skipDomainChange = false)
+        private IEnumerable<MimeMessage> BuildMessages(EmailDto email, bool skipDomainChange = false)
         {
             switch (_emailBuildingStrategy)
             {
@@ -89,45 +109,49 @@ namespace Shrooms.Infrastructure.Email
             }
         }
 
-        private MailMessage BuildMessage(EmailDto email, bool skipDomainChange, bool recipientsTo)
+        private MimeMessage BuildMessage(EmailDto email, bool skipDomainChange, bool recipientsTo)
         {
-            var mailMessage = new MailMessage();
+            var mimeMessage = new MimeMessage();
 
             var sender = skipDomainChange
                 ? $"{email.SenderFullName} <{email.SenderEmail}>"
                 : ChangeEmailDomain(email.SenderEmail, email.SenderFullName);
 
-            mailMessage.From = new MailAddress(sender);
+            mimeMessage.From.Add(MailboxAddress.Parse(sender));
 
             if (recipientsTo)
             {
                 foreach (var receiver in email.Receivers)
                 {
-                    mailMessage.To.Add(receiver);
+                    mimeMessage.To.Add(MailboxAddress.Parse(receiver));
                 }
             }
             else
             {
-                mailMessage.To.Add(sender);
+                mimeMessage.To.Add(MailboxAddress.Parse(sender));
                 foreach (var receiver in email.Receivers)
                 {
-                    mailMessage.Bcc.Add(receiver);
+                    mimeMessage.Bcc.Add(MailboxAddress.Parse(receiver));
                 }
             }
 
+            mimeMessage.Subject = email.Subject;
+
+            var builder = new BodyBuilder { HtmlBody = email.Body };
             if (email.Attachment != null)
             {
-                mailMessage.Attachments.Add(email.Attachment);
+                builder.Attachments.Add(
+                    email.Attachment.FileName,
+                    email.Attachment.Content,
+                    ContentType.Parse(email.Attachment.ContentType));
             }
 
-            mailMessage.Subject = email.Subject;
-            mailMessage.Body = email.Body;
-            mailMessage.IsBodyHtml = true;
+            mimeMessage.Body = builder.ToMessageBody();
 
-            return mailMessage;
+            return mimeMessage;
         }
 
-        private void LogSendFailure(SmtpException ex)
+        private void LogSendFailure(Exception ex)
         {
             var exceptionTelemetry = new ExceptionTelemetry
             {
