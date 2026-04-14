@@ -34,7 +34,8 @@ namespace Shrooms.IoC.Modules
             services.AddScoped<IExcelBuilderFactory, ExcelBuilderFactory>();
             services.AddSingleton<IRazorLightEngine>(_ =>
                 new RazorLightEngineBuilder()
-                    .UseFileSystemProject(Path.Combine(AppContext.BaseDirectory, "EmailTemplates"), ".cshtml")
+                    .UseProject(new Shrooms.Infrastructure.Email.Templating.NormalizedFileSystemRazorProject(
+                        Path.Combine(AppContext.BaseDirectory, "EmailTemplates")))
                     .UseMemoryCachingProvider()
                     .Build());
             services.AddScoped<IMailTemplate, MailTemplate>();

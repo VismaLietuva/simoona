@@ -11,6 +11,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC;
+using Shrooms.Presentation.Api.BackgroundWorkers;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
 using System.Text;
@@ -188,6 +189,8 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 // Application services (IoC bootstrapper)
 builder.Services.AddShrooms();
+builder.Services.AddTransient<PostNotifier>();
+builder.Services.AddTransient<CommentNotifier>();
 
 var app = builder.Build();
 

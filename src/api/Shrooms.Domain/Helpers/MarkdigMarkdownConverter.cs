@@ -11,6 +11,7 @@ namespace Shrooms.Domain.Helpers
                 .UseSoftlineBreakAsHardlineBreak()
                 .Build();
 
-        public string ConvertToHtml(string markdown) => Markdown.ToHtml(markdown, Pipeline);
+        public string ConvertToHtml(string markdown) =>
+            string.IsNullOrEmpty(markdown) ? string.Empty : Markdown.ToHtml(markdown, Pipeline);
     }
 }
