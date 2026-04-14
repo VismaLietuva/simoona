@@ -121,7 +121,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
-                .Include(e => e.EventParticipants.Select(v => v.EventOptions))
+                .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
@@ -205,11 +205,9 @@ namespace Shrooms.Premium.Domain.Services.Events
         public async Task UpdateEventAsync(EditEventDto eventDto)
         {
             var eventToUpdate = await _eventsDbSet
-                .Include(e => e.EventParticipants)
+                .Include(e => e.EventParticipants).ThenInclude(participant => participant.ApplicationUser).ThenInclude(u => u.Manager)
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventType)
-                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
-                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
                 .Include(e => e.Reminders)
                 .SingleOrDefaultAsync(e => e.Id.ToString() == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 

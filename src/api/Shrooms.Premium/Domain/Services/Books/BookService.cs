@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Books
         {
             var allBooks = _bookOfficesDbSet
                 .Include(x => x.Book)
-                .Include(x => x.BookLogs.Select(v => v.ApplicationUser))
+                .Include(x => x.BookLogs).ThenInclude(v => v.ApplicationUser)
                 .Where(x => x.OrganizationId == options.OrganizationId && x.Quantity != 0)
                 .Where(OfficeFilter(options.OfficeId))
                 .Where(SearchFilter(options.SearchString))
@@ -112,7 +112,7 @@ namespace Shrooms.Premium.Domain.Services.Books
         {
             var bookOffice = await _bookOfficesDbSet
                 .Include(x => x.Book)
-                .Include(x => x.BookLogs.Select(u => u.ApplicationUser))
+                .Include(x => x.BookLogs).ThenInclude(u => u.ApplicationUser)
                 .Where(x => x.Id == bookOfficeId && x.OrganizationId == userOrg.OrganizationId)
                 .Select(MapBookToDto())
                 .FirstAsync();
