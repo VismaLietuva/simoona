@@ -9,7 +9,7 @@ namespace Shrooms.Infrastructure.Email.Extensions
     {
         public static TimeZoneGroup CreateTimeZoneGroup(this IEnumerable<IEmailReceiver> receivers)
         {
-            return new TimeZoneGroup(receivers.GroupBy(receiver => receiver.TimeZoneKey, receiver => receiver.Email)
+            return new TimeZoneGroup(receivers.GroupBy(receiver => receiver.TimeZoneKey ?? string.Empty, receiver => receiver.Email)
                 .ToDictionary(receiver => receiver.Key, receiver => receiver.ToList()));
         }
     }
