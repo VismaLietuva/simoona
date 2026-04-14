@@ -11,6 +11,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC;
+using Microsoft.Extensions.FileProviders;
 using Shrooms.Presentation.Api.BackgroundWorkers;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
@@ -182,7 +183,17 @@ builder.Services.AddControllers()
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Skip actions where Swashbuckle cannot determine the HTTP method.
+    // This happens when controllers inherit virtual actions from a base class
+    // and override them without re-applying the [HttpGet/Post/Put/Delete] attribute
+    // (C# does not inherit method attributes through overrides).
+    c.DocInclusionPredicate((_, api) => api.HttpMethod != null);
+    // When two actions produce the same route+verb (e.g. base and override both visible),
+    // pick the first one instead of throwing.
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
 
 // Application Insights
 builder.Services.AddApplicationInsightsTelemetry();
@@ -221,6 +232,18 @@ app.Use(async (context, next) =>
 
 app.UseRouting();
 app.UseCors();
+
+// Serve uploaded storage files (profile pictures, etc.) before authentication.
+// Browser <img> tags never send JWT tokens, so auth cannot be enforced here.
+// GUID-based filenames make the URLs non-guessable, which is sufficient for dev.
+var storagePath = Path.Combine(app.Environment.ContentRootPath, "storage");
+Directory.CreateDirectory(storagePath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(storagePath),
+    RequestPath = "/storage"
+});
+
 app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
 app.UseMiddleware<ImageResizerMiddleware>();
