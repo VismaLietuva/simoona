@@ -1,4 +1,3 @@
-using System;
 using NUnit.Framework;
 using Shrooms.Domain.Helpers;
 
@@ -59,9 +58,11 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_Null_ThrowsArgumentNullException()
+        public void ConvertToHtml_Null_ReturnsEmpty()
         {
-            Assert.Throws<ArgumentNullException>(() => _sut.ConvertToHtml(null));
+            var result = _sut.ConvertToHtml(null);
+
+            Assert.That(result, Is.EqualTo(string.Empty));
         }
 
         [Test]

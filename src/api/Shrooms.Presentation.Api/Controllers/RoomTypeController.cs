@@ -110,7 +110,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task<RoomType> GetByIdOrNameAsync(string name, int id = -1, string includeProperties = "")
         {
-            var result = await _repository.Get(f => f.Name.ToLower() == name.ToLower() || f.Id == id, 1, includeProperties: includeProperties).FirstOrDefaultAsync();
+            var result = await _repository.Get(f => (name != null && f.Name.ToLower() == name.ToLower()) || f.Id == id, 1, includeProperties: includeProperties).FirstOrDefaultAsync();
 
             return result;
         }
