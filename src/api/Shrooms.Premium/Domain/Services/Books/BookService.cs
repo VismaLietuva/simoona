@@ -373,7 +373,7 @@ namespace Shrooms.Premium.Domain.Services.Books
         {
             return new BookOffice
             {
-                BookId = newBook.Id,
+                Book = newBook,
                 Created = DateTime.UtcNow,
                 CreatedBy = createdBy,
                 Modified = DateTime.UtcNow,
