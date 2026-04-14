@@ -71,6 +71,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             _asyncRunner = asyncRunner;
         }
 
+        [HttpGet]
         [Route("Recurrences")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IActionResult GetEventRecurrenceOptions()
@@ -79,6 +80,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return Ok(recurrences);
         }
 
+        [HttpGet]
         [Route("Types")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IActionResult> GetEventTypes()
@@ -89,6 +91,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
         [Route("Offices")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IActionResult> GetOffices()

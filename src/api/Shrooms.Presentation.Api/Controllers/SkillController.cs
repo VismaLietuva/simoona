@@ -31,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _skillRepository = unitOfWork.GetRepository<Skill>();
         }
 
+        [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
         public async Task<IActionResult> Post(SkillPostViewModel model)

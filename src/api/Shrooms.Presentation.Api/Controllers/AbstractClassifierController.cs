@@ -83,6 +83,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return await GetFilteredPaged(includeProperties, page, pageSize, sort, dir, f => f.Name.Contains(s));
         }
 
+        [HttpGet]
         public IEnumerable<AbstractClassifierTypeViewModel> GetAbstractClassifierTypes()
         {
             var abstractClassifierTypes = new List<AbstractClassifierTypeViewModel>();
@@ -118,6 +119,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return childrenViewModel;
         }
 
+        [HttpGet]
         public async Task<IEnumerable<AbstractClassifierViewModel>> GetClassifiersWithoutMe()
         {
             var children = await _classifierRepository.Get().ToListAsync();

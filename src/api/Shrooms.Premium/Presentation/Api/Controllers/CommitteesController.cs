@@ -26,12 +26,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             _committeesService = committeesService;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
         public override async Task<IEnumerable<CommitteeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
             return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
         public override async Task<IActionResult> Delete(int id)
         {
@@ -134,6 +136,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
         public async Task<IActionResult> DeleteSuggestion(int committeeId, int suggestionId)
         {

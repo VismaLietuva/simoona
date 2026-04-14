@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -27,6 +27,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override async Task<IActionResult> Post([FromBody] RoomTypePostViewModel crudViewModel)
         {
@@ -50,6 +51,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override async Task<IActionResult> Put([FromBody] RoomTypePostViewModel crudViewModel)
         {
@@ -68,6 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override async Task<IActionResult> Delete(int id)
         {
@@ -93,6 +96,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override async Task<PagedViewModel<RoomTypeViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
@@ -106,11 +110,12 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task<RoomType> GetByIdOrNameAsync(string name, int id = -1, string includeProperties = "")
         {
-            var result = await _repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefaultAsync();
+            var result = await _repository.Get(f => f.Name.ToLower() == name.ToLower() || f.Id == id, 1, includeProperties: includeProperties).FirstOrDefaultAsync();
 
             return result;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public async Task<IEnumerable<RoomTypeViewModel>> GetByFloor(int floorId, string includeProperties = "")
         {

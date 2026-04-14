@@ -128,6 +128,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return applicationUserViewModels;
         }
 
+        [HttpPost]
         [ValidationFilter]
         [Route("Post")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
@@ -152,6 +153,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok(role.Id);
         }
 
+        [HttpPut]
         [ValidationFilter]
         [Route("Put")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
@@ -172,6 +174,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok(role.Id);
         }
 
+        [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
         public async Task<IActionResult> Delete(string roleId)

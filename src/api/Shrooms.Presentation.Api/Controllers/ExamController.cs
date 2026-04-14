@@ -31,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _examRepository = unitOfWork.GetRepository<Exam>();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
         public async Task<ExamViewModel> Get(int id, string includeProperties = "")
         {
@@ -39,6 +40,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return examViewModel;
         }
 
+        [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
         public async Task<IActionResult> Post(IList<ExamPostViewModel> models)
