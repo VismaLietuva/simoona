@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Module> builder)
         {
-            builder.Ignore(m => m.IsDeleted);
-
             builder.HasMany(m => m.Organizations)
                 .WithMany(o => o.ShroomsModules)
                 .UsingEntity<Dictionary<string, object>>(

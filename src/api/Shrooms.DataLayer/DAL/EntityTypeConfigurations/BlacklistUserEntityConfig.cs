@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<BlacklistUser> builder)
         {
-            builder.Ignore(u => u.IsDeleted);
-
             builder.HasOne(u => u.ModifiedByUser)
                 .WithMany()
                 .HasForeignKey(u => u.ModifiedBy)
