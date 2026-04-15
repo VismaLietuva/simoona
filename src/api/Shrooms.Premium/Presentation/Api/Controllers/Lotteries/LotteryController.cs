@@ -33,6 +33,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             _lotteryExportService = lotteryExportService;
         }
 
+        [HttpGet]
         [Route("All")]
         public async Task<IActionResult> GetAllLotteries()
         {

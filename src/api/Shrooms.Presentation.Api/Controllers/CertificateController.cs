@@ -56,6 +56,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return _mapper.Map<IEnumerable<CertificateAutoCompleteViewModel>>(certificates);
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
         public async Task<IActionResult> Post(CertificatePostViewModel crudViewModel)
         {
@@ -121,6 +122,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
         public async Task<IActionResult> Put(CertificatePostViewModel crudViewModel)
         {

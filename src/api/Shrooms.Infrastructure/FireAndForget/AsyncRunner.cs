@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.FireAndForget
@@ -26,7 +27,7 @@ namespace Shrooms.Infrastructure.FireAndForget
                     tenantContainer.TenantName = tenantName;
                 }
 
-                var logger = scope.ServiceProvider.GetService<ILogger>();
+                var logger = scope.ServiceProvider.GetService<ILogger<AsyncRunner>>();
                 var service = scope.ServiceProvider.GetRequiredService<T>();
                 try
                 {
@@ -34,7 +35,7 @@ namespace Shrooms.Infrastructure.FireAndForget
                 }
                 catch (Exception ex)
                 {
-                    logger?.Error(ex);
+                    logger?.LogError(ex, ex.Message);
                 }
             });
         }

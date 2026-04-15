@@ -223,3 +223,6 @@ src/Premium.WithForkedOss.sln
 
 # IIS app_offline.htm (created/deleted during Debug builds to release file locks)
 app_offline.htm
+
+# Local developer appsettings
+appsettings.Development.json

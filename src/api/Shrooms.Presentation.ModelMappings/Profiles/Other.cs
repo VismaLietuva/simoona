@@ -199,11 +199,14 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateViewModelMap<Organization, OrganizationViewModel, OrganizationPostViewModel>();
             CreateViewModelMap<Address, AddressViewModel, AddressPostViewModel>();
             // AbstractClassifier → AbstractClassifierViewModel is defined below with ForMember; only add the other 3 maps here
-            CreateMap<AbstractClassifierViewModel, AbstractClassifier>(MemberList.None);
-            CreateMap<AbstractClassifierPostViewModel, AbstractClassifier>(MemberList.None);
+            CreateMap<AbstractClassifierViewModel, AbstractClassifier>(MemberList.None)
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore());
+            CreateMap<AbstractClassifierPostViewModel, AbstractClassifier>(MemberList.None)
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore());
             CreateMap<AbstractClassifier, AbstractClassifierPostViewModel>(MemberList.None);
 
-            CreateMap<CertificateViewModel, Certificate>(MemberList.None);
+            CreateMap<CertificateViewModel, Certificate>(MemberList.None)
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore());
             CreateMap<Certificate, CertificateViewModel>(MemberList.None);
             CreateMap<CertificatePostViewModel, Certificate>(MemberList.None)
                 .ForMember(dest => dest.Exams, opt => opt.Ignore());
@@ -212,6 +215,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<Certificate, CertificatePostViewModel>(MemberList.None);
 
             CreateMap<OfficePostViewModel, Office>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore())
                 .ForMember(dest => dest.Floors, src => src.Ignore());
             CreateMap<Office, OfficeViewModel>(MemberList.None);
             CreateMap<Office, OfficePostViewModel>(MemberList.None);
@@ -219,11 +223,13 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<Office, OfficeMiniViewModel>(MemberList.None);
 
             CreateMap<FloorPostViewModel, Floor>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore())
                 .ForMember(dest => dest.Office, src => src.Ignore());
             CreateMap<Floor, FloorViewModel>(MemberList.None);
             CreateMap<Floor, FloorPostViewModel>(MemberList.None);
 
             CreateMap<RoomPostViewModel, Room>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore())
                 .ForMember(dest => dest.ApplicationUsers, src => src.Ignore())
                 .ForMember(dest => dest.Floor, src => src.Ignore())
                 .ForMember(dest => dest.RoomType, src => src.Ignore());
@@ -246,14 +252,18 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<ApplicationRole, ApplicationRoleMiniViewModel>(MemberList.None);
 
             CreateMap<ApplicationRole, ApplicationRoleViewModel>(MemberList.None);
-            CreateMap<ApplicationRoleViewModel, ApplicationRole>(MemberList.None);
+            CreateMap<ApplicationRoleViewModel, ApplicationRole>(MemberList.None)
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore());
 
             CreateMap<ApplicationRole, RoleMiniViewModel>(MemberList.None)
                 .ForMember(dest => dest.Permissions, src => src.Ignore());
             CreateMap<RoleMiniViewModel, ApplicationRole>(MemberList.None)
-                .ForMember(dest => dest.Permissions, src => src.Ignore());
+                .ForMember(dest => dest.Permissions, src => src.Ignore())
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore());
 
             CreateMap<RoomTypePostViewModel, RoomType>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore())
+                .ForMember(dest => dest.OrganizationId, src => src.Ignore())
                 .ForMember(dest => dest.Rooms, src => src.Ignore());
             CreateMap<RoomType, RoomTypeViewModel>(MemberList.None);
             CreateMap<RoomType, RoomTypePostViewModel>(MemberList.None);
@@ -269,7 +279,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<QualificationLevel, QualificationLevelViewModel>(MemberList.None);
             CreateMap<QualificationLevel, QualificationLevelMiniViewModel>(MemberList.None);
             CreateMap<QualificationLevel, QualificationLevelAutoCompleteViewModel>(MemberList.None);
-            CreateMap<QualificationLevelPostViewModel, QualificationLevel>(MemberList.None);
+            CreateMap<QualificationLevelPostViewModel, QualificationLevel>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore());
 
             CreateMap<Room, AbstractViewModel>(MemberList.None);
             CreateMap<ApplicationUser, AbstractViewModel>(MemberList.None);
@@ -287,7 +298,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .ConvertUsing(src => src.Id);
             CreateMap<Exam, ExamAutoCompleteViewModel>(MemberList.None);
             CreateMap<Exam, ExamMiniViewModel>(MemberList.None);
-            CreateMap<ExamPostViewModel, Exam>(MemberList.None);
+            CreateMap<ExamPostViewModel, Exam>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore());
             CreateMap<ExamPostViewModel, int>(MemberList.None)
                 .ConvertUsing(src => src.Id);
 
@@ -299,7 +311,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
             CreateMap<Skill, SkillMiniViewModel>(MemberList.None);
             CreateMap<Skill, SkillAutoCompleteViewModel>(MemberList.None);
-            CreateMap<SkillPostViewModel, Skill>(MemberList.None);
+            CreateMap<SkillPostViewModel, Skill>(MemberList.None)
+                .ForMember(dest => dest.Id, src => src.Ignore());
 
             CreateMap<SkillMiniViewModel, Skill>(MemberList.None); // used for unit testing only. Never use for anything else!
 

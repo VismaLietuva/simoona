@@ -10,7 +10,7 @@ namespace Shrooms.Premium.IoC.Modules
         {
             services.AddScoped<IVacationHistoryService, VacationHistoryService>();
             services.AddScoped<IVacationService, VacationService>();
-            services.AddScoped<IVacationBotService, VacationBotService>();
+            services.AddHttpClient<IVacationBotService, VacationBotService>();
             services.AddScoped<IVacationDomainService, VacationDomainService>();
             return services;
         }

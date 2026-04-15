@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
         public async Task<IList<KudosBasketLogDto>> GetDonationsAsync(UserAndOrganizationDto userAndOrg)
         {
             var kudosBasket = await _kudosBasketsDbSet
-                .Include(basket => basket.KudosLogs.Select(log => log.Employee))
+                .Include(basket => basket.KudosLogs).ThenInclude(log => log.Employee)
                 .FirstOrDefaultAsync(basket => basket.OrganizationId == userAndOrg.OrganizationId);
 
             var kudosLogs = kudosBasket?.KudosLogs.OrderByDescending(log => log.Created);

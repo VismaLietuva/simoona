@@ -45,6 +45,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Support)]
         public IEnumerable<SupportType> GetSupportTypes()
         {

@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.0" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +19,4 @@
     <ProjectReference Include="..\Shrooms.Resources\Shrooms.Resources.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Membership\ShroomsSignInManager.cs" />
-  </ItemGroup>
 </Project>

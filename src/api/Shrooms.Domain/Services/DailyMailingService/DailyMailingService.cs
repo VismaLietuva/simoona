@@ -36,7 +36,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
             // Select users that want to receive emails at this hour
             var usersToEmail = await _applicationUserDbSeb
                 .Include(u => u.Organization)
-                .Include(u => u.WallUsers.Select(y => y.Wall))
+                .Include(u => u.WallUsers).ThenInclude(y => y.Wall)
                 .Where(u => u.DailyMailingHour.HasValue && u.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
                 .ToListAsync();
 

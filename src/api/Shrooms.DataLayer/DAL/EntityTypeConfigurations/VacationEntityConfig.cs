@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<VacationPage> builder)
         {
-            builder.Ignore(v => v.IsDeleted);
-
             builder.Property(v => v.Content)
                 .IsRequired();
         }

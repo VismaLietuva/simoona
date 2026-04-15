@@ -122,7 +122,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             SetOrganizationAndUser(options);
 
             var books = await _bookService.GetBooksByOfficeAsync(options);
-            var result = _mapper.Map<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>(books);
+            var result = _mapper.Map<ILazyPaged<BooksByOfficeDto>, LazyPaged<BooksByOfficeViewModel>>(books);
             return Ok(result);
         }
 

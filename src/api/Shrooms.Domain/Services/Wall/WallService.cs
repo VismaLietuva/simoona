@@ -394,8 +394,7 @@ namespace Shrooms.Domain.Services.Wall
             var wall = await _wallsDbSet
                 .Include(x => x.Moderators)
                 .Include(x => x.Members)
-                .Include(x => x.Posts)
-                .Include(x => x.Posts.Select(y => y.Comments))
+                .Include(x => x.Posts).ThenInclude(y => y.Comments)
                 .FirstOrDefaultAsync(x => x.Id == wallId &&
                                      x.OrganizationId == userOrg.OrganizationId &&
                                      x.Type == type);

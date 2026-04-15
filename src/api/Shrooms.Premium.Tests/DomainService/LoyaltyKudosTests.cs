@@ -8,6 +8,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
@@ -36,7 +37,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
             _organizationsDbSet = uow.MockDbSetForAsync<Organization>();
 
-            var loggerMock = Substitute.For<ILogger>();
+            var loggerMock = Substitute.For<ILogger<LoyaltyKudosService>>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
             var mapper = ModelMapper.Create();
 

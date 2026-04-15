@@ -111,6 +111,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("Logins")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         public async Task<IActionResult> GetUserLogins()

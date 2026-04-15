@@ -198,8 +198,8 @@ namespace Shrooms.Domain.Services.Projects
                 ModeratorsIds = new List<string> { dto.OwningUserId }
             };
 
+            project.WallId = await _wallService.CreateNewWallAsync(wall);
             _projectsDbSet.Add(project);
-            await _wallService.CreateNewWallAsync(wall);
 
             await _uow.SaveChangesAsync(dto.UserId);
         }

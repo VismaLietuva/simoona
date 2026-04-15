@@ -58,6 +58,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasQueryFilter(m => !m.IsDeleted);
             _modelBuilder.Entity<NotificationsSettings>()
                 .HasQueryFilter(e => !e.IsDeleted);
+            _modelBuilder.Entity<Lottery>()
+                .HasQueryFilter(e => !e.IsDeleted);
+            _modelBuilder.Entity<LotteryParticipant>()
+                .HasQueryFilter(e => !e.IsDeleted);
 
             // LikesCollection is an owned type stored as a JSON column on Post and Comment
             _modelBuilder.Entity<Post>()
@@ -191,8 +195,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.Entity<BadgeLog>().Ignore(e => e.IsDeleted);
             _modelBuilder.Entity<BadgeType>().Ignore(e => e.IsDeleted);
             _modelBuilder.Entity<BadgeCategory>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<Lottery>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<LotteryParticipant>().Ignore(e => e.IsDeleted);
 
             // DbSet property names now match the DB table names for these entities.
         }

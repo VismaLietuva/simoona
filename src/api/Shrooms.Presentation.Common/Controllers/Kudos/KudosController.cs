@@ -231,7 +231,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         public async Task<IActionResult> RemoveType(int id)
         {

@@ -35,18 +35,21 @@ namespace Shrooms.Presentation.Api.Controllers
             _organizationRepository = unitOfWork.GetRepository<Organization>();
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public override async Task<IActionResult> Post(FloorPostViewModel crudViewModel)
         {
             return await base.Post(crudViewModel);
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public override async Task<IActionResult> Put(FloorPostViewModel crudViewModel)
         {
             return await base.Put(crudViewModel);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public async Task<FloorViewModel> GetByRoom(int roomId)
         {
@@ -54,6 +57,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return _mapper.Map<Floor, FloorViewModel>(model);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public async Task<IEnumerable<FloorViewModel>> GetByOffice(int officeId)
         {
@@ -61,6 +65,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(model);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public async Task<FloorViewPagedModel> GetAllFloors(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
@@ -113,6 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return floorsViewPagedModel;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public async Task<FloorViewPagedModel> GetPaged(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
@@ -159,6 +165,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return floorsViewPagedModel;
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public override async Task<IActionResult> Delete(int id)
         {

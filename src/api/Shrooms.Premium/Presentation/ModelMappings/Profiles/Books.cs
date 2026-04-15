@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
@@ -24,7 +25,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>(MemberList.None);
             CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>(MemberList.None);
             CreateMap<BasicBookUserDto, BasicBookUserViewModel>(MemberList.None);
-            CreateMap<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>(MemberList.None);
+            CreateMap<ILazyPaged<BooksByOfficeDto>, LazyPaged<BooksByOfficeViewModel>>(MemberList.None)
+                .ConstructUsing((src, ctx) => new LazyPaged<BooksByOfficeViewModel>(
+                    ctx.Mapper.Map<IEnumerable<BooksByOfficeViewModel>>(src.Entries),
+                    src.Page,
+                    src.PageSize,
+                    src.ItemCount));
             CreateMap<BookDetailsDto, BookDetailsViewModel>(MemberList.None);
             CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>(MemberList.None);
             CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>(MemberList.None);

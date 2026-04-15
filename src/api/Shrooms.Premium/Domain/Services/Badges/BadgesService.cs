@@ -138,7 +138,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
         public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
         {
             return await _badgeCategoriesDbSet
-                .Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
+                .Include(x => x.RelationshipsWithKudosTypes).ThenInclude(y => y.KudosType)
                 .Include(x => x.BadgeTypes)
                 .AsNoTracking()
                 .ToListAsync();
@@ -208,7 +208,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
             {
                 // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
-                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .Include(x => x.BadgeLogs).ThenInclude(y => y.BadgeType)
                     .AsNoTracking()
                     .ToListAsync();
             }
@@ -220,7 +220,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
                                                          && !string.IsNullOrEmpty(x.EmployeeId)
                                                          && x.KudosSystemType != KudosTypeEnum.Minus)
                     .Select(x => x.Employee)
-                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .Include(x => x.BadgeLogs).ThenInclude(y => y.BadgeType)
                     .Distinct(new EmployeeComparer())
                     .AsNoTracking()
                     .ToListAsync();

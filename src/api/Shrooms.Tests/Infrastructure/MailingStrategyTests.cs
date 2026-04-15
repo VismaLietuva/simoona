@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using MimeKit;
 using Moq;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
@@ -34,17 +36,17 @@ namespace Shrooms.Tests.Infrastructure
         {
             // Arrange
             _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.AllTo);
-            var actualSent = new List<MailMessage>();
+            var actualSent = new List<MimeMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
             Assert.That(actualSent.Count, Is.EqualTo(1));
-            Assert.That(_recipients, Is.EqualTo(actualSent[0].To.Select(x => x.Address)));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].To.Mailboxes.Select(x => x.Address)));
         }
 
         [Test]
@@ -52,17 +54,17 @@ namespace Shrooms.Tests.Infrastructure
         {
             // Arrange
             _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.AllBcc);
-            var actualSent = new List<MailMessage>();
+            var actualSent = new List<MimeMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
             Assert.That(actualSent.Count, Is.EqualTo(1));
-            Assert.That(_recipients, Is.EqualTo(actualSent[0].Bcc.Select(x => x.Address)));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].Bcc.Mailboxes.Select(x => x.Address)));
         }
 
         [Test]
@@ -70,24 +72,24 @@ namespace Shrooms.Tests.Infrastructure
         {
             // Arrange
             _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.SingleTo);
-            var actualSent = new List<MailMessage>();
+            var actualSent = new List<MimeMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
             Assert.That(actualSent.Count, Is.EqualTo(3));
-            Assert.That(_recipients, Is.EqualTo(actualSent.Select(x => x.To.Single().Address)));
+            Assert.That(_recipients, Is.EqualTo(actualSent.Select(x => x.To.Mailboxes.Single().Address)));
         }
 
-        private void TrackActualSent(List<MailMessage> actualSent)
+        private void TrackActualSent(List<MimeMessage> actualSent)
         {
             _smtpService
-                .Setup(x => x.SendAsync(It.IsAny<IEnumerable<MailMessage>>()))
-                .Callback((IEnumerable<MailMessage> messages) => actualSent.AddRange(messages))
+                .Setup(x => x.SendAsync(It.IsAny<IEnumerable<MimeMessage>>()))
+                .Callback((IEnumerable<MimeMessage> messages) => actualSent.AddRange(messages))
                 .Returns(Task.CompletedTask);
         }
     }

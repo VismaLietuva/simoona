@@ -46,7 +46,7 @@ namespace Shrooms.Presentation.Common.Controllers
             _defaultOrderByProperty = defaultOrderByProperty;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         public virtual async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             var model = await _repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
@@ -150,7 +150,7 @@ namespace Shrooms.Presentation.Common.Controllers
             return StatusCode(201);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public virtual async Task<IActionResult> Delete(int id)
         {
             var model = await _repository.GetByIdAsync(id);

@@ -2,6 +2,7 @@
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
@@ -18,12 +19,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private readonly ILotteryParticipantService _lotteryParticipantService;
         private readonly IKudosService _kudosService;
         private readonly IAsyncRunner _asyncRunner;
-        private readonly ILogger _logger;
+        private readonly ILogger<LotteryAbortJob> _logger;
         private readonly IUnitOfWork2 _uow;
 
         public LotteryAbortJob(IKudosService kudosService,
             ILotteryParticipantService lotteryParticipantService,
-            ILogger logger,
+            ILogger<LotteryAbortJob> logger,
             IAsyncRunner asyncRunner,
             IUnitOfWork2 uow,
             ILotteryService lotteryService)
@@ -54,7 +55,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
             catch (Exception e)
             {
-                _logger.Error(e);
+                _logger.LogError(e, e.Message);
                 _asyncRunner.Run<ILotteryService>(async n => await n.UpdateRefundFailedFlagAsync(lottery.Id, true, userOrg), _uow.ConnectionName);
             }
         }

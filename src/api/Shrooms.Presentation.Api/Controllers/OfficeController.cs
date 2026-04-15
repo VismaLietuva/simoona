@@ -34,12 +34,14 @@ namespace Shrooms.Presentation.Api.Controllers
             _filterPresetService = filterPresetService;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public override async Task<IEnumerable<OfficeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
             return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public async Task<OfficeViewModel> GetDefault()
         {
@@ -53,6 +55,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return office ?? new OfficeViewModel();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public async Task<IEnumerable<OfficeDropdownViewModel>> GetAllOfficesForDropdown()
         {
@@ -69,6 +72,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return mappedOffices;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<PagedViewModel<OfficeViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
@@ -127,6 +131,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return pagedModel;
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<IActionResult> Post([FromBody] OfficePostViewModel model)
         {
@@ -148,6 +153,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<IActionResult> Put([FromBody] OfficePostViewModel viewModel)
         {
@@ -171,6 +177,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
+        [HttpDelete("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<IActionResult> Delete(int id)
         {

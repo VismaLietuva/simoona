@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -24,9 +25,9 @@ namespace Shrooms.Premium.Domain.Services.Books
         private readonly IMailingService _mailingService;
         private readonly IOrganizationService _organizationService;
         private readonly DbSet<BookLog> _booksDbSet;
-        private readonly ILogger _logger;
+        private readonly ILogger<BookRemindService> _logger;
 
-        public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService, ILogger logger)
+        public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService, ILogger<BookRemindService> logger)
         {
             _userService = userService;
             _organizationService = organizationService;
@@ -64,14 +65,14 @@ namespace Shrooms.Premium.Domain.Services.Books
                     var formattedDate = $"{bookToRemind.TakenFrom:D}";
 
                     var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
-                    var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
+                    var content = await _mailTemplate.GenerateAsync(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
 
                     var emailData = new EmailDto(user.Email, subject, content);
                     await _mailingService.SendEmailAsync(emailData);
                 }
                 catch (Exception e)
                 {
-                    _logger.Debug(e.Message, e);
+                    _logger.LogDebug(e, e.Message);
                 }
             }
         }

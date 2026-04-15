@@ -8,8 +8,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<KudosLog> builder)
         {
-            builder.Ignore(log => log.IsDeleted);
-
             builder.Property(log => log.Comments)
                 .IsRequired();
 

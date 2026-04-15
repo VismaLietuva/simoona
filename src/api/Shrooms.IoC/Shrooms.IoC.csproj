@@ -2,7 +2,6 @@
   <Import Project="..\Targets\shared.targets" />
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
     <ProjectGuid>{6E972BA4-C333-4441-A9DE-CEDB0AA3C7FF}</ProjectGuid>
     <AssemblyTitle>Shrooms.IoC</AssemblyTitle>
     <Product>Shrooms.IoC</Product>
