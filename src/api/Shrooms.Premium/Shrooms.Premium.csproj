@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="EmailTemplates\**\*.cshtml">
+    <None Include="EmailTemplates\**\*.cshtml" Exclude="EmailTemplates\_ViewImports.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
