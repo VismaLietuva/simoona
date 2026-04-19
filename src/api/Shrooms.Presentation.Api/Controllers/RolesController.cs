@@ -166,6 +166,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var role = await _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstAsync();
             _mapper.Map(roleViewModel, role);
+            role.OrganizationId = GetUserAndOrganization().OrganizationId;
 
             await AssignPermissionsToRoleAsync(roleViewModel, role);
             await AssignUsersToRole(roleViewModel);
@@ -242,8 +243,17 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
         {
-            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name);
-            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name);
+            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name).ToList();
+            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name).ToList();
+
+            if (adminControllers.Count == 0 && basicControllers.Count == 0)
+                return p => false;
+
+            if (adminControllers.Count == 0)
+                return p => basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic;
+
+            if (basicControllers.Count == 0)
+                return p => adminControllers.Any(a => p.Name.StartsWith(a + "_"));
 
             return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
         }

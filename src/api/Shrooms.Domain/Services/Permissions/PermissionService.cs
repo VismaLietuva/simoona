@@ -19,9 +19,9 @@ namespace Shrooms.Domain.Services.Permissions
     {
         private readonly DbSet<Permission> _permissionsDbSet;
         private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
-        private readonly ICustomCache<string, IList<string>> _permissionsCache;
+        private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
 
-        public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IList<string>> permissionsCache)
+        public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IEnumerable<string>> permissionsCache)
         {
             _permissionsDbSet = unitOfWork.GetDbSet<Permission>();
             _userRolesDbSet = unitOfWork.GetDbSet<IdentityUserRole<string>>();
@@ -46,8 +46,7 @@ namespace Shrooms.Domain.Services.Permissions
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
             }
 
-            var isPermitted = permissions.Contains(permissionName);
-            return isPermitted;
+            return permissions.Contains(permissionName);
         }
 
         public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName)
