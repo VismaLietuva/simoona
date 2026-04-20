@@ -19,7 +19,7 @@ namespace Shrooms.Tests.DomainService
     public class PermissionServiceTest
     {
         private IPermissionService _permissionService;
-        private ICustomCache<string, IList<string>> _permissionCache;
+        private ICustomCache<string, IEnumerable<string>> _permissionCache;
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<Permission> _permissionsDbSet;
         private DbSet<IdentityUserRole<string>> _userRolesDbSet;
@@ -37,7 +37,7 @@ namespace Shrooms.Tests.DomainService
             uow.GetDbSet<Permission>().Returns(_permissionsDbSet);
             uow.GetDbSet<IdentityUserRole<string>>().Returns(_userRolesDbSet);
 
-            _permissionCache = Substitute.For<ICustomCache<string, IList<string>>>();
+            _permissionCache = Substitute.For<ICustomCache<string, IEnumerable<string>>>();
 
             _permissionService = new PermissionService(uow, _permissionCache);
         }
