@@ -17,7 +17,7 @@ using X.PagedList;
 namespace Shrooms.Presentation.Common.Controllers
 {
     public abstract class AbstractWebApiController<TModel, TViewModel, TPostViewModel> : BaseController
-        where TModel : BaseModel, ISoftDelete
+        where TModel : BaseModel
         where TViewModel : AbstractViewModel
         where TPostViewModel : AbstractViewModel
     {

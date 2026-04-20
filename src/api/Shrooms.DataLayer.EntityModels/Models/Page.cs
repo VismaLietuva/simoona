@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Page : BaseModelWithOrg
+    public class Page : SoftDeletableModelWithOrg
     {
         [Required]
         public string Name { get; set; }

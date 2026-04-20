@@ -14,7 +14,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Add Identity v3 columns idempotently (brownfield DBs won't have them; fresh installs will)
+            // Batch 1: DDL — add missing Identity v3 columns if not present.
+            // Must be a separate Sql() call from the UPDATE below; SQL Server compiles
+            // each batch before executing it, so referencing a just-added column in the
+            // same batch causes "Invalid column name" even if the ADD runs first.
             migrationBuilder.Sql(@"
                 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'AspNetUsers' AND COLUMN_NAME = 'NormalizedUserName')
                     ALTER TABLE AspNetUsers ADD NormalizedUserName NVARCHAR(256) NULL;
@@ -22,6 +25,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     ALTER TABLE AspNetUsers ADD NormalizedEmail NVARCHAR(256) NULL;
                 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'AspNetUsers' AND COLUMN_NAME = 'ConcurrencyStamp')
                     ALTER TABLE AspNetUsers ADD ConcurrencyStamp NVARCHAR(MAX) NULL;
+            ");
+
+            // Batch 2: DML — back-fill values and create index (columns guaranteed to exist now).
+            migrationBuilder.Sql(@"
                 UPDATE AspNetUsers SET
                     NormalizedUserName = COALESCE(NormalizedUserName, UPPER(UserName)),
                     NormalizedEmail    = COALESCE(NormalizedEmail, UPPER(Email)),

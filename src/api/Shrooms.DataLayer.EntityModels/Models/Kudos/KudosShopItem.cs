@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.DataLayer.EntityModels.Models.Kudos
 {
-    public class KudosShopItem : BaseModelWithOrg
+    public class KudosShopItem : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

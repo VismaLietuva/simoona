@@ -4,7 +4,7 @@ using Shrooms.Contracts.Constants;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Organization : BaseModel
+    public class Organization : SoftDeletableModel
     {
         [Required]
         [StringLength(BusinessLayerConstants.MaxOrganizationNameLength)]

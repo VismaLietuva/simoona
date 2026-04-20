@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models.Books
 {
-    public class BookOffice : BaseModelWithOrg
+    public class BookOffice : SoftDeletableModelWithOrg
     {
         public virtual ICollection<BookLog> BookLogs { get; set; }
 

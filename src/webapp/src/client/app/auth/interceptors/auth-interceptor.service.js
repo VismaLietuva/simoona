@@ -29,7 +29,7 @@
             config.headers.Organization = auth.getOrganizationName() || auth.getOrganizationNameFromUrl();
 
             if (!!authData && !!authData.token) {
-                config.headers.Organization = authData.organizationName;
+                config.headers.Organization = authData.organizationName || auth.getOrganizationName() || auth.getOrganizationNameFromUrl();
                 if (!config.headers.Authorization) {
                     config.headers.Authorization = 'Bearer ' + authData.token;
                 }

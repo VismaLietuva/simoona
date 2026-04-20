@@ -330,6 +330,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         Rule = o.Rule
                     })
                     .OrderByDescending(o => o.Rule == OptionRules.Default)
+                    .ToList()
             };
         }
 

@@ -3,7 +3,7 @@ using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 {
-    public class Wall : BaseModelWithOrg
+    public class Wall : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

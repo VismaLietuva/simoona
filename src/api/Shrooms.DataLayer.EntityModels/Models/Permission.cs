@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Permission : BaseModel
+    public class Permission : SoftDeletableModel
     {
         public string Name { get; set; }
 

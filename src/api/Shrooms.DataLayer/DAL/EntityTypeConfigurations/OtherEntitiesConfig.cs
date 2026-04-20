@@ -58,10 +58,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasQueryFilter(m => !m.IsDeleted);
             _modelBuilder.Entity<NotificationsSettings>()
                 .HasQueryFilter(e => !e.IsDeleted);
-            _modelBuilder.Entity<Lottery>()
-                .HasQueryFilter(e => !e.IsDeleted);
-            _modelBuilder.Entity<LotteryParticipant>()
-                .HasQueryFilter(e => !e.IsDeleted);
 
             // LikesCollection is an owned type stored as a JSON column on Post and Comment
             _modelBuilder.Entity<Post>()
@@ -187,14 +183,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                     "ServiceRequestCategoryApplicationUsers",
                     j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"),
                     j => j.HasOne<ServiceRequestCategory>().WithMany().HasForeignKey("ServiceRequestCategory_Id"));
-
-            // These entities inherit from BaseModel (which has IsDeleted) but their DB tables
-            // do not have the IsDeleted column, so the property must be ignored.
-            _modelBuilder.Entity<QualificationLevel>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<Skill>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<BadgeLog>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<BadgeType>().Ignore(e => e.IsDeleted);
-            _modelBuilder.Entity<BadgeCategory>().Ignore(e => e.IsDeleted);
 
             // DbSet property names now match the DB table names for these entities.
         }

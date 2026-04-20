@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.DataLayer.EntityModels.Models.Notifications
 {
-    public class NotificationsSettings : BaseModelWithOrg
+    public class NotificationsSettings : SoftDeletableModelWithOrg
     {
         public bool EventsAppNotifications { get; set; }
 

@@ -20,7 +20,7 @@ namespace Shrooms.Presentation.Api.Middlewares
             {
                 var pathValue = context.Request.Path.Value ?? string.Empty;
                 var index = pathValue.LastIndexOf('.');
-                if (index > 0 && IsImage(pathValue.Substring(index + 1)))
+                if (index > 0 && IsImage(pathValue.Substring(index + 1)) && !pathValue.StartsWith("/storage/", StringComparison.OrdinalIgnoreCase))
                 {
                     context.Response.StatusCode = 401;
                     return;

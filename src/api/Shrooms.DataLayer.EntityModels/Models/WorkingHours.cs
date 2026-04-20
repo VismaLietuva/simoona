@@ -2,7 +2,7 @@ using System;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class WorkingHours : BaseModelWithOrg
+    public class WorkingHours : SoftDeletableModelWithOrg
     {
         public TimeSpan? StartTime { get; set; }
 

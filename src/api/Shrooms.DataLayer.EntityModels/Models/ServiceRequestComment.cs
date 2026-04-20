@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ServiceRequestComment : BaseModelWithOrg
+    public class ServiceRequestComment : SoftDeletableModelWithOrg
     {
         public string EmployeeId { get; set; }
 

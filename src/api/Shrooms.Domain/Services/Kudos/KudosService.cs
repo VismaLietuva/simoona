@@ -849,9 +849,7 @@ namespace Shrooms.Domain.Services.Kudos
                             l.Created.Year == timestamp.Year &&
                             l.KudosSystemType == KudosTypeEnum.Send &&
                             l.OrganizationId == kudos.KudosLog.OrganizationId)
-                .Select(p => p.Points)
-                .DefaultIfEmpty(0)
-                .SumAsync();
+                .SumAsync(p => (decimal?)p.Points) ?? 0m;
 
             currentMonthSum += kudos.TotalPointsSent;
 

@@ -5,7 +5,7 @@ using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class BaseModel : ITrackable, ISoftDelete, IValidatableObject
+    public class BaseModel : ITrackable, IValidatableObject
     {
         [Key]
         public virtual int Id { get; set; }
@@ -17,8 +17,6 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public DateTime Modified { get; set; }
 
         public string ModifiedBy { get; set; }
-
-        public bool IsDeleted { get; set; }
 
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

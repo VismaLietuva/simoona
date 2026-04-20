@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class JobPosition : BaseModelWithOrg
+    public class JobPosition : SoftDeletableModelWithOrg
     {
         public string Title { get; set; }
 

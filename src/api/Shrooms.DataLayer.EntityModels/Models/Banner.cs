@@ -2,7 +2,7 @@ using System;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Banner : BaseModelWithOrg
+    public class Banner : SoftDeletableModelWithOrg
     {
         public string Url { get; set; }
         public string PictureId { get; set; }

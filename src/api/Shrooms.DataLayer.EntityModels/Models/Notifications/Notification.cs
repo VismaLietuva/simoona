@@ -4,7 +4,7 @@ using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Notifications
 {
-    public class Notification : BaseModelWithOrg
+    public class Notification : SoftDeletableModelWithOrg
     {
         public string Title { get; set; }
 

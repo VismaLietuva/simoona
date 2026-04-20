@@ -3,7 +3,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public abstract class LikeBaseModel : BaseModel, ILikeable
+    public abstract class LikeBaseModel : SoftDeletableModel, ILikeable
     {
         public virtual LikesCollection Likes { get; set; }
 

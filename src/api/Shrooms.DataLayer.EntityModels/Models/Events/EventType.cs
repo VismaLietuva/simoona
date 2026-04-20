@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models.Events
 {
-    public class EventType : BaseModelWithOrg
+    public class EventType : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

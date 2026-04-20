@@ -10,50 +10,35 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_BadgeCategoryKudosType_BadgeCategories_BadgeCategoryId1",
-                table: "BadgeCategoryKudosType");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_BadgeTypes_BadgeCategories_BadgeCategoryId1",
-                table: "BadgeTypes");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Events_AspNetUsers_ResponsibleUserId1",
-                table: "Events");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Events_ResponsibleUserId1",
-                table: "Events");
-
-            migrationBuilder.DropIndex(
-                name: "IX_BadgeTypes_BadgeCategoryId1",
-                table: "BadgeTypes");
-
-            migrationBuilder.DropIndex(
-                name: "IX_BadgeCategoryKudosType_BadgeCategoryId1",
-                table: "BadgeCategoryKudosType");
-
-            migrationBuilder.DropIndex(
-                name: "IX_BadgeCategoryKudosType_KudosTypeId",
-                table: "BadgeCategoryKudosType");
-
-            migrationBuilder.DropColumn(
-                name: "ResponsibleUserId1",
-                table: "Events");
-
-            migrationBuilder.DropColumn(
-                name: "BadgeCategoryId1",
-                table: "BadgeTypes");
-
-            migrationBuilder.DropColumn(
-                name: "BadgeCategoryId1",
-                table: "BadgeCategoryKudosType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BadgeCategoryKudosType_KudosTypeId",
-                table: "BadgeCategoryKudosType",
-                column: "KudosTypeId");
+            // All DROP operations are guarded with IF EXISTS so this migration is safe on
+            // brownfield databases where InitialBaseline was skipped and these shadow
+            // columns/FKs were never created.
+            // Order: drop FKs → drop indexes → drop columns → recreate clean index.
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_BadgeCategoryKudosType_BadgeCategories_BadgeCategoryId1' AND parent_object_id = OBJECT_ID('BadgeCategoryKudosType'))
+                    ALTER TABLE BadgeCategoryKudosType DROP CONSTRAINT FK_BadgeCategoryKudosType_BadgeCategories_BadgeCategoryId1;
+                IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_BadgeTypes_BadgeCategories_BadgeCategoryId1' AND parent_object_id = OBJECT_ID('BadgeTypes'))
+                    ALTER TABLE BadgeTypes DROP CONSTRAINT FK_BadgeTypes_BadgeCategories_BadgeCategoryId1;
+                IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Events_AspNetUsers_ResponsibleUserId1' AND parent_object_id = OBJECT_ID('Events'))
+                    ALTER TABLE Events DROP CONSTRAINT FK_Events_AspNetUsers_ResponsibleUserId1;
+                IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Events_ResponsibleUserId1' AND object_id = OBJECT_ID('Events'))
+                    DROP INDEX IX_Events_ResponsibleUserId1 ON Events;
+                IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_BadgeTypes_BadgeCategoryId1' AND object_id = OBJECT_ID('BadgeTypes'))
+                    DROP INDEX IX_BadgeTypes_BadgeCategoryId1 ON BadgeTypes;
+                IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_BadgeCategoryKudosType_BadgeCategoryId1' AND object_id = OBJECT_ID('BadgeCategoryKudosType'))
+                    DROP INDEX IX_BadgeCategoryKudosType_BadgeCategoryId1 ON BadgeCategoryKudosType;
+                IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_BadgeCategoryKudosType_KudosTypeId' AND object_id = OBJECT_ID('BadgeCategoryKudosType'))
+                    DROP INDEX IX_BadgeCategoryKudosType_KudosTypeId ON BadgeCategoryKudosType;
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Events' AND COLUMN_NAME = 'ResponsibleUserId1')
+                    ALTER TABLE Events DROP COLUMN ResponsibleUserId1;
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'BadgeTypes' AND COLUMN_NAME = 'BadgeCategoryId1')
+                    ALTER TABLE BadgeTypes DROP COLUMN BadgeCategoryId1;
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'BadgeCategoryKudosType' AND COLUMN_NAME = 'BadgeCategoryId1')
+                    ALTER TABLE BadgeCategoryKudosType DROP COLUMN BadgeCategoryId1;
+                IF OBJECT_ID('BadgeCategoryKudosType') IS NOT NULL
+                    AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_BadgeCategoryKudosType_KudosTypeId' AND object_id = OBJECT_ID('BadgeCategoryKudosType'))
+                    CREATE INDEX IX_BadgeCategoryKudosType_KudosTypeId ON BadgeCategoryKudosType (KudosTypeId);
+            ");
         }
 
         /// <inheritdoc />

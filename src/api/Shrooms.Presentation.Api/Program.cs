@@ -222,20 +222,41 @@ using (var scope = app.Services.CreateScope())
     conn.Open();
     using (var cmd = conn.CreateCommand())
     {
-        cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '__EFMigrationsHistory'";
-        var historyExists = (int)(cmd.ExecuteScalar() ?? 0) > 0;
-        if (!historyExists)
-        {
-            cmd.CommandText = @"
+        cmd.CommandText = @"
+            IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '__EFMigrationsHistory')
+            BEGIN
                 CREATE TABLE __EFMigrationsHistory (
                     MigrationId NVARCHAR(150) NOT NULL,
                     ProductVersion NVARCHAR(32) NOT NULL,
                     CONSTRAINT PK___EFMigrationsHistory PRIMARY KEY (MigrationId)
-                );
+                )
+            END
+            IF NOT EXISTS (SELECT 1 FROM __EFMigrationsHistory WHERE MigrationId = '20260225115301_InitialBaseline')
+            BEGIN
                 INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion)
-                VALUES ('20260225115301_InitialBaseline', '10.0.0');";
-            cmd.ExecuteNonQuery();
-        }
+                VALUES ('20260225115301_InitialBaseline', '10.0.0')
+            END
+            -- SeedInitialData inserts reference rows (KudosTypes, Roles, Permissions, etc.)
+            -- that already exist in brownfield databases. Its INSERT statements reference
+            -- columns that SQL Server validates at compile time even inside dead-branch
+            -- IF NOT EXISTS blocks, causing startup failures when the old schema is missing
+            -- those columns. Brownfield databases are detected by having existing rows in
+            -- Organizations; skipping is safe because all seed data is already present.
+            IF OBJECT_ID('dbo.Organizations') IS NOT NULL
+            BEGIN
+                IF EXISTS (SELECT TOP 1 1 FROM dbo.Organizations)
+                   AND NOT EXISTS (SELECT 1 FROM __EFMigrationsHistory WHERE MigrationId = '20260302000000_SeedInitialData')
+                BEGIN
+                    INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion)
+                    VALUES ('20260302000000_SeedInitialData', '10.0.0')
+                END
+            END
+            DELETE FROM __EFMigrationsHistory
+            WHERE MigrationId IN (
+                '20260421000002_AddIsDeletedToLotteries',
+                '20260421000004_RemoveIsDeletedFromLotteries'
+            )";
+        cmd.ExecuteNonQuery();
     }
 
     db.Database.Migrate();

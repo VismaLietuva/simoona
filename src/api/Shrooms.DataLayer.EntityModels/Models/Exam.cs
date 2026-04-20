@@ -8,7 +8,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
 {
     [Index(nameof(Title))]
     [Index(nameof(Number))]
-    public class Exam : BaseModelWithOrg
+    public class Exam : SoftDeletableModelWithOrg
     {
         [Required]
         [StringLength(ValidationConstants.ExamMaxTitleLength)]

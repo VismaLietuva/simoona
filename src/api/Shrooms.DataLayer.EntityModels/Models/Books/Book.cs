@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Books
 {
-    public class Book : BaseModelWithOrg
+    public class Book : SoftDeletableModelWithOrg
     {
         public string Title { get; set; }
 
