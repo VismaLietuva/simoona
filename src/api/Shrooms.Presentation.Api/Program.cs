@@ -205,7 +205,6 @@ builder.Services.AddTransient<CommentNotifier>();
 
 var app = builder.Build();
 
-// Apply pending migrations automatically (brownfield + new migrations).
 using (var scope = app.Services.CreateScope())
 {
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -215,6 +214,30 @@ using (var scope = app.Services.CreateScope())
         .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
         .Options;
     using var db = new ShroomsDbContext(options);
+
+    // TODO: Remove this block once all environments have been migrated to .NET 10.
+    // Existing databases were created by the old .NET Framework app and have no EF Core
+    // migration history. Without this, Migrate() tries to recreate all tables and fails.
+    var conn = db.Database.GetDbConnection();
+    conn.Open();
+    using (var cmd = conn.CreateCommand())
+    {
+        cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '__EFMigrationsHistory'";
+        var historyExists = (int)(cmd.ExecuteScalar() ?? 0) > 0;
+        if (!historyExists)
+        {
+            cmd.CommandText = @"
+                CREATE TABLE __EFMigrationsHistory (
+                    MigrationId NVARCHAR(150) NOT NULL,
+                    ProductVersion NVARCHAR(32) NOT NULL,
+                    CONSTRAINT PK___EFMigrationsHistory PRIMARY KEY (MigrationId)
+                );
+                INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion)
+                VALUES ('20260225115301_InitialBaseline', '10.0.0');";
+            cmd.ExecuteNonQuery();
+        }
+    }
+
     db.Database.Migrate();
 }
 
