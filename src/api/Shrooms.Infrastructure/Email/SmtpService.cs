@@ -53,8 +53,10 @@ namespace Shrooms.Infrastructure.Email
             var port = int.TryParse(_configuration["Smtp:Port"], out var p) ? p : 587;
             var username = _configuration["Smtp:Username"];
             var password = _configuration["Smtp:Password"];
+            var useSsl = bool.TryParse(_configuration["Smtp:UseSsl"], out var ssl) && ssl;
+
             using var client = new SmtpClient();
-            await client.ConnectAsync(host, port, SecureSocketOptions.Auto);
+            await client.ConnectAsync(host, port, useSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
 
             if (!string.IsNullOrEmpty(username))
             {

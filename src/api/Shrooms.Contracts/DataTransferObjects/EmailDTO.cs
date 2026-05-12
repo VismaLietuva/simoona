@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MimeKit;
 using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Contracts.DataTransferObjects
@@ -15,7 +16,7 @@ namespace Shrooms.Contracts.DataTransferObjects
 
         public string Body { get; private set; }
 
-        public EmailAttachment Attachment { get; set; }
+        public MimePart Attachment { get; set; }
 
         public EmailDto(string senderFullName, string senderEmail, IEnumerable<string> receivers, string subject, string body)
         {
