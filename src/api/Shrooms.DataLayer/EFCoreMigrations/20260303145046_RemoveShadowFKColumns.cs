@@ -38,12 +38,24 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 IF OBJECT_ID('BadgeCategoryKudosType') IS NOT NULL
                     AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_BadgeCategoryKudosType_KudosTypeId' AND object_id = OBJECT_ID('BadgeCategoryKudosType'))
                     CREATE INDEX IX_BadgeCategoryKudosType_KudosTypeId ON BadgeCategoryKudosType (KudosTypeId);
+                -- Rename brownfield EF6 columns to match EF Core shadow property names
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Floors' AND COLUMN_NAME = 'Picture_Id')
+                    EXEC sp_rename 'Floors.Picture_Id', 'PictureId1', 'COLUMN';
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NotificationsSettings' AND COLUMN_NAME = 'ApplicationUser_Id')
+                    EXEC sp_rename 'NotificationsSettings.ApplicationUser_Id', 'ApplicationUserId', 'COLUMN';
             ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NotificationsSettings' AND COLUMN_NAME = 'ApplicationUserId')
+                    EXEC sp_rename 'NotificationsSettings.ApplicationUserId', 'ApplicationUser_Id', 'COLUMN';
+                IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Floors' AND COLUMN_NAME = 'PictureId1')
+                    EXEC sp_rename 'Floors.PictureId1', 'Picture_Id', 'COLUMN';
+            ");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Floors_Pictures_PictureId1",
                 table: "Floors");
@@ -51,11 +63,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             migrationBuilder.DropIndex(
                 name: "IX_BadgeCategoryKudosType_KudosTypeId",
                 table: "BadgeCategoryKudosType");
-
-            migrationBuilder.RenameColumn(
-                name: "PictureId1",
-                table: "Floors",
-                newName: "Picture_Id");
 
             migrationBuilder.RenameIndex(
                 name: "IX_Floors_PictureId1",

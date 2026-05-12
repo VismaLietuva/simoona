@@ -259,6 +259,18 @@ using (var scope = app.Services.CreateScope())
         cmd.ExecuteNonQuery();
     }
 
+    // TODO: Remove once staging has been patched (RemoveShadowFKColumns already applied there,
+    // so the migration fix won't run — this one-time script does the rename directly).
+    using (var fixCmd = conn.CreateCommand())
+    {
+        fixCmd.CommandText = @"
+            IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Floors' AND COLUMN_NAME = 'Picture_Id')
+                EXEC sp_rename 'Floors.Picture_Id', 'PictureId1', 'COLUMN';
+            IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NotificationsSettings' AND COLUMN_NAME = 'ApplicationUser_Id')
+                EXEC sp_rename 'NotificationsSettings.ApplicationUser_Id', 'ApplicationUserId', 'COLUMN';";
+        fixCmd.ExecuteNonQuery();
+    }
+
     db.Database.Migrate();
 }
 
