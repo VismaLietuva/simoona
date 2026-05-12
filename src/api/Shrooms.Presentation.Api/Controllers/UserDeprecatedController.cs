@@ -578,7 +578,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return validatedModelInfo;
             }
 
-            var applicationUser = await _applicationUserRepository.Get(u => u.Id == model.Id, includeProperties: "Roles,Projects,Skills,WorkingHours").FirstOrDefaultAsync();
+            var applicationUser = await _applicationUserRepository.Get(u => u.Id == model.Id, includeProperties: "Projects,Skills,WorkingHours").FirstOrDefaultAsync();
 
             if (!editorIsAdministrator)
             {
