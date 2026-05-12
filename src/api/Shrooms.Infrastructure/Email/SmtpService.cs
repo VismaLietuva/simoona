@@ -1,9 +1,7 @@
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.Extensions.Configuration;
-using MimeKit;
 
 namespace Shrooms.Infrastructure.Email
 {
@@ -27,7 +25,17 @@ namespace Shrooms.Infrastructure.Email
             var host = _configuration["Smtp:Host"];
             var pickupDirectory = _configuration["Smtp:PickupDirectoryLocation"];
 
-            return !string.IsNullOrEmpty(host) || !string.IsNullOrEmpty(pickupDirectory);
+            if (!string.IsNullOrEmpty(pickupDirectory))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(host))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -35,40 +43,13 @@ namespace Shrooms.Infrastructure.Email
         /// </summary>
         /// <param name="messages">Message collection for sending.</param>
         /// <returns>A <see cref="Task"/> that represents asynchronous operation.</returns>
-        public async Task SendAsync(IEnumerable<MimeMessage> messages)
+        public async Task SendAsync(IEnumerable<MailMessage> messages)
         {
-            var pickupDirectory = _configuration["Smtp:PickupDirectoryLocation"];
-            if (!string.IsNullOrEmpty(pickupDirectory))
-            {
-                foreach (var message in messages)
-                {
-                    var filePath = System.IO.Path.Combine(pickupDirectory, $"{System.Guid.NewGuid()}.eml");
-                    await message.WriteToAsync(filePath);
-                }
-
-                return;
-            }
-
-            var host = _configuration["Smtp:Host"];
-            var port = int.TryParse(_configuration["Smtp:Port"], out var p) ? p : 587;
-            var username = _configuration["Smtp:Username"];
-            var password = _configuration["Smtp:Password"];
-            var useSsl = bool.TryParse(_configuration["Smtp:UseSsl"], out var ssl) && ssl;
-
             using var client = new SmtpClient();
-            await client.ConnectAsync(host, port, useSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
-
-            if (!string.IsNullOrEmpty(username))
+            foreach (MailMessage message in messages)
             {
-                await client.AuthenticateAsync(username, password);
+                await client.SendMailAsync(message);
             }
-
-            foreach (var message in messages)
-            {
-                await client.SendAsync(message);
-            }
-
-            await client.DisconnectAsync(true);
         }
     }
 }

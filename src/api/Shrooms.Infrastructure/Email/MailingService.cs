@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using MimeKit;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -52,10 +51,10 @@ namespace Shrooms.Infrastructure.Email
 
             try
             {
-                IEnumerable<MimeMessage> messages = BuildMessages(email, skipDomainChange);
+                IEnumerable<MailMessage> messages = BuildMessages(email, skipDomainChange);
                 await _mailSendingService.SendAsync(messages);
             }
-            catch (SmtpCommandException ex)
+            catch (SmtpException ex)
             {
                 LogSendFailure(ex);
             }
@@ -63,11 +62,11 @@ namespace Shrooms.Infrastructure.Email
 
         private string ChangeEmailDomain(string senderEmail, string senderFullName)
         {
-            var mailAddress = MailboxAddress.Parse(senderEmail);
-            return $"{senderFullName} <{mailAddress.Address.Split('@')[0]}@simoona.com>";
+            var mailAddress = new MailAddress(senderEmail);
+            return $"{senderFullName} <{mailAddress.User}@simoona.com>";
         }
 
-        private IEnumerable<MimeMessage> BuildMessages(EmailDto email, bool skipDomainChange = false)
+        private IEnumerable<MailMessage> BuildMessages(EmailDto email, bool skipDomainChange = false)
         {
             switch (_emailBuildingStrategy)
             {
@@ -90,46 +89,45 @@ namespace Shrooms.Infrastructure.Email
             }
         }
 
-        private MimeMessage BuildMessage(EmailDto email, bool skipDomainChange, bool recipientsTo)
+        private MailMessage BuildMessage(EmailDto email, bool skipDomainChange, bool recipientsTo)
         {
-            var mimeMessage = new MimeMessage();
+            var mailMessage = new MailMessage();
 
             var sender = skipDomainChange
                 ? $"{email.SenderFullName} <{email.SenderEmail}>"
                 : ChangeEmailDomain(email.SenderEmail, email.SenderFullName);
 
-            mimeMessage.From.Add(MailboxAddress.Parse(sender));
+            mailMessage.From = new MailAddress(sender);
 
             if (recipientsTo)
             {
                 foreach (var receiver in email.Receivers)
                 {
-                    mimeMessage.To.Add(MailboxAddress.Parse(receiver));
+                    mailMessage.To.Add(receiver);
                 }
             }
             else
             {
-                mimeMessage.To.Add(MailboxAddress.Parse(sender));
+                mailMessage.To.Add(sender);
                 foreach (var receiver in email.Receivers)
                 {
-                    mimeMessage.Bcc.Add(MailboxAddress.Parse(receiver));
+                    mailMessage.Bcc.Add(receiver);
                 }
             }
 
-            mimeMessage.Subject = email.Subject;
-
-            var builder = new BodyBuilder { HtmlBody = email.Body };
             if (email.Attachment != null)
             {
-                builder.Attachments.Add(email.Attachment);
+                mailMessage.Attachments.Add(email.Attachment);
             }
 
-            mimeMessage.Body = builder.ToMessageBody();
+            mailMessage.Subject = email.Subject;
+            mailMessage.Body = email.Body;
+            mailMessage.IsBodyHtml = true;
 
-            return mimeMessage;
+            return mailMessage;
         }
 
-        private void LogSendFailure(SmtpCommandException ex)
+        private void LogSendFailure(SmtpException ex)
         {
             var exceptionTelemetry = new ExceptionTelemetry
             {
