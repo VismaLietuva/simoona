@@ -33,6 +33,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     NormalizedUserName = COALESCE(NormalizedUserName, UPPER(UserName)),
                     NormalizedEmail    = COALESCE(NormalizedEmail, UPPER(Email)),
                     ConcurrencyStamp   = COALESCE(ConcurrencyStamp, CAST(NEWID() AS NVARCHAR(MAX)));
+                UPDATE AspNetUsers SET Created  = GETUTCDATE() WHERE Created  IS NULL;
+                UPDATE AspNetUsers SET Modified = GETUTCDATE() WHERE Modified IS NULL;
                 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UserNameIndex' AND object_id = OBJECT_ID('AspNetUsers'))
                     CREATE UNIQUE INDEX UserNameIndex ON AspNetUsers(NormalizedUserName) WHERE NormalizedUserName IS NOT NULL;
             ");

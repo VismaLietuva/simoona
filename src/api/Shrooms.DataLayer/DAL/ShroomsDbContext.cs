@@ -261,6 +261,17 @@ namespace Shrooms.DataLayer.DAL
             }
         }
 
+        // EF Core's standard SaveChangesAsync(CancellationToken) is called by Identity's UserManager
+        // and other framework code that bypasses our custom SaveChangesAsync(bool) overloads.
+        // Overriding it here ensures UpdateEntityMetadata always runs, preventing DateTime.MinValue
+        // from being written to brownfield datetime columns (which only accept dates >= 1753-01-01).
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            UpdateEntityMetadata(ChangeTracker.Entries());
+            await SoftDeleteHandler.ExecuteAsync(ChangeTracker.Entries(), this);
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
         private static void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = "")
         {
             var now = DateTime.UtcNow;
@@ -284,6 +295,12 @@ namespace Shrooms.DataLayer.DAL
                 {
                     item.Entity.Modified = now;
                     item.Entity.ModifiedBy = userId;
+                    // Guard against DateTime.MinValue from brownfield NULL columns —
+                    // 0001-01-01 is out of range for SQL Server's datetime type.
+                    if (item.Entity.Created == default)
+                    {
+                        item.Entity.Created = now;
+                    }
                 }
             }
         }

@@ -267,7 +267,11 @@ using (var scope = app.Services.CreateScope())
             IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Floors' AND COLUMN_NAME = 'Picture_Id')
                 EXEC sp_rename 'Floors.Picture_Id', 'PictureId1', 'COLUMN';
             IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NotificationsSettings' AND COLUMN_NAME = 'ApplicationUser_Id')
-                EXEC sp_rename 'NotificationsSettings.ApplicationUser_Id', 'ApplicationUserId', 'COLUMN';";
+                EXEC sp_rename 'NotificationsSettings.ApplicationUser_Id', 'ApplicationUserId', 'COLUMN';
+            -- Fix NULL Created/Modified in brownfield rows — EF Core reads NULL as DateTime.MinValue
+            -- (0001-01-01) which is out of range for SQL Server's datetime type.
+            UPDATE AspNetUsers SET Created = GETUTCDATE() WHERE Created IS NULL;
+            UPDATE AspNetUsers SET Modified = GETUTCDATE() WHERE Modified IS NULL;";
         fixCmd.ExecuteNonQuery();
     }
 

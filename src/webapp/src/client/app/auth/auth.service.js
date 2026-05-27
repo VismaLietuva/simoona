@@ -91,8 +91,22 @@
             if (!authorizationData.userName.length) {
                 var authData = localStorageService.get('authorizationData');
                 if (authData) {
-                    angular.extend(authorizationData, authData);
+                    if (!isTokenExpired(authData.token)) {
+                        angular.extend(authorizationData, authData);
+                    } else {
+                        localStorageService.remove('authorizationData');
+                    }
                 }
+            }
+        }
+
+        function isTokenExpired(token) {
+            if (!token) return true;
+            try {
+                var payload = JSON.parse(atob(token.split('.')[1]));
+                return payload.exp < Math.floor(Date.now() / 1000);
+            } catch (e) {
+                return true;
             }
         }
 
@@ -205,8 +219,8 @@
 
         function requestToken(params) {
             const data = "grant_type=password" +
-                "&username=" + params.username +
-                "&password=" + params.password +
+                "&username=" + encodeURIComponent(params.username) +
+                "&password=" + encodeURIComponent(params.password) +
                 "&client_id=" + appConfig.clientId;
 
             return $resource(tokenUrl, {}, {

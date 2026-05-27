@@ -594,14 +594,14 @@ namespace Shrooms.Presentation.Api.Controllers
 
             applicationUser.Skills = await _skillsRepository.Get(s => model.SkillIds.Contains(s.Id)).ToListAsync();
 
-            if (editorIsAdministrator && model.RoleIds != null)
-            {
-                await UpdateRolesAsync(applicationUser, model.RoleIds);
-            }
-
             if (applicationUser.WorkingHours?.OrganizationId == 0)
             {
                 applicationUser.WorkingHours.OrganizationId = GetUserAndOrganization().OrganizationId;
+            }
+
+            if (editorIsAdministrator && model.RoleIds != null)
+            {
+                await UpdateRolesAsync(applicationUser, model.RoleIds);
             }
 
             await _projectService.AddProjectsToUserAsync(applicationUser.Id, model.ProjectIds, userOrg);
