@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,14 +26,17 @@ namespace Shrooms.DataLayer.DAL
 {
     public class ShroomsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IDbContext
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public ShroomsDbContext()
         {
         }
 
-        public ShroomsDbContext(DbContextOptions<ShroomsDbContext> options)
+        public ShroomsDbContext(DbContextOptions<ShroomsDbContext> options, IHttpContextAccessor httpContextAccessor = null)
             : base(options)
         {
             ChangeTracker.LazyLoadingEnabled = false;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // For backward compatibility - connection string based initialization
@@ -272,8 +276,13 @@ namespace Shrooms.DataLayer.DAL
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-        private static void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = "")
+        private void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = null)
         {
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+
             var now = DateTime.UtcNow;
             var items = entries
                 .Where(p => p.Entity is ITrackable && p.Entity is ISoftDelete)
