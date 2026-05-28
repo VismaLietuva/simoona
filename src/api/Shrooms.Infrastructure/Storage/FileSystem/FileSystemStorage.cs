@@ -35,5 +35,16 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
             using var destinationStream = File.Create(fullPath);
             await stream.CopyToAsync(destinationStream);
         }
+
+        public Task<Stream> GetPictureAsync(string blobKey, string tenantPicturesContainer)
+        {
+            var filePath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer, blobKey);
+            if (!File.Exists(filePath))
+            {
+                return Task.FromResult<Stream>(null);
+            }
+
+            return Task.FromResult<Stream>(File.OpenRead(filePath));
+        }
     }
 }

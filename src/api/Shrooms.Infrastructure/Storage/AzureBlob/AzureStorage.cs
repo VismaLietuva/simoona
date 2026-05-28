@@ -41,6 +41,18 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
             await blobClient.UploadAsync(stream, uploadOptions);
         }
 
+        public async Task<Stream> GetPictureAsync(string blobKey, string tenantPicturesContainer)
+        {
+            var blobClient = GetBlobClient(blobKey, tenantPicturesContainer);
+
+            if (!await blobClient.ExistsAsync())
+            {
+                return null;
+            }
+
+            return await blobClient.OpenReadAsync();
+        }
+
         private BlobClient GetBlobClient(string blobKey, string containerName)
         {
             var blobServiceClient = new BlobServiceClient(_settings.StorageConnectionString);

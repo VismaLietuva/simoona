@@ -50,14 +50,13 @@ namespace Shrooms.IoC.Modules
 
         private static void RegisterStorage(IServiceCollection services)
         {
-            if (string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("StorageConnectionString")))
+            services.AddScoped<IStorage>(sp =>
             {
-                services.AddScoped<IStorage, FileSystemStorage>();
-            }
-            else
-            {
-                services.AddScoped<IStorage, AzureStorage>();
-            }
+                var settings = sp.GetRequiredService<IApplicationSettings>();
+                return string.IsNullOrEmpty(settings.StorageConnectionString)
+                    ? ActivatorUtilities.CreateInstance<FileSystemStorage>(sp)
+                    : ActivatorUtilities.CreateInstance<AzureStorage>(sp);
+            });
         }
     }
 }

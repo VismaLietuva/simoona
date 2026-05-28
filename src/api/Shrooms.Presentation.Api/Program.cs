@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shrooms.Contracts.Constants;
@@ -16,6 +15,8 @@ using Shrooms.IoC;
 using Shrooms.Presentation.Api.BackgroundWorkers;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.DependencyInjection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -205,6 +206,42 @@ builder.Services.AddShrooms();
 builder.Services.AddTransient<PostNotifier>();
 builder.Services.AddTransient<CommentNotifier>();
 
+// ImageSharp.Web: on-the-fly image resizing for /storage/* URLs that carry
+// width/height/mode query commands. Source images are read via IStorage (local FS in dev,
+// Azure Blob in staging/prod) through our custom StorageImageProvider. Resized variants
+// are cached on the App Service's local disk under <ContentRoot>/storage-cache so the
+// resize work happens at most once per (URL + commands) until the app instance restarts.
+// 'mode=max|crop|pad|stretch' (master/ImageResizer.NET convention) is aliased to the
+// ImageSharp.Web command name 'rmode' so the existing frontend URLs keep working without
+// any client-side change.
+builder.Services.AddImageSharp(options =>
+{
+    var defaultOnParse = options.OnParseCommandsAsync;
+    options.OnParseCommandsAsync = async context =>
+    {
+        if (context.Commands.TryGetValue("mode", out var mode) && !context.Commands.Contains("rmode"))
+        {
+            context.Commands.Remove("mode");
+            context.Commands.Add("rmode", mode);
+        }
+        if (defaultOnParse != null)
+        {
+            await defaultOnParse(context);
+        }
+    };
+})
+.Configure<PhysicalFileSystemCacheOptions>(options =>
+{
+    // Simoona is an API-only project with no wwwroot, so PhysicalFileSystemCache's
+    // default of resolving CacheFolder against WebRootPath throws at startup. Pin
+    // CacheRootPath to ContentRootPath instead, so the cache lives next to the
+    // deployed binaries at <ContentRoot>/storage-cache/.
+    options.CacheRootPath = builder.Environment.ContentRootPath;
+    options.CacheFolder = "storage-cache";
+})
+.ClearProviders()
+.AddProvider<StorageImageProvider>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -292,19 +329,10 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.UseImageSharp();
+
 app.UseRouting();
 app.UseCors();
-
-// Serve uploaded storage files (profile pictures, etc.) before authentication.
-// Browser <img> tags never send JWT tokens, so auth cannot be enforced here.
-// GUID-based filenames make the URLs non-guessable, which is sufficient for dev.
-var storagePath = Path.Combine(app.Environment.ContentRootPath, "storage");
-Directory.CreateDirectory(storagePath);
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(storagePath),
-    RequestPath = "/storage"
-});
 
 app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
@@ -319,5 +347,25 @@ app.UseHangfireDashboard();
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
 app.MapHealthChecks("/healthz");
+
+// Serve uploaded pictures via the configured IStorage so the same provider that handles
+// uploads also handles reads (local FS in dev, Azure Blob in staging/prod). Browser <img>
+// tags don't send JWT, so this endpoint is anonymous — GUID filenames make URLs unguessable.
+var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage) =>
+{
+    var stream = await storage.GetPictureAsync(filename, tenant.ToLowerInvariant());
+    if (stream == null)
+    {
+        return Results.NotFound();
+    }
+
+    if (!contentTypeProvider.TryGetContentType(filename, out var contentType))
+    {
+        contentType = "application/octet-stream";
+    }
+
+    return Results.File(stream, contentType);
+}).AllowAnonymous();
 
 app.Run();
