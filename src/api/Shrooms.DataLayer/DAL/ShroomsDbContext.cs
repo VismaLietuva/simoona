@@ -285,7 +285,7 @@ namespace Shrooms.DataLayer.DAL
 
             var now = DateTime.UtcNow;
             var items = entries
-                .Where(p => p.Entity is ITrackable && p.Entity is ISoftDelete)
+                .Where(p => p.Entity is ITrackable)
                 .Select(x => new
                 {
                     x.State,

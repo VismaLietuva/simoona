@@ -16,15 +16,26 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
--- KudosTypes
-IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes)
-BEGIN
+-- KudosTypes (insert each type individually so re-running on an existing DB is safe)
+IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes WHERE [Type] = 2)
     INSERT INTO dbo.KudosTypes ([Name], [Value], [IsActive], [Created], [Modified], [IsDeleted], [Description], [Type])
-    VALUES
-        ('Send',  1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'kudos.typeSend',  2),
-        ('Minus', 1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'kudos.typeMinus', 3),
-        ('Other', 1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'kudos.typeOther', 4)
-END
+    VALUES ('Send',    1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'kudos.typeSend',    2)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes WHERE [Type] = 3)
+    INSERT INTO dbo.KudosTypes ([Name], [Value], [IsActive], [Created], [Modified], [IsDeleted], [Description], [Type])
+    VALUES ('Minus',   1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'Minus',   3)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes WHERE [Type] = 4)
+    INSERT INTO dbo.KudosTypes ([Name], [Value], [IsActive], [Created], [Modified], [IsDeleted], [Description], [Type])
+    VALUES ('Other',   1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'Other',   4)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes WHERE [Type] = 5)
+    INSERT INTO dbo.KudosTypes ([Name], [Value], [IsActive], [Created], [Modified], [IsDeleted], [Description], [Type])
+    VALUES ('Welcome', 3, 1, GETUTCDATE(), GETUTCDATE(), 0, 'Welcome Kudos for you. Be active and earn more!', 5)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.KudosTypes WHERE [Type] = 6)
+    INSERT INTO dbo.KudosTypes ([Name], [Value], [IsActive], [Created], [Modified], [IsDeleted], [Description], [Type])
+    VALUES ('Refund',  1, 1, GETUTCDATE(), GETUTCDATE(), 0, 'Refund',  6)
 ");
 
             migrationBuilder.Sql(@"
