@@ -15,6 +15,7 @@ using Shrooms.IoC;
 using Shrooms.Presentation.Api.BackgroundWorkers;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
+using Shrooms.Presentation.Api.Caching;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using System.Text;
@@ -241,6 +242,11 @@ builder.Services.AddImageSharp(options =>
 })
 .ClearProviders()
 .AddProvider<StorageImageProvider>();
+
+if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
+{
+    builder.Services.AddSingleton<IImageCache, NullImageCache>();
+}
 
 var app = builder.Build();
 
