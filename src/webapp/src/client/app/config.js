@@ -15,7 +15,6 @@
         'LocalStorageModule',
         'monospaced.elastic',
         'ApplicationInsightsModule',
-        'SignalR',
         'pascalprecht.translate',
         'tmh.dynamicLocale',
         'angular-loading-bar',
