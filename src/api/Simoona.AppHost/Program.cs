@@ -17,7 +17,6 @@ var simoonaDb = sqlServer.AddDatabase("DefaultConnection", "SimoonaDB");
 var jobsDb    = sqlServer.AddDatabase("BackgroundJobs",   "SimoonaDBJobs");
 
 var api = builder.AddProject<Projects.Shrooms_Presentation_Api>("api")
-    .WithHttpEndpoint(port: 50321, name: "http")
     .WithReference(simoonaDb)
     .WithReference(jobsDb)
     .WaitFor(simoonaDb);

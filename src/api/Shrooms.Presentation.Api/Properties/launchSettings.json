@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Shrooms.Presentation.Api": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:50321"
+    }
+  }
+}
