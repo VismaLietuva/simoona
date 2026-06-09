@@ -60,6 +60,8 @@ namespace Shrooms.DataLayer.DAL
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
+
+                queryableSet = queryableSet.AsSplitQuery();
             }
 
             if (!string.IsNullOrWhiteSpace(orderBy))
@@ -96,6 +98,8 @@ namespace Shrooms.DataLayer.DAL
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
+
+                queryableSet = queryableSet.AsSplitQuery();
             }
 
             if (orderBy != null)

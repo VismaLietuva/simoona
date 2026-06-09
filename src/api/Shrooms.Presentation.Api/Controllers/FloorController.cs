@@ -61,7 +61,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public async Task<IEnumerable<FloorViewModel>> GetByOffice(int officeId)
         {
-            var model = await _repository.Get(f => f.OfficeId == officeId, includeProperties: "Picture").ToListAsync();
+            var model = await _repository.Get(f => f.OfficeId == officeId).ToListAsync();
             return _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(model);
         }
 
@@ -126,7 +126,7 @@ namespace Shrooms.Presentation.Api.Controllers
             s ??= string.Empty;
 
             var floors = await _repository.GetPagedAsync(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
-                                                        orderBy: sortQuery, includeProperties: "Picture,Rooms,Rooms.ApplicationUsers");
+                                                        orderBy: sortQuery, includeProperties: "Rooms,Rooms.ApplicationUsers");
 
             var floorId = floors.Where(n => n != null).Select(n => n.Id).FirstOrDefault();
 

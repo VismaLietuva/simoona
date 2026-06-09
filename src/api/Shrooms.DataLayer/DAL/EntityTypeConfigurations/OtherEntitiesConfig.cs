@@ -100,9 +100,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            _modelBuilder.Entity<Floor>()
-                .HasOne(f => f.Picture)
-                .WithMany();
 
             _modelBuilder.Entity<Picture>()
                 .HasOne(a => a.Organization)

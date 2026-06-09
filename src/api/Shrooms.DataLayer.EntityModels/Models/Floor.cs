@@ -15,7 +15,5 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual ICollection<Room> Rooms { get; set; }
 
         public string PictureId { get; set; }
-
-        public virtual Picture Picture { get; set; }
     }
 }

@@ -1584,16 +1584,12 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("PictureId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PictureId1")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OfficeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("PictureId1");
 
                     b.ToTable("Floors");
                 });
@@ -3920,17 +3916,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Picture", "Picture")
-                        .WithMany()
-                        .HasForeignKey("PictureId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Office");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("Picture");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.JobPosition", b =>

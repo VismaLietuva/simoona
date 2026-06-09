@@ -42,7 +42,11 @@ builder.Services.AddScoped<ShroomsDbContext>(sp =>
     connStr ??= configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
     var optionsBuilder = new DbContextOptionsBuilder<ShroomsDbContext>();
     optionsBuilder.UseSqlServer(connStr);
-    optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    optionsBuilder.ConfigureWarnings(w =>
+    {
+        w.Ignore(RelationalEventId.PendingModelChangesWarning);
+        w.Log(CoreEventId.InvalidIncludePathError);
+    });
     var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
     return new ShroomsDbContext(optionsBuilder.Options, httpContextAccessor);
 });
