@@ -7,12 +7,12 @@ namespace Shrooms.Domain.Services.WebHookCallbacks
 {
     public interface IWebHookCallbackServices
     {
-        IBirthdaysNotificationWebHookService BirthdaysNotification { get; set; }
+        IBirthdaysNotificationWebHookService BirthdaysNotification { get; }
 
-        IUsersAnonymizationWebHookService UsersAnonymization { get; set; }
+        IUsersAnonymizationWebHookService UsersAnonymization { get; }
 
-        IDailyMailingService DailyMails { get; set; }
+        IDailyMailingService DailyMails { get; }
 
-        IBlacklistUserStatusChangeWebHookService BlacklistUserStatusChange { get; set; }
+        IBlacklistUserStatusChangeWebHookService BlacklistUserStatusChange { get; }
     }
 }
