@@ -17,6 +17,7 @@ using X.PagedList.EF;
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
+    [ApiController]
     [Route("Skill")]
     public class SkillController : ControllerBase
     {
@@ -31,7 +32,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _skillRepository = unitOfWork.GetRepository<Skill>();
         }
 
-        [HttpPost]
+        [HttpPost("Post")]
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
         public async Task<IActionResult> Post(SkillPostViewModel model)
@@ -47,7 +48,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201, _mapper.Map<SkillMiniViewModel>(skill));
         }
 
-        [HttpGet]
+        [HttpGet("GetForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
         public async Task<IEnumerable<SkillAutoCompleteViewModel>> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {

@@ -3137,9 +3137,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 

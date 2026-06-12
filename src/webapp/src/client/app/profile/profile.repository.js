@@ -17,7 +17,7 @@
         var certificateUrl = endPoint + '/Certificate/';
         var examUrl = endPoint + '/Exam/';
         var hashtagsUrl = endPoint + '/Hashtags/';
-        var blacklistStateUrl = endPoint + '/Blacklist/';
+        var blacklistStateUrl = endPoint + '/Blacklist';
 
         var service = {
             getUserProfile: getUserProfile,
