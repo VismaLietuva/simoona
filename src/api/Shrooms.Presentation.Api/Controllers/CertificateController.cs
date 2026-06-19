@@ -48,10 +48,10 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var start = s.ToLower();
-            var certificates = await _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
+            var matches = await _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
                 .OrderBy(c => c.Name)
-                .DistinctBy(c => c.Name)
-                .ToPagedListAsync(1, pageSize);
+                .ToListAsync();
+            var certificates = matches.DistinctBy(c => c.Name).Take(pageSize).ToList();
 
             return _mapper.Map<IEnumerable<CertificateAutoCompleteViewModel>>(certificates);
         }

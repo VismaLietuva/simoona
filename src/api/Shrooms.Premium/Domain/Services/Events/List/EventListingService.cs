@@ -171,7 +171,6 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var myEventFilter = _eventFilters[options.Filter](userOrg.UserId);
             var events = await _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Offices)
                 .Where(t => t.OrganizationId == userOrg.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
