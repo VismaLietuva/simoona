@@ -12,6 +12,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
@@ -202,6 +203,24 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("Search")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public async Task<IActionResult> Search([FromQuery] EventSearchOptionsViewModel options)
+        {
+            if (options == null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var optionsDto = _mapper.Map<EventSearchOptionsViewModel, EventSearchOptionsDto>(options);
+            optionsDto.View = options.View ?? EventTimeFrame.Upcoming;
+            var pagedEvents = await _eventListingService.SearchEventsAsync(optionsDto, GetUserAndOrganization());
+            var viewModels = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(pagedEvents);
+
+            return Ok(pagedEvents.ToPagedViewModel(viewModels, optionsDto));
         }
 
         [HttpGet]

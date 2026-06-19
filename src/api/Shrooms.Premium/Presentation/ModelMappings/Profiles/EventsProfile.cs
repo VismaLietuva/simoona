@@ -69,6 +69,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .IgnoreUserOrgDto()
                 .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>(MemberList.None);
+            CreateMap<EventSearchOptionsViewModel, EventSearchOptionsDto>(MemberList.None);
             CreateMap<EventJoinViewModel, EventJoinDto>(MemberList.None)
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();

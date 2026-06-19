@@ -165,6 +165,18 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 
+        public async Task<IPagedList<EventListItemDto>> SearchEventsAsync(EventSearchOptionsDto options, UserAndOrganizationDto userOrg)
+        {
+            return await _eventsDbSet
+                .Include(x => x.EventParticipants)
+                .Where(e => e.OrganizationId == userOrg.OrganizationId)
+                .Where(SearchTextFilter(options.SearchString))
+                .Where(EventTimeFrameFilter(options.View))
+                .OrderByDescending(e => e.StartDate)
+                .Select(MapEventToListItemDto(userOrg.UserId))
+                .ToPagedListAsync(options.Page, options.PageSize);
+        }
+
         public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, UserAndOrganizationDto userOrg, int? officeIdNullable = null)
         {
             var officeSearchString = OfficeIdToString(officeIdNullable);
@@ -368,6 +380,29 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             return e => e.Name.Contains(searchString) || e.Place.Contains(searchString);
+        }
+
+        private static Expression<Func<Event, bool>> SearchTextFilter(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return e => true;
+            }
+
+            return e => e.Name.Contains(searchString)
+                || e.Place.Contains(searchString)
+                || e.Description.Contains(searchString);
+        }
+
+        private static Expression<Func<Event, bool>> EventTimeFrameFilter(EventTimeFrame view)
+        {
+            var now = DateTime.UtcNow;
+            return view switch
+            {
+                EventTimeFrame.Past => e => e.EndDate < now,
+                EventTimeFrame.All => e => true,
+                _ => e => e.EndDate >= now,
+            };
         }
 
         private static string OfficeIdToString(int? officeId) => officeId != null ? $@"""{officeId.ToString()}""" : OutsideOffice;
