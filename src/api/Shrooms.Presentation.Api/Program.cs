@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.DAL;
@@ -201,6 +202,32 @@ builder.Services.AddSwaggerGen(c =>
     // When two actions produce the same route+verb (e.g. base and override both visible),
     // pick the first one instead of throwing.
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+    // JWT bearer auth — adds the "Authorize" button at the top of Swagger UI.
+    // Paste the raw token (no "Bearer " prefix) and it is sent on every request.
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Paste your JWT access token below (without the 'Bearer ' prefix).",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 // Application Insights
