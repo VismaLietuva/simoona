@@ -227,10 +227,32 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("ExternalLogins")]
-        public IActionResult GetExternalLogins(string returnUrl, bool isLinkable = false)
+        public async Task<IActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
-            // External auth logins - return empty list; external login flow uses Challenge in Token endpoint
-            return Ok(new List<ExternalLoginViewModel>());
+            var logins = new List<ExternalLoginViewModel>();
+            var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
+
+            if (string.IsNullOrEmpty(organizationProviders))
+            {
+                return Ok(logins);
+            }
+
+            var externalProviders = new[]
+            {
+                AuthenticationConstants.GoogleLoginProvider,
+                AuthenticationConstants.FacebookLoginProvider,
+                AuthenticationConstants.MicrosoftLoginProvider,
+            };
+
+            foreach (var provider in externalProviders)
+            {
+                if (ContainsProvider(organizationProviders, provider))
+                {
+                    logins.Add(new ExternalLoginViewModel { Name = provider });
+                }
+            }
+
+            return Ok(logins);
         }
 
         private static bool ContainsProvider(string providerList, string providerName)
