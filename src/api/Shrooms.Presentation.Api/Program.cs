@@ -111,29 +111,49 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// External cookie used to round-trip the identity returned by social IdPs back to /Account/ExternalLoginCallback.
+// Required because every social handler below uses IdentityConstants.ExternalScheme as its SignInScheme.
+var externalSchemeRegistered = false;
+void EnsureExternalCookie()
+{
+    if (externalSchemeRegistered) return;
+    builder.Services.AddAuthentication().AddCookie(IdentityConstants.ExternalScheme, o =>
+    {
+        o.Cookie.Name = IdentityConstants.ExternalScheme;
+        o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    });
+    externalSchemeRegistered = true;
+}
+
 // Social auth (optional, reads from config)
 if (!string.IsNullOrEmpty(builder.Configuration["GoogleAccountClientId"]))
 {
+    EnsureExternalCookie();
     builder.Services.AddAuthentication().AddGoogle(opts =>
     {
         opts.ClientId = builder.Configuration["GoogleAccountClientId"];
         opts.ClientSecret = builder.Configuration["GoogleAccountClientSecret"];
+        opts.SignInScheme = IdentityConstants.ExternalScheme;
     });
 }
 if (!string.IsNullOrEmpty(builder.Configuration["FacebookAccountAppId"]))
 {
+    EnsureExternalCookie();
     builder.Services.AddAuthentication().AddFacebook(opts =>
     {
         opts.AppId = builder.Configuration["FacebookAccountAppId"];
         opts.AppSecret = builder.Configuration["FacebookAccountAppSecret"];
+        opts.SignInScheme = IdentityConstants.ExternalScheme;
     });
 }
 if (!string.IsNullOrEmpty(builder.Configuration["MicrosoftAccountClientId"]))
 {
+    EnsureExternalCookie();
     builder.Services.AddAuthentication().AddMicrosoftAccount(opts =>
     {
         opts.ClientId = builder.Configuration["MicrosoftAccountClientId"];
         opts.ClientSecret = builder.Configuration["MicrosoftAccountClientSecret"];
+        opts.SignInScheme = IdentityConstants.ExternalScheme;
     });
 }
 

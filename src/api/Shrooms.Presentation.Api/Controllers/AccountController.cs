@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Administration;
+using Shrooms.Domain.Services.Jwt;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.RefreshTokens;
@@ -14,9 +17,11 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.AccountModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Shrooms.Presentation.Api.Controllers
@@ -32,6 +37,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IAdministrationUsersService _administrationService;
         private readonly IApplicationSettings _applicationSettings;
+        private readonly IJwtTokenService _jwtTokenService;
 
         private string RequestedOrganization => HttpContext.GetRequestedTenant();
 
@@ -42,7 +48,8 @@ namespace Shrooms.Presentation.Api.Controllers
             IOrganizationService organizationService,
             IRefreshTokenService refreshTokenService,
             IAdministrationUsersService administrationService,
-            IApplicationSettings applicationSettings)
+            IApplicationSettings applicationSettings,
+            IJwtTokenService jwtTokenService)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -51,6 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _refreshTokenService = refreshTokenService;
             _administrationService = administrationService;
             _applicationSettings = applicationSettings;
+            _jwtTokenService = jwtTokenService;
         }
 
         [Route("UserInfo")]
@@ -246,13 +254,148 @@ namespace Shrooms.Presentation.Api.Controllers
 
             foreach (var provider in externalProviders)
             {
-                if (ContainsProvider(organizationProviders, provider))
+                if (!ContainsProvider(organizationProviders, provider))
                 {
-                    logins.Add(new ExternalLoginViewModel { Name = provider });
+                    continue;
                 }
+
+                logins.Add(new ExternalLoginViewModel
+                {
+                    Name = provider,
+                    Url = BuildExternalLoginUrl(provider, RequestedOrganization, returnUrl, isRegistration: false)
+                });
+
+                logins.Add(new ExternalLoginViewModel
+                {
+                    Name = provider + "Registration",
+                    Url = BuildExternalLoginUrl(provider, RequestedOrganization, returnUrl, isRegistration: true)
+                });
             }
 
             return Ok(logins);
+        }
+
+        // Initiates the external OAuth challenge. The frontend opens this URL in the browser
+        // (built by GetExternalLogins above); we round-trip the organization / returnUrl /
+        // isRegistration through ExternalLoginCallback because the SignIn cookie can't carry
+        // tenant context across IdP hops.
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("ExternalLogin")]
+        public IActionResult ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
+        {
+            if (string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(returnUrl))
+            {
+                return BadRequest();
+            }
+
+            var callback = Url.Action(nameof(ExternalLoginCallback), "Account", new
+            {
+                provider,
+                organization,
+                returnUrl,
+                isRegistration
+            });
+
+            var props = new AuthenticationProperties { RedirectUri = callback };
+            return Challenge(props, provider);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("ExternalLoginCallback")]
+        public async Task<IActionResult> ExternalLoginCallback(string provider, string organization, string returnUrl, bool isRegistration = false)
+        {
+            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider))
+            {
+                return BadRequest();
+            }
+
+            // Pull the external identity that the social handler stashed in the ExternalScheme cookie.
+            var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return Redirect(AppendHash(returnUrl, "error=external_auth_failed"));
+            }
+
+            var providerKey = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var loginProvider = provider;
+            var email = result.Principal.FindFirstValue(ClaimTypes.Email);
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(providerKey))
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                return Redirect(AppendHash(returnUrl, "error=missing_claims"));
+            }
+
+            // Push the tenant into HttpContext.Items so the per-request DbContext (Program.cs:31)
+            // resolves the right tenant's connection string for the lookups below.
+            HttpContext.Items["tenantName"] = organization;
+
+            var loginInfo = new ExternalLoginInfo(result.Principal, loginProvider, providerKey, loginProvider);
+            var user = await _userManager.FindByLoginAsync(loginProvider, providerKey);
+
+            if (user == null)
+            {
+                var existing = await _userManager.FindByEmailAsync(email);
+
+                if (existing != null)
+                {
+                    // Email exists in this tenant: attach the social login to the existing user.
+                    await _userManager.AddLoginAsync(existing, new UserLoginInfo(loginProvider, providerKey, loginProvider));
+                    user = existing;
+                }
+                else if (isRegistration)
+                {
+                    // First-time external registration.
+                    var isHostValid = await _organizationService.IsOrganizationHostValidAsync(email, organization);
+                    if (!isHostValid)
+                    {
+                        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                        return Redirect(AppendHash(returnUrl, "error=invalid_email_host"));
+                    }
+
+                    var createResult = await _administrationService.CreateNewUserWithExternalLoginAsync(loginInfo, organization);
+                    if (!createResult.Succeeded)
+                    {
+                        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                        return Redirect(AppendHash(returnUrl, "error=create_failed"));
+                    }
+
+                    user = await _userManager.FindByEmailAsync(email);
+                }
+                else
+                {
+                    // No matching user and not in registration mode → bounce back so the SPA can prompt registration.
+                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                    return Redirect(AppendHash(returnUrl, "error=user_not_found"));
+                }
+            }
+
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            var token = await _jwtTokenService.GenerateTokenAsync(user);
+            var hash = $"access_token={Uri.EscapeDataString(token.Token)}&token_type=bearer&expires_in={token.ExpiresIn}";
+            return Redirect(AppendHash(returnUrl, hash));
+        }
+
+        private string BuildExternalLoginUrl(string provider, string organization, string returnUrl, bool isRegistration)
+        {
+            var qs = new Dictionary<string, string>
+            {
+                ["provider"] = provider,
+                ["organization"] = organization ?? string.Empty,
+                ["returnUrl"] = returnUrl ?? string.Empty,
+                ["isRegistration"] = isRegistration ? "true" : "false"
+            };
+            return QueryHelpers.AddQueryString("/Account/ExternalLogin", qs);
+        }
+
+        private static string AppendHash(string url, string hash)
+        {
+            if (string.IsNullOrEmpty(hash)) return url;
+            var sep = url.Contains('#') ? "&" : "#";
+            return url + sep + hash;
         }
 
         private static bool ContainsProvider(string providerList, string providerName)
