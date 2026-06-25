@@ -10,6 +10,7 @@ namespace Shrooms.Presentation.Api.Controllers
     {
         [HttpGet]
         [Route("")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public IActionResult Index()
         {
             return Ok("API is up and running");

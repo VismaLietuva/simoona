@@ -114,7 +114,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]        public async Task<IActionResult> DeleteUser(string id)
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -181,6 +183,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("Get")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(string id, string includeProperties = "")
         {
             var user = await _applicationUserRepository.Get(e => e.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
@@ -291,6 +294,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetDetails/{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDetails(string id)
         {
             var user = await _applicationUserRepository
@@ -343,6 +347,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("ConfirmUser")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ConfirmUser(string id)
         {
             if (!ModelState.IsValid)
@@ -369,6 +374,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserProfileViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserProfile(string id)
         {
             var user = await _applicationUserRepository
@@ -399,6 +405,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}/Personal")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserPersonalInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserPersonalInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
@@ -419,6 +426,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}/Job")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserJobInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserJobInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
@@ -451,6 +459,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}/Office")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserOfficeInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserOfficeInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
@@ -470,6 +479,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUserProfile/{id}/Shrooms")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserShroomsInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserShroomsInfo(string id)
         {
             if (!(await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || id == User.Identity.GetUserId()))
@@ -490,6 +500,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetProfile")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserProfileViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProfile()
         {
             return await GetUserProfile(User.Identity.GetUserId());
@@ -497,6 +508,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetProfile/Personal")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserPersonalInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPersonalInfo()
         {
             return await GetUserPersonalInfo(User.Identity.GetUserId());
@@ -504,6 +516,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetProfile/Job")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserJobInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetJobInfo()
         {
             return await GetUserJobInfo(User.Identity.GetUserId());
@@ -511,6 +524,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetProfile/Office")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(ApplicationUserOfficeInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOfficeInfo()
         {
             return await GetUserOfficeInfo(User.Identity.GetUserId());
@@ -526,6 +540,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("PutExams")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutExams(ApplicationUserExamsPostModel userExams)
         {
             if (!ModelState.IsValid)
@@ -558,6 +573,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("PutJobInfo")]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutJobInfo(ApplicationUserPutJobInfoViewModel model)
         {
             var userOrg = GetUserAndOrganization();
@@ -732,6 +748,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutOfficeInfo(ApplicationUserPutOfficeInfoViewModel model)
         {
             var userId = GetUserAndOrganization().UserId;
@@ -767,6 +784,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("PutShroomsInfo")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutShroomsInfo(ApplicationUserShroomsInfoViewModel model)
         {
             if (!await CanAccessAsync(model))
@@ -860,6 +878,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("CompleteTutorial")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SetUserTutorialStatusToComplete()
         {
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync(GetUserAndOrganization().UserId);
@@ -868,6 +887,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("TutorialStatus")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserTutorialStatus()
         {
             var tutorialStatus = await _administrationUsersService.GetUserTutorialStatusAsync(GetUserAndOrganization().UserId);

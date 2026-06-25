@@ -47,6 +47,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
+        [ProducesResponseType(typeof(QualificationLevelViewModel), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             return await base.Get(id, includeProperties);
@@ -100,6 +101,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);

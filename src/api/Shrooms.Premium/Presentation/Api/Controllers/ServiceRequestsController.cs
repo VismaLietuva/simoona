@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -67,6 +68,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
         public IActionResult Get(int id, string includeProperties = "")
         {
             var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
@@ -172,6 +174,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> KudosShopItemsExist()
         {
             return Ok(await _kudosShopService.ItemsExistAsync(GetUserAndOrganization()));
@@ -204,6 +207,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PostComment([FromBody] ServiceRequestCommentPostViewModel postModel)
         {
             if (!ModelState.IsValid)
@@ -227,6 +231,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(ServiceRequestCreateViewModel newServiceRequest)
         {
             if (!ModelState.IsValid)
@@ -250,6 +255,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(ServiceRequestUpdateViewModel serviceRequest)
         {
             if (!ModelState.IsValid)
@@ -277,6 +283,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> MarkAsDone(int id)
         {
             try
@@ -297,6 +304,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             var model = await _serviceRequestRepository.GetByIdAsync(id);
@@ -313,6 +321,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(typeof(IEnumerable<ServiceRequestCategoryDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetServiceRequestCategories()
         {
             var serviceRequestCategoriesDto = await _serviceRequestService.GetCategoriesAsync();
@@ -322,6 +331,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateCategory(ServiceRequestCategoryCreateViewModel category)
         {
             if (!ModelState.IsValid)
@@ -343,6 +353,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(typeof(ServiceRequestCategoryDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditCategory(int categoryId)
         {
             try
@@ -359,6 +370,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditCategory(ServiceRequestCategoryViewModel model)
         {
             if (!ModelState.IsValid)
@@ -381,6 +393,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RemoveCategory(int categoryId)
         {
             try

@@ -179,6 +179,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public override async Task<IActionResult> Delete(int id)
         {
             var office = await _repository.Get(o => o.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefaultAsync();

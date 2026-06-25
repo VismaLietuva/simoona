@@ -27,7 +27,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("List")]
-        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]        public async Task<IActionResult> GetAll()
+        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        [ProducesResponseType(typeof(IEnumerable<ExternalLinkViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
         {
             var externalLinks = await _externalLinkService.GetAllAsync(GetUserAndOrganization().OrganizationId);
             var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDto>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
@@ -37,6 +39,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        [ProducesResponseType(typeof(ExternalLinkViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetExternalLink(int id)
         {
             var externalLink = await _externalLinkService.GetAsync(id, GetUserAndOrganization());
@@ -53,7 +56,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Update")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]        public async Task<IActionResult> UpdateLinks(ManageExternalLinkViewModel manageLinksViewModel)
+        [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateLinks(ManageExternalLinkViewModel manageLinksViewModel)
         {
             if (!ModelState.IsValid)
             {

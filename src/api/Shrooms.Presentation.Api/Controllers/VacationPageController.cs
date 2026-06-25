@@ -26,6 +26,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [ProducesResponseType(typeof(VacationPageViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetVacationPage()
         {
             var vacationPageDto = await _vacationPageService.GetVacationPage(GetOrganizationId());
@@ -41,6 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Vacation)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditVacationPage(VacationPageViewModel vacationPageViewModel)
         {
             if (!ModelState.IsValid)

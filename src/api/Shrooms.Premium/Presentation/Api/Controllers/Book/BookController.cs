@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -36,6 +37,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddBook(NewBookViewModel book)
         {
             if (!ModelState.IsValid)
@@ -59,6 +61,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteBook(int bookId)
         {
             if (bookId < 1)
@@ -81,6 +84,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditBook(EditBookViewModel book)
         {
             if (!ModelState.IsValid)
@@ -105,6 +109,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("ListByOffice")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        [ProducesResponseType(typeof(LazyPaged<BooksByOfficeViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBooksByOffice(int officeId, int page = 1, string searchString = null)
         {
             if (!string.IsNullOrEmpty(searchString) && searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch || officeId < 1)
@@ -129,6 +134,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        [ProducesResponseType(typeof(BookDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBookDetails(int bookOfficeId)
         {
             if (bookOfficeId < 1)
@@ -144,6 +150,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("DetailsForAdmin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(typeof(BookDetailsAdministrationViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBookDetailsForAdministrator(int bookOfficeId)
         {
             if (bookOfficeId < 1)
@@ -159,6 +166,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Return")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ReturnBook(int bookOfficeId)
         {
             if (bookOfficeId < 1)
@@ -181,6 +189,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Report")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ReportMissingBook(BookReportViewModel bookReport)
         {
             if (bookReport.BookOfficeId < 1)
@@ -204,6 +213,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route(template: "ReturnForAdmin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ReturnBookForAdmin(int bookOfficeId, string userId)
         {
             if (bookOfficeId < 1)
@@ -229,6 +239,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Take")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> TakeBook(int bookOfficeId)
         {
             if (bookOfficeId < 1)
@@ -252,6 +263,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPatch]
         [Route("Covers")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult UpdateBookCovers()
         {
             _bookService.UpdateBookCovers();
@@ -261,6 +273,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("FindByIsbn")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        [ProducesResponseType(typeof(RetrievedBookInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> FindByIsbn(string isbn)
         {
             if (string.IsNullOrEmpty(isbn))

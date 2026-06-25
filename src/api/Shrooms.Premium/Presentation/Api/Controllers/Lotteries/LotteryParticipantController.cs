@@ -8,6 +8,7 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -28,6 +29,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Participants")]
+        [ProducesResponseType(typeof(IEnumerable<LotteryParticipantViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetParticipantsCounted(int id)
         {
             var participants = await _participantService.GetParticipantsCountedAsync(id);
@@ -39,6 +41,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Participants/Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
+        [ProducesResponseType(typeof(PagedViewModel<LotteryParticipantDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
             var pagedParticipants = await _participantService.GetPagedParticipantsAsync(id, page, pageSize);

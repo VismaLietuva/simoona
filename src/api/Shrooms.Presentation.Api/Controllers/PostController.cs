@@ -45,6 +45,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPost")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(typeof(WallPostViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPost(int postId)
         {
             try
@@ -69,6 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(typeof(WallPostViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
@@ -108,6 +110,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
@@ -141,6 +144,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeletePost(int id)
         {
             if (id <= 0)
@@ -167,6 +171,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Hide")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
@@ -193,6 +198,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
@@ -217,6 +223,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Watch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> WatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
@@ -240,6 +247,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Unwatch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UnwatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
@@ -68,6 +69,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [ProducesResponseType(typeof(PagedViewModel<KudosUserLogViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserKudosLogs(string userId, int page = 1)
         {
             if (!ModelState.IsValid)
@@ -165,6 +167,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [ProducesResponseType(typeof(KudosTypeViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditType(int id)
         {
             if (id < 1)
@@ -187,6 +190,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditType([FromBody] KudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
@@ -210,6 +214,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateType([FromBody] NewKudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
@@ -233,6 +238,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPut("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RemoveType(int id)
         {
             if (id < 1)
@@ -261,6 +267,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddKudosLog([FromBody] AddKudosLogViewModel kudosLog)
         {
             if (!ModelState.IsValid)
@@ -296,6 +303,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ApproveKudos(int id)
         {
             try
@@ -311,6 +319,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RejectKudos([FromBody] KudosRejectViewModel kudosRejectModel)
         {
             if (!ModelState.IsValid)
@@ -350,6 +359,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [ProducesResponseType(typeof(IEnumerable<UserKudosInformationViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetApprovedKudosList(string id = null)
         {
             id = GetUserIdIfNull(id);
@@ -424,6 +434,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [ProducesResponseType(typeof(WelcomeKudosViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetWelcomeKudos()
         {
             var welcomeKudos = await _kudosService.GetWelcomeKudosAsync();

@@ -206,6 +206,7 @@ builder.Services.AddControllers()
     {
         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
         options.SerializerSettings.Converters.Add(new Shrooms.Presentation.Api.Helpers.EmptyToNullConverter());
         options.SerializerSettings.Converters.Add(new Shrooms.Presentation.Api.Helpers.FormattedDecimalConverter());
     });
@@ -248,7 +249,11 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+
+    c.SchemaFilter<Shrooms.Presentation.Api.Helpers.StringEnumSchemaFilter>();
 });
+
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 // Application Insights
 builder.Services.AddApplicationInsightsTelemetry();

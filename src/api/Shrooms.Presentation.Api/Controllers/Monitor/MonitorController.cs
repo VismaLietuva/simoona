@@ -31,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpGet]
         [Route("List")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
+        [ProducesResponseType(typeof(IEnumerable<MonitorViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMonitorList()
         {
             var monitorsDto = await _monitorService.GetMonitorListAsync(GetUserAndOrganization().OrganizationId);
@@ -41,6 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
+        [ProducesResponseType(typeof(MonitorViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMonitorDetails(int monitorId)
         {
             try
@@ -58,6 +60,7 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateMonitor(CreateMonitorViewModel monitor)
         {
             if (!ModelState.IsValid)
@@ -82,6 +85,7 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateMonitor(MonitorViewModel monitor)
         {
             if (!ModelState.IsValid)

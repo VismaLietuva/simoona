@@ -39,7 +39,9 @@ namespace Shrooms.Presentation.Api.Controllers
         /// <returns>List of languages and timezones</returns>
         [HttpGet]
         [Route("GeneralSettings")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]        public async Task<IActionResult> GetLocalizationSettings()
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(LocalizationSettingsViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetLocalizationSettings()
         {
             var settingsDto = await _userService.GetUserLocalizationSettingsAsync(GetUserAndOrganization());
             var result = _mapper.Map<LocalizationSettingsDto, LocalizationSettingsViewModel>(settingsDto);
@@ -55,7 +57,9 @@ namespace Shrooms.Presentation.Api.Controllers
         /// <returns>HTTP OK</returns>
         [HttpPut]
         [Route("GeneralSettings")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]        public async Task<IActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
         {
             if (!ModelState.IsValid)
             {
@@ -79,6 +83,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("Notifications")]
         [PermissionAuthorize(BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(UserNotificationsSettingsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetWallNotifications()
         {
             var settings = await _userService.GetWallNotificationSettingsAsync(GetUserAndOrganization());
@@ -89,6 +94,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Notifications")]
         [PermissionAuthorize(BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ChangeNotifications(UserNotificationsSettingsViewModel userNotificationsSettings)
         {
             if (!ModelState.IsValid)
@@ -114,6 +120,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("Logins")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(List<ProviderViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserLogins()
         {
             var id = GetUserAndOrganization().UserId;
@@ -140,6 +147,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("DeleteLogin")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginsUnlink(string providerName)
         {
             var userId = GetUserAndOrganization().UserId;

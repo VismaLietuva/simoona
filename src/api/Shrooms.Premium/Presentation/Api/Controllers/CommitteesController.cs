@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -35,6 +36,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);
@@ -65,6 +67,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
+        [ProducesResponseType(typeof(CommitteeViewDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> KudosCommittee()
         {
             var kudosCommittee = await _committeesService.GetKudosCommitteeAsync();
@@ -138,6 +141,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteSuggestion(int committeeId, int suggestionId)
         {
             var userAndOrg = GetUserAndOrganization();
@@ -155,6 +159,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
+        [ProducesResponseType(typeof(IEnumerable<CommitteeSuggestionViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSuggestions(int id)
         {
             if (id == 0)

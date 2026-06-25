@@ -90,6 +90,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Room)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public override async Task<IActionResult> Delete(int id)
         {
             try
@@ -146,6 +147,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
+        [ProducesResponseType(typeof(RoomViewModel), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             return await base.Get(id, includeProperties);

@@ -78,6 +78,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
@@ -110,6 +111,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteComment(int id)
         {
             if (!ModelState.IsValid)
@@ -135,6 +137,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Hide")]
         [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)
@@ -160,6 +163,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)

@@ -30,6 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(typeof(UpdatedFilterPresetViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(ManageFilterPresetViewModel manageViewModel)
         {
             if (!ModelState.IsValid)
@@ -57,6 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPresetsForPage")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(typeof(IEnumerable<FilterPresetViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPresets(PageType pageType)
         {
             try
@@ -76,6 +78,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetFilters")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(typeof(IEnumerable<FiltersViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetFilters([FromQuery] FilterType[] filterTypes)
         {
             try

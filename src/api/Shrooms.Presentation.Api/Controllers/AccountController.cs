@@ -83,6 +83,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [Route("Register")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -125,6 +126,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RequestPasswordReset")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RequestPasswordReset([FromBody] ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -147,6 +149,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("VerifyEmail")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailViewModel model)
         {
             if (!ModelState.IsValid)
@@ -174,6 +177,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("ResetPassword")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -201,6 +205,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("InternalLogins")]
+        [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetInternalLogins()
         {
             var logins = new List<ExternalLoginViewModel>();
@@ -218,6 +223,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
             if (!User.Identity.IsAuthenticated)
@@ -235,6 +241,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("ExternalLogins")]
+        [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
             var logins = new List<ExternalLoginViewModel>();

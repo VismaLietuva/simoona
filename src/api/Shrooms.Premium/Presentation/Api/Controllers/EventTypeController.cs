@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -32,6 +33,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Types")]
+        [ProducesResponseType(typeof(IEnumerable<EventTypeViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetEventTypes()
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
@@ -43,6 +45,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Get")]
+        [ProducesResponseType(typeof(EventTypeViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
         {
             if (id == 0)
@@ -68,6 +71,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(CreateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
@@ -94,6 +98,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
@@ -120,6 +125,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -140,6 +146,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Groups")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSingleJoinGroupNames()
         {
             try

@@ -70,6 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetRolesForAutocomplete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
+        [ProducesResponseType(typeof(IEnumerable<RoleViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetRolesForAutoComplete(string search)
         {
             if (string.IsNullOrEmpty(search))
@@ -85,6 +86,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPermissionGroups")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
+        [ProducesResponseType(typeof(IEnumerable<PermissionGroupViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPermissionGroups()
         {
             var roleGroups = await _permissionService.GetGroupNamesAsync(GetUserAndOrganization().OrganizationId);
@@ -95,6 +97,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
         [Route("Get")]
+        [ProducesResponseType(typeof(RoleDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(string roleId)
         {
             if (string.IsNullOrEmpty(roleId))
@@ -132,6 +135,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [Route("Post")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Post([FromBody] RoleMiniViewModel roleViewModel)
         {
             if (await _roleRepository.Get(r => r.Name == roleViewModel.Name).AnyAsync())
@@ -157,6 +161,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [Route("Put")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Put([FromBody] RoleMiniViewModel roleViewModel)
         {
             if (_roleRepository.Get(r => r.Name == roleViewModel.Name && r.Id != roleViewModel.Id).Any())
@@ -178,6 +183,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(string roleId)
         {
             var role = await _roleManager.FindByIdAsync(roleId);

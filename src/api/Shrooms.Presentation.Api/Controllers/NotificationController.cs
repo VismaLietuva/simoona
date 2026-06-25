@@ -33,6 +33,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> MarkAsRead(IEnumerable<int> ids)
         {
             await _notificationService.MarkAsReadAsync(GetUserAndOrganization(), ids);
@@ -41,6 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> MarkAllAsRead()
         {
             await _notificationService.MarkAllAsReadAsync(GetUserAndOrganization());

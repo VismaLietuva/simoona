@@ -29,6 +29,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
         [Route("Types")]
+        [ProducesResponseType(typeof(IEnumerable<JobTypeViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetJobTypes()
         {
             var jobTypeDto = await _jobService.GetJobTypesAsync(GetUserAndOrganization());
@@ -40,6 +41,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
         [Route("Get")]
+        [ProducesResponseType(typeof(JobTypeViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0)
@@ -63,6 +65,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(NewJobTypeViewModel jobTypeViewModel)
         {
             if (!ModelState.IsValid)
@@ -87,6 +90,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(JobTypeViewModel jobTypeViewModel)
         {
             if (!ModelState.IsValid)
@@ -111,6 +115,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Job)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id < 1)

@@ -2,6 +2,7 @@
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Employees;
 using Shrooms.Presentation.Common.Controllers;
@@ -30,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("")]
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
+        [ProducesResponseType(typeof(PagedViewModel<EmployeeViewModel>), StatusCodes.Status200OK)]
         public virtual async Task<IActionResult> GetPagedEmployees([FromQuery] EmployeeListingArgsViewModel employeeArgsViewModel)
         {
             if (!ModelState.IsValid)

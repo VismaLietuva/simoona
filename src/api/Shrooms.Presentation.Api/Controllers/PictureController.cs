@@ -31,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Upload")]
         [PermissionAuthorize(Permission = BasicPermissions.Picture)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             var validationResult = ValidateUpload(file);
@@ -55,6 +56,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("UploadOriginal")]
         [PermissionAuthorize(Permission = BasicPermissions.Picture)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> UploadOriginal(IFormFile file)
         {
             var validationResult = ValidateUpload(file);

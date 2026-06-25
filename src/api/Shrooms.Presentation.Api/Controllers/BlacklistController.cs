@@ -30,6 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
+        [ProducesResponseType(typeof(CreateBlacklistUserViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> AddToBlacklist(CreateBlacklistUserViewModel createViewModel)
         {
             if (!ModelState.IsValid)
@@ -54,6 +55,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
+        [ProducesResponseType(typeof(UpdateBlacklistUserViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateBlacklist([FromQuery] UpdateBlacklistUserViewModel updateViewModel)
         {
             if (!ModelState.IsValid)
@@ -78,6 +80,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("{id}/Cancel")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CancelBlacklist(string id)
         {
             try
@@ -95,6 +98,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.Blacklist)]
+        [ProducesResponseType(typeof(BlacklistUserViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActiveBlacklist(string id)
         {
             var blacklistUserDto = await _blacklistService.GetAsync(id, GetUserAndOrganization());
@@ -111,6 +115,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("{id}/History")]
+        [ProducesResponseType(typeof(IEnumerable<BlacklistUserViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBlacklistHistory(string id)
         {
             try

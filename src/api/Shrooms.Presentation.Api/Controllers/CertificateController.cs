@@ -58,6 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
+        [ProducesResponseType(typeof(CertificateMiniViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Post(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
@@ -96,6 +97,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             var currentUserId = GetUserAndOrganization().UserId;
@@ -124,6 +126,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
+        [ProducesResponseType(typeof(CertificateMiniViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> Put(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)

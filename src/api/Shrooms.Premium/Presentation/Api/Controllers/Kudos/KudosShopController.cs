@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -29,6 +30,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateItem(KudosShopItemViewModel kudosShopItemViewModel)
         {
             if (!ModelState.IsValid)
@@ -53,6 +55,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpGet]
         [Route("Get")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
+        [ProducesResponseType(typeof(KudosShopItemViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetItem(int id)
         {
             if (id <= 0)
@@ -75,6 +78,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpGet]
         [Route("All")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
+        [ProducesResponseType(typeof(IEnumerable<KudosShopItemViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllItems()
         {
             var userOrganization = GetUserAndOrganization();
@@ -86,6 +90,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateItem(KudosShopItemViewModel kudosShopItemViewModel)
         {
             if (!ModelState.IsValid)
@@ -110,6 +115,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosShop)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteItem(int id)
         {
             if (id <= 0)

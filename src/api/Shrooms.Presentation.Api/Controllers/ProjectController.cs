@@ -30,6 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("List")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(typeof(IEnumerable<ProjectsListItemViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProjects()
         {
             var projectsDto = await _projectsService.GetProjectsAsync(GetUserAndOrganization());
@@ -41,6 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Project)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> NewProject(NewProjectViewModel viewModel)
         {
             if (!ModelState.IsValid)
@@ -66,6 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("Edit")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(typeof(EditProjectDisplayViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProjectForEdit(int id)
         {
             if (id < 1)
@@ -92,6 +95,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(EditProjectViewModel viewModel)
         {
             if (!ModelState.IsValid)
@@ -120,6 +124,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("AutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(typeof(IEnumerable<ProjectsBasicInfoViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetForAutoComplete(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -136,6 +141,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Project)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id < 1)
@@ -161,6 +167,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(typeof(ProjectDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProjectDetails(int projectId)
         {
             try
@@ -178,6 +185,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("ExpelMember")]
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ExpelMember(int projectId, string userId)
         {
             try

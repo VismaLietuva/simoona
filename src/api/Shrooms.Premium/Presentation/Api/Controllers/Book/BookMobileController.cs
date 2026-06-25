@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
@@ -28,6 +29,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(RetrievedMobileBookInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBook([FromQuery] BookMobileGetViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
@@ -50,6 +52,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(RetrievedBookForPostViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBookForPostAsync(string code, int organizationId)
         {
             if (!ModelState.IsValid)
@@ -70,6 +73,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<MobileUserViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUsersForAutoComplete(string search, int organizationId)
         {
             if (!ModelState.IsValid)
@@ -83,6 +87,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<OfficeBookViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOffices(int organizationId)
         {
             var officeBookDto = await _bookMobileService.GetOfficesAsync(organizationId);
@@ -91,6 +96,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PostBook(BookMobilePostViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
@@ -112,6 +118,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
+        [ProducesResponseType(typeof(IEnumerable<BookMobileLogViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> ReturnBook(BookMobileReturnViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
@@ -138,6 +145,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ReturnSpecificBook(int bookLogId)
         {
             try
@@ -153,6 +161,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> TakeBook(BookMobileTakeViewModel bookViewModel)
         {
             if (!ModelState.IsValid)

@@ -31,6 +31,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Vacation)]
+        [ProducesResponseType(typeof(VacationImportStatusDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -51,6 +52,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Vacation)]
+        [ProducesResponseType(typeof(VacationAvailableDaysViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> AvailableDays()
         {
             var availableDaysDto = await _vacationService.GetAvailableDaysAsync(GetUserAndOrganization());
@@ -61,6 +63,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Vacation)]
+        [ProducesResponseType(typeof(VacationViewModel[]), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetVacationHistory()
         {
             try
