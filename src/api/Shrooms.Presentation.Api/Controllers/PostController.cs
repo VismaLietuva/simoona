@@ -43,6 +43,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("GetPost")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
         public async Task<IActionResult> GetPost(int postId)
         {
