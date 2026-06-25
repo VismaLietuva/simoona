@@ -111,16 +111,13 @@ namespace Shrooms.Presentation.Api.Middlewares
 
         private bool TryFindTenant(out string tenantName, string tenantKey)
         {
-            // Try Organizations section in configuration
-            tenantName = _configuration[$"Organizations:{tenantKey}"] != null ? tenantKey : null;
-            if (tenantName != null)
-            {
-                return true;
-            }
-
-            // Fall back to checking if a connection string exists with this name
+            // A tenant is only valid in the current environment if both:
+            //   1. it's registered in the Organizations section, AND
+            //   2. it has a non-empty connection string.
+            // This prevents accepting requests for tenants whose DB isn't provisioned here.
+            var organizationsEntry = _configuration[$"Organizations:{tenantKey}"];
             var connStr = _configuration.GetConnectionString(tenantKey);
-            if (!string.IsNullOrEmpty(connStr))
+            if (organizationsEntry != null && !string.IsNullOrWhiteSpace(connStr))
             {
                 tenantName = tenantKey;
                 return true;

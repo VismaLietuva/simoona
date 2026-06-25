@@ -304,13 +304,39 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var connStr = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
-    var options = new DbContextOptionsBuilder<ShroomsDbContext>()
-        .UseSqlServer(connStr)
-        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
-        .Options;
-    using var db = new ShroomsDbContext(options);
-    db.Database.Migrate();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    var tenants = configuration.GetSection("Organizations").GetChildren()
+        .Select(c => c.Key)
+        .ToList();
+
+    foreach (var tenant in tenants)
+    {
+        var connStr = configuration.GetConnectionString(tenant);
+        if (string.IsNullOrWhiteSpace(connStr) || connStr.StartsWith("$("))
+        {
+            logger.LogInformation("Skipping migration for tenant '{Tenant}' — no connection string configured.", tenant);
+            continue;
+        }
+
+        try
+        {
+            _ = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connStr);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(ex, "Skipping migration for tenant '{Tenant}' — connection string is malformed.", tenant);
+            continue;
+        }
+
+        logger.LogInformation("Migrating tenant '{Tenant}'.", tenant);
+        var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+            .UseSqlServer(connStr)
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
+            .Options;
+        using var db = new ShroomsDbContext(options);
+        db.Database.Migrate();
+    }
 }
 
 // Middleware pipeline
