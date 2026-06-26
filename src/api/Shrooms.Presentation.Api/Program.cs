@@ -108,7 +108,14 @@ builder.Services.AddAuthentication(options =>
         OnAuthenticationFailed = context =>
         {
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            logger.LogError(context.Exception, "JWT authentication failed for {Path}", context.Request.Path);
+            if (context.Exception is SecurityTokenException)
+            {
+                logger.LogDebug("JWT rejected for {Path}: {Message}", context.Request.Path, context.Exception.Message);
+            }
+            else
+            {
+                logger.LogError(context.Exception, "JWT authentication failed for {Path}", context.Request.Path);
+            }
             return Task.CompletedTask;
         }
     };
