@@ -850,7 +850,9 @@ namespace Shrooms.Domain.Services.Wall
                     // Don't simplify, since it's EF projection
                     IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
                     Type = w.Type,
-                    Logo = w.Logo
+                    Logo = w.Logo,
+                    TotalMembers = w.Members.Count,
+                    PostsCount = w.Posts.Count
                 })
                 .ToListAsync();
 
@@ -870,6 +872,8 @@ namespace Shrooms.Domain.Services.Wall
                     Type = wall.Type,
                     IsFollowing = true,
                     Logo = wall.Logo,
+                    TotalMembers = wall.Members.Count,
+                    PostsCount = wall.Posts.Count,
                     UserId = wallUser.UserId
                 })
                 .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
@@ -880,7 +884,9 @@ namespace Shrooms.Domain.Services.Wall
                     Description = x.Description,
                     Type = x.Type,
                     IsFollowing = true,
-                    Logo = x.Logo
+                    Logo = x.Logo,
+                    TotalMembers = x.TotalMembers,
+                    PostsCount = x.PostsCount
                 })
                 .Distinct()
                 .ToListAsync();
