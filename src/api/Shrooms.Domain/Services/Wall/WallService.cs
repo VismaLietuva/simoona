@@ -57,16 +57,22 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<int> CreateNewWallAsync(CreateWallDto newWallDto)
         {
-            var alreadyExists = await _wallsDbSet
-                .AnyAsync(w =>
-                    w.OrganizationId == newWallDto.OrganizationId &&
-                    w.Name == newWallDto.Name &&
-                    (w.Type == WallType.UserCreated ||
-                     w.Type == WallType.Main));
-
-            if (alreadyExists)
+            // Uniqueness is only enforced for user-visible walls (UserCreated/Main).
+            // Events and Project walls live in their own naming context and may share
+            // a name with each other or with an existing user-created wall.
+            if (newWallDto.Type == WallType.UserCreated || newWallDto.Type == WallType.Main)
             {
-                throw new ValidationException(ErrorCodes.WallNameAlreadyExists, "Wall name already exists");
+                var alreadyExists = await _wallsDbSet
+                    .AnyAsync(w =>
+                        w.OrganizationId == newWallDto.OrganizationId &&
+                        w.Name == newWallDto.Name &&
+                        (w.Type == WallType.UserCreated ||
+                         w.Type == WallType.Main));
+
+                if (alreadyExists)
+                {
+                    throw new ValidationException(ErrorCodes.WallNameAlreadyExists, "Wall name already exists");
+                }
             }
 
             if (newWallDto.MembersIds == null || newWallDto.MembersIds.Any())
