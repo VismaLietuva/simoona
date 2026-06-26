@@ -49,7 +49,10 @@ builder.Services.AddScoped<ShroomsDbContext>(sp =>
         w.Log(CoreEventId.InvalidIncludePathError);
     });
     var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-    return new ShroomsDbContext(optionsBuilder.Options, httpContextAccessor);
+    return new ShroomsDbContext(optionsBuilder.Options, httpContextAccessor)
+    {
+        ConnectionName = tenantName
+    };
 });
 builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbContext>());
 

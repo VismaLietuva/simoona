@@ -39,8 +39,9 @@ namespace Shrooms.DataLayer.DAL
             _httpContextAccessor = httpContextAccessor;
         }
 
-        // For backward compatibility - connection string based initialization
-        public string ConnectionName { get; private set; }
+        // Tenant key the DbContext was resolved for. Assigned by the DI factory so
+        // background workers (AsyncRunner) can flow the tenant via _uow.ConnectionName.
+        public string ConnectionName { get; set; }
 
         public virtual DbSet<Office> Offices { get; set; }
 
