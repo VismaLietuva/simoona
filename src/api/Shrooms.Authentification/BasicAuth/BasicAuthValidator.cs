@@ -28,7 +28,10 @@ namespace Shrooms.Authentification.BasicAuth
 
             var tenantName = httpContext.Items["tenantName"] as string;
 
-            if (userName != _appSettings.BasicUsername && password != _appSettings.BasicPassword && DoesOrganizationExists(tenantName))
+            // Reject if any of: username mismatch, password mismatch, tenant unknown.
+            // The previous `&&` chain only rejected when all three failed, so a one-correct-field
+            // combination (e.g. right username, wrong password) authenticated successfully.
+            if (userName != _appSettings.BasicUsername || password != _appSettings.BasicPassword || !DoesOrganizationExists(tenantName))
             {
                 return null;
             }
