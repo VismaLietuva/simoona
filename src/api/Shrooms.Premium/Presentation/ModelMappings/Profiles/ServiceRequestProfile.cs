@@ -33,7 +33,10 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelMappings()
         {
-            CreateMap<ServiceRequestViewModel, ServiceRequest>(MemberList.None).ReverseMap();
+            CreateMap<ServiceRequestViewModel, ServiceRequest>(MemberList.None);
+            CreateMap<ServiceRequest, ServiceRequestViewModel>(MemberList.None)
+                .ForMember(dest => dest.KudosShopItem,
+                    opt => opt.MapFrom(src => src.KudosShopItemId.HasValue ? src.KudosShopItem : null));
             CreateMap<ServiceRequestPostViewModel, ServiceRequest>(MemberList.None).ReverseMap();
 
             CreateMap<ServiceRequestComment, ServiceRequestCommentViewModel>(MemberList.None)
