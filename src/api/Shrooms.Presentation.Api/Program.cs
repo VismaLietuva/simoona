@@ -19,6 +19,7 @@ using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.Api.Caching;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -306,7 +307,9 @@ builder.Services.AddImageSharp(options =>
     options.CacheFolder = "storage-cache";
 })
 .ClearProviders()
-.AddProvider<StorageImageProvider>();
+.AddProvider<StorageImageProvider>()
+.RemoveProcessor<ResizeWebProcessor>()
+.AddProcessor<ClampingResizeWebProcessor>();
 
 if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
 {
