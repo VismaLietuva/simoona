@@ -93,6 +93,55 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Add_Second_Reaction_Of_Different_Type()
+        {
+            var post = new Post
+            {
+                Id = 1,
+                Likes = new LikesCollection { new Like("user1", LikeTypeEnum.Like) },
+                Wall = new Wall
+                {
+                    OrganizationId = 2
+                }
+            };
+
+            _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Love },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            var likes = _postsDbSet.First().Likes;
+            Assert.That(likes.Count, Is.EqualTo(2));
+            Assert.That(likes.Any(l => l.UserId == "user1" && l.Type == LikeTypeEnum.Like), Is.True);
+            Assert.That(likes.Any(l => l.UserId == "user1" && l.Type == LikeTypeEnum.Love), Is.True);
+        }
+
+        [Test]
+        public async Task Should_Remove_Only_Matching_Type_When_User_Has_Multiple_Reactions()
+        {
+            var post = new Post
+            {
+                Id = 1,
+                Likes = new LikesCollection
+                {
+                    new Like("user1", LikeTypeEnum.Like),
+                    new Like("user1", LikeTypeEnum.Love),
+                },
+                Wall = new Wall
+                {
+                    OrganizationId = 2
+                }
+            };
+
+            _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            var likes = _postsDbSet.First().Likes;
+            Assert.That(likes.Count, Is.EqualTo(1));
+            Assert.That(likes.Single().Type, Is.EqualTo(LikeTypeEnum.Love));
+        }
+
+        [Test]
         public void Should_Throw_If_There_Is_No_Post_To_Be_Liked()
         {
             _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());

@@ -53,7 +53,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 userOrg,
                 checkForAdministrationEventPermission: false);
 
-            var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
+            var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
 
             if (like == null)
             {

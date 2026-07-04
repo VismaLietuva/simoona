@@ -42,10 +42,11 @@
 
         function unlikePost() {
             if (vm.messageObject.id) {
+                var myType = getMyReactionType();
                 removeLikeFromList();
                 vm.messageObject.isLiked = false;
 
-                messageLikeRepository.togglePostLike(vm.messageObject.id);
+                messageLikeRepository.togglePostLike(vm.messageObject.id, myType);
             }
         }
 
@@ -60,11 +61,19 @@
 
         function unlikeComment() {
             if (vm.messageObject.id) {
+                var myType = getMyReactionType();
                 removeLikeFromList();
                 vm.messageObject.isLiked = false;
 
-                messageLikeRepository.toggleCommentLike(vm.messageObject.id);
+                messageLikeRepository.toggleCommentLike(vm.messageObject.id, myType);
             }
+        }
+
+        function getMyReactionType() {
+            var myLike = lodash.find(vm.messageObject.likes, {
+                userId: authService.identity.userId
+            });
+            return myLike ? myLike.type : 0;
         }
 
         function addLikeToList($likeType) {

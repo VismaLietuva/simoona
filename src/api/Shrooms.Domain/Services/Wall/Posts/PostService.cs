@@ -117,7 +117,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     userOrg,
                     checkForAdministrationEventPermission: false);
 
-                var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
+                var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
                 if (like == null)
                 {
                     post.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
