@@ -68,6 +68,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         }
 
         [HttpGet]
+        [Route("Counts")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
+        [ProducesResponseType(typeof(IEnumerable<LotteryStatusCountDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetLotteryStatusCounts()
+        {
+            var counts = await _lotteryService.GetLotteryStatusCountsAsync(GetUserAndOrganization());
+
+            return Ok(counts);
+        }
+
+        [HttpGet]
         [Route("{id}/Details")]
         [ProducesResponseType(typeof(LotteryDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetLottery(int id, bool includeBuyer = false)
