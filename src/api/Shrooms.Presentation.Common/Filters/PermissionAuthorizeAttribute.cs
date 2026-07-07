@@ -34,6 +34,14 @@ namespace Shrooms.Presentation.Common.Filters
 
         public string Permission { get; set; }
 
+        // Any-of set: user is permitted if they hold at least one of these,
+        // in addition to satisfying Permission / the AND-list. Use when an
+        // endpoint is legitimately callable through more than one permission
+        // (e.g. GET /Kudos/GetKudosTypes is used by both the kudosify modal
+        // — BasicPermissions.Kudos — and the admin panel —
+        // AdministrationPermissions.Kudos).
+        public string[] AnyOf { get; set; }
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             if (!context.HttpContext.User.Identity.IsAuthenticated)
@@ -57,7 +65,8 @@ namespace Shrooms.Presentation.Common.Filters
             };
 
             var isPermitted = this.permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
-                && (this.Permission == null || permissionService.UserHasPermission(userAndOrg, this.Permission));
+                && (this.Permission == null || permissionService.UserHasPermission(userAndOrg, this.Permission))
+                && (this.AnyOf == null || this.AnyOf.Length == 0 || this.AnyOf.Any(p => permissionService.UserHasPermission(userAndOrg, p)));
 
             if (!isPermitted)
             {

@@ -27,7 +27,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("List")]
-        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.ExternalLink, AdministrationPermissions.ExternalLink })]
         [ProducesResponseType(typeof(IEnumerable<ExternalLinkViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.ExternalLink, AdministrationPermissions.ExternalLink })]
         [ProducesResponseType(typeof(ExternalLinkViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetExternalLink(int id)
         {

@@ -148,7 +148,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos })]
         public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypes()
         {
             var kudosTypeDto = await _kudosService.GetKudosTypesAsync(GetUserAndOrganization());
@@ -166,7 +166,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos })]
         [ProducesResponseType(typeof(KudosTypeViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditType(int id)
         {
