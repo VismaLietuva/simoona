@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using System.Collections.Generic;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
@@ -11,7 +12,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class Books : Profile
     {
-        protected override void Configure()
+        public Books()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -19,23 +20,28 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<RetrievedBookInfoDto, RetrievedBookForPostViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookForPostViewModel>(MemberList.None);
 
-            CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>();
-            CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>();
-            CreateMap<BasicBookUserDto, BasicBookUserViewModel>();
-            CreateMap<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>();
-            CreateMap<BookDetailsDto, BookDetailsViewModel>();
-            CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>();
-            CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>();
-            CreateMap<BookQuantityByOfficeDto, BookQuantityByOfficeViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>(MemberList.None);
+            CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>(MemberList.None);
+            CreateMap<BasicBookUserDto, BasicBookUserViewModel>(MemberList.None);
+            CreateMap<ILazyPaged<BooksByOfficeDto>, LazyPaged<BooksByOfficeViewModel>>(MemberList.None)
+                .ConstructUsing((src, ctx) => new LazyPaged<BooksByOfficeViewModel>(
+                    ctx.Mapper.Map<IEnumerable<BooksByOfficeViewModel>>(src.Entries),
+                    src.Page,
+                    src.PageSize,
+                    src.ItemCount));
+            CreateMap<BookDetailsDto, BookDetailsViewModel>(MemberList.None);
+            CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>(MemberList.None);
+            CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>(MemberList.None);
+            CreateMap<BookQuantityByOfficeDto, BookQuantityByOfficeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<NewBookViewModel, NewBookDto>();
-            CreateMap<NewBookQuantityViewModel, NewBookQuantityDto>();
-            CreateMap<EditBookViewModel, EditBookDto>();
+            CreateMap<NewBookViewModel, NewBookDto>(MemberList.None);
+            CreateMap<NewBookQuantityViewModel, NewBookQuantityDto>(MemberList.None);
+            CreateMap<EditBookViewModel, EditBookDto>(MemberList.None);
         }
     }
 }

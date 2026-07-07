@@ -1,8 +1,8 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Tests.Extensions;
 using Shrooms.Domain.Services.Events;
 using Shrooms.Contracts.Infrastructure;
@@ -60,7 +60,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            Assert.AreEqual(eventCount, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(eventCount));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            Assert.That(result.Any(), Is.False);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            Assert.That(result.Any(), Is.False);
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            Assert.IsFalse(result.Any());
+            Assert.That(result.Any(), Is.False);
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId, eventCount);
 
             // Assert
-            CollectionAssert.AreEqual(result.OrderBy(x => x.RegistrationDeadlineDate).ThenBy(x => x.StartDate), result);
+            Assert.That(result, Is.EqualTo(result.OrderBy(x => x.RegistrationDeadlineDate).ThenBy(x => x.StartDate)));
         }
 
         [Test]
@@ -173,7 +173,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _sut.GetUpcomingEventsAsync(DefaultOrganizationId);
 
             // Assert
-            Assert.AreEqual(eventsWithUpcomingTypeSet, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(eventsWithUpcomingTypeSet));
         }
 
         private List<Event> CreateEventsForGetUpcomingEventsAsyncTest(

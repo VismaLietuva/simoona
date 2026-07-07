@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
@@ -16,7 +16,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Walls : Profile
     {
-        protected override void Configure()
+        public Walls()
         {
             CreateViewModelToDtoMappings();
             CreateDtoToViewModelMappings();
@@ -25,46 +25,46 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<WallDto, WallListViewModel>();
-            CreateMap<UserWallDto, UserWallViewModel>();
-            CreateMap<ModeratorDto, ModeratorViewModel>();
-            CreateMap<WallMemberDto, WallMemberViewModel>();
+            CreateMap<WallDto, WallListViewModel>(MemberList.None);
+            CreateMap<UserWallDto, UserWallViewModel>(MemberList.None);
+            CreateMap<ModeratorDto, ModeratorViewModel>(MemberList.None);
+            CreateMap<WallMemberDto, WallMemberViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateWallViewModel, CreateWallDto>()
+            CreateMap<CreateWallViewModel, CreateWallDto>(MemberList.None)
                 .ForMember(dest => dest.ModeratorsIds, opt => opt.MapFrom(src => src.Moderators.Select(x => x.Id)))
                 .Ignore(x => x.Access)
                 .Ignore(x => x.MembersIds)
                 .Ignore(x => x.Type)
                 .IgnoreUserOrgDto();
-            CreateMap<UpdateWallViewModel, UpdateWallDto>()
+            CreateMap<UpdateWallViewModel, UpdateWallDto>(MemberList.None)
                 .ForMember(dest => dest.ModeratorsIds, opt => opt.MapFrom(src => src.Moderators.Select(x => x.Id)))
                 .IgnoreUserOrgDto();
         }
 
         private void CreateEntitiesToDtoMappings()
         {
-            CreateMap<Post, PostDto>()
+            CreateMap<Post, PostDto>(MemberList.None)
                 .ForMember(m => m.Author, opt => opt.Ignore())
                 .ForMember(m => m.Likes, opt => opt.Ignore())
                 .ForMember(m => m.IsLiked, opt => opt.Ignore())
                 .ForMember(m => m.IsEdited, opt => opt.Ignore())
                 .ForMember(m => m.CanModerate, opt => opt.Ignore())
-                .ForMember(m => m.Comments, opt => opt.UseValue(new List<CommentDto>()))
+                .ForMember(m => m.Comments, opt => opt.MapFrom(src => new List<CommentDto>()))
                 .ForMember(m => m.WallType, opt => opt.MapFrom(s => s.Wall.Type))
                 .ForMember(m => m.WallName, opt => opt.MapFrom(s => s.Wall.Name))
                 .ForMember(m => m.IsWatched, opt => opt.Ignore());
 
-            CreateMap<Comment, CommentDto>()
+            CreateMap<Comment, CommentDto>(MemberList.None)
                 .ForMember(m => m.Author, opt => opt.Ignore())
                 .ForMember(m => m.Likes, opt => opt.Ignore())
                 .ForMember(m => m.IsLiked, opt => opt.Ignore())
                 .ForMember(m => m.IsEdited, opt => opt.Ignore())
                 .ForMember(m => m.CanModerate, opt => opt.Ignore());
 
-            CreateMap<ApplicationUser, UserDto>()
+            CreateMap<ApplicationUser, UserDto>(MemberList.None)
                 .ForMember(m => m.UserId, opt => opt.MapFrom(s => s.Id))
                 .ForMember(m => m.FullName, opt => opt.MapFrom(s => s.FullName))
                 .ForMember(m => m.PictureId, opt => opt.MapFrom(s => s.PictureId));

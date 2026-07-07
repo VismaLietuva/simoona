@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 using Shrooms.Tests.Extensions;
@@ -16,7 +16,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             var viewModel = CreateValidViewModel();
 
             // Assert
-            Assert.IsTrue(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.True);
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.Id = 0;
 
             // Assert
-            Assert.IsFalse(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.False);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.MessageBody = null;
 
             // Assert
-            Assert.IsTrue(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.True);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.MessageBody = null;
 
             // Assert
-            Assert.IsFalse(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.False);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.MessageBody = null;
 
             // Assert
-            Assert.IsFalse(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.False);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.MessageBody = null;
 
             // Assert
-            Assert.IsFalse(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.False);
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.MessageBody = new string('-', ValidationConstants.MaxPostMessageBodyLength + 1);
 
             // Assert
-            Assert.IsFalse(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.False);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             viewModel.PictureId = "id";
 
             // Assert
-            Assert.IsTrue(viewModel.IsValid());
+            Assert.That(viewModel.IsValid(), Is.True);
         }
 
         private EditPostViewModel CreateValidViewModel()

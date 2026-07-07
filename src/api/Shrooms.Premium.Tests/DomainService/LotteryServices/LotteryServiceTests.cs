@@ -1,5 +1,6 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
@@ -16,7 +17,7 @@ using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -269,7 +270,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var actual = await _sut.GetLotteryDetailsAsync(int.MaxValue, false, userOrg);
 
             // Assert
-            Assert.IsNull(actual);
+            ClassicAssert.IsNull(actual);
         }
 
         [Test]
@@ -308,7 +309,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, false, userOrg);
 
             // Assert
-            Assert.AreEqual(expected, actual.Participants);
+            ClassicAssert.AreEqual(expected, actual.Participants);
         }
 
         [Test]
@@ -359,7 +360,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 .Received(1)
                 .CheckIfBuyerExists(Arg.Any<ApplicationUser>());
 
-            Assert.NotNull(actual.Buyer);
+            ClassicAssert.NotNull(actual.Buyer);
         }
 
         [Test]
@@ -421,7 +422,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 .Received(1)
                 .CheckIfBuyerExists(Arg.Any<ApplicationUser>());
 
-            Assert.AreEqual(expected, actual.Buyer.RemainingGiftedTicketCount);
+            ClassicAssert.AreEqual(expected, actual.Buyer.RemainingGiftedTicketCount);
         }
 
         [Test]
@@ -443,7 +444,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, false, userOrg);
 
             // Assert
-            Assert.IsNull(actual.Buyer);
+            ClassicAssert.IsNull(actual.Buyer);
         }
 
         [Test]
@@ -456,7 +457,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.AbortLotteryAsync(default, default);
 
             // Assert
-            Assert.AreEqual(false, result);
+            ClassicAssert.AreEqual(false, result);
         }
 
         [TestCase(1)]
@@ -471,7 +472,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.AbortLotteryAsync(lotteryId, GetUserOrg());
 
             // Assert
-            Assert.AreEqual(expected: true, result);
+            ClassicAssert.AreEqual(expected: true, result);
         }
 
         [Test]
@@ -566,9 +567,9 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.GetLotteryStatsAsync(lotteryId, GetUserOrg());
 
             // Assert
-            Assert.AreEqual(expected.TotalParticipants, result.TotalParticipants);
-            Assert.AreEqual(expected.KudosSpent, result.KudosSpent);
-            Assert.AreEqual(expected.TicketsSold, result.TicketsSold);
+            ClassicAssert.AreEqual(expected.TotalParticipants, result.TotalParticipants);
+            ClassicAssert.AreEqual(expected.KudosSpent, result.KudosSpent);
+            ClassicAssert.AreEqual(expected.TicketsSold, result.TicketsSold);
         }
 
         [Test]
@@ -581,7 +582,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.GetLotteriesAsync(new UserAndOrganizationDto { OrganizationId = 12345 });
 
             // Assert
-            Assert.AreEqual(2, result.Count());
+            ClassicAssert.AreEqual(2, result.Count());
         }
 
         [Test]
@@ -599,8 +600,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.GetLotteryStatusAsync(1, GetUserOrg());
 
             // Assert
-            Assert.AreEqual(expected.LotteryStatus, result.LotteryStatus);
-            Assert.AreEqual(expected.RefundFailed, result.RefundFailed);
+            ClassicAssert.AreEqual(expected.LotteryStatus, result.LotteryStatus);
+            ClassicAssert.AreEqual(expected.RefundFailed, result.RefundFailed);
         }
 
         [Test]
@@ -824,7 +825,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.GetPagedLotteriesAsync(args, userOrg);
 
             // Assert
-            Assert.AreEqual(expectedCount, result.Count);
+            ClassicAssert.AreEqual(expectedCount, result.Count);
         }
 
         [Test]
@@ -878,7 +879,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var result = await _sut.GetPagedLotteriesAsync(args, userOrg);
 
             // Assert
-            Assert.IsTrue(result.FirstOrDefault().RefundFailed);
+            ClassicAssert.IsTrue(result.FirstOrDefault().RefundFailed);
         }
 
         [Test]
@@ -888,7 +889,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             var result = await _sut.GetRunningLotteriesAsync(GetUserOrg());
 
-            Assert.AreEqual(2, result.Count);
+            ClassicAssert.AreEqual(2, result.Count);
         }
 
         [Test]
@@ -908,7 +909,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var actual = await _sut.GetLotteryByIdAsync(expectedId, userOrg);
 
             // Assert
-            Assert.AreEqual(actual.Id, expectedId);
+            ClassicAssert.AreEqual(actual.Id, expectedId);
         }
 
         [Test]
@@ -926,7 +927,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var actual = await _sut.GetLotteryByIdAsync(1, userOrg);
 
             // Assert
-            Assert.IsNull(actual);
+            ClassicAssert.IsNull(actual);
         }
 
         private IList<LotteryParticipantDto> GetParticipantDto()

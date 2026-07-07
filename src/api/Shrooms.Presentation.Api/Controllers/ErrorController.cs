@@ -1,23 +1,24 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web;
-using System.Web.Http;
-using NLog;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [AllowAnonymous]
-    public class ErrorController : ApiController
+    public class ErrorController : ControllerBase
     {
-        [HttpGet, HttpPost, HttpPut, HttpDelete, HttpHead, HttpOptions]
-        public IHttpActionResult NotFound(string path)
-        {
-            if (Request == null)
-            {
-                Request = new HttpRequestMessage();
-            }
+        private readonly ILogger<ErrorController> _logger;
 
-            LogManager.GetCurrentClassLogger().Log(LogLevel.Info, new HttpException((int)HttpStatusCode.NotFound, $"404 Not Found: /{path}"));
+        public ErrorController(ILogger<ErrorController> logger)
+        {
+            _logger = logger;
+        }
+
+        [HttpGet, HttpPost, HttpPut, HttpDelete, HttpHead, HttpOptions]
+        [Route("Error/NotFound")]
+        public IActionResult HandleNotFound(string path)
+        {
+            _logger.LogInformation("404 Not Found: /{Path}", path);
             return NotFound();
         }
     }

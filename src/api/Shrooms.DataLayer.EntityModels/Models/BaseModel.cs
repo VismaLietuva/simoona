@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class BaseModel : ITrackable, ISoftDelete, IValidatableObject
+    public class BaseModel : ITrackable, IValidatableObject
     {
         [Key]
         public virtual int Id { get; set; }

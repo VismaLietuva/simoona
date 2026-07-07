@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Web;
+using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models.PostModels
@@ -14,7 +14,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.PostModels
 
         public string Map { get; set; }
 
-        public HttpPostedFileBase PostedMapPicture { get; set; }
+        public IFormFile PostedMapPicture { get; set; }
 
         public int OfficeId { get; set; }
 

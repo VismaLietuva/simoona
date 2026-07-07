@@ -1,5 +1,7 @@
 ﻿using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
@@ -7,6 +9,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
     public class LotteryListingArgsViewModel : IPageable, ISortable
     {
         public string Filter { get; set; }
+
+        public IEnumerable<LotteryStatus> Statuses { get; set; }
 
         [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = WebApiConstants.DefaultPageSize;

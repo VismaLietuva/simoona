@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
@@ -49,16 +47,16 @@ namespace Shrooms.Tests.DomainService
             _settings = Substitute.For<IApplicationSettings>();
             _settings.KudosAvailableToSendPerMonth.Returns((int?)50);
 
-            _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
+            _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IAsyncEnumerable<KudosLog>>();
             _kudosLogsDbSet.SetDbSetDataForAsync(MockKudosLogs());
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
 
-            _kudosTypesDbSet = Substitute.For<DbSet<KudosType>, IQueryable<KudosType>, IDbAsyncEnumerable<KudosType>>();
+            _kudosTypesDbSet = Substitute.For<DbSet<KudosType>, IQueryable<KudosType>, IAsyncEnumerable<KudosType>>();
             _kudosTypesDbSet.SetDbSetDataForAsync(MockKudosTypes());
 
-            _organizationDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IDbAsyncEnumerable<Organization>>();
+            _organizationDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IAsyncEnumerable<Organization>>();
             _organizationDbSet.SetDbSetDataForAsync(MockOrganization());
 
             MockFindMethod();
@@ -107,7 +105,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosService.GetKudosLogsAsync(filter);
 
-            Assert.AreEqual(4, result.TotalKudosCount);
+            Assert.That(result.TotalKudosCount, Is.EqualTo(4));
         }
 
         [Test]
@@ -125,7 +123,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosService.GetKudosLogsAsync(filter);
 
-            Assert.AreEqual(2, result.TotalKudosCount);
+            Assert.That(result.TotalKudosCount, Is.EqualTo(2));
         }
 
         [Test]
@@ -143,8 +141,8 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosService.GetKudosLogsAsync(filter);
 
-            Assert.AreEqual(1, result.KudosLogs.Count());
-            Assert.AreEqual(1, result.KudosLogs.First().Id);
+            Assert.That(result.KudosLogs.Count(), Is.EqualTo(1));
+            Assert.That(result.KudosLogs.First().Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -152,7 +150,7 @@ namespace Shrooms.Tests.DomainService
         {
             var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
 
-            Assert.AreEqual(3, result.TotalKudosCount);
+            Assert.That(result.TotalKudosCount, Is.EqualTo(3));
         }
 
         [Test]
@@ -161,8 +159,8 @@ namespace Shrooms.Tests.DomainService
             MockKudosLogsForOrganizationTest();
             var result = await _kudosService.GetUserKudosLogsAsync("UserId", 1, 1);
 
-            Assert.AreEqual(1, result.KudosLogs.Count());
-            Assert.AreEqual(2, result.KudosLogs.First().Id);
+            Assert.That(result.KudosLogs.Count(), Is.EqualTo(1));
+            Assert.That(result.KudosLogs.First().Id, Is.EqualTo(2));
         }
 
         [Test]
@@ -175,7 +173,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg);
 
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -190,8 +188,8 @@ namespace Shrooms.Tests.DomainService
 
             var result = (await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg)).ToList();
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Comment2", result.First().Comment);
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Comment, Is.EqualTo("Comment2"));
         }
 
         [Test]
@@ -199,8 +197,8 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForPieChart();
             var result = (await _kudosService.GetKudosPieChartDataAsync(1, "UserId")).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(3, result.First().Value);
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Value, Is.EqualTo(3));
         }
 
         [Test]
@@ -208,10 +206,10 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForPieChart();
             var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(2, result.First().Value);
-            Assert.AreEqual(10, result.ToArray()[1].Value);
-            Assert.AreEqual("Type2", result.ToArray()[1].Name);
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.First().Value, Is.EqualTo(2));
+            Assert.That(result.ToArray()[1].Value, Is.EqualTo(10));
+            Assert.That(result.ToArray()[1].Name, Is.EqualTo("Type2"));
         }
 
         [Test]
@@ -221,9 +219,9 @@ namespace Shrooms.Tests.DomainService
 
             MockKudosLogsForApprovedList();
             var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 1)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Comment2", result.First().Comments);
-            Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Comments, Is.EqualTo("Comment2"));
+            Assert.That(result.First().Sender.Id, Is.EqualTo("CreatedUserId"));
         }
 
         [Test]
@@ -231,10 +229,10 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForApprovedList();
             var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 2)).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("Comment1", result.First().Comments);
-            Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
-            Assert.AreEqual("Comment3", result.ToArray()[1].Comments);
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result.First().Comments, Is.EqualTo("Comment1"));
+            Assert.That(result.First().Sender.Id, Is.EqualTo("CreatedUserId"));
+            Assert.That(result.ToArray()[1].Comments, Is.EqualTo("Comment3"));
         }
 
         #endregion
@@ -250,7 +248,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
-            Assert.AreEqual(5, types.Count());
+            Assert.That(types.Count(), Is.EqualTo(5));
         }
 
         [Test]
@@ -262,7 +260,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
-            Assert.AreEqual(5, types.Count());
+            Assert.That(types.Count(), Is.EqualTo(5));
         }
 
         [Test]
@@ -274,7 +272,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
-            Assert.IsTrue(types.Any(type => type.IsActive));
+            Assert.That(types.Any(type => type.IsActive), Is.True);
         }
 
         #endregion
@@ -307,8 +305,8 @@ namespace Shrooms.Tests.DomainService
             };
 
             await _kudosService.ApproveKudosAsync(1, userAndOrg);
-            Assert.AreEqual(_kudosLogsDbSet.First().Points, _kudosLogsDbSet.First().Employee.RemainingKudos);
-            Assert.AreEqual(KudosStatus.Approved, _kudosLogsDbSet.First().Status);
+            Assert.That(_kudosLogsDbSet.First().Employee.RemainingKudos, Is.EqualTo(_kudosLogsDbSet.First().Points));
+            Assert.That(_kudosLogsDbSet.First().Status, Is.EqualTo(KudosStatus.Approved));
         }
 
         [Test]
@@ -325,8 +323,8 @@ namespace Shrooms.Tests.DomainService
             await _kudosService.RejectKudosAsync(kudosRejectDto);
 
             var log = await _kudosLogsDbSet.FirstAsync(x => x.Id == 1);
-            Assert.AreEqual(KudosStatus.Rejected, log.Status);
-            Assert.AreEqual("testMessage", log.RejectionMessage);
+            Assert.That(log.Status, Is.EqualTo(KudosStatus.Rejected));
+            Assert.That(log.RejectionMessage, Is.EqualTo("testMessage"));
         }
 
         [Test]
@@ -363,9 +361,9 @@ namespace Shrooms.Tests.DomainService
             MockKudosLogsForProfileUpdate();
 
             _kudosService.UpdateProfileKudosAsync(user, userOrg);
-            Assert.AreEqual(11, user.TotalKudos);
-            Assert.AreEqual(9, user.RemainingKudos);
-            Assert.AreEqual(2, user.SpentKudos);
+            Assert.That(user.TotalKudos, Is.EqualTo(11));
+            Assert.That(user.RemainingKudos, Is.EqualTo(9));
+            Assert.That(user.SpentKudos, Is.EqualTo(2));
         }
 
         #endregion
@@ -437,10 +435,6 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Kudos_Logs_Has_Not_Been_Saved_2()
         {
-            HttpContext.Current = new HttpContext(
-                new HttpRequest("", "http://shrooms", ""),
-                new HttpResponse(new StringWriter()));
-
             var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
@@ -543,14 +537,14 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForStats();
             var actual = (await _kudosService.GetKudosStatsAsync(3, 10, 2)).ToList();
-            Assert.AreEqual("User 1", actual[0].Name);
-            Assert.AreEqual(274.4, actual[0].KudosAmount);
-            Assert.AreEqual("User 3", actual[1].Name);
-            Assert.AreEqual(34, actual[1].KudosAmount);
-            Assert.AreEqual("User 2", actual[2].Name);
-            Assert.AreEqual(20, actual[2].KudosAmount);
-            Assert.AreEqual("User 4", actual[3].Name);
-            Assert.AreEqual(10, actual[3].KudosAmount);
+            Assert.That(actual[0].Name, Is.EqualTo("User 1"));
+            Assert.That(actual[0].KudosAmount, Is.EqualTo(274.4));
+            Assert.That(actual[1].Name, Is.EqualTo("User 3"));
+            Assert.That(actual[1].KudosAmount, Is.EqualTo(34));
+            Assert.That(actual[2].Name, Is.EqualTo("User 2"));
+            Assert.That(actual[2].KudosAmount, Is.EqualTo(20));
+            Assert.That(actual[3].Name, Is.EqualTo("User 4"));
+            Assert.That(actual[3].KudosAmount, Is.EqualTo(10));
         }
 
         #endregion
@@ -562,7 +556,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForStats();
             var actual = await _kudosService.HasPendingKudosAsync("User1");
-            Assert.AreEqual(true, actual);
+            Assert.That(actual, Is.EqualTo(true));
         }
 
         [Test]
@@ -570,7 +564,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForStats();
             var actual = await _kudosService.HasPendingKudosAsync("User2");
-            Assert.AreEqual(false, actual);
+            Assert.That(actual, Is.EqualTo(false));
         }
 
         #endregion
@@ -587,7 +581,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosService.GetSendKudosTypeAsync(userAndOrg);
 
-            Assert.AreEqual(result.Type, KudosTypeEnum.Send);
+            Assert.That(KudosTypeEnum.Send, Is.EqualTo(result.Type));
         }
 
         #endregion

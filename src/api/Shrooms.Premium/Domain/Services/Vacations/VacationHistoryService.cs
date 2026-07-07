@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -10,7 +10,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 {
     public class VacationHistoryService : IVacationHistoryService
     {
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly IVacationBotService _vacationBotService;
 
         public VacationHistoryService(IUnitOfWork2 uow, IVacationBotService vacationBotService)

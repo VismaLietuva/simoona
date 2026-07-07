@@ -1,8 +1,8 @@
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
@@ -10,6 +10,7 @@ using Shrooms.Premium.Domain.Services.Vacations;
 using Shrooms.Premium.Presentation.WebViewModels.Vacations;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -28,31 +29,31 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             _vacationHistoryService = vacationHistoryService;
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Vacation)]
-        public async Task<IHttpActionResult> Upload()
+        [ProducesResponseType(typeof(VacationImportStatusDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (!Request.Content.IsMimeMultipartContent())
+            if (file == null || file.Length == 0)
             {
-                UnsupportedMediaType();
+                return BadRequest("No file uploaded");
             }
 
-            var provider = new MultipartMemoryStreamProvider();
-            await Request.Content.ReadAsMultipartAsync(provider);
-            var fileContent = provider.Contents[0];
-
-            if (fileContent.Headers.ContentLength >= WebApiConstants.MaximumPictureSizeInBytes)
+            if (file.Length >= WebApiConstants.MaximumPictureSizeInBytes)
             {
                 return BadRequest("File is too large");
             }
 
-            var importStatus = _vacationService.UploadVacationReportFileAsync(await fileContent.ReadAsStreamAsync());
+            using var stream = file.OpenReadStream();
+            var importStatus = await _vacationService.UploadVacationReportFileAsync(stream);
 
             return Ok(importStatus);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Vacation)]
-        public async Task<IHttpActionResult> AvailableDays()
+        [ProducesResponseType(typeof(VacationAvailableDaysViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> AvailableDays()
         {
             var availableDaysDto = await _vacationService.GetAvailableDaysAsync(GetUserAndOrganization());
             var availableDaysViewModel = _mapper.Map<VacationAvailableDaysViewModel>(availableDaysDto);
@@ -62,7 +63,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Vacation)]
-        public async Task<IHttpActionResult> GetVacationHistory()
+        [ProducesResponseType(typeof(VacationViewModel[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetVacationHistory()
         {
             try
             {

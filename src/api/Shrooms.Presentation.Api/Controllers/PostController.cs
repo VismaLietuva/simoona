@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
@@ -18,12 +18,13 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("Post")]
+    [Route("Post")]
     public class PostController : BaseController
     {
         private readonly IMapper _mapper;
@@ -42,8 +43,10 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("GetPost")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetPost(int postId)
+        [ProducesResponseType(typeof(WallPostViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPost(int postId)
         {
             try
             {
@@ -67,7 +70,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
+        [ProducesResponseType(typeof(WallPostViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -106,7 +110,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> EditPost(EditPostViewModel editedPost)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
             {
@@ -139,7 +144,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> DeletePost(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeletePost(int id)
         {
             if (id <= 0)
             {
@@ -165,7 +171,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Hide")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> HidePost(HidePostViewModel post)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {
@@ -191,7 +198,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -215,7 +223,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Watch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> WatchPost(HidePostViewModel post)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> WatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {
@@ -238,7 +247,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Unwatch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> UnwatchPost(HidePostViewModel post)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UnwatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {

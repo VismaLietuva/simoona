@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 

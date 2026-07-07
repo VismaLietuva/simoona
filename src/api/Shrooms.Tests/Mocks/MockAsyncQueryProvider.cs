@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Shrooms.Tests.Mocks
 {
@@ -18,25 +17,23 @@ namespace Shrooms.Tests.Mocks
         }
     }
 
-    public class MockDbAsyncQueryProvider<TEntity> : IDbAsyncQueryProvider
+    public class MockAsyncQueryProvider<TEntity> : IAsyncQueryProvider
     {
         private readonly IQueryProvider _inner;
 
-        internal MockDbAsyncQueryProvider(IQueryProvider inner)
+        internal MockAsyncQueryProvider(IQueryProvider inner)
         {
             _inner = inner;
         }
 
         public IQueryable CreateQuery(Expression expression)
         {
-            var convertedExpression = MockQueryExpressionDbFunctionsReplacer.Replace(expression);
-            return new MockDbAsyncEnumerable<TEntity>(convertedExpression);
+            return new MockAsyncEnumerable<TEntity>(expression);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            var convertedExpression = MockQueryExpressionDbFunctionsReplacer.Replace(expression);
-            return new MockDbAsyncEnumerable<TElement>(convertedExpression);
+            return new MockAsyncEnumerable<TElement>(expression);
         }
 
         public object Execute(Expression expression)
@@ -49,104 +46,68 @@ namespace Shrooms.Tests.Mocks
             return _inner.Execute<TResult>(expression);
         }
 
-        public Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken)
+        public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(Execute(expression));
-        }
+            var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            // IQueryProvider has two Execute overloads (generic and non-generic); GetMethod throws AmbiguousMatchException in .NET 10
+            var executeMethod = typeof(IQueryProvider)
+                .GetMethods()
+                .Single(m => m.Name == nameof(IQueryProvider.Execute) && m.IsGenericMethod)
+                .MakeGenericMethod(expectedResultType);
 
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(Execute<TResult>(expression));
-        }
-    }
-
-    public static class MockQueryExpressionDbFunctionsReplacer
-    {
-        public static Expression Replace(Expression general)
-        {
-            var visitor = new ReplaceDbFunctionsVisitor();
-            return visitor.Visit(general);
-        }
-    }
-
-    public class ReplaceDbFunctionsVisitor : ExpressionVisitor
-    {
-        private static (MethodInfo, MethodInfo) GetDbFunctionsAddDaysMethodReplacement()
-        {
-            var methodToReplace = typeof(DbFunctions).GetMethod(nameof(DbFunctions.AddDays), new[] { typeof(DateTime?), typeof(int?) });
-            var newMethod = typeof(MockDbFunctions).GetMethod(nameof(MockDbFunctions.AddDays), new[] { typeof(DateTime?), typeof(int?) });
-            return (methodToReplace, newMethod);
-        }
-
-        private static List<(MethodInfo MethodToReplace, MethodInfo NewMethod)> GetReplacableMethods()
-        {
-            return new List<(MethodInfo MethodToReplace, MethodInfo NewMethod)>
+            object result;
+            try
             {
-                GetDbFunctionsAddDaysMethodReplacement()
-            };
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            var replacableMethods = GetReplacableMethods();
-            foreach (var replacableMethod in replacableMethods)
+                result = executeMethod.Invoke(_inner, new object[] { expression });
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
-                if (node.Method == replacableMethod.MethodToReplace)
-                {
-                    return Expression.Call(replacableMethod.NewMethod, node.Arguments);
-                }
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw; // unreachable
             }
 
-            return base.VisitMethodCall(node);
+            return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
+                .MakeGenericMethod(expectedResultType)
+                .Invoke(null, new[] { result });
         }
     }
 
-    public class MockDbAsyncEnumerable<T> : EnumerableQuery<T>, IDbAsyncEnumerable<T>, IQueryable<T>
+    public sealed class MockAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
     {
-        public MockDbAsyncEnumerable(IEnumerable<T> enumerable)
-            : base(enumerable)
+        public MockAsyncEnumerable(IEnumerable<T> enumerable)
+            : base(enumerable) { }
+
+        public MockAsyncEnumerable(Expression expression)
+            : base(expression) { }
+
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
+            return new MockAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
         }
 
-        public MockDbAsyncEnumerable(Expression expression)
-            : base(expression)
-        {
-        }
-
-        public IDbAsyncEnumerator<T> GetAsyncEnumerator()
-        {
-            return new MockDbAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
-        }
-
-        IDbAsyncEnumerator IDbAsyncEnumerable.GetAsyncEnumerator()
-        {
-            return GetAsyncEnumerator();
-        }
-
-        IQueryProvider IQueryable.Provider => new MockDbAsyncQueryProvider<T>(this);
+        IQueryProvider IQueryable.Provider => new MockAsyncQueryProvider<T>(this);
     }
 
-    public class MockDbAsyncEnumerator<T> : IDbAsyncEnumerator<T>
+    public class MockAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _inner;
 
-        public MockDbAsyncEnumerator(IEnumerator<T> inner)
+        public MockAsyncEnumerator(IEnumerator<T> inner)
         {
             _inner = inner;
         }
 
-        public void Dispose()
-        {
-            _inner.Dispose();
-        }
-
-        public Task<bool> MoveNextAsync(CancellationToken cancellationToken)
-        {
-            return Task.FromResult(_inner.MoveNext());
-        }
-
         public T Current => _inner.Current;
 
-        object IDbAsyncEnumerator.Current => Current;
+        public ValueTask<bool> MoveNextAsync()
+        {
+            return new ValueTask<bool>(_inner.MoveNext());
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            _inner.Dispose();
+            return ValueTask.CompletedTask;
+        }
     }
 }

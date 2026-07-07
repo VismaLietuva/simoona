@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -27,7 +27,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
@@ -46,11 +46,11 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             var result = await _organizationalStructureService.GetOrganizationalStructureAsync(userAndOrg);
-            Assert.AreEqual("Name1 Surname1", result.FullName);
-            Assert.AreEqual("Name2 Surname2", result.Children.First().FullName);
-            Assert.AreEqual("Name3 Surname3", result.Children.ToArray()[1].FullName);
-            Assert.AreEqual("Name4 Surname4", result.Children.First().Children.First().FullName);
-            Assert.AreEqual("Name6 Surname6", result.Children.ToArray()[1].Children.First().FullName);
+            ClassicAssert.AreEqual("Name1 Surname1", result.FullName);
+            ClassicAssert.AreEqual("Name2 Surname2", result.Children.First().FullName);
+            ClassicAssert.AreEqual("Name3 Surname3", result.Children.ToArray()[1].FullName);
+            ClassicAssert.AreEqual("Name4 Surname4", result.Children.First().Children.First().FullName);
+            ClassicAssert.AreEqual("Name6 Surname6", result.Children.ToArray()[1].Children.First().FullName);
         }
 
         private static void MockRoleService(IRoleService roleService)

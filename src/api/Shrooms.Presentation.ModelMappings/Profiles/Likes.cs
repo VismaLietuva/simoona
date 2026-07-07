@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.ViewModels.Wall.Likes;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Likes : Profile
     {
-        protected override void Configure()
+        public Likes()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -14,12 +14,12 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<LikeDto, LikeViewModel>();
+            CreateMap<LikeDto, LikeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<AddLikeViewModel, AddLikeDto>();
+            CreateMap<AddLikeViewModel, AddLikeDto>(MemberList.None);
         }
     }
 }

@@ -1,107 +1,127 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Committee;
+using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class ApplicationUserConfiguration : EntityTypeConfiguration<ApplicationUser>
+    internal class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
-        public ApplicationUserConfiguration()
+        public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(value: false))
-                .ToTable("AspNetUsers");
+            // Soft delete query filter
+            builder.HasQueryFilter(e => !e.IsDeleted);
+            
+            builder.ToTable("AspNetUsers");
 
-            Property(u => u.BirthDay)
-                .IsOptional();
+            builder.Property(u => u.BirthDay)
+                .IsRequired(false);
 
-            Property(u => u.IsAnonymized)
+            builder.Property(u => u.IsAnonymized)
                 .IsRequired();
 
-            HasMany(u => u.Exams)
+            // Many-to-many: ApplicationUser <-> Exam
+            builder.HasMany(u => u.Exams)
                 .WithMany(e => e.ApplicationUsers)
-                .Map(t => t.MapLeftKey("ApplicationUserId")
-                        .MapRightKey("ExamId")
-                        .ToTable("ApplicationUserExams"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "ApplicationUserExams",
+                    j => j.HasOne<Exam>().WithMany().HasForeignKey("ExamId"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUserId"));
 
-            HasMany(u => u.Skills)
+            // Many-to-many: ApplicationUser <-> Skill
+            builder.HasMany(u => u.Skills)
                 .WithMany(s => s.ApplicationUsers)
-                .Map(t => t.MapLeftKey("ApplicationUserId")
-                    .MapRightKey("SkillId")
-                    .ToTable("ApplicationUserSkills"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "ApplicationUserSkills",
+                    j => j.HasOne<Skill>().WithMany().HasForeignKey("SkillId"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUserId"));
 
-            HasMany(u => u.ManagedUsers)
-                .WithOptional()
-                .HasForeignKey(u => u.ManagerId);
+            // Self-referencing: Manager -> ManagedUsers
+            builder.HasMany(u => u.ManagedUsers)
+                .WithOne(u => u.Manager)
+                .HasForeignKey(u => u.ManagerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasMany(u => u.Roles)
-                .WithRequired()
+            // ASP.NET Core Identity relationships - these are already configured by IdentityDbContext
+            // Keeping them commented out to avoid conflicts
+            /*
+            builder.HasMany(u => u.Roles)
+                .WithOne()
                 .HasForeignKey(ur => ur.UserId);
 
-            HasMany(u => u.Claims)
-                .WithRequired()
+            builder.HasMany(u => u.Claims)
+                .WithOne()
                 .HasForeignKey(uc => uc.UserId);
 
-            HasMany(u => u.Logins)
-                .WithRequired()
+            builder.HasMany(u => u.Logins)
+                .WithOne()
                 .HasForeignKey(ul => ul.UserId);
+            */
 
-            Property(u => u.UserName)
+            // Map EF Core Identity v3 column name to old Identity v2 column name
+            builder.Property(u => u.LockoutEnd)
+                .HasColumnName("LockoutEndDateUtc");
+
+            builder.Property(u => u.UserName)
                 .IsRequired()
-                .HasMaxLength(value: 256);
+                .HasMaxLength(256);
 
-            Property(u => u.Email)
-                .HasMaxLength(value: 256)
-                .HasColumnAnnotation(
-                    name: IndexAnnotation.AnnotationName,
-                    value: new IndexAnnotation(
-                        indexAttribute: new IndexAttribute("Email") { IsUnique = true }));
+            builder.Property(u => u.Email)
+                .HasMaxLength(256);
 
-            HasOptional(u => u.WorkingHours)
-                .WithRequired(w => w.ApplicationUser)
-                .Map(m => m.MapKey("ApplicationUserId"));
+            builder.HasIndex(u => u.Email)
+                .IsUnique()
+                .HasDatabaseName("Email");
 
-            Property(u => u.IsManagingDirector)
+            // One-to-one: ApplicationUser -> WorkingHours
+            builder.HasOne(u => u.WorkingHours)
+                .WithOne(w => w.ApplicationUser)
+                .HasForeignKey<WorkingHours>("ApplicationUserId");
+
+            builder.Property(u => u.IsManagingDirector)
                 .IsRequired();
 
-            HasMany(e => e.Events)
-                .WithRequired()
+            // One-to-many: ApplicationUser -> Events
+            builder.HasMany(e => e.Events)
+                .WithOne(e => e.ResponsibleUser)
                 .HasForeignKey(e => e.ResponsibleUserId)
-                .WillCascadeOnDelete(value: false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(u => u.Organization)
+            // Many-to-one: ApplicationUser -> Organization
+            builder.HasOne(u => u.Organization)
                 .WithMany()
                 .HasForeignKey(u => u.OrganizationId)
-                .WillCascadeOnDelete(value: false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasMany(u => u.OwnedProjects)
-                .WithRequired()
-                .HasForeignKey(p => p.OwnerId)
-                .WillCascadeOnDelete(value: false);
-
-            HasMany(u => u.Committees)
+            // Many-to-many: ApplicationUser <-> Committee (Members)
+            builder.HasMany(u => u.Committees)
                 .WithMany(c => c.Members)
-                .Map(x =>
-                {
-                    x.ToTable("CommitteesUsersMembership");
-                });
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersMembership",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
-            HasMany(u => u.DelegatingCommittees)
+            // Many-to-many: ApplicationUser <-> Committee (Delegates)
+            builder.HasMany(u => u.DelegatingCommittees)
                 .WithMany(c => c.Delegates)
-                .Map(x =>
-                {
-                    x.ToTable("CommitteesUsersDelegates");
-                });
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersDelegates",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
-            HasMany(u => u.LeadingCommittees)
+            // Many-to-many: ApplicationUser <-> Committee (Leads)
+            builder.HasMany(u => u.LeadingCommittees)
                 .WithMany(c => c.Leads)
-                .Map(x =>
-                {
-                    x.ToTable("CommitteesUsersLeadership");
-                });
+                .UsingEntity<Dictionary<string, object>>(
+                    "CommitteesUsersLeadership",
+                    j => j.HasOne<Committee>().WithMany().HasForeignKey("Committee_Id"),
+                    j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("ApplicationUser_Id"));
 
-            HasOptional(u => u.NotificationsSettings)
-                .WithOptionalPrincipal(s => s.ApplicationUser);
+            // One-to-one: ApplicationUser -> NotificationsSettings
+            builder.HasOne(u => u.NotificationsSettings)
+                .WithOne(s => s.ApplicationUser)
+                .HasForeignKey<NotificationsSettings>("ApplicationUserId");
         }
     }
 }

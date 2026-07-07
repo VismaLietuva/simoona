@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -32,23 +32,23 @@ namespace Shrooms.Premium.Tests.DomainService
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IDbAsyncEnumerable<Office>>();
+            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IAsyncEnumerable<Office>>();
             _officesDbSet.SetDbSetDataForAsync(MockOffices());
             uow.GetDbSet<Office>().Returns(_officesDbSet);
 
-            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IDbAsyncEnumerable<BookOffice>>();
+            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IAsyncEnumerable<BookOffice>>();
             _bookOfficesDbSet.SetDbSetDataForAsync(MockBookOffice());
             uow.GetDbSet<BookOffice>().Returns(_bookOfficesDbSet);
 
-            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IDbAsyncEnumerable<Book>>();
+            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IAsyncEnumerable<Book>>();
             _booksDbSet.SetDbSetDataForAsync(MockBook());
             uow.GetDbSet<Book>().Returns(_booksDbSet);
 
-            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IDbAsyncEnumerable<BookLog>>();
+            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IAsyncEnumerable<BookLog>>();
             _bookLogsDbSet.SetDbSetDataForAsync(MockBookLog());
             uow.GetDbSet<BookLog>().Returns(_bookLogsDbSet);
 
@@ -61,37 +61,37 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_If_Gets_Wrong_Users_From_Autocomplete()
         {
             var result = (await _bookService.GetUsersForAutoCompleteAsync("Fir", 1)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("FirstName", result.First().FirstName);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("FirstName", result.First().FirstName);
         }
 
         [Test]
         public async Task Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Full_Name()
         {
             var result = (await _bookService.GetUsersForAutoCompleteAsync("Eglė Eglė", 1)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Eglė", result.First().LastName);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("Eglė", result.First().LastName);
         }
 
         [Test]
         public async Task Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Username()
         {
             var result = await _bookService.GetUsersForAutoCompleteAsync("user", 1);
-            Assert.AreEqual(1, result.Count());
+            ClassicAssert.AreEqual(1, result.Count());
         }
 
         [Test]
         public async Task Should_Return_If_Gets_Wrong_Users_From_Autocomplete_By_Similar_Surname()
         {
             var result = await _bookService.GetUsersForAutoCompleteAsync("Surname", 1);
-            Assert.AreEqual(2, result.Count());
+            ClassicAssert.AreEqual(2, result.Count());
         }
 
         [Test]
         public async Task Should_Return_If_Gets_Wrong_Number_Of_Offices()
         {
             var result = await _bookService.GetOfficesAsync(1);
-            Assert.AreEqual(2, result.Count());
+            ClassicAssert.AreEqual(2, result.Count());
         }
 
         [Test]
@@ -118,14 +118,14 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             var result = await _bookService.GetBookAsync(bookMobileGetDto);
-            Assert.AreEqual("Author1", result.Author);
+            ClassicAssert.AreEqual("Author1", result.Author);
         }
 
         [Test]
         public async Task Should_Return_If_Get_Book_For_Post_Result_Has_Invalid_Data()
         {
             var result = await _bookService.GetBookForPostAsync("1", 1);
-            Assert.AreEqual("Author1", result.Author);
+            ClassicAssert.AreEqual("Author1", result.Author);
         }
 
         [Test]
@@ -211,8 +211,8 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             var result = (await _bookService.ReturnBookAsync(bookMobileReturnDto)).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(3, result.First().LogId);
+            ClassicAssert.AreEqual(2, result.Count);
+            ClassicAssert.AreEqual(3, result.First().LogId);
         }
 
         #region dataMock

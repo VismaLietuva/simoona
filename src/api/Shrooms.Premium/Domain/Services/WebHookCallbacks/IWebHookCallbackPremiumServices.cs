@@ -8,16 +8,16 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks
 {
     public interface IWebHookCallbackPremiumServices
     {
-        IEventsWebHookService Events { get; set; }
+        IEventsWebHookService Events { get; }
 
-        IBookRemindService Books { get; set; }
+        IBookRemindService Books { get; }
 
-        ILoyaltyKudosService LoyaltyKudos { get; set; }
+        ILoyaltyKudosService LoyaltyKudos { get; }
 
-        IBadgesService BadgesService { get; set; }
+        IBadgesService BadgesService { get; }
 
-        IEventRemindService EventRemindService { get; set; }
+        IEventRemindService EventRemindService { get; }
 
-        ILotteryStatusChangeService LotteryStatusChangeService { get; set; }
+        ILotteryStatusChangeService LotteryStatusChangeService { get; }
     }
 }

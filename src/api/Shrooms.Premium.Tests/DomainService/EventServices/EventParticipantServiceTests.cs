@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -49,16 +49,16 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             _uow2 = Substitute.For<IUnitOfWork2>();
 
-            _eventsDbSet = Substitute.For<DbSet<Event>, IQueryable<Event>, IDbAsyncEnumerable<Event>>();
+            _eventsDbSet = Substitute.For<DbSet<Event>, IQueryable<Event>, IAsyncEnumerable<Event>>();
             _uow2.GetDbSet<Event>().Returns(_eventsDbSet);
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _uow2.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _eventParticipantsDbSet = Substitute.For<DbSet<EventParticipant>, IQueryable<EventParticipant>, IDbAsyncEnumerable<EventParticipant>>();
+            _eventParticipantsDbSet = Substitute.For<DbSet<EventParticipant>, IQueryable<EventParticipant>, IAsyncEnumerable<EventParticipant>>();
             _uow2.GetDbSet<EventParticipant>().Returns(_eventParticipantsDbSet);
 
-            _eventOptionsDbSet = Substitute.For<DbSet<EventOption>, IQueryable<EventOption>, IDbAsyncEnumerable<EventOption>>();
+            _eventOptionsDbSet = Substitute.For<DbSet<EventOption>, IQueryable<EventOption>, IAsyncEnumerable<EventOption>>();
             _uow2.GetDbSet<EventOption>().Returns(_eventOptionsDbSet);
 
             _systemClockMock = Substitute.For<ISystemClock>();
@@ -238,8 +238,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("Name", result.First().FirstName);
+            ClassicAssert.AreEqual(2, result.Count);
+            ClassicAssert.AreEqual("Name", result.First().FirstName);
         }
 
         [Test]
@@ -540,9 +540,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
-            Assert.AreEqual(3, result.Count);
-            Assert.IsFalse(result.Any(x => x.Id == "user1"));
-            Assert.IsFalse(result.Any(x => x.Id == "user2"));
+            ClassicAssert.AreEqual(3, result.Count);
+            ClassicAssert.IsFalse(result.Any(x => x.Id == "user1"));
+            ClassicAssert.IsFalse(result.Any(x => x.Id == "user2"));
         }
 
         [Test]
@@ -556,8 +556,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("user4", result.First().Id);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("user4", result.First().Id);
         }
 
         [Test]
@@ -570,8 +570,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 OrganizationId = 2
             };
             var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("user1", result.First().Id);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("user1", result.First().Id);
         }
 
         [Test]
@@ -585,8 +585,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("user1", result.First().Id);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("user1", result.First().Id);
         }
 
         [Test]
@@ -600,8 +600,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("user1", result.First().Id);
+            ClassicAssert.AreEqual(1, result.Count);
+            ClassicAssert.AreEqual("user1", result.First().Id);
         }
 
         [Test]

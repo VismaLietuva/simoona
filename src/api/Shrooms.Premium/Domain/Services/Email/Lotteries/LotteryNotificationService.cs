@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -6,7 +6,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Resources.Models.Lotteries;
@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
     public class LotteryNotificationService : NotificationServiceBase, ILotteryNotificationService
     {
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationSettings _applicationSettings;

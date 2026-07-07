@@ -1,28 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class RefreshTokenConfiguration : EntityTypeConfiguration<RefreshToken>
+    internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
     {
-        public RefreshTokenConfiguration()
+        public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
-            Property(x => x.Subject)
+            builder.Property(x => x.Subject)
                 .HasMaxLength(70)
-                .IsRequired()
-                .HasColumnAnnotation(
-                    "Index",
-                    new IndexAnnotation(new IndexAttribute("IX_Subject") { IsUnique = true }));
-
-            Property(x => x.ProtectedTicket)
                 .IsRequired();
 
-            HasRequired(r => r.Organization)
+            builder.HasIndex(x => x.Subject)
+                .IsUnique()
+                .HasDatabaseName("IX_Subject");
+
+            builder.Property(x => x.ProtectedTicket)
+                .IsRequired();
+
+            builder.HasOne(r => r.Organization)
                 .WithMany()
                 .HasForeignKey(r => r.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

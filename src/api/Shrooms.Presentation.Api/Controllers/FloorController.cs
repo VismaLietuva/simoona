@@ -1,5 +1,6 @@
-using AutoMapper;
-using Microsoft.AspNet.SignalR;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -9,12 +10,13 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using X.PagedList;
+using X.PagedList.Extensions;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -33,18 +35,21 @@ namespace Shrooms.Presentation.Api.Controllers
             _organizationRepository = unitOfWork.GetRepository<Organization>();
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public override async Task<HttpResponseMessage> Post(FloorPostViewModel crudViewModel)
+        public override async Task<IActionResult> Post(FloorPostViewModel crudViewModel)
         {
             return await base.Post(crudViewModel);
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public override async Task<HttpResponseMessage> Put(FloorPostViewModel crudViewModel)
+        public override async Task<IActionResult> Put(FloorPostViewModel crudViewModel)
         {
             return await base.Put(crudViewModel);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public async Task<FloorViewModel> GetByRoom(int roomId)
         {
@@ -52,13 +57,15 @@ namespace Shrooms.Presentation.Api.Controllers
             return _mapper.Map<Floor, FloorViewModel>(model);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public async Task<IEnumerable<FloorViewModel>> GetByOffice(int officeId)
         {
-            var model = await _repository.Get(f => f.OfficeId == officeId, includeProperties: "Picture").ToListAsync();
+            var model = await _repository.Get(f => f.OfficeId == officeId).ToListAsync();
             return _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(model);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public async Task<FloorViewPagedModel> GetAllFloors(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
@@ -87,7 +94,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 floorViewModel.OrganizationName = organizationName;
             }
 
-            var pagedList = await floorsViewModel.ToPagedListAsync(page, pageSize);
+            var pagedList = floorsViewModel.ToPagedList(page, pageSize);
 
             var floorsViewPagedModel = new FloorViewPagedModel
             {
@@ -111,6 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return floorsViewPagedModel;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public async Task<FloorViewPagedModel> GetPaged(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
@@ -118,7 +126,7 @@ namespace Shrooms.Presentation.Api.Controllers
             s ??= string.Empty;
 
             var floors = await _repository.GetPagedAsync(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
-                                                        orderBy: sortQuery, includeProperties: "Picture,Rooms,Rooms.ApplicationUsers");
+                                                        orderBy: sortQuery, includeProperties: "Rooms,Rooms.ApplicationUsers");
 
             var floorId = floors.Where(n => n != null).Select(n => n.Id).FirstOrDefault();
 
@@ -133,7 +141,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 floorViewModel.OrganizationName = organizationName;
             }
 
-            var pagedList = await floorsViewModel.ToPagedListAsync(page, pageSize);
+            var pagedList = floorsViewModel.ToPagedList(page, pageSize);
 
             var floorsViewPagedModel = new FloorViewPagedModel
             {
@@ -157,14 +165,16 @@ namespace Shrooms.Presentation.Api.Controllers
             return floorsViewPagedModel;
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Delete(int id)
         {
             var floor = await _repository.Get(filter: of => of.Id == id, includeProperties: "Rooms,Rooms.ApplicationUsers").FirstOrDefaultAsync();
 
             if (floor == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             floor.Rooms.ForEach(r =>
@@ -176,7 +186,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Delete(floor);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls;
 using System;
 using System.Collections.Generic;
@@ -63,7 +63,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, actual);
+            Assert.That(actual, Is.EqualTo(ValidationResult.Success));
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.IsNotNull(actual.ErrorMessage);
+            Assert.That(actual.ErrorMessage, Is.Not.Null);
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.IsNotNull(actual.ErrorMessage);
+            Assert.That(actual.ErrorMessage, Is.Not.Null);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, actual);
+            Assert.That(actual, Is.EqualTo(ValidationResult.Success));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, actual);
+            Assert.That(actual, Is.EqualTo(ValidationResult.Success));
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(null, validationContext);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, actual);
+            Assert.That(actual, Is.EqualTo(ValidationResult.Success));
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(null, validationContext);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, actual);
+            Assert.That(actual, Is.EqualTo(ValidationResult.Success));
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var actual = attribute.GetValidationResult(null, validationContext);
 
             // Assert
-            Assert.IsNotNull(actual.ErrorMessage);
+            Assert.That(actual.ErrorMessage, Is.Not.Null);
         }
     }
 }

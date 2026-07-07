@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -19,11 +19,11 @@ namespace Shrooms.Premium.Domain.Services.Badges
 
         private readonly DbSet<BadgeType> _badgeTypesDbSet;
         private readonly DbSet<BadgeCategory> _badgeCategoriesDbSet;
-        private readonly IDbSet<BadgeCategoryKudosType> _badgeCategoryKudosTypesDbSet;
-        private readonly IDbSet<BadgeLog> _badgeLogsDbSet;
+        private readonly DbSet<BadgeCategoryKudosType> _badgeCategoryKudosTypesDbSet;
+        private readonly DbSet<BadgeLog> _badgeLogsDbSet;
 
-        private readonly IDbSet<KudosLog> _kudosLogsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<KudosLog> _kudosLogsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         public BadgesService(IUnitOfWork2 uow)
         {
@@ -138,7 +138,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
         public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
         {
             return await _badgeCategoriesDbSet
-                .Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
+                .Include(x => x.RelationshipsWithKudosTypes).ThenInclude(y => y.KudosType)
                 .Include(x => x.BadgeTypes)
                 .AsNoTracking()
                 .ToListAsync();
@@ -208,7 +208,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
             {
                 // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
-                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .Include(x => x.BadgeLogs).ThenInclude(y => y.BadgeType)
                     .AsNoTracking()
                     .ToListAsync();
             }
@@ -220,7 +220,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
                                                          && !string.IsNullOrEmpty(x.EmployeeId)
                                                          && x.KudosSystemType != KudosTypeEnum.Minus)
                     .Select(x => x.Employee)
-                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .Include(x => x.BadgeLogs).ThenInclude(y => y.BadgeType)
                     .Distinct(new EmployeeComparer())
                     .AsNoTracking()
                     .ToListAsync();

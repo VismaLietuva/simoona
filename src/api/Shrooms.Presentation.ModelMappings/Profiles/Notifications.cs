@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.ViewModels.Notifications;
@@ -9,20 +9,20 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Notifications : Profile
     {
-        protected override void Configure()
+        public Notifications()
         {
-            CreateMap<Notification, NotificationDto>()
+            CreateMap<Notification, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.SourceIds, opt => opt.MapFrom(u => u.Sources));
-            CreateMap<NotificationDto, NotificationViewModel>()
-                .ForMember(dest => dest.stackedIds, opt => opt.UseValue(new List<int>()))
-                .ForMember(dest => dest.others, opt => opt.UseValue(0));
+            CreateMap<NotificationDto, NotificationViewModel>(MemberList.None)
+                .ForMember(dest => dest.stackedIds, opt => opt.MapFrom(src => new List<int>()))
+                .ForMember(dest => dest.others, opt => opt.MapFrom(src => 0));
 
-            CreateMap<WallPostViewModel, NotificationDto>()
+            CreateMap<WallPostViewModel, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(u => u.MessageBody))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(u => u.Author.FullName));
 
-            CreateMap<Sources, SourcesDto>();
-            CreateMap<SourcesDto, SourcesViewModel>();
+            CreateMap<Sources, SourcesDto>(MemberList.None);
+            CreateMap<SourcesDto, SourcesViewModel>(MemberList.None);
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿@using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
+@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewMentionTemplateViewModel
+@using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
 @using Shrooms.Domain.Helpers
-@using RazorEngine.Templating
 @using Shrooms.Contracts.Constants
-
-@inherits TemplateBase<NewMentionTemplateViewModel>
-
 @{
-    Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
+    Layout = "../HeaderFooter";
 }
 
     <tr>
@@ -39,7 +36,7 @@
                     <!-- DYNAMIC WALL POST USER DISPLAY END -->
 
                     <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                        @Raw(HtmlSanitizerHelper.Sanitize(Model.Content))
+                    @Raw(HtmlSanitizerHelper.Sanitize(Model.Content))
                     </p>
                 </tr>
                 <tr>

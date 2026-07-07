@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -16,8 +16,8 @@ namespace Shrooms.Domain.Services.Email.Kudos
     {
         private readonly IApplicationSettings _appSettings;
 
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
 
         public KudosNotificationService(
             IUnitOfWork2 uow,

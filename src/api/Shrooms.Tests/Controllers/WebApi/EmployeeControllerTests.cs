@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
@@ -9,8 +10,6 @@ using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.Employees;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -38,11 +37,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var args = new EmployeeListingArgsViewModel();
 
             // Act
-            var httpActionResult = await _employeeController.GetPagedEmployees(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _employeeController.GetPagedEmployees(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -51,16 +49,15 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             _employeeListingService
                 .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             var args = new EmployeeListingArgsViewModel();
 
             // Act
-            var httpActionResult = await _employeeController.GetPagedEmployees(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _employeeController.GetPagedEmployees(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -72,14 +69,13 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Page = -1
             };
 
-            _employeeController.Validate(args);
+            _employeeController.ModelState.AddModelError("Page", "Invalid value");
 
             // Act
-            var httpActionResult = await _employeeController.GetPagedEmployees(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _employeeController.GetPagedEmployees(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
     }
 }

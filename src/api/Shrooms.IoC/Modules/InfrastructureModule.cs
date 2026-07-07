@@ -1,8 +1,7 @@
-﻿using System.Configuration;
-using Autofac;
-using Autofac.Core.Lifetime;
+using System;
 using Hangfire;
-using ReallySimpleFeatureToggle;
+using Microsoft.Extensions.DependencyInjection;
+using RazorLight;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
@@ -13,51 +12,51 @@ using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Infrastructure.FeatureToggle;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Infrastructure.Interceptors;
-using Shrooms.Infrastructure.Logger;
 using Shrooms.Infrastructure.Storage;
 using Shrooms.Infrastructure.Storage.AzureBlob;
 using Shrooms.Infrastructure.Storage.FileSystem;
 using Shrooms.Infrastructure.SystemClock;
+using System.IO;
 
 namespace Shrooms.IoC.Modules
 {
-    public class InfrastructureModule : Module
+    public static class InfrastructureModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            builder.RegisterType<Logger>().As<ILogger>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
-            builder.RegisterType<CommonMarkMarkdownConverter>().As<IMarkdownConverter>().InstancePerRequest();
-            builder.RegisterType<MailingService>().As<IMailingService>()
-                .InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag)
-                .EnableInterfaceTelemetryInterceptor();
+            services.AddSingleton<IMarkdownConverter, MarkdigMarkdownConverter>();
+            services.AddScoped<IMailingService, MailingService>();
+            services.AddSingleton(typeof(ICustomCache<,>), typeof(CustomCache<,>));
+            services.AddScoped<IApplicationSettings, ApplicationSettings>();
+            services.AddSingleton<ISystemClock, SystemClock>();
+            services.AddScoped<IExcelBuilderFactory, ExcelBuilderFactory>();
+            services.AddSingleton<IRazorLightEngine>(_ =>
+                new RazorLightEngineBuilder()
+                    .UseProject(new Shrooms.Infrastructure.Email.Templating.NormalizedFileSystemRazorProject(
+                        Path.Combine(AppContext.BaseDirectory, "EmailTemplates")))
+                    .UseMemoryCachingProvider()
+                    .Build());
+            services.AddScoped<IMailTemplate, MailTemplate>();
+            services.AddScoped<IDailyMailingService, DailyMailingService>();
+            services.AddScoped<IJobScheduler, HangFireScheduler>();
+            services.AddSingleton<IFeatureConfiguration, AlwaysEnabledFeatureConfiguration>();
 
-            builder.RegisterGeneric(typeof(CustomCache<,>)).As(typeof(ICustomCache<,>)).SingleInstance();
-            builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerRequest();
-            builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerBackgroundJob();
-            builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerLifetimeScope();
+            RegisterStorage(services);
 
-            builder.RegisterType<SystemClock>().As<ISystemClock>().SingleInstance();
-            builder.RegisterType<ExcelBuilderFactory>().As<IExcelBuilderFactory>().InstancePerRequest();
-            builder.RegisterType<MailTemplate>().As<IMailTemplate>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<DailyMailingService>().As<IDailyMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<HangFireScheduler>().As<IJobScheduler>().InstancePerRequest();
-            builder.Register(_ => ReallySimpleFeature.Toggles.GetFeatureConfiguration()).As<IFeatureConfiguration>().SingleInstance();
-
-            RegisterStorage(builder);
+            return services;
         }
 
-        private void RegisterStorage(ContainerBuilder builder)
+        private static void RegisterStorage(IServiceCollection services)
         {
-            if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString))
+            services.AddScoped<IStorage>(sp =>
             {
-                builder.RegisterType<FileSystemStorage>().As<IStorage>().InstancePerRequest();
-            }
-            else
-            {
-                builder.RegisterType<AzureStorage>().As<IStorage>().InstancePerRequest();
-            }
+                var settings = sp.GetRequiredService<IApplicationSettings>();
+                return string.IsNullOrEmpty(settings.StorageConnectionString)
+                    ? ActivatorUtilities.CreateInstance<FileSystemStorage>(sp)
+                    : ActivatorUtilities.CreateInstance<AzureStorage>(sp);
+            });
         }
     }
 }

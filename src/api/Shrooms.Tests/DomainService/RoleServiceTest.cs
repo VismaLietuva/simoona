@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -24,17 +23,20 @@ namespace Shrooms.Tests.DomainService
         private IPermissionService _permissionService;
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<ApplicationRole> _roleDbSet;
+        private DbSet<IdentityUserRole<string>> _userRolesDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
-            _roleDbSet = Substitute.For<DbSet<ApplicationRole>, IQueryable<ApplicationRole>, IDbAsyncEnumerable<ApplicationRole>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
+            _roleDbSet = Substitute.For<DbSet<ApplicationRole>, IQueryable<ApplicationRole>, IAsyncEnumerable<ApplicationRole>>();
+            _userRolesDbSet = Substitute.For<DbSet<IdentityUserRole<string>>, IQueryable<IdentityUserRole<string>>, IAsyncEnumerable<IdentityUserRole<string>>>();
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             uow.GetDbSet<ApplicationRole>().Returns(_roleDbSet);
+            uow.GetDbSet<IdentityUserRole<string>>().Returns(_userRolesDbSet);
 
             _permissionService = Substitute.For<IPermissionService>();
 
@@ -53,9 +55,9 @@ namespace Shrooms.Tests.DomainService
 
             var roles = (await _roleService.GetRolesForAutocompleteAsync("Test1", userOrg)).ToList();
 
-            Assert.AreEqual(2, roles.Count);
-            Assert.AreEqual("roleId1", roles.ToArray()[0].Id);
-            Assert.AreEqual("roleId3", roles.ToArray()[1].Id);
+            Assert.That(roles.Count, Is.EqualTo(2));
+            Assert.That(roles.ToArray()[0].Id, Is.EqualTo("roleId1"));
+            Assert.That(roles.ToArray()[1].Id, Is.EqualTo("roleId3"));
         }
 
         [Test]
@@ -70,55 +72,30 @@ namespace Shrooms.Tests.DomainService
 
             var roles = await _roleService.GetRoleByIdAsync(userAndOrg, "roleId1");
 
-            Assert.AreEqual("Test1", roles.Name);
-            Assert.AreEqual(3, roles.Permissions.Count());
-            Assert.AreEqual(PermissionScopes.Basic, roles.Permissions.ToArray()[0].ActiveScope);
-            Assert.AreEqual(PermissionScopes.Administration, roles.Permissions.ToArray()[1].ActiveScope);
-            Assert.AreEqual("", roles.Permissions.ToArray()[2].ActiveScope);
-            Assert.AreEqual(2, roles.Users.Count());
-            Assert.AreEqual("first1 last1", roles.Users.ToArray()[0].FullName);
-            Assert.AreEqual("first2 last2", roles.Users.ToArray()[1].FullName);
+            Assert.That(roles.Name, Is.EqualTo("Test1"));
+            Assert.That(roles.Permissions.Count(), Is.EqualTo(3));
+            Assert.That(roles.Permissions.ToArray()[0].ActiveScope, Is.EqualTo(PermissionScopes.Basic));
+            Assert.That(roles.Permissions.ToArray()[1].ActiveScope, Is.EqualTo(PermissionScopes.Administration));
+            Assert.That(roles.Permissions.ToArray()[2].ActiveScope, Is.EqualTo(""));
+            Assert.That(roles.Users.Count(), Is.EqualTo(2));
+            Assert.That(roles.Users.ToArray()[0].FullName, Is.EqualTo("first1 last1"));
+            Assert.That(roles.Users.ToArray()[1].FullName, Is.EqualTo("first2 last2"));
         }
 
         private void MockRoles()
         {
-            var user1 = Substitute.For<ApplicationUser>();
-            user1.Id = "userId1";
-            user1.FirstName = "first1";
-            user1.LastName = "last1";
-            user1.Roles.Returns(new List<IdentityUserRole>
-            {
-                new()
-                {
-                    RoleId = "roleId1"
-                }
-            });
-
-            var user2 = Substitute.For<ApplicationUser>();
-            user2.Id = "userId2";
-            user2.FirstName = "first2";
-            user2.LastName = "last2";
-            user2.Roles.Returns(new List<IdentityUserRole>
-            {
-                new()
-                {
-                    RoleId = "roleId1"
-                }
-            });
-
-            var user3 = Substitute.For<ApplicationUser>();
-            user3.Id = "userId3";
-            user3.FirstName = "first3";
-            user3.LastName = "last3";
-            user3.Roles.Returns(new List<IdentityUserRole>
-            {
-                new()
-                {
-                    RoleId = "roleId2"
-                }
-            });
+            var user1 = new ApplicationUser { Id = "userId1", FirstName = "first1", LastName = "last1" };
+            var user2 = new ApplicationUser { Id = "userId2", FirstName = "first2", LastName = "last2" };
+            var user3 = new ApplicationUser { Id = "userId3", FirstName = "first3", LastName = "last3" };
 
             var users = new List<ApplicationUser> { user1, user2, user3 }.AsQueryable();
+
+            var userRoles = new List<IdentityUserRole<string>>
+            {
+                new() { UserId = "userId1", RoleId = "roleId1" },
+                new() { UserId = "userId2", RoleId = "roleId1" },
+                new() { UserId = "userId3", RoleId = "roleId2" }
+            }.AsQueryable();
 
             var roles = new List<ApplicationRole>
             {
@@ -168,6 +145,7 @@ namespace Shrooms.Tests.DomainService
 
             _roleDbSet.SetDbSetDataForAsync(roles);
             _usersDbSet.SetDbSetDataForAsync(users);
+            _userRolesDbSet.SetDbSetDataForAsync(userRoles);
         }
 
         private void MockRolesForAutocomplete()

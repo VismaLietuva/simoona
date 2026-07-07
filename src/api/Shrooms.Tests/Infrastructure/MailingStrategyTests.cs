@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Moq;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
@@ -37,14 +39,14 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(1, actualSent.Count);
-            Assert.AreEqual(actualSent[0].To.Select(x => x.Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(1));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].To.Select(x => x.Address)));
         }
 
         [Test]
@@ -55,14 +57,14 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(1, actualSent.Count);
-            Assert.AreEqual(actualSent[0].Bcc.Select(x => x.Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(1));
+            Assert.That(_recipients, Is.EqualTo(actualSent[0].Bcc.Select(x => x.Address)));
         }
 
         [Test]
@@ -73,14 +75,14 @@ namespace Shrooms.Tests.Infrastructure
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object);
+            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
 
             // Assert
-            Assert.AreEqual(3, actualSent.Count);
-            Assert.AreEqual(actualSent.Select(x => x.To.Single().Address), _recipients);
+            Assert.That(actualSent.Count, Is.EqualTo(3));
+            Assert.That(_recipients, Is.EqualTo(actualSent.Select(x => x.To.Single().Address)));
         }
 
         private void TrackActualSent(List<MailMessage> actualSent)

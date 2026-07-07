@@ -1,15 +1,16 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class EventOptionEntityConfig : EntityTypeConfiguration<EventOption>
+    public class EventOptionEntityConfig : IEntityTypeConfiguration<EventOption>
     {
-        public EventOptionEntityConfig()
+        public void Configure(EntityTypeBuilder<EventOption> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            Property(e => e.Option)
+            builder.Property(e => e.Option)
                 .IsRequired();
         }
     }

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Configuration;
-using System.Data.Entity;
-using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -20,10 +20,10 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
 
-        public UsersAnonymizationWebHookService(IUnitOfWork2 uow, IPictureService pictureService)
+        public UsersAnonymizationWebHookService(IUnitOfWork2 uow, IPictureService pictureService, IConfiguration configuration)
         {
-            _anonymizeUsersAfterDays = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersAfterDays"]);
-            _anonymizeUsersPerRequest = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersPerRequest"]);
+            _anonymizeUsersAfterDays = int.TryParse(configuration["AnonymizeUsersAfterDays"], out var days) ? days : 14;
+            _anonymizeUsersPerRequest = int.TryParse(configuration["AnonymizeUsersPerRequest"], out var perReq) ? perReq : 10;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
@@ -36,20 +36,14 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         {
             var organization = await _organizationsDbSet.FirstAsync(org => org.ShortName == organizationName);
 
-            var sqlQuery = @"SELECT TOP(@userLimit) * FROM [dbo].[AspNetUsers] WHERE
-                             IsDeleted = 1 AND
-                             OrganizationId = @organizationId AND
-                             IsAnonymized = 0 AND
-                             DATEDIFF(DAY, Modified, GETDATE()) >= @anonymizeAfterDays";
-
-            var sqlParameters = new object[]
-            {
-                new SqlParameter("@organizationId", organization.Id),
-                new SqlParameter("@anonymizeAfterDays", _anonymizeUsersAfterDays),
-                new SqlParameter("@userLimit", _anonymizeUsersPerRequest)
-            };
-
-            var usersToAnonymize = await _usersDbSet.SqlQuery(sqlQuery, sqlParameters).ToListAsync();
+            var cutoffDate = DateTime.UtcNow.AddDays(-_anonymizeUsersAfterDays);
+            var usersToAnonymize = await _usersDbSet
+                .Where(u => u.IsDeleted &&
+                            u.OrganizationId == organization.Id &&
+                            !u.IsAnonymized &&
+                            u.Modified <= cutoffDate)
+                .Take(_anonymizeUsersPerRequest)
+                .ToListAsync();
 
             foreach (var user in usersToAnonymize)
             {

@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -183,28 +183,31 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<KudosLogsEntriesDto<MainKudosLogDto>> GetKudosLogsAsync(KudosLogsFilterDto options)
         {
-            var kudosLogsQuery = _kudosLogsDbSet
+            var kudosLogsQueryBeforeSort = _kudosLogsDbSet
                 .Include(log => log.Employee)
                 .Where(log => log.OrganizationId == options.OrganizationId && log.KudosBasketId == null)
                 .Where(KudosServiceHelper.StatusFilter(options.Status))
                 .Where(KudosServiceHelper.UserFilter(options.SearchUserId))
                 .Where(KudosServiceHelper.TypeFilter(options.FilteringType))
-                .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto())
-                .OrderBy(string.Concat(options.SortBy, " ", options.SortOrder));
+                .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto());
+
+            var kudosLogsQuery = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
+                kudosLogsQueryBeforeSort.AsQueryable(), 
+                string.Concat(options.SortBy, " ", options.SortOrder));
 
             var logsTotalCount = await kudosLogsQuery.CountAsync();
 
             var entriesCountToSkip = EntriesCountToSkip(options.Page);
             var kudosLogs = await kudosLogsQuery
-                .Skip(() => entriesCountToSkip)
-                .Take(() => BusinessLayerConstants.MaxKudosLogsPerPage)
+                .Skip(entriesCountToSkip)
+                .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
             var user = await _usersDbSet.FindAsync(options.UserId);
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var kudosLog in kudosLogs)
                 {
@@ -255,15 +258,15 @@ namespace Shrooms.Domain.Services.Kudos
 
             var entriesCountToSkip = EntriesCountToSkip(page);
             var userLogs = await userLogsQuery
-                .Skip(() => entriesCountToSkip)
-                .Take(() => BusinessLayerConstants.MaxKudosLogsPerPage)
+                .Skip(entriesCountToSkip)
+                .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
             var user = await _usersDbSet.FindAsync(userId);
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var userLog in userLogs)
                 {
@@ -292,7 +295,7 @@ namespace Shrooms.Domain.Services.Kudos
                     log.OrganizationId == userAndOrg.OrganizationId)
                 .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, MapKudosLogToWallKudosLogDto())
                 .OrderByDescending(log => log.Created)
-                .Take(() => BusinessLayerConstants.WallKudosLogCount)
+                .Take(BusinessLayerConstants.WallKudosLogCount)
                 .ToListAsync();
 
             return approvedKudos;
@@ -314,7 +317,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
                 foreach (var kudosLog in kudosLogs)
                 {
@@ -347,7 +350,7 @@ namespace Shrooms.Domain.Services.Kudos
                 return kudosTypes;
             }
 
-            var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+            var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
             foreach (var kudosType in kudosTypes)
             {
@@ -566,7 +569,7 @@ namespace Shrooms.Domain.Services.Kudos
                     KudosAmount = log.Sum(s => s.Points)
                 })
                 .OrderByDescending(log => log.KudosAmount)
-                .Take(() => amount)
+                .Take(amount)
                 .ToListAsync();
 
             var userIds = kudosLogsStats.Select(s => s.Name).ToArray();
@@ -846,9 +849,7 @@ namespace Shrooms.Domain.Services.Kudos
                             l.Created.Year == timestamp.Year &&
                             l.KudosSystemType == KudosTypeEnum.Send &&
                             l.OrganizationId == kudos.KudosLog.OrganizationId)
-                .Select(p => p.Points)
-                .DefaultIfEmpty(0)
-                .SumAsync();
+                .SumAsync(p => (decimal?)p.Points) ?? 0m;
 
             currentMonthSum += kudos.TotalPointsSent;
 

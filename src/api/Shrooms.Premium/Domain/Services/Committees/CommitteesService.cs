@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -22,8 +22,8 @@ namespace Shrooms.Premium.Domain.Services.Committees
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUnitOfWork2 _uow;
         private readonly IAsyncRunner _asyncRunner;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Committee> _committeeDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Committee> _committeeDbSet;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<Committee> _committeeRepository;
         private readonly IMapper _mapper;

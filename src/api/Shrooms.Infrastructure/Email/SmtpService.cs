@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Configuration;
+using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Shrooms.Infrastructure.Email
 {
@@ -12,13 +10,11 @@ namespace Shrooms.Infrastructure.Email
     /// </summary>
     public class SmtpService : IMailSendingService
     {
-        private static MailSettingsSectionGroup _mailSettings;
+        private readonly IConfiguration _configuration;
 
-        public SmtpService()
+        public SmtpService(IConfiguration configuration)
         {
-            _mailSettings = (MailSettingsSectionGroup)WebConfigurationManager
-                .OpenWebConfiguration(HttpRuntime.AppDomainAppVirtualPath)
-                .GetSectionGroup("system.net/mailSettings");
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -26,17 +22,15 @@ namespace Shrooms.Infrastructure.Email
         /// </summary>
         public bool IsMailSenderConfigured()
         {
-            if (_mailSettings?.Smtp == null)
-            {
-                return false;
-            }
+            var host = _configuration["SmtpHost"];
+            var pickupDirectory = _configuration["SmtpPickupDirectoryLocation"];
 
-            if (_mailSettings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(_mailSettings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+            if (!string.IsNullOrEmpty(pickupDirectory))
             {
                 return true;
             }
 
-            if (_mailSettings.Smtp.Network != null && string.IsNullOrEmpty(_mailSettings.Smtp.Network.Host) == false)
+            if (!string.IsNullOrEmpty(host))
             {
                 return true;
             }
@@ -51,8 +45,38 @@ namespace Shrooms.Infrastructure.Email
         /// <returns>A <see cref="Task"/> that represents asynchronous operation.</returns>
         public async Task SendAsync(IEnumerable<MailMessage> messages)
         {
-            using var client = new SmtpClient();
-            foreach (MailMessage message in messages)
+            var pickupDirectory = _configuration["SmtpPickupDirectoryLocation"];
+            if (!string.IsNullOrEmpty(pickupDirectory))
+            {
+                using var pickupClient = new SmtpClient
+                {
+                    DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                    PickupDirectoryLocation = pickupDirectory
+                };
+                foreach (var message in messages)
+                {
+                    await pickupClient.SendMailAsync(message);
+                }
+                return;
+            }
+
+            var host = _configuration["SmtpHost"];
+            var port = int.TryParse(_configuration["SmtpPort"], out var p) ? p : 587;
+            var username = _configuration["SmtpUserName"];
+            var password = _configuration["SmtpPassword"];
+
+            using var client = new SmtpClient(host, port)
+            {
+                EnableSsl = port != 25,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+            };
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                client.Credentials = new System.Net.NetworkCredential(username, password);
+            }
+
+            foreach (var message in messages)
             {
                 await client.SendMailAsync(message);
             }

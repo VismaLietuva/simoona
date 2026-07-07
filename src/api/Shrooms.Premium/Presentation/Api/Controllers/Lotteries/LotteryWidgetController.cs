@@ -7,12 +7,13 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 {
     [Authorize]
-    [RoutePrefix("LotteryWidget")]
+    [Route("LotteryWidget")]
     public class LotteryWidgetController : BaseController
     {
         private readonly IMapper _mapper;

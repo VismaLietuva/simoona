@@ -1,18 +1,27 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class OfficeEntityConfig : EntityTypeConfiguration<Office>
+    internal class OfficeEntityConfig : IEntityTypeConfiguration<Office>
     {
-        public OfficeEntityConfig()
+        public void Configure(EntityTypeBuilder<Office> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(o => o.Organization)
+            builder.HasOne(o => o.Organization)
                 .WithMany()
                 .HasForeignKey(o => o.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.OwnsOne(o => o.Address, a =>
+            {
+                a.Property(x => x.Country).HasColumnName("Country");
+                a.Property(x => x.City).HasColumnName("City");
+                a.Property(x => x.Street).HasColumnName("Street");
+                a.Property(x => x.Building).HasColumnName("Building");
+            });
         }
     }
 }

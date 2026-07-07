@@ -1,28 +1,29 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class ExternalLinkConfig : EntityTypeConfiguration<ExternalLink>
+    internal class ExternalLinkConfig : IEntityTypeConfiguration<ExternalLink>
     {
-        public ExternalLinkConfig()
+        public void Configure(EntityTypeBuilder<ExternalLink> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            Property(x => x.Name).IsRequired();
+            builder.Property(x => x.Name).IsRequired();
 
-            Property(x => x.Url).IsRequired();
+            builder.Property(x => x.Url).IsRequired();
 
-            Property(x => x.Type).IsRequired();
+            builder.Property(x => x.Type).IsRequired();
 
-            Property(x => x.Created).HasColumnType("datetime2");
+            builder.Property(x => x.Created).HasColumnType("datetime2");
 
-            Property(x => x.Modified).HasColumnType("datetime2");
+            builder.Property(x => x.Modified).HasColumnType("datetime2");
 
-            HasRequired(e => e.Organization)
+            builder.HasOne(e => e.Organization)
                 .WithMany()
                 .HasForeignKey(e => e.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -1,47 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Targets\shared.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ProjectGuid>{D9C5606D-3855-44A0-BDB3-98D963D63FCF}</ProjectGuid>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <AssemblyTitle>Shrooms.Infrastructure</AssemblyTitle>
     <Product>Shrooms.Infrastructure</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.2" />
-    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
-    <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="EPPlus" Version="4.1.0" />
-    <PackageReference Include="Hangfire" Version="1.6.6" />
-    <PackageReference Include="Hangfire.Core" Version="1.6.6" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.6.6" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.10.0" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
-    <PackageReference Include="Microsoft.Azure.KeyVault.Core" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Data.OData" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Data.Services.Client" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="NLog" Version="4.6.7" />
-    <PackageReference Include="Owin" Version="1.0" />
-    <PackageReference Include="RazorEngine" Version="3.9.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
-    <PackageReference Include="System.Spatial" Version="5.8.4" />
-    <PackageReference Include="WindowsAzure.Storage" Version="6.2.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="EPPlus" Version="7.5.2" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.18" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+    <PackageReference Include="RazorLight" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>

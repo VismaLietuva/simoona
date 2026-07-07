@@ -2,15 +2,11 @@
 {
     public class TenantNameContainer : ITenantNameContainer
     {
-        public string TenantName { get; }
-        public TenantNameContainer(string tenantName)
-        {
-            TenantName = tenantName;
-        }
+        public string TenantName { get; set; }
     }
 
     public interface ITenantNameContainer
     {
-        string TenantName { get; }
+        string TenantName { get; set; }
     }
 }

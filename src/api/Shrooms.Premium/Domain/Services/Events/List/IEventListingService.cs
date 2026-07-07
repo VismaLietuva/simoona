@@ -11,6 +11,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
     {
         Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, UserAndOrganizationDto userOrg, int? officeIdNullable = null);
 
+        Task<IPagedList<EventListItemDto>> SearchEventsAsync(EventSearchOptionsDto options, UserAndOrganizationDto userOrg);
+
         Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventFilteredArgsDto filteredArgsDto, UserAndOrganizationDto userOrganization);

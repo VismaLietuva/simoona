@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +15,8 @@ namespace Shrooms.Domain.Services.DailyMailingService
 {
     public class DailyMailingService : IDailyMailingService
     {
-        private readonly IDbSet<ApplicationUser> _applicationUserDbSeb;
-        private readonly IDbSet<Post> _postDbSet;
+        private readonly DbSet<ApplicationUser> _applicationUserDbSeb;
+        private readonly DbSet<Post> _postDbSet;
         private readonly IMailingService _emailService;
         private readonly ISystemClock _systemClock;
 
@@ -36,7 +36,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
             // Select users that want to receive emails at this hour
             var usersToEmail = await _applicationUserDbSeb
                 .Include(u => u.Organization)
-                .Include(u => u.WallUsers.Select(y => y.Wall))
+                .Include(u => u.WallUsers).ThenInclude(y => y.Wall)
                 .Where(u => u.DailyMailingHour.HasValue && u.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
                 .ToListAsync();
 

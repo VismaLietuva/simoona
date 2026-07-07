@@ -8,12 +8,14 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 {
     [Authorize]
-    [RoutePrefix("Lottery")]
+    [Route("Lottery")]
     public class LotteryParticipantController : BaseController
     {
         private readonly ILotteryParticipantService _participantService;
@@ -27,7 +29,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Participants")]
-        public async Task<IHttpActionResult> GetParticipantsCounted(int id)
+        [ProducesResponseType(typeof(IEnumerable<LotteryParticipantViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetParticipantsCounted(int id)
         {
             var participants = await _participantService.GetParticipantsCountedAsync(id);
             var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDto>, IEnumerable<LotteryParticipantViewModel>>(participants);
@@ -38,7 +41,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Participants/Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public async Task<IHttpActionResult> GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        [ProducesResponseType(typeof(PagedViewModel<LotteryParticipantDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
             var pagedParticipants = await _participantService.GetPagedParticipantsAsync(id, page, pageSize);
             var pagedModel = new PagedViewModel<LotteryParticipantDto>

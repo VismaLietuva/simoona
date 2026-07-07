@@ -4,7 +4,7 @@ using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Kudos
 {
-    public class KudosType : BaseModel
+    public class KudosType : SoftDeletableModel
     {
         [Required]
         public string Name { get; set; }

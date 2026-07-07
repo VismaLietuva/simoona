@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq.Expressions;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -19,7 +17,7 @@ using X.PagedList;
 namespace Shrooms.Presentation.Common.Controllers
 {
     public abstract class AbstractWebApiController<TModel, TViewModel, TPostViewModel> : BaseController
-        where TModel : BaseModel, ISoftDelete
+        where TModel : BaseModel
         where TViewModel : AbstractViewModel
         where TPostViewModel : AbstractViewModel
     {
@@ -49,15 +47,15 @@ namespace Shrooms.Presentation.Common.Controllers
         }
 
         [HttpGet]
-        public virtual async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        public virtual async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             var model = await _repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.NotFound);
+                return BadRequest(Resources.Common.NotFound);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, _mapper.Map<TModel, TViewModel>(model));
+            return Ok(_mapper.Map<TModel, TViewModel>(model));
         }
 
         [HttpGet]
@@ -87,9 +85,10 @@ namespace Shrooms.Presentation.Common.Controllers
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var models = await _repository
-                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty)
-                .ToPagedListAsync(page, pageSize);
+            var query = _repository.Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty);
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var models = new StaticPagedList<TModel>(items, page, pageSize, totalCount);
 
             var abstractViewModels = _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models);
             var pagedVm = new StaticPagedList<TViewModel>(abstractViewModels, models.PageNumber, models.PageSize, models.TotalItemCount);
@@ -107,17 +106,17 @@ namespace Shrooms.Presentation.Common.Controllers
 
         [HttpPost]
         [ValidationFilter]
-        public virtual async Task<HttpResponseMessage> Post([FromBody] TPostViewModel crudViewModel)
+        public virtual async Task<IActionResult> Post([FromBody] TPostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             // can not create new item with same id
             if (await _repository.GetByIdAsync(crudViewModel.Id) != null)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return Conflict();
             }
 
             var model = _mapper.Map<TPostViewModel, TModel>(crudViewModel);
@@ -125,45 +124,45 @@ namespace Shrooms.Presentation.Common.Controllers
             await _unitOfWork.SaveAsync();
             crudViewModel.Id = model.Id;
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpPut]
         [ValidationFilter]
-        public virtual async Task<HttpResponseMessage> Put([FromBody] TPostViewModel crudViewModel)
+        public virtual async Task<IActionResult> Put([FromBody] TPostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var model = await _repository.GetByIdAsync(crudViewModel.Id);
 
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             _mapper.Map(crudViewModel, model);
             _repository.Update(model);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpDelete]
-        public virtual async Task<HttpResponseMessage> Delete(int id)
+        public virtual async Task<IActionResult> Delete(int id)
         {
             var model = await _repository.GetByIdAsync(id);
 
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             _repository.Delete(model);
             await _unitOfWork.SaveAsync();
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
     }
 }

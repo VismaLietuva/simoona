@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -12,12 +11,15 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
 using X.PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("Skill")]
-    public class SkillController : ApiController
+    [ApiController]
+    [Route("Skill")]
+    public class SkillController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -30,9 +32,10 @@ namespace Shrooms.Presentation.Api.Controllers
             _skillRepository = unitOfWork.GetRepository<Skill>();
         }
 
+        [HttpPost("Post")]
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
-        public async Task<HttpResponseMessage> Post(SkillPostViewModel model)
+        public async Task<IActionResult> Post(SkillPostViewModel model)
         {
             var skill = await _skillRepository.Get(s => s.Title == model.Title).FirstOrDefaultAsync();
             if (skill == null)
@@ -42,10 +45,10 @@ namespace Shrooms.Presentation.Api.Controllers
                 await _unitOfWork.SaveAsync();
             }
 
-            return Request.CreateResponse(HttpStatusCode.Created, _mapper.Map<SkillMiniViewModel>(skill));
+            return StatusCode(201, _mapper.Map<SkillMiniViewModel>(skill));
         }
 
-        [HttpGet]
+        [HttpGet("GetForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
         public async Task<IEnumerable<SkillAutoCompleteViewModel>> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {

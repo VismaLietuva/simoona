@@ -2,11 +2,11 @@ using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
-    [RoutePrefix("ExternalJobs")]
+    [Route("ExternalJobs")]
     [IdentityBasicAuthentication]
     public class ExternalJobsController : BaseController
     {

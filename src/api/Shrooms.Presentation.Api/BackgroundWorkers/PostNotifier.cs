@@ -1,5 +1,6 @@
 using AutoMapper;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
@@ -21,17 +22,20 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public PostNotifier(
             IPostNotificationService postNotificationService,
             IUserService userService,
             INotificationService notificationService,
-            IMapper mapper)
+            IMapper mapper,
+            IHubContext<NotificationHub> hubContext)
         {
             _postNotificationService = postNotificationService;
             _userService = userService;
             _notificationService = notificationService;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         public async Task NotifyAboutNewPostAsync(NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
@@ -44,8 +48,8 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
             var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
 
-            await NotificationHub.SendNotificationToParticularUsersAsync(notificationViewModel, userAndOrganizationHubDto, membersToNotify);
-            await NotificationHub.SendWallNotificationAsync(createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
+            await NotificationHub.SendNotificationToParticularUsersAsync(_hubContext, notificationViewModel, userAndOrganizationHubDto, membersToNotify);
+            await NotificationHub.SendWallNotificationAsync(_hubContext, createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
         }
 
         public async Task NotifyUpdatedPostMentionsAsync(EditPostDto editPostDto)

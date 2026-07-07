@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
 
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         public EventNotificationService(
             IUnitOfWork2 uow,

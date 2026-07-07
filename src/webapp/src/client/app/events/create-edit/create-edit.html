@@ -552,10 +552,10 @@
                     <div class="pull-right">
                         <button class="btn btn-primary" ng-if="vm.states.isAdd"
                             ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)"
-                            ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
+                            ng-disabled="eventForm.$invalid || !vm.responsibleUser.id ||
                                          !vm.isEndDateValid() || vm.isDeadlineDateValid() || !vm.isStartDateValid() ||
-                                         !vm.isOfficeSelected ||
-                                         !vm.isOptionsUnique() || !vm.eventCroppedImage || (vm.countOptions() < 2 && vm.isOptions)" data-test-id="event-form-save-button">
+                                         !vm.isOfficeSelected || !vm.eventImage || !vm.eventCroppedImage ||
+                                         !vm.isOptionsUnique() || (vm.countOptions() < 2 && vm.isOptions)" data-test-id="event-form-save-button">
                             <span translate="common.save"></span>
                         </button>
                         <button class="btn btn-primary" ng-if="vm.states.isEdit"

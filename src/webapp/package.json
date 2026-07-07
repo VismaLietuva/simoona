@@ -18,9 +18,11 @@
   "scripts": {
     "init": "npm install",
     "install": "bower install",
-    "start": "node src/server/app.js"
+    "start": "node src/server/app.js",
+    "start:aspire": "gulp build-dev && node src/server/app.js"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",

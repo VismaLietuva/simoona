@@ -1,9 +1,9 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Shrooms.Tests.Extensions;
 using Shrooms.Contracts.Infrastructure;

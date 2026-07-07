@@ -1,19 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Targets\shared.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ProjectGuid>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</ProjectGuid>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <AssemblyTitle>Shrooms.Domain.ServiceValidators</AssemblyTitle>
     <Product>Shrooms.Domain.ServiceValidators</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,5 +17,6 @@
     <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj" />
     <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj" />
     <ProjectReference Include="..\Shrooms.Domain.Exceptions\Shrooms.Domain.Exceptions.csproj" />
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
   </ItemGroup>
 </Project>

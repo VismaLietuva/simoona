@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -205,9 +205,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private void AssertBadgeReceived(string userId, int badgeTypeId, int organizationId)
         {
             _badgeLogsDbSet.Received().Add(Arg.Is<BadgeLog>(x => x.EmployeeId == userId && x.BadgeTypeId == badgeTypeId && x.OrganizationId == organizationId));
-
-            // ReSharper disable once AsyncVoidLambda
-            Received.InOrder(async () => await _unitOfWork.SaveChangesAsync());
+            _unitOfWork.Received().SaveChangesAsync();
         }
     }
 }

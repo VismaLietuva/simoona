@@ -1,28 +1,23 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class AbstractClassifierConfiguration : EntityTypeConfiguration<AbstractClassifier>
+    internal class AbstractClassifierConfiguration : IEntityTypeConfiguration<AbstractClassifier>
     {
-        public AbstractClassifierConfiguration()
+        public void Configure(EntityTypeBuilder<AbstractClassifier> builder)
         {
-            Map<Language>(m =>
-            {
-                m.Requires("ClassificatorType").HasValue("Language");
-                m.Requires("IsDeleted").HasValue(false);
-            });
+            builder.HasDiscriminator<string>("ClassificatorType")
+                .HasValue<Language>("Language")
+                .HasValue<Certificate>("Certificate");
 
-            Map<Certificate>(m =>
-            {
-                m.Requires("ClassificatorType").HasValue("Certificate");
-                m.Requires("IsDeleted").HasValue(false);
-            });
+            builder.HasQueryFilter(m => !m.IsDeleted);
 
-            HasRequired(a => a.Organization)
+            builder.HasOne(a => a.Organization)
                 .WithMany()
                 .HasForeignKey(a => a.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

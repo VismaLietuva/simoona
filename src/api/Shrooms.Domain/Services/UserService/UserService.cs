@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -15,7 +15,6 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Services.Roles;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -27,11 +26,12 @@ namespace Shrooms.Domain.Services.UserService
 {
     public class UserService : IUserService
     {
-        private readonly IDbSet<ApplicationRole> _rolesDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<WallMember> _wallMembersDbSet;
-        private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
-        private readonly IDbSet<WallModel> _wallDbSet;
+        private readonly DbSet<ApplicationRole> _rolesDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<WallMember> _wallMembersDbSet;
+        private readonly DbSet<WallModerator> _wallModeratorsDbSet;
+        private readonly DbSet<WallModel> _wallDbSet;
+        private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
 
         private readonly IUnitOfWork2 _uow;
         private readonly ShroomsUserManager _userManager;
@@ -44,6 +44,7 @@ namespace Shrooms.Domain.Services.UserService
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _wallMembersDbSet = uow.GetDbSet<WallMember>();
             _wallDbSet = uow.GetDbSet<WallModel>();
+            _userRolesDbSet = uow.GetDbSet<IdentityUserRole<string>>();
 
             _uow = uow;
             _userManager = userManager;
@@ -123,7 +124,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(u => new { u.CultureCode, u.TimeZone })
                 .FirstAsync();
 
-            var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode);
+            var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode ?? "en-US");
 
             var settingsDto = new LocalizationSettingsDto
             {
@@ -137,7 +138,7 @@ namespace Shrooms.Domain.Services.UserService
                     {
                         Id = tz.Id,
                         DisplayName = tz.DisplayName,
-                        IsSelected = string.Equals(tz.Id, userSettings.TimeZone, StringComparison.InvariantCultureIgnoreCase)
+                        IsSelected = string.Equals(tz.Id, userSettings.TimeZone ?? "UTC", StringComparison.InvariantCultureIgnoreCase)
                     })
                     .ToList()
             };
@@ -171,13 +172,22 @@ namespace Shrooms.Domain.Services.UserService
 
             var wall = await _wallDbSet.SingleAsync(w => w.Id == wallId);
 
-            var userAppNotificationEnabledIds = await _usersDbSet
+            // EF Core doesn't have ApplicationUser.Roles navigation property, need to join with IdentityUserRole
+            var userAppNotificationEnabledIdsQuery = from u in _usersDbSet
                 .Include(u => u.WallUsers)
-                .Include(u => u.Roles)
-                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled) &&
-                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
-                               user.Id != posterId)
-                .Where(ExternalRoleFilter(wall, externalRoleId))
+                where u.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled) &&
+                      u.Id != posterId &&
+                      !_userRolesDbSet.Any(ur => ur.UserId == u.Id && ur.RoleId == newUserRoleId)
+                select u;
+
+            // Apply external role filter inline (ExternalRoleFilter can't use navigation properties in EF Core)
+            if (wall.Type != WallType.Events)
+            {
+                userAppNotificationEnabledIdsQuery = userAppNotificationEnabledIdsQuery
+                    .Where(u => !_userRolesDbSet.Any(ur => ur.UserId == u.Id && ur.RoleId == externalRoleId));
+            }
+
+            var userAppNotificationEnabledIds = await userAppNotificationEnabledIdsQuery
                 .Select(u => u.Id)
                 .Distinct()
                 .ToListAsync();
@@ -213,15 +223,37 @@ namespace Shrooms.Domain.Services.UserService
             var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.NewUser).Id;
             var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.External).Id;
 
-            var emails = await _usersDbSet
-                .Include(u => u.WallUsers)
-                .Include(u => u.Roles)
-                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled) &&
-                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
-                               user.Email != senderEmail)
-                .Where(ExternalRoleFilter(wall, externalRoleId))
+            // Materialize role memberships first to avoid cross-DbSet subqueries in LINQ expression trees
+            var rolesToFilter = new[] { newUserRoleId, externalRoleId };
+            var usersInFilteredRoles = await _userRolesDbSet
+                .Where(ur => rolesToFilter.Contains(ur.RoleId))
+                .Select(ur => new { ur.UserId, ur.RoleId })
+                .ToListAsync();
+
+            var newUserRoleUserIds = usersInFilteredRoles
+                .Where(ur => ur.RoleId == newUserRoleId)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+            var externalRoleUserIds = usersInFilteredRoles
+                .Where(ur => ur.RoleId == externalRoleId)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+
+            var emailsQuery = from u in _usersDbSet
+                    .Include(u => u.WallUsers)
+                where u.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled) &&
+                      u.Email != senderEmail &&
+                      !newUserRoleUserIds.Contains(u.Id)
+                select u;
+
+            if (wall.Type != WallType.Events)
+            {
+                emailsQuery = emailsQuery
+                    .Where(u => !externalRoleUserIds.Contains(u.Id));
+            }
+
+            var emails = await emailsQuery
                 .Select(u => u.Email)
-                .Distinct()
                 .ToListAsync();
 
             return emails;
@@ -236,9 +268,11 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(role => role.Id)
                 .ToListAsync();
 
-            var userEmails = await _usersDbSet
-                .Where(e => e.Roles.Any(x => rolesWithPermission.Contains(x.RoleId)))
-                .Select(x => x.Email)
+            // EF Core doesn't have ApplicationUser.Roles navigation property, need to join with IdentityUserRole
+            var userEmails = await (from u in _usersDbSet
+                join ur in _userRolesDbSet on u.Id equals ur.UserId
+                where rolesWithPermission.Contains(ur.RoleId)
+                select u.Email)
                 .ToListAsync();
 
             return userEmails;
@@ -338,16 +372,24 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id)
+        public async Task<IList<IdentityUserLogin<string>>> GetUserLoginsAsync(string id)
         {
-            return (await _userManager.FindByIdAsync(id)).Logins.ToList();
+            var user = await _userManager.FindByIdAsync(id);
+            var logins = await _userManager.GetLoginsAsync(user);
+            // Convert UserLoginInfo to IdentityUserLogin<string> for backward compatibility
+            return logins.Select(l => new IdentityUserLogin<string>
+            {
+                UserId = id,
+                LoginProvider = l.LoginProvider,
+                ProviderKey = l.ProviderKey,
+                ProviderDisplayName = l.ProviderDisplayName
+            }).ToList();
         }
 
         public async Task RemoveLoginAsync(string id, UserLoginInfo loginInfo)
         {
-            await _userManager.RemoveLoginAsync(id, loginInfo);
-
             var user = await _usersDbSet.FirstAsync(u => u.Id == id);
+            await _userManager.RemoveLoginAsync(user, loginInfo.LoginProvider, loginInfo.ProviderKey);
 
             if (loginInfo.LoginProvider == "Google")
             {
@@ -440,18 +482,6 @@ namespace Shrooms.Domain.Services.UserService
                 PictureId = u.PictureId,
                 Email = u.Email
             };
-        }
-
-        private static Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(WallModel wall, string externalRoleId)
-        {
-            if (wall.Type != WallType.Events)
-            {
-                return user => user.Roles.All(r => r.RoleId != externalRoleId);
-            }
-            else
-            {
-                return user => true;
-            }
         }
 
         private static void ClearUserKudos(ApplicationUser user)

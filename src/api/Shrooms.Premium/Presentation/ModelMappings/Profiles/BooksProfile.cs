@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
@@ -9,7 +9,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class BooksProfile : Profile
     {
-        protected override void Configure()
+        public BooksProfile()
         {
             CreateModelMappings();
             CreateDtoToViewModelMappings();
@@ -18,28 +18,28 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateModelMappings()
         {
-            CreateMap<BookMobileDto, Book>();
-            CreateMap<Book, BookMobileDto>();
-            CreateMap<ApplicationUser, MobileUserDto>();
+            CreateMap<BookMobileDto, Book>(MemberList.None);
+            CreateMap<Book, BookMobileDto>(MemberList.None);
+            CreateMap<ApplicationUser, MobileUserDto>(MemberList.None);
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<BookMobileGetDto, BookMobileGetViewModel>();
-            CreateMap<OfficeBookDto, OfficeBookViewModel>();
-            CreateMap<MobileUserDto, MobileUserViewModel>();
-            CreateMap<BookMobileLogDto, BookMobileLogViewModel>();
-            CreateMap<RetrievedBookInfoDto, RetrievedMobileBookInfoViewModel>();
-            CreateMap<BookReportDto, BookReportViewModel>();
+            CreateMap<BookMobileGetDto, BookMobileGetViewModel>(MemberList.None);
+            CreateMap<OfficeBookDto, OfficeBookViewModel>(MemberList.None);
+            CreateMap<MobileUserDto, MobileUserViewModel>(MemberList.None);
+            CreateMap<BookMobileLogDto, BookMobileLogViewModel>(MemberList.None);
+            CreateMap<RetrievedBookInfoDto, RetrievedMobileBookInfoViewModel>(MemberList.None);
+            CreateMap<BookReportDto, BookReportViewModel>(MemberList.None);
         }
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<BookMobilePostViewModel, BookMobilePostDto>();
-            CreateMap<BookMobileReturnViewModel, BookMobileReturnDto>();
-            CreateMap<BookMobileTakeViewModel, BookTakeDto>();
-            CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDto>();
-            CreateMap<BookMobileGetViewModel, BookMobileGetDto>();
-            CreateMap<BookReportViewModel, BookReportDto>();
+            CreateMap<BookMobilePostViewModel, BookMobilePostDto>(MemberList.None);
+            CreateMap<BookMobileReturnViewModel, BookMobileReturnDto>(MemberList.None);
+            CreateMap<BookMobileTakeViewModel, BookTakeDto>(MemberList.None);
+            CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDto>(MemberList.None);
+            CreateMap<BookMobileGetViewModel, BookMobileGetDto>(MemberList.None);
+            CreateMap<BookReportViewModel, BookReportDto>(MemberList.None);
         }
     }
 }

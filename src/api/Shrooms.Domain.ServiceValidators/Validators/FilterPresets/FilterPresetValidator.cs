@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Contracts.Enums;
@@ -8,7 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;

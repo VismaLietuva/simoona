@@ -11,53 +11,32 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PreBuildEvent Condition=" '$(Configuration)' != 'Release' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
-  </PropertyGroup>
-
-  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)' != 'Release' ">
-    <Message Text="Recycling web app..." Importance="High" />
-    <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
-  </Target>
-
   <ItemGroup>
-    <PackageReference Include="ExcelDataReader" Version="2.1.2.3" />
-    <PackageReference Include="Google.Apis" Version="1.43.0" />
-    <PackageReference Include="Google.Apis.Auth" Version="1.43.0" />
-    <PackageReference Include="Google.Apis.Books.v1" Version="1.43.0.1768" />
-    <PackageReference Include="Google.Apis.Core" Version="1.43.0" />
-    <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
-    <PackageReference Include="Ical.Net" Version="4.1.11" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.SystemWeb" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
-    <PackageReference Include="NodaTime" Version="2.0.2" />
-    <PackageReference Include="SharpZipLib" Version="0.86.0" />
-    <PackageReference Include="System.Reflection" Version="4.1.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="ExcelDataReader" Version="3.7.0" />
+    <PackageReference Include="Google.Apis" Version="1.68.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
+    <PackageReference Include="Google.Apis.Books.v1" Version="1.68.0.3331" />
+    <PackageReference Include="Google.Apis.Core" Version="1.68.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
+    <PackageReference Include="Ical.Net" Version="4.3.0" />
+    <PackageReference Include="NodaTime" Version="3.2.0" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="X.PagedList" Version="10.5.9" />
+    <PackageReference Include="X.PagedList.EF" Version="10.5.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="EmailTemplates\**\*.cshtml" />
-    <Content Include="EmailTemplates\**\*.cshtml">
+    <None Include="EmailTemplates\**\*.cshtml" Exclude="EmailTemplates\_ViewImports.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shrooms.Presentation.Common\Shrooms.Presentation.Common.csproj" />
   </ItemGroup>
 </Project>
+

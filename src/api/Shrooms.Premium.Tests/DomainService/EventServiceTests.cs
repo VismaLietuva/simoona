@@ -1,5 +1,6 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -17,7 +18,7 @@ using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Tests.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService
@@ -118,8 +119,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 .Received(1)
                 .CheckIfEventExists(Arg.Any<EventReportDetailsDto>());
 
-            Assert.AreEqual(result.Name, @event.Name);
-            Assert.AreEqual(result.HostUserId, @event.ResponsibleUser.Id);
+            ClassicAssert.AreEqual(result.Name, @event.Name);
+            ClassicAssert.AreEqual(result.HostUserId, @event.ResponsibleUser.Id);
         }
     }
 }

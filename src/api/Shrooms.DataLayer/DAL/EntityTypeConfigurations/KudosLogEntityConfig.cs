@@ -1,23 +1,24 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class KudosLogEntityConfig : EntityTypeConfiguration<KudosLog>
+    internal class KudosLogEntityConfig : IEntityTypeConfiguration<KudosLog>
     {
-        public KudosLogEntityConfig()
+        public void Configure(EntityTypeBuilder<KudosLog> builder)
         {
-            Property(log => log.Comments)
+            builder.Property(log => log.Comments)
                 .IsRequired();
 
-            Property(log => log.RejectionMessage)
-                .IsOptional();
+            builder.Property(log => log.RejectionMessage)
+                .IsRequired(false);
 
-            Property(log => log.OrganizationId)
+            builder.Property(log => log.OrganizationId)
                 .IsRequired();
 
-            Property(log => log.PictureId)
-                .IsOptional();
+            builder.Property(log => log.PictureId)
+                .IsRequired(false);
         }
     }
 }

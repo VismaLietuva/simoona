@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Shrooms.DataLayer.EntityModels.Models;
 
@@ -14,7 +14,7 @@ namespace Shrooms.Tests.DomainService
                 EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-1)
             };
 
-            Assert.AreEqual(2, employee.YearsEmployed);
+            Assert.That(employee.YearsEmployed, Is.EqualTo(2));
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace Shrooms.Tests.DomainService
                 EmploymentDate = DateTime.UtcNow.AddDays(-360)
             };
 
-            Assert.AreEqual(0, employee.YearsEmployed);
+            Assert.That(employee.YearsEmployed, Is.EqualTo(0));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace Shrooms.Tests.DomainService
                 EmploymentDate = DateTime.UtcNow.AddMonths(-1)
             };
 
-            Assert.AreEqual(0, employee.YearsEmployed);
+            Assert.That(employee.YearsEmployed, Is.EqualTo(0));
         }
     }
 }

@@ -3,7 +3,7 @@ using Shrooms.DataLayer.EntityModels.Models.Books;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Office : BaseModelWithOrg
+    public class Office : SoftDeletableModelWithOrg
     {
         public bool IsDefault { get; set; }
 

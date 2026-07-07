@@ -1,8 +1,6 @@
 using System;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Shrooms.Presentation.Common.Filters
 {
@@ -12,12 +10,11 @@ namespace Shrooms.Presentation.Common.Filters
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
     public class ValidationFilterAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!actionContext.ModelState.IsValid)
+            if (!context.ModelState.IsValid)
             {
-                actionContext.Response = actionContext.Request.CreateResponse(
-                    HttpStatusCode.BadRequest, actionContext.ModelState);
+                context.Result = new BadRequestObjectResult(context.ModelState);
             }
         }
     }

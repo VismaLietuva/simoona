@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -10,17 +12,15 @@ using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using System;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using X.PagedList;
 
 namespace Shrooms.Domain.Services.Employees
 {
     public class EmployeeListingService : IEmployeeListingService
     {
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
@@ -48,7 +48,7 @@ namespace Shrooms.Domain.Services.Employees
             var searchFilter = GetSearchStringFilter(employeeArgsDto);
             var blacklistFilter = GetBlacklistFilter(employeeArgsDto, hasBlacklistPermission);
 
-            var users = await _usersDbSet
+            var employeesQuery = _usersDbSet
                 .Include(user => user.WorkingHours)
                 .Include(user => user.JobPosition)
                 .Include(user => user.BlacklistEntries)
@@ -77,8 +77,16 @@ namespace Shrooms.Domain.Services.Employees
                         })
                         .FirstOrDefault()
                 })
-                .OrderByPropertyNames(employeeArgsDto)
-                .ToPagedListAsync(employeeArgsDto.Page, employeeArgsDto.PageSize);
+                .OrderByPropertyNames(employeeArgsDto);
+
+            // X.PagedList doesn't have async support for IQueryable, need to materialize first
+            var totalCount = await employeesQuery.CountAsync();
+            var items = await employeesQuery
+                .Skip((employeeArgsDto.Page - 1) * employeeArgsDto.PageSize)
+                .Take(employeeArgsDto.PageSize)
+                .ToListAsync();
+
+            var users = new StaticPagedList<EmployeeDto>(items, employeeArgsDto.Page, employeeArgsDto.PageSize, totalCount);
 
             HidePrivateInformationBasedOnPermissions(users, hasApplicationUserPermission, hasBlacklistPermission);
 

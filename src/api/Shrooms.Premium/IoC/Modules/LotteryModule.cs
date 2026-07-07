@@ -1,41 +1,21 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class LotteryModule : Module
+    public static class LotteryModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumLottery(this IServiceCollection services)
         {
-            builder.RegisterType<LotteryService>()
-                .As<ILotteryService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<LotteryParticipantService>()
-                .As<ILotteryParticipantService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<LotteryExportService>()
-                 .As<ILotteryExportService>()
-                 .InstancePerRequest()
-                 .EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<LotteryAbortJob>()
-                .As<ILotteryAbortJob>()
-                .EnableInterfaceTelemetryInterceptor();
-
-            builder.RegisterType<LotteryNotificationService>()
-                .As<ILotteryNotificationService>()
-                .InstancePerRequest();
-
-            builder.RegisterType<LotteryValidator>()
-                .As<ILotteryValidator>()
-                .InstancePerRequest();
+            services.AddScoped<ILotteryService, LotteryService>();
+            services.AddScoped<ILotteryParticipantService, LotteryParticipantService>();
+            services.AddScoped<ILotteryExportService, LotteryExportService>();
+            services.AddScoped<ILotteryAbortJob, LotteryAbortJob>();
+            services.AddScoped<ILotteryNotificationService, LotteryNotificationService>();
+            services.AddScoped<ILotteryValidator, LotteryValidator>();
+            return services;
         }
     }
 }

@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
@@ -13,11 +12,13 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 using X.PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    public class ExamController : ApiController
+    public class ExamController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -30,6 +31,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _examRepository = unitOfWork.GetRepository<Exam>();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
         public async Task<ExamViewModel> Get(int id, string includeProperties = "")
         {
@@ -38,9 +40,10 @@ namespace Shrooms.Presentation.Api.Controllers
             return examViewModel;
         }
 
+        [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public async Task<HttpResponseMessage> Post(IList<ExamPostViewModel> models)
+        public async Task<IActionResult> Post(IList<ExamPostViewModel> models)
         {
             foreach (var model in models)
             {
@@ -55,7 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 model.Id = exam.Id;
             }
 
-            return Request.CreateResponse(HttpStatusCode.Created, models);
+            return StatusCode(201, models);
         }
 
         [HttpGet]

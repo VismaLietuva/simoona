@@ -1,25 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Targets\shared.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ProjectGuid>{8AD6F857-708C-4B5E-98BC-B3206E7DD918}</ProjectGuid>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <!-- Use 'annotations' mode: compiler emits nullability metadata (needed by EF Core) without enforcing it -->
+    <Nullable>annotations</Nullable>
     <AssemblyTitle>Shrooms.DataLayer.EntityModels</AssemblyTitle>
     <Product>Shrooms.DataLayer.EntityModels</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>

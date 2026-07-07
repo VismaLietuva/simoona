@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
@@ -13,12 +13,13 @@ using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using X.PagedList.EF;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
@@ -246,12 +247,33 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             var sortable = args.AddSortablePropertiesToStart((nameof(LotteryDetailsDto.RefundFailed), SortDirection.Descending))
                 .AddSortablePropertiesToEnd((nameof(LotteryDetailsDto.Id), SortDirection.Descending));
 
-            return await _lotteriesDbSet
+            var query = _lotteriesDbSet
                 .Where(lottery => lottery.OrganizationId == userOrg.OrganizationId &&
-                                  (args.Filter == null || lottery.Title.Contains(args.Filter)))
+                                  (args.Filter == null || lottery.Title.Contains(args.Filter)));
+
+            if (args.Statuses != null && args.Statuses.Any())
+            {
+                var statuses = args.Statuses.ToList();
+                query = query.Where(lottery => statuses.Contains(lottery.Status));
+            }
+
+            return await query
                 .Select(MapLotteriesToListItemDto)
                 .OrderByPropertyNames(sortable)
                 .ToPagedListAsync(args.Page, args.PageSize);
+        }
+
+        public async Task<IEnumerable<LotteryStatusCountDto>> GetLotteryStatusCountsAsync(UserAndOrganizationDto userOrg)
+        {
+            return await _lotteriesDbSet
+                .Where(lottery => lottery.OrganizationId == userOrg.OrganizationId)
+                .GroupBy(lottery => lottery.Status)
+                .Select(group => new LotteryStatusCountDto
+                {
+                    Status = group.Key,
+                    Count = group.Count()
+                })
+                .ToListAsync();
         }
 
         public async Task<LotteryStatusDto> GetLotteryStatusAsync(int lotteryId, UserAndOrganizationDto userOrg)
@@ -492,7 +514,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
-        private static Expression<Func<Lottery, LotteryDetailsDto>> MapLotteriesToListItemDto =>
+        private Expression<Func<Lottery, LotteryDetailsDto>> MapLotteriesToListItemDto =>
             e => new LotteryDetailsDto
             {
                 Id = e.Id,
@@ -502,7 +524,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 EndDate = e.EndDate,
                 Status = e.Status,
                 RefundFailed = e.IsRefundFailed,
-                GiftedTicketLimit = e.GiftedTicketLimit
+                GiftedTicketLimit = e.GiftedTicketLimit,
+                Participants = _participantsDbSet.Count(participant => participant.LotteryId == e.Id)
             };
 
         private void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto, UserAndOrganizationDto userOrg)

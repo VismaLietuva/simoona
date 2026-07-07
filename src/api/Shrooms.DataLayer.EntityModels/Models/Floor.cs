@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Floor : BaseModelWithOrg
+    public class Floor : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 
@@ -15,7 +15,5 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual ICollection<Room> Rooms { get; set; }
 
         public string PictureId { get; set; }
-
-        public virtual Picture Picture { get; set; }
     }
 }

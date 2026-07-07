@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Books
 {
-    public class BookLog : BaseModelWithOrg
+    public class BookLog : SoftDeletableModelWithOrg
     {
         [ForeignKey("ApplicationUser")]
         public string ApplicationUserId { get; set; }

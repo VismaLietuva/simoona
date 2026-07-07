@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -53,7 +53,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 userOrg,
                 checkForAdministrationEventPermission: false);
 
-            var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
+            var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
 
             if (like == null)
             {

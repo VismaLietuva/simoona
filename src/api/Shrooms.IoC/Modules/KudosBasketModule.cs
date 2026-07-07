@@ -1,16 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.ServiceValidators.Validators.KudosBaskets;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class KudosBasketModule : Module
+    public static class KudosBasketModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddKudosBasket(this IServiceCollection services)
         {
-            builder.RegisterType<KudosBasketValidator>().As<IKudosBasketValidator>().InstancePerRequest();
-            builder.RegisterType<KudosBasketService>().As<IKudosBasketService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IKudosBasketValidator, KudosBasketValidator>();
+            services.AddScoped<IKudosBasketService, KudosBasketService>();
+            return services;
         }
     }
 }

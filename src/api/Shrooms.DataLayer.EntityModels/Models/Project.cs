@@ -4,7 +4,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Project : BaseModelWithOrg
+    public class Project : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

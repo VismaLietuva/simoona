@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace Shrooms.Domain.Services.Birthday
     {
         private const int SevenDays = 7;
         private const int OneDay = 1;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IRoleService _roleService;
 
         public BirthdayService(IUnitOfWork2 uow, IRoleService roleService)

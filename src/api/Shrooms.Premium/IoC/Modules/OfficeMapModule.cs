@@ -1,14 +1,14 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.OfficeMap;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class OfficeMapModule : Module
+    public static class OfficeMapModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumOfficeMap(this IServiceCollection services)
         {
-            builder.RegisterType<OfficeMapService>().As<IOfficeMapService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IOfficeMapService, OfficeMapService>();
+            return services;
         }
     }
 }

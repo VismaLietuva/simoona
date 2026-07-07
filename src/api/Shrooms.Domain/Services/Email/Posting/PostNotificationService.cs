@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -30,9 +30,9 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
 
-        private readonly IDbSet<MultiwallWall> _wallsDbSet;
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<Project> _projectsDbSet;
+        private readonly DbSet<MultiwallWall> _wallsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<Project> _projectsDbSet;
 
         public PostNotificationService(
             IUnitOfWork2 uow,

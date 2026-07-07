@@ -4,7 +4,7 @@ using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Events
 {
-    public class EventOption : BaseModel
+    public class EventOption : SoftDeletableModel
     {
         public Guid EventId { get; set; }
         public virtual Event Event { get; set; }

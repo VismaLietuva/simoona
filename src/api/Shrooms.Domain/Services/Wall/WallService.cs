@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -34,12 +34,12 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
 
-        private readonly IDbSet<Post> _postsDbSet;
-        private readonly IDbSet<WallMember> _wallUsersDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<WallModerator> _moderatorsDbSet;
-        private readonly IDbSet<MultiwallWall> _wallsDbSet;
-        private readonly IDbSet<PostWatcher> _postWatchers;
+        private readonly DbSet<Post> _postsDbSet;
+        private readonly DbSet<WallMember> _wallUsersDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<WallModerator> _moderatorsDbSet;
+        private readonly DbSet<MultiwallWall> _wallsDbSet;
+        private readonly DbSet<PostWatcher> _postWatchers;
 
         public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService)
         {
@@ -57,16 +57,22 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<int> CreateNewWallAsync(CreateWallDto newWallDto)
         {
-            var alreadyExists = await _wallsDbSet
-                .AnyAsync(w =>
-                    w.OrganizationId == newWallDto.OrganizationId &&
-                    w.Name == newWallDto.Name &&
-                    (w.Type == WallType.UserCreated ||
-                     w.Type == WallType.Main));
-
-            if (alreadyExists)
+            // Uniqueness is only enforced for user-visible walls (UserCreated/Main).
+            // Events and Project walls live in their own naming context and may share
+            // a name with each other or with an existing user-created wall.
+            if (newWallDto.Type == WallType.UserCreated || newWallDto.Type == WallType.Main)
             {
-                throw new ValidationException(ErrorCodes.WallNameAlreadyExists, "Wall name already exists");
+                var alreadyExists = await _wallsDbSet
+                    .AnyAsync(w =>
+                        w.OrganizationId == newWallDto.OrganizationId &&
+                        w.Name == newWallDto.Name &&
+                        (w.Type == WallType.UserCreated ||
+                         w.Type == WallType.Main));
+
+                if (alreadyExists)
+                {
+                    throw new ValidationException(ErrorCodes.WallNameAlreadyExists, "Wall name already exists");
+                }
             }
 
             if (newWallDto.MembersIds == null || newWallDto.MembersIds.Any())
@@ -394,8 +400,7 @@ namespace Shrooms.Domain.Services.Wall
             var wall = await _wallsDbSet
                 .Include(x => x.Moderators)
                 .Include(x => x.Members)
-                .Include(x => x.Posts)
-                .Include(x => x.Posts.Select(y => y.Comments))
+                .Include(x => x.Posts).ThenInclude(y => y.Comments)
                 .FirstOrDefaultAsync(x => x.Id == wallId &&
                                      x.OrganizationId == userOrg.OrganizationId &&
                                      x.Type == type);
@@ -697,8 +702,8 @@ namespace Shrooms.Domain.Services.Wall
                 .Where(post => wallsIds.Contains(post.WallId))
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
-                .Skip(() => entriesCountToSkip)
-                .Take(() => pageSize)
+                .Skip(entriesCountToSkip)
+                .Take(pageSize)
                 .ToListAsync();
 
             var moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
@@ -845,7 +850,9 @@ namespace Shrooms.Domain.Services.Wall
                     // Don't simplify, since it's EF projection
                     IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
                     Type = w.Type,
-                    Logo = w.Logo
+                    Logo = w.Logo,
+                    TotalMembers = w.Members.Count,
+                    PostsCount = w.Posts.Count
                 })
                 .ToListAsync();
 
@@ -865,6 +872,8 @@ namespace Shrooms.Domain.Services.Wall
                     Type = wall.Type,
                     IsFollowing = true,
                     Logo = wall.Logo,
+                    TotalMembers = wall.Members.Count,
+                    PostsCount = wall.Posts.Count,
                     UserId = wallUser.UserId
                 })
                 .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
@@ -875,7 +884,9 @@ namespace Shrooms.Domain.Services.Wall
                     Description = x.Description,
                     Type = x.Type,
                     IsFollowing = true,
-                    Logo = x.Logo
+                    Logo = x.Logo,
+                    TotalMembers = x.TotalMembers,
+                    PostsCount = x.PostsCount
                 })
                 .Distinct()
                 .ToListAsync();

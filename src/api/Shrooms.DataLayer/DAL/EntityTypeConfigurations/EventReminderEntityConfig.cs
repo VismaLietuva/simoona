@@ -1,14 +1,15 @@
-﻿using Shrooms.DataLayer.EntityModels.Models.Events;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class EventReminderEntityConfig : EntityTypeConfiguration<EventReminder>
+    public class EventReminderEntityConfig : IEntityTypeConfiguration<EventReminder>
     {
-        public EventReminderEntityConfig()
+        public void Configure(EntityTypeBuilder<EventReminder> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
-            Property(e => e.EventId)
+            builder.HasQueryFilter(e => !e.IsDeleted);
+            builder.Property(e => e.EventId)
                 .IsRequired();
         }
     }

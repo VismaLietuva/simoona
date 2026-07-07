@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -10,14 +10,14 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -31,13 +31,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Room)]
-        public override async Task<HttpResponseMessage> Post([FromBody] RoomPostViewModel roomViewModel)
+        public override async Task<IActionResult> Post([FromBody] RoomPostViewModel roomViewModel)
         {
             try
             {
                 if (await _repository.GetByIdAsync(roomViewModel.Id) != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.Conflict);
+                    return StatusCode(409);
                 }
 
                 var model = _mapper.Map<RoomPostViewModel, Room>(roomViewModel);
@@ -53,15 +53,15 @@ namespace Shrooms.Presentation.Api.Controllers
             }
             catch (Exception)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Room)]
-        public override async Task<HttpResponseMessage> Put([FromBody] RoomPostViewModel roomViewModel)
+        public override async Task<IActionResult> Put([FromBody] RoomPostViewModel roomViewModel)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
                 if (model == null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                    return NotFound();
                 }
 
                 _mapper.Map(roomViewModel, model);
@@ -82,22 +82,23 @@ namespace Shrooms.Presentation.Api.Controllers
             }
             catch (Exception)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Room)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var model = await _repository.Get(r => r.Id == id, includeProperties: "ApplicationUsers").FirstOrDefaultAsync();
                 if (model == null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                    return NotFound();
                 }
 
                 _repository.Delete(model);
@@ -105,10 +106,10 @@ namespace Shrooms.Presentation.Api.Controllers
             }
             catch (Exception)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [HttpGet]
@@ -146,7 +147,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        [ProducesResponseType(typeof(RoomViewModel), StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             return await base.Get(id, includeProperties);
         }
@@ -190,7 +192,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return;
             }
 
-            var removedFromRoom = await model.ApplicationUsers.Where(applicationUser => roomViewModel.ApplicationUsers.All(u => u.Id != applicationUser.Id)).ToListAsync();
+            var removedFromRoom = model.ApplicationUsers.Where(applicationUser => roomViewModel.ApplicationUsers.All(u => u.Id != applicationUser.Id)).ToList();
             if (!removedFromRoom.Any())
             {
                 return;

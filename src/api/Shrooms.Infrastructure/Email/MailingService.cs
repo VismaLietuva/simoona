@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -12,22 +11,17 @@ using Shrooms.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Infrastructure.Email
 {
-    public class MailingService : IMailingService, IIdentityMessageService
+    public class MailingService : IMailingService
     {
         private readonly EmailBuildingStrategy _emailBuildingStrategy;
         private readonly IMailSendingService _mailSendingService;
         private readonly TelemetryClient _telemetryClient;
 
-        public MailingService(IMailSendingService mailSendingService, IApplicationSettings appSettings)
+        public MailingService(IMailSendingService mailSendingService, IApplicationSettings appSettings, TelemetryClient telemetryClient)
         {
             _mailSendingService = mailSendingService;
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = telemetryClient;
             _emailBuildingStrategy = appSettings.EmailBuildingStrategy;
-        }
-
-        public async Task SendAsync(IdentityMessage message)
-        {
-            await SendEmailInternalAsync(new EmailDto(message.Destination, message.Subject, message.Body));
         }
 
         public async Task SendEmailAsync(EmailDto email, bool skipDomainChange = false)

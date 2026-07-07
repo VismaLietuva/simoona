@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAnnotationsExtensions;
 using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Presentation.WebViewModels.Models.ExternalLink
@@ -12,7 +11,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.ExternalLink
 
         [Required]
         [MaxLength(2000)]
-        [DataAnnotationsExtensions.Url(UrlOptions.RequireProtocol)]
+        [Url]
         public string Url { get; set; }
 
         [Required]

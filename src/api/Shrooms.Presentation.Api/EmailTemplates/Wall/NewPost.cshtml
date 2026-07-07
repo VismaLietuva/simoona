@@ -1,12 +1,9 @@
-﻿@using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
+@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewWallPostEmailTemplateViewModel
+@using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
 @using Shrooms.Domain.Helpers
-@using RazorEngine.Templating
 @using Shrooms.Contracts.Constants
-
-@inherits TemplateBase<NewWallPostEmailTemplateViewModel>
-
 @{
-    Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
+    Layout = "../HeaderFooter";
 }
 
 <tr>

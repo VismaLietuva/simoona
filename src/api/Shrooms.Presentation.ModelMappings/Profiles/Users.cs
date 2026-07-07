@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels.User;
@@ -9,7 +9,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Users : Profile
     {
-        protected override void Configure()
+        public Users()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -17,7 +17,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<UserDto, ApplicationUserViewModel>()
+            CreateMap<UserDto, ApplicationUserViewModel>(MemberList.None)
                 .Ignore(x => x.Id)
                 .Ignore(x => x.JobTitle)
                 .Ignore(x => x.Skills)
@@ -45,23 +45,23 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .Ignore(x => x.FirstName)
                 .Ignore(x => x.LastName);
 
-            CreateMap<UserDto, UserViewModel>();
-            CreateMap<TimeZoneDto, TimeZoneViewModel>();
-            CreateMap<LanguageDto, LanguageViewModel>();
-            CreateMap<WallNotificationsDto, WallNotificationsViewModel>();
-            CreateMap<LocalizationSettingsDto, LocalizationSettingsViewModel>();
-            CreateMap<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>();
-            CreateMap<UserAutoCompleteDto, ApplicationUserAutoCompleteViewModel>();
+            CreateMap<UserDto, UserViewModel>(MemberList.None);
+            CreateMap<TimeZoneDto, TimeZoneViewModel>(MemberList.None);
+            CreateMap<LanguageDto, LanguageViewModel>(MemberList.None);
+            CreateMap<WallNotificationsDto, WallNotificationsViewModel>(MemberList.None);
+            CreateMap<LocalizationSettingsDto, LocalizationSettingsViewModel>(MemberList.None);
+            CreateMap<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>(MemberList.None);
+            CreateMap<UserAutoCompleteDto, ApplicationUserAutoCompleteViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<ChangeUserLocalizationSettingsViewModel, ChangeUserLocalizationSettingsDto>()
+            CreateMap<ChangeUserLocalizationSettingsViewModel, ChangeUserLocalizationSettingsDto>(MemberList.None)
                 .IgnoreUserOrgDto();
 
-            CreateMap<WallNotificationsViewModel, WallNotificationsDto>();
+            CreateMap<WallNotificationsViewModel, WallNotificationsDto>(MemberList.None);
 
-            CreateMap<UserNotificationsSettingsViewModel, UserNotificationsSettingsDto>();
+            CreateMap<UserNotificationsSettingsViewModel, UserNotificationsSettingsDto>(MemberList.None);
         }
     }
 }

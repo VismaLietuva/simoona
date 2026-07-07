@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
     {
         public Expression<Func<ApplicationUser, bool>> UsersByNamesFilter(string fullName)
         {
-            var predicate = PredicateBuilder.False<ApplicationUser>();
+            var predicate = PredicateBuilder.New<ApplicationUser>(false);
 
             foreach (var name in fullName.Split(' '))
             {

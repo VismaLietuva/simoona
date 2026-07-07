@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 {
-    public class WallMember : BaseModel
+    public class WallMember : SoftDeletableModel
     {
         [ForeignKey("Wall")]
         public int WallId { get; set; }

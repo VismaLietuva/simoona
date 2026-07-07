@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -22,13 +22,16 @@ namespace Shrooms.Authentification.BasicAuth
             _dbContext = dbContext;
         }
 
-        public IPrincipal Validate(string userName, string password, CancellationToken cancellationToken, IOwinContext owinContext)
+        public IPrincipal Validate(string userName, string password, CancellationToken cancellationToken, HttpContext httpContext)
         {
             cancellationToken.ThrowIfCancellationRequested(); // Unfortunately, UserManager doesn't support CancellationTokens.
 
-            var tenantName = owinContext.Get<string>("tenantName");
+            var tenantName = httpContext.Items["tenantName"] as string;
 
-            if (userName != _appSettings.BasicUsername && password != _appSettings.BasicPassword && DoesOrganizationExists(tenantName))
+            // Reject if any of: username mismatch, password mismatch, tenant unknown.
+            // The previous `&&` chain only rejected when all three failed, so a one-correct-field
+            // combination (e.g. right username, wrong password) authenticated successfully.
+            if (userName != _appSettings.BasicUsername || password != _appSettings.BasicPassword || !DoesOrganizationExists(tenantName))
             {
                 return null;
             }

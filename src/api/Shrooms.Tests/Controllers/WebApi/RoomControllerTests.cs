@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Net;
-using System.Net.Http;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
@@ -48,46 +46,46 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Room_Get_Should_Return_Correct_View_Model()
         {
             var result = await _roomController.Get(1);
-            var room = await result.Content.ReadAsAsync<RoomViewModel>();
+            var room = ((OkObjectResult)result).Value as RoomViewModel;
 
-            Assert.IsInstanceOf<RoomViewModel>(room);
+            Assert.That(room, Is.InstanceOf<RoomViewModel>());
         }
 
         [Test]
         public async Task Room_Get_Should_Return_Correct_Id()
         {
             var result = await _roomController.Get(1);
-            var model = await result.Content.ReadAsAsync<RoomViewModel>();
+            var model = ((OkObjectResult)result).Value as RoomViewModel;
 
-            Assert.AreEqual(1, model.Id);
+            Assert.That(model.Id, Is.EqualTo(1));
         }
 
         [Test]
         public async Task Room_GetPaged_Should_Return_Correct_Paged_Model()
         {
             var rooms = await _roomController.GetPaged();
-            Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
+            Assert.That(rooms, Is.InstanceOf<PagedViewModel<RoomViewModel>>());
         }
 
         [Test]
         public async Task Room_GetPaged_Should_Return_Correct_Page_Count()
         {
             var rooms = await _roomController.GetPaged(page: 1, pageSize: 2);
-            Assert.AreEqual(3, rooms.PageCount);
+            Assert.That(rooms.PageCount, Is.EqualTo(3));
         }
 
         [Test]
         public async Task Room_GetPagedByFloor_Should_Return_Correct_Paged_Model()
         {
             var rooms = await _roomController.GetAllRoomsByFloor(floorId: 1);
-            Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
+            Assert.That(rooms, Is.InstanceOf<PagedViewModel<RoomViewModel>>());
         }
 
         [Test]
         public async Task Room_GetPagedByFloor_Should_Return_Correct_Page_Count()
         {
             var rooms = await _roomController.GetAllRoomsByFloor(floorId: 1, page: 1, pageSize: 2);
-            Assert.AreEqual(2, rooms.PageCount);
+            Assert.That(rooms.PageCount, Is.EqualTo(2));
         }
 
         [Test]
@@ -112,20 +110,16 @@ namespace Shrooms.Tests.Controllers.WebApi
             var userToReturn = _unitOfWork.GetDbContextAs<MockDbContext>().ApplicationUsers.Find(p => p.Id == "1");
             _userManager.FindByIdAsync("1").Returns(Task.FromResult(userToReturn));
 
-            _roomController.Request = new HttpRequestMessage();
-            _roomController.Request.SetConfiguration(new HttpConfiguration());
-            _roomController.Validate(testRoom);
-
             var response = await _roomController.Post(testRoom);
 
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            Assert.That(((StatusCodeResult)response).StatusCode, Is.EqualTo(201));
         }
 
         [Test]
         public async Task Room_Post_Should_Return_Bad_Request_If_Invalid_Room_Model_Provided()
         {
             var response = await _roomController.Post(null);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(response, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -149,11 +143,9 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             // ReSharper disable once PossibleNullReferenceException
             _userManager.FindByIdAsync(applicationUser.Id).Returns(Task.FromResult(applicationUser));
-
-            _roomController.Validate(testRoom);
             var response = await _roomController.Put(testRoom);
 
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            Assert.That(((StatusCodeResult)response).StatusCode, Is.EqualTo(201));
         }
 
         [Test]
@@ -168,33 +160,25 @@ namespace Shrooms.Tests.Controllers.WebApi
                 FloorId = 1,
                 ApplicationUsers = new List<ApplicationUserViewModel>()
             };
-
-            _roomController.Validate(testRoom);
             var response = await _roomController.Put(testRoom);
 
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.That(response, Is.InstanceOf<NotFoundResult>());
         }
 
         [Test]
         public async Task Room_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
         {
-            _roomController.Request = new HttpRequestMessage();
-            _roomController.Request.SetConfiguration(new HttpConfiguration());
-
             var response = await _roomController.Delete(-1);
 
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.That(response, Is.InstanceOf<NotFoundResult>());
         }
 
         [Test]
         public async Task Room_Delete_Should_Return_Ok_If_Room_Deleted_SuccessfullyDeleteReturnOkResponse()
         {
-            _roomController.Request = new HttpRequestMessage();
-            _roomController.Request.SetConfiguration(new HttpConfiguration());
-
             var response = await _roomController.Delete(1);
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response, Is.InstanceOf<OkResult>());
         }
     }
 }

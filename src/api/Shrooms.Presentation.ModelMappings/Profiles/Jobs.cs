@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Jobs : Profile
     {
-        protected override void Configure()
+        public Jobs()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -14,14 +14,14 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<JobTypeDto, JobTypeViewModel>();
-            CreateMap<JobTypeDto, NewJobTypeViewModel>();
+            CreateMap<JobTypeDto, JobTypeViewModel>(MemberList.None);
+            CreateMap<JobTypeDto, NewJobTypeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<JobTypeViewModel, JobTypeDto>();
-            CreateMap<NewJobTypeViewModel, JobTypeDto>();
+            CreateMap<JobTypeViewModel, JobTypeDto>(MemberList.None);
+            CreateMap<NewJobTypeViewModel, JobTypeDto>(MemberList.None);
         }
     }
 }

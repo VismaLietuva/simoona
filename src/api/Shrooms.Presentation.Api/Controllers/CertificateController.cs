@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
@@ -13,6 +13,8 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using X.PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -46,16 +48,18 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var start = s.ToLower();
-            var certificates = await _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
+            var matches = await _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
                 .OrderBy(c => c.Name)
-                .DistinctBy(c => c.Name)
-                .ToPagedListAsync(1, pageSize);
+                .ToListAsync();
+            var certificates = matches.DistinctBy(c => c.Name).Take(pageSize).ToList();
 
             return _mapper.Map<IEnumerable<CertificateAutoCompleteViewModel>>(certificates);
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Post(CertificatePostViewModel crudViewModel)
+        [ProducesResponseType(typeof(CertificateMiniViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Post(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -93,7 +97,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(int id)
         {
             var currentUserId = GetUserAndOrganization().UserId;
             var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.Certificate);
@@ -119,8 +124,10 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public async Task<IHttpActionResult> Put(CertificatePostViewModel crudViewModel)
+        [ProducesResponseType(typeof(CertificateMiniViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Put(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {

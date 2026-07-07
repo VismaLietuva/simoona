@@ -1,11 +1,10 @@
-﻿using NSubstitute;
+using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
 using System.Threading.Tasks;
-using System.Threading;
-using System.Net;
 using Shrooms.Contracts.DataTransferObjects;
 using NSubstitute.ExceptionExtensions;
 using Shrooms.Contracts.Exceptions;
@@ -39,11 +38,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var args = new CreateBlacklistUserViewModel();
 
             // Act
-            var httpActionResult = await _blacklistController.AddToBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.AddToBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -52,14 +50,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             var args = new CreateBlacklistUserViewModel();
 
-            _blacklistController.Validate(args);
+            _blacklistController.ModelState.AddModelError("key", "error");
 
             // Act
-            var httpActionResult = await _blacklistController.AddToBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.AddToBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -70,14 +67,13 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .CreateAsync(Arg.Any<CreateBlacklistUserDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
-            var httpActionResult = await _blacklistController.AddToBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.AddToBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -87,11 +83,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var args = new UpdateBlacklistUserViewModel();
 
             // Act
-            var httpActionResult = await _blacklistController.UpdateBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.UpdateBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -100,14 +95,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             var args = new UpdateBlacklistUserViewModel();
 
-            _blacklistController.Validate(args);
+            _blacklistController.ModelState.AddModelError("key", "error");
 
             // Act
-            var httpActionResult = await _blacklistController.UpdateBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.UpdateBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -118,14 +112,13 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .UpdateAsync(Arg.Any<UpdateBlacklistUserDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
-            var httpActionResult = await _blacklistController.UpdateBlacklist(args);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.UpdateBlacklist(args);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -135,11 +128,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             const string userId = "";
 
             // Act
-            var httpActionResult = await _blacklistController.CancelBlacklist(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.CancelBlacklist(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
         }
 
         [Test]
@@ -150,14 +142,13 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .CancelAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
-            var httpActionResult = await _blacklistController.CancelBlacklist(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.CancelBlacklist(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -170,11 +161,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             const string userId = "";
 
             // Act
-            var httpActionResult = await _blacklistController.GetActiveBlacklist(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.GetActiveBlacklist(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -188,11 +178,10 @@ namespace Shrooms.Tests.Controllers.WebApi
                 .Returns((BlacklistUserDto)null);
 
             // Act
-            var httpActionResult = await _blacklistController.GetActiveBlacklist(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.GetActiveBlacklist(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<NotFoundResult>());
         }
 
         [Test]
@@ -206,11 +195,10 @@ namespace Shrooms.Tests.Controllers.WebApi
                 .Returns(new List<BlacklistUserDto>());
 
             // Act
-            var httpActionResult = await _blacklistController.GetBlacklistHistory(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.GetBlacklistHistory(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -221,14 +209,13 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _blacklistService
                 .GetAllExceptActiveAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             // Act
-            var httpActionResult = await _blacklistController.GetBlacklistHistory(userId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _blacklistController.GetBlacklistHistory(userId);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.That(((StatusCodeResult)result).StatusCode, Is.EqualTo(403));
         }
     }
 }

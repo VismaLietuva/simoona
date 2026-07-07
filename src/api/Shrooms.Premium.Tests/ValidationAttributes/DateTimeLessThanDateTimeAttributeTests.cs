@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -63,7 +64,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         [Test]
@@ -84,7 +85,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
 
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
 
         [Test]
@@ -104,7 +105,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(testValue, validationContext);
 
             // Assert
-            Assert.IsNotNull(result.ErrorMessage);
+            ClassicAssert.IsNotNull(result.ErrorMessage);
         }
     }
 }

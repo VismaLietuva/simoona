@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -15,6 +15,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using X.PagedList.EF;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
@@ -32,11 +33,11 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private readonly IEventValidationService _eventValidationService;
 
-        private readonly IDbSet<Event> _eventsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<KudosLog> _kudosLogDbSet;
         private readonly DbSet<KudosType> _kudosTypesDbSet;
         private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
-        private readonly IDbSet<Office> _officeDbSet;
+        private readonly DbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {
@@ -164,13 +165,24 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 
+        public async Task<IPagedList<EventListItemDto>> SearchEventsAsync(EventSearchOptionsDto options, UserAndOrganizationDto userOrg)
+        {
+            return await _eventsDbSet
+                .Include(x => x.EventParticipants)
+                .Where(e => e.OrganizationId == userOrg.OrganizationId)
+                .Where(SearchTextFilter(options.SearchString))
+                .Where(EventTimeFrameFilter(options.View))
+                .OrderByDescending(e => e.StartDate)
+                .Select(MapEventToListItemDto(userOrg.UserId))
+                .ToPagedListAsync(options.Page, options.PageSize);
+        }
+
         public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, UserAndOrganizationDto userOrg, int? officeIdNullable = null)
         {
             var officeSearchString = OfficeIdToString(officeIdNullable);
             var myEventFilter = _eventFilters[options.Filter](userOrg.UserId);
             var events = await _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Offices)
                 .Where(t => t.OrganizationId == userOrg.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
@@ -329,6 +341,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         Rule = o.Rule
                     })
                     .OrderByDescending(o => o.Rule == OptionRules.Default)
+                    .ToList()
             };
         }
 
@@ -367,6 +380,29 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             return e => e.Name.Contains(searchString) || e.Place.Contains(searchString);
+        }
+
+        private static Expression<Func<Event, bool>> SearchTextFilter(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return e => true;
+            }
+
+            return e => e.Name.Contains(searchString)
+                || e.Place.Contains(searchString)
+                || e.Description.Contains(searchString);
+        }
+
+        private static Expression<Func<Event, bool>> EventTimeFrameFilter(EventTimeFrame view)
+        {
+            var now = DateTime.UtcNow;
+            return view switch
+            {
+                EventTimeFrame.Past => e => e.EndDate < now,
+                EventTimeFrame.All => e => true,
+                _ => e => e.EndDate >= now,
+            };
         }
 
         private static string OfficeIdToString(int? officeId) => officeId != null ? $@"""{officeId.ToString()}""" : OutsideOffice;

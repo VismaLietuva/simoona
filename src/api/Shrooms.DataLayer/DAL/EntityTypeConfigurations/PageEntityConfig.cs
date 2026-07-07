@@ -1,19 +1,23 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class PageEntityConfig : EntityTypeConfiguration<Page>
+    internal class PageEntityConfig : IEntityTypeConfiguration<Page>
     {
-        public PageEntityConfig()
+        public void Configure(EntityTypeBuilder<Page> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false))
-                .HasOptional(e => e.ParentPage);
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(p => p.Organization)
+            builder.HasOne(e => e.ParentPage)
+                .WithMany()
+                .IsRequired(false);
+
+            builder.HasOne(p => p.Organization)
                 .WithMany()
                 .HasForeignKey(p => p.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

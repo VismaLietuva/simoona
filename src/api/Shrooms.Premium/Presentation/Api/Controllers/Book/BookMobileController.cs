@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Domain.DomainExceptions.Book;
@@ -13,7 +15,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 {
     [AllowAnonymous]
     [HmacAuthentication]
-    public class BookMobileController : ApiController
+    public class BookMobileController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
@@ -27,7 +29,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetBook([FromUri] BookMobileGetViewModel bookViewModel)
+        [ProducesResponseType(typeof(RetrievedMobileBookInfoViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetBook([FromQuery] BookMobileGetViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -49,7 +52,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetBookForPostAsync(string code, int organizationId)
+        [ProducesResponseType(typeof(RetrievedBookForPostViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetBookForPostAsync(string code, int organizationId)
         {
             if (!ModelState.IsValid)
             {
@@ -69,7 +73,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetUsersForAutoComplete(string search, int organizationId)
+        [ProducesResponseType(typeof(IEnumerable<MobileUserViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUsersForAutoComplete(string search, int organizationId)
         {
             if (!ModelState.IsValid)
             {
@@ -82,7 +87,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public async Task<IHttpActionResult> GetOffices(int organizationId)
+        [ProducesResponseType(typeof(IEnumerable<OfficeBookViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetOffices(int organizationId)
         {
             var officeBookDto = await _bookMobileService.GetOfficesAsync(organizationId);
             var officeBookViewModel = _mapper.Map<IEnumerable<OfficeBookDto>, IEnumerable<OfficeBookViewModel>>(officeBookDto);
@@ -90,7 +96,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPost]
-        public async Task<IHttpActionResult> PostBook(BookMobilePostViewModel bookViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> PostBook(BookMobilePostViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -111,7 +118,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> ReturnBook(BookMobileReturnViewModel bookViewModel)
+        [ProducesResponseType(typeof(IEnumerable<BookMobileLogViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ReturnBook(BookMobileReturnViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -137,7 +145,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> ReturnSpecificBook(int bookLogId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ReturnSpecificBook(int bookLogId)
         {
             try
             {
@@ -152,7 +161,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> TakeBook(BookMobileTakeViewModel bookViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> TakeBook(BookMobileTakeViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {

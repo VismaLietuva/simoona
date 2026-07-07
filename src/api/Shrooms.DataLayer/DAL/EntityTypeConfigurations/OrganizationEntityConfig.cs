@@ -1,13 +1,14 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class OrganizationEntityConfig : EntityTypeConfiguration<Organization>
+    public class OrganizationEntityConfig : IEntityTypeConfiguration<Organization>
     {
-        public OrganizationEntityConfig()
+        public void Configure(EntityTypeBuilder<Organization> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

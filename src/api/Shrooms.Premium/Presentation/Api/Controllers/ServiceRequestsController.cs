@@ -5,9 +5,10 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
@@ -22,6 +23,10 @@ using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Shrooms.Presentation.Common.Helpers;
+using X.PagedList.EF;
 using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
@@ -63,16 +68,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public HttpResponseMessage Get(int id, string includeProperties = "")
+        [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
+        public IActionResult Get(int id, string includeProperties = "")
         {
             var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
 
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.NotFound);
+                return BadRequest(Resources.Common.NotFound);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, _mapper.Map<ServiceRequest, ServiceRequestViewModel>(model));
+            return Ok(_mapper.Map<ServiceRequest, ServiceRequestViewModel>(model));
         }
 
         [HttpGet]
@@ -168,7 +174,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> KudosShopItemsExist()
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> KudosShopItemsExist()
         {
             return Ok(await _kudosShopService.ItemsExistAsync(GetUserAndOrganization()));
         }
@@ -200,7 +207,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> PostComment([FromBody] ServiceRequestCommentPostViewModel postModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> PostComment([FromBody] ServiceRequestCommentPostViewModel postModel)
         {
             if (!ModelState.IsValid)
             {
@@ -223,7 +231,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> Create(ServiceRequestCreateViewModel newServiceRequest)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Create(ServiceRequestCreateViewModel newServiceRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -246,7 +255,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> Update(ServiceRequestUpdateViewModel serviceRequest)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(ServiceRequestUpdateViewModel serviceRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -273,7 +283,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> MarkAsDone(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> MarkAsDone(int id)
         {
             try
             {
@@ -293,23 +304,25 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(int id)
         {
             var model = await _serviceRequestRepository.GetByIdAsync(id);
 
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             _serviceRequestRepository.Delete(model);
             await _uow.SaveAsync();
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> GetServiceRequestCategories()
+        [ProducesResponseType(typeof(IEnumerable<ServiceRequestCategoryDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetServiceRequestCategories()
         {
             var serviceRequestCategoriesDto = await _serviceRequestService.GetCategoriesAsync();
 
@@ -318,7 +331,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> CreateCategory(ServiceRequestCategoryCreateViewModel category)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateCategory(ServiceRequestCategoryCreateViewModel category)
         {
             if (!ModelState.IsValid)
             {
@@ -339,7 +353,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> EditCategory(int categoryId)
+        [ProducesResponseType(typeof(ServiceRequestCategoryDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditCategory(int categoryId)
         {
             try
             {
@@ -355,7 +370,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> EditCategory(ServiceRequestCategoryViewModel model)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditCategory(ServiceRequestCategoryViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -377,7 +393,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> RemoveCategory(int categoryId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RemoveCategory(int categoryId)
         {
             try
             {
@@ -393,7 +410,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ServiceRequest)]
-        public async Task<IHttpActionResult> GetServiceRequestsAsExcel()
+        public async Task<IActionResult> GetServiceRequestsAsExcel()
         {
             var userId = GetUserAndOrganization().UserId;
             Expression<Func<ServiceRequest, bool>> filter = null;
@@ -411,9 +428,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var content =await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter);
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
-                return ResponseMessage(result);
+                var content = await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter);
+                var bytes = await content.ReadAsByteArrayAsync();
+                return File(bytes, "application/vnd.ms-excel");
             }
             catch (ValidationException e)
             {

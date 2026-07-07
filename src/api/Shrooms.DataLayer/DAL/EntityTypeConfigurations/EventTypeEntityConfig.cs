@@ -1,24 +1,25 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class EventTypeEntityConfig : EntityTypeConfiguration<EventType>
+    internal class EventTypeEntityConfig : IEntityTypeConfiguration<EventType>
     {
-        public EventTypeEntityConfig()
+        public void Configure(EntityTypeBuilder<EventType> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasMany(r => r.Events)
-                .WithRequired(e => e.EventType)
+            builder.HasMany(r => r.Events)
+                .WithOne(e => e.EventType)
                 .HasForeignKey(e => e.EventTypeId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(x => x.Organization)
+            builder.HasOne(x => x.Organization)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(e => e.SingleJoinGroupName).HasMaxLength(value: 100);
+            builder.Property(e => e.SingleJoinGroupName).HasMaxLength(100);
         }
     }
 }

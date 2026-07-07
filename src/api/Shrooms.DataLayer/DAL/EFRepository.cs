@@ -1,13 +1,14 @@
-﻿using System;
-using System.Data.Entity;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace Shrooms.DataLayer.DAL
 {
@@ -50,15 +51,17 @@ namespace Shrooms.DataLayer.DAL
 
             if (maxResults > 0)
             {
-                queryableSet = queryableSet.Take(() => maxResults);
+                queryableSet = queryableSet.Take(maxResults);
             }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
                 foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    queryableSet = queryableSet.Include(includeProperty);
+                    queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
+
+                queryableSet = queryableSet.AsSplitQuery();
             }
 
             if (!string.IsNullOrWhiteSpace(orderBy))
@@ -86,15 +89,17 @@ namespace Shrooms.DataLayer.DAL
 
             if (maxResults > 0)
             {
-                queryableSet = queryableSet.Take(() => maxResults);
+                queryableSet = queryableSet.Take(maxResults);
             }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
                 foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    queryableSet = queryableSet.Include(includeProperty);
+                    queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
+
+                queryableSet = queryableSet.AsSplitQuery();
             }
 
             if (orderBy != null)
@@ -116,7 +121,8 @@ namespace Shrooms.DataLayer.DAL
 
             page = page ?? 1;
 
-            return await queryableSet.ToPagedListAsync(page.Value, pageSize);
+            // Use ToPagedList() which is synchronous, as X.PagedList doesn't have proper EF Core async support
+            return await Task.FromResult(queryableSet.ToPagedList(page.Value, pageSize));
         }
 
         public virtual async Task<TEntity> GetByIdAsync(object id)

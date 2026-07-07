@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Excel;
+using ExcelDataReader;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -30,11 +29,11 @@ namespace Shrooms.Tests.DomainService
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
-            _kudosDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
+            _kudosDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IAsyncEnumerable<KudosLog>>();
             _kudosDbSet.SetDbSetDataForAsync(MockKudos());
             _uow.GetDbSet<KudosLog>().Returns(_kudosDbSet);
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
@@ -62,18 +61,17 @@ namespace Shrooms.Tests.DomainService
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
-                excelReader.IsFirstRowAsColumnNames = true;
-                var excelData = excelReader.AsDataSet();
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
                 var excelColumns = excelData.Tables[0].Columns;
 
-                Assert.AreEqual(Resources.Models.Kudos.Kudos.ExportColumnSender, excelColumns[0].ColumnName);
-                Assert.AreEqual(Resources.Models.Kudos.Kudos.ExportColumnReceiver, excelColumns[1].ColumnName);
-                Assert.AreEqual("name surname", excelRows[0].ItemArray[0]);
-                Assert.AreEqual("name surname", excelRows[0].ItemArray[1]);
-                Assert.AreEqual("name2 surname2", excelRows[1].ItemArray[0]);
-                Assert.AreEqual("name surname", excelRows[1].ItemArray[1]);
-                Assert.AreEqual(4, excelRows.Count);
+                Assert.That(excelColumns[0].ColumnName, Is.EqualTo(Resources.Models.Kudos.Kudos.ExportColumnSender));
+                Assert.That(excelColumns[1].ColumnName, Is.EqualTo(Resources.Models.Kudos.Kudos.ExportColumnReceiver));
+                Assert.That(excelRows[0].ItemArray[0], Is.EqualTo("name surname"));
+                Assert.That(excelRows[0].ItemArray[1], Is.EqualTo("name surname"));
+                Assert.That(excelRows[1].ItemArray[0], Is.EqualTo("name2 surname2"));
+                Assert.That(excelRows[1].ItemArray[1], Is.EqualTo("name surname"));
+                Assert.That(excelRows.Count, Is.EqualTo(4));
 
                 excelReader.Close();
             }
@@ -96,13 +94,12 @@ namespace Shrooms.Tests.DomainService
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
-                excelReader.IsFirstRowAsColumnNames = true;
-                var excelData = excelReader.AsDataSet();
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
 
-                Assert.AreEqual("name5 surname5", excelRows[0].ItemArray[0]);
-                Assert.AreEqual("name3 surname3", excelRows[0].ItemArray[1]);
-                Assert.AreEqual(1, excelRows.Count);
+                Assert.That(excelRows[0].ItemArray[0], Is.EqualTo("name5 surname5"));
+                Assert.That(excelRows[0].ItemArray[1], Is.EqualTo("name3 surname3"));
+                Assert.That(excelRows.Count, Is.EqualTo(1));
 
                 excelReader.Close();
             }

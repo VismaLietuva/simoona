@@ -1,14 +1,14 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.OrganizationalStructure;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class OrganizationalStructureModule : Module
+    public static class OrganizationalStructureModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumOrganizationalStructure(this IServiceCollection services)
         {
-            builder.RegisterType<OrganizationalStructureService>().As<IOrganizationalStructureService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IOrganizationalStructureService, OrganizationalStructureService>();
+            return services;
         }
     }
 }

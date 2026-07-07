@@ -1,4 +1,7 @@
-using AutoMapper;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
@@ -19,32 +22,36 @@ using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
 using X.PagedList;
+using X.PagedList.Extensions;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers.Wall
 {
     [Authorize]
-    [RoutePrefix("Wall")]
+    [Route("Wall")]
     public class WallController : BaseController
     {
         private readonly IWallService _wallService;
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public WallController(IMapper mapper, IWallService wallService, INotificationService notificationService, IPermissionService permissionService)
+        public WallController(IMapper mapper, IWallService wallService, INotificationService notificationService, IPermissionService permissionService, IHubContext<NotificationHub> hubContext)
         {
             _wallService = wallService;
             _mapper = mapper;
             _notificationService = notificationService;
             _permissionService = permissionService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
         [Route("List")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> GetWallList(WallsListFilter filter)
+        [ProducesResponseType(typeof(IEnumerable<WallListViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWallList(WallsListFilter filter)
         {
             var wallList = await _wallService.GetWallsListAsync(GetUserAndOrganization(), filter);
             var mappedWallList = _mapper.Map<IEnumerable<WallDto>, IEnumerable<WallListViewModel>>(wallList);
@@ -61,7 +68,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("Details")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetWall(int wallId)
+        [ProducesResponseType(typeof(WallListViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWall(int wallId)
         {
             if (wallId <= 0)
             {
@@ -99,7 +107,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpPut]
         [Route("Follow")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public async Task<IHttpActionResult> JoinWall(int wallId, string attendeeId = null)
+        [ProducesResponseType(typeof(ApplicationUserMinimalViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> JoinWall(int wallId, string attendeeId = null)
         {
             if (wallId <= 0)
             {
@@ -139,7 +148,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("Members")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public async Task<IHttpActionResult> GetWallMembers(int wallId)
+        [ProducesResponseType(typeof(IEnumerable<WallMemberViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWallMembers(int wallId)
         {
             try
             {
@@ -157,7 +167,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("Posts")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetPagedWall(int wallId, int page = 1)
+        [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPagedWall(int wallId, int page = 1)
         {
             if (wallId <= 0)
             {
@@ -179,7 +190,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
                 var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
                 {
-                    PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
+                    PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
                     PageSize = WebApiConstants.DefaultPageSize
                 };
                 return Ok(pagedViewModel);
@@ -193,7 +204,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("AllPosts")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> GetAllPagedWall(WallsListFilter filter, int page = 1)
+        [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllPagedWall(WallsListFilter filter, int page = 1)
         {
             var userAndOrg = GetUserAndOrganization();
             var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, filter);
@@ -201,16 +213,17 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
+                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
                 PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);
         }
 
         [HttpGet]
-        [Route("AllPosts")]
+        [Route("AllPostsLegacy")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1)
+        public async Task<IActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1)
         {
             return await GetAllPagedWall((WallsListFilter)wallsType, page);
         }
@@ -218,7 +231,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("Search")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> SearchWall(string searchString, int page = 1)
+        [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> SearchWall(string searchString, int page = 1)
         {
             if (!ModelState.IsValid)
             {
@@ -231,7 +245,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
+                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
                 PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);
@@ -240,7 +254,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public async Task<IHttpActionResult> CreateWall(CreateWallViewModel newWall)
+        public async Task<IActionResult> CreateWall(CreateWallViewModel newWall)
         {
             if (!ModelState.IsValid)
             {
@@ -256,7 +270,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                 var userAndOrg = GetUserAndOrganization();
                 var notificationDto = await _notificationService.CreateForWallAsync(userAndOrg, wallDto, wallId);
 
-                await NotificationHub.SendNotificationToAllUsersAsync(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
+                await NotificationHub.SendNotificationToAllUsersAsync(_hubContext, _mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
 
                 return Ok(new { Id = wallId });
             }
@@ -269,7 +283,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public async Task<IHttpActionResult> EditWall(UpdateWallViewModel updateWallViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditWall(UpdateWallViewModel updateWallViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -297,7 +312,8 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public async Task<IHttpActionResult> DeleteWall(int wallId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteWall(int wallId)
         {
             if (wallId <= 0)
             {

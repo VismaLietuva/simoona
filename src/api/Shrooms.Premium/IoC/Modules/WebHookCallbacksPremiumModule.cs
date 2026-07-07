@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Shrooms.Infrastructure.Interceptors;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Domain.Services.Email.Kudos;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks;
@@ -9,17 +8,18 @@ using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class WebHookCallbacksPremiumModule : Module
+    public static class WebHookCallbacksPremiumModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumWebHookCallbacks(this IServiceCollection services)
         {
-            builder.RegisterType<KudosPremiumNotificationService>().As<IKudosPremiumNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<LoyaltyKudosService>().As<ILoyaltyKudosService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<LoyaltyKudosCalculator>().As<ILoyaltyKudosCalculator>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<BookRemindService>().As<IBookRemindService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<LotteryStatusChangeService>().As<ILotteryStatusChangeService>().InstancePerRequest();
-            builder.RegisterType<EventsWebHookService>().As<IEventsWebHookService>().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<WebHookCallbackPremiumServices>().As<IWebHookCallbackPremiumServices>().InstancePerRequest().PropertiesAutowired(); //.EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IKudosPremiumNotificationService, KudosPremiumNotificationService>();
+            services.AddScoped<ILoyaltyKudosService, LoyaltyKudosService>();
+            services.AddScoped<ILoyaltyKudosCalculator, LoyaltyKudosCalculator>();
+            services.AddScoped<IBookRemindService, BookRemindService>();
+            services.AddScoped<ILotteryStatusChangeService, LotteryStatusChangeService>();
+            services.AddScoped<IEventsWebHookService, EventsWebHookService>();
+            services.AddScoped<IWebHookCallbackPremiumServices, WebHookCallbackPremiumServices>();
+            return services;
         }
     }
 }

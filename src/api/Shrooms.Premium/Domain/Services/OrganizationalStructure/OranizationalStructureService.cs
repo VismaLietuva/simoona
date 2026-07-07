@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
 {
     public class OrganizationalStructureService : IOrganizationalStructureService
     {
-        private readonly IDbSet<ApplicationUser> _applicationUsersDbSet;
+        private readonly DbSet<ApplicationUser> _applicationUsersDbSet;
         private readonly IRoleService _roleService;
 
         public OrganizationalStructureService(IUnitOfWork2 uow, IRoleService roleService)

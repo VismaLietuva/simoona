@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
@@ -25,7 +26,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsTrue(model.IsValid());
+            ClassicAssert.IsTrue(model.IsValid());
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -57,7 +58,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -135,7 +136,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsTrue(model.IsValid());
+            ClassicAssert.IsTrue(model.IsValid());
         }
 
         [Test]
@@ -144,7 +145,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             var model = CreateValid();
             model.Reminders = new List<EventReminderViewModel>();
 
-            Assert.IsTrue(model.IsValid());
+            ClassicAssert.IsTrue(model.IsValid());
         }
 
         [Test]
@@ -156,7 +157,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 new EventReminderViewModel()
             };
 
-            Assert.IsFalse(model.IsValid());
+            ClassicAssert.IsFalse(model.IsValid());
         }
 
         private static CreateEventViewModel CreateValid(EventRecurrenceOptions recurrence = EventRecurrenceOptions.None)

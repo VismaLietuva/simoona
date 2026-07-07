@@ -1,22 +1,18 @@
-using AutoMapper;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.OAuth;
-using Shrooms.Authentification.ExternalLoginInfrastructure;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Administration;
+using Shrooms.Domain.Services.Jwt;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.RefreshTokens;
-using Shrooms.Presentation.Api.Helpers;
-using Shrooms.Presentation.Api.Providers;
-using Shrooms.Presentation.Api.Results;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models;
@@ -24,18 +20,16 @@ using Shrooms.Presentation.WebViewModels.Models.AccountModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("Account")]
+    [Route("Account")]
     public class AccountController : BaseController
     {
-        private const int StateStrengthInBits = 256;
         private readonly ShroomsUserManager _userManager;
         private readonly IMapper _mapper;
         private readonly IPermissionService _permissionService;
@@ -43,10 +37,9 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IAdministrationUsersService _administrationService;
         private readonly IApplicationSettings _applicationSettings;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        private IAuthenticationManager Authentication => Request.GetOwinContext().Authentication;
-
-        private string RequestedOrganization => Request.GetRequestedTenant();
+        private string RequestedOrganization => HttpContext.GetRequestedTenant();
 
         public AccountController(
             IMapper mapper,
@@ -55,7 +48,8 @@ namespace Shrooms.Presentation.Api.Controllers
             IOrganizationService organizationService,
             IRefreshTokenService refreshTokenService,
             IAdministrationUsersService administrationService,
-            IApplicationSettings applicationSettings)
+            IApplicationSettings applicationSettings,
+            IJwtTokenService jwtTokenService)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -64,33 +58,33 @@ namespace Shrooms.Presentation.Api.Controllers
             _refreshTokenService = refreshTokenService;
             _administrationService = administrationService;
             _applicationSettings = applicationSettings;
+            _jwtTokenService = jwtTokenService;
         }
 
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("UserInfo")]
-        public async Task<IHttpActionResult> GetUserInfo()
+        public async Task<IActionResult> GetUserInfo()
         {
-            var externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-            if (externalLogin == null && User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Ok(new ExternalUserInfoViewModel { HasRegistered = false });
+            }
+
+            try
             {
                 var loggedUser = await GetLoggedInUserInfoAsync();
                 return Ok(loggedUser);
             }
-            else
+            catch (InvalidOperationException)
             {
-                var externalUserInfo = new ExternalUserInfoViewModel
-                {
-                    Email = User.Identity.GetUserName(),
-                    HasRegistered = externalLogin == null,
-                    LoginProvider = externalLogin?.LoginProvider
-                };
-                return Ok(externalUserInfo);
+                return Unauthorized();
             }
         }
 
         [AllowAnonymous]
         [Route("Register")]
-        public async Task<IHttpActionResult> RegisterUser([FromBody] RegisterViewModel model)
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -106,8 +100,8 @@ namespace Shrooms.Presentation.Api.Controllers
                     return BadRequest("User already exists");
                 }
 
-                await _userManager.RemovePasswordAsync(user.Id);
-                await _userManager.AddPasswordAsync(user.Id, model.Password);
+                await _userManager.RemovePasswordAsync(user);
+                await _userManager.AddPasswordAsync(user, model.Password);
                 await _administrationService.SendUserVerificationEmailAsync(user, RequestedOrganization);
 
                 return Ok();
@@ -116,7 +110,6 @@ namespace Shrooms.Presentation.Api.Controllers
             if (await _administrationService.UserIsSoftDeletedAsync(model.Email))
             {
                 await _administrationService.RestoreUserAsync(model.Email);
-
                 return Ok();
             }
 
@@ -130,37 +123,11 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
-        public async Task<IHttpActionResult> SignIn(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var user = await _userManager.FindAsync(model.UserName, model.Password);
-
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
-            Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            var oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
-            var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
-
-            var properties = await CreateInitialRefreshToken(model.ClientId, user, oAuthIdentity);
-
-            SetCookieExpirationDateToAccessTokenLifeTime(properties);
-
-            Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
-
-            await _userManager.AddLoginAsync(user.Id, new UserLoginInfo(AuthenticationConstants.InternalLoginProvider, user.Id));
-
-            return Ok();
-        }
-
         [AllowAnonymous]
-        public async Task<IHttpActionResult> RequestPasswordReset(ForgotPasswordViewModel model)
+        [HttpPost]
+        [Route("RequestPasswordReset")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RequestPasswordReset([FromBody] ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -180,7 +147,10 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IHttpActionResult> VerifyEmail([FromBody] VerifyEmailViewModel model)
+        [HttpPost]
+        [Route("VerifyEmail")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -194,7 +164,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user.Id, model.Code);
+            var result = await _userManager.ConfirmEmailAsync(user, model.Code);
 
             if (!result.Succeeded)
             {
@@ -205,7 +175,10 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IHttpActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
+        [HttpPost]
+        [Route("ResetPassword")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -219,7 +192,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            var result = await _userManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
 
             if (!result.Succeeded)
             {
@@ -230,8 +203,10 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         [Route("InternalLogins")]
-        public async Task<IHttpActionResult> GetInternalLogins()
+        [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetInternalLogins()
         {
             var logins = new List<ExternalLoginViewModel>();
             var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
@@ -241,18 +216,15 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Ok(logins);
             }
 
-            var internalLogin = new ExternalLoginViewModel
-            {
-                Name = AuthenticationConstants.InternalLoginProvider
-            };
-
-            logins.Add(internalLogin);
+            logins.Add(new ExternalLoginViewModel { Name = AuthenticationConstants.InternalLoginProvider });
 
             return Ok(logins);
         }
 
+        [HttpPost]
         [Route("Logout")]
-        public async Task<IHttpActionResult> Logout()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Logout()
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -262,192 +234,180 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrganization = GetUserAndOrganization();
             await _refreshTokenService.RemoveTokenBySubjectAsync(userAndOrganization);
             _permissionService.RemoveCache(userAndOrganization.UserId);
-            Authentication.SignOut();
 
             return Ok();
         }
 
         [AllowAnonymous]
+        [HttpGet]
         [Route("ExternalLogins")]
-        public async Task<IHttpActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
+        [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
-            var descriptions = Authentication.GetExternalAuthenticationTypes();
             var logins = new List<ExternalLoginViewModel>();
-
             var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
 
-            foreach (var description in descriptions)
+            if (string.IsNullOrEmpty(organizationProviders))
             {
-                if (!ContainsProvider(organizationProviders, description.Caption))
+                return Ok(logins);
+            }
+
+            var externalProviders = new[]
+            {
+                AuthenticationConstants.GoogleLoginProvider,
+                AuthenticationConstants.FacebookLoginProvider,
+                AuthenticationConstants.MicrosoftLoginProvider,
+            };
+
+            foreach (var provider in externalProviders)
+            {
+                if (!ContainsProvider(organizationProviders, provider))
                 {
                     continue;
                 }
-                var state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
 
-                var login = new ExternalLoginViewModel
+                logins.Add(new ExternalLoginViewModel
                 {
-                    Name = description.Caption,
-                    Url = CreateUrl(description, returnUrl, state, isLinkable, false),
-                    State = state
-                };
+                    Name = provider,
+                    Url = BuildExternalLoginUrl(provider, RequestedOrganization, returnUrl, isRegistration: false)
+                });
 
-                logins.Add(login);
-
-                state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
-                login = new ExternalLoginViewModel
+                logins.Add(new ExternalLoginViewModel
                 {
-                    Name = $"{description.Caption}Registration",
-                    Url = CreateUrl(description, returnUrl, state, isLinkable, true),
-                    State = state
-                };
-
-                logins.Add(login);
+                    Name = provider + "Registration",
+                    Url = BuildExternalLoginUrl(provider, RequestedOrganization, returnUrl, isRegistration: true)
+                });
             }
 
             return Ok(logins);
         }
 
-        [OverrideAuthentication]
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("RegisterExternal")]
-        public async Task<IHttpActionResult> RegisterExternal()
+        // Initiates the external OAuth challenge. The frontend opens this URL in the browser
+        // (built by GetExternalLogins above); we round-trip the organization / returnUrl /
+        // isRegistration through ExternalLoginCallback because the SignIn cookie can't carry
+        // tenant context across IdP hops.
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("ExternalLogin")]
+        public IActionResult ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(returnUrl))
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
-            var info = await Authentication.GetExternalLoginInfoAsync();
-            if (info == null)
+            var callback = Url.Action(nameof(ExternalLoginCallback), "Account", new
             {
-                return InternalServerError();
+                provider,
+                organization,
+                returnUrl,
+                isRegistration
+            });
+
+            var props = new AuthenticationProperties { RedirectUri = callback };
+            return Challenge(props, provider);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("ExternalLoginCallback")]
+        public async Task<IActionResult> ExternalLoginCallback(string provider, string organization, string returnUrl, bool isRegistration = false)
+        {
+            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider))
+            {
+                return BadRequest();
             }
 
-            if (!await _administrationService.UserEmailExistsAsync(info.Email))
+            // Pull the external identity that the social handler stashed in the ExternalScheme cookie.
+            var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
+            if (!result.Succeeded || result.Principal == null)
             {
-                if (await _administrationService.UserIsSoftDeletedAsync(info.Email))
+                return Redirect(AppendHash(returnUrl, "error=external_auth_failed"));
+            }
+
+            var providerKey = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var loginProvider = provider;
+            var email = result.Principal.FindFirstValue(ClaimTypes.Email);
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(providerKey))
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                return Redirect(AppendHash(returnUrl, "error=missing_claims"));
+            }
+
+            // Push the tenant into HttpContext.Items so the per-request DbContext (Program.cs:31)
+            // resolves the right tenant's connection string for the lookups below.
+            HttpContext.Items["tenantName"] = organization;
+
+            var loginInfo = new ExternalLoginInfo(result.Principal, loginProvider, providerKey, loginProvider);
+            var user = await _userManager.FindByLoginAsync(loginProvider, providerKey);
+
+            if (user == null)
+            {
+                var existing = await _userManager.FindByEmailAsync(email);
+
+                if (existing != null)
                 {
-                    await _administrationService.RestoreUserAsync(info.Email);
+                    // Email exists in this tenant: attach the social login to the existing user.
+                    await _userManager.AddLoginAsync(existing, new UserLoginInfo(loginProvider, providerKey, loginProvider));
+                    user = existing;
+                }
+                else if (isRegistration)
+                {
+                    // First-time external registration.
+                    var isHostValid = await _organizationService.IsOrganizationHostValidAsync(email, organization);
+                    if (!isHostValid)
+                    {
+                        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                        return Redirect(AppendHash(returnUrl, "error=invalid_email_host"));
+                    }
+
+                    var createResult = await _administrationService.CreateNewUserWithExternalLoginAsync(loginInfo, organization);
+                    if (!createResult.Succeeded)
+                    {
+                        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                        return Redirect(AppendHash(returnUrl, "error=create_failed"));
+                    }
+
+                    user = await _userManager.FindByEmailAsync(email);
                 }
                 else
                 {
-                    var requestedOrganization = RequestedOrganization;
-                    var result = await _administrationService.CreateNewUserWithExternalLoginAsync(info, requestedOrganization);
-                    if (!result.Succeeded)
-                    {
-                        return GetErrorResult(result);
-                    }
-                }
-            }
-            else if (await _administrationService.HasExistingExternalLoginAsync(info.Email, info.Login.LoginProvider))
-            {
-                var user = await _userManager.FindByEmailAsync(info.Email);
-                await _administrationService.AddProviderImageAsync(user.Id, info.ExternalIdentity);
-                return Ok("User already exists");
-            }
-            else if (await _administrationService.HasExistingExternalLoginAsync(info.Email, AuthenticationConstants.InternalLoginProvider))
-            {
-                var user = await _userManager.FindByEmailAsync(info.Email);
-                if (user?.EmailConfirmed == false)
-                {
-                    await _userManager.RemoveLoginAsync(user.Id, new UserLoginInfo(AuthenticationConstants.InternalLoginProvider, user.Id));
-                    await _userManager.RemovePasswordAsync(user.Id);
+                    // No matching user and not in registration mode → bounce back so the SPA can prompt registration.
+                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                    return Redirect(AppendHash(returnUrl, "error=user_not_found"));
                 }
             }
 
-            var userId = (await _userManager.FindByEmailAsync(info.Email)).Id;
-            await _userManager.AddLoginAsync(userId, info.Login);
-            await _administrationService.AddProviderImageAsync(userId, info.ExternalIdentity);
-            await _administrationService.AddProviderEmailAsync(userId, info.Login.LoginProvider, info.Email);
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            return Ok();
+            var token = await _jwtTokenService.GenerateTokenAsync(user);
+            var hash = $"access_token={Uri.EscapeDataString(token.Token)}&token_type=bearer&expires_in={token.ExpiresIn}";
+            return Redirect(AppendHash(returnUrl, hash));
         }
 
-        [OverrideAuthentication]
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
-        [AllowAnonymous]
-        [Route("ExternalLogin", Name = "ExternalLogin")]
-        // ReSharper disable once InconsistentNaming
-        public async Task<IHttpActionResult> GetExternalLogin(string provider, string client_Id = null, string userId = null, bool isRegistration = false, string error = null)
+        private string BuildExternalLoginUrl(string provider, string organization, string returnUrl, bool isRegistration)
         {
-            if (string.IsNullOrEmpty(client_Id) || error != null)
+            var qs = new Dictionary<string, string>
             {
-                var uri = CreateErrorUri("error");
-                return Redirect(uri);
-            }
+                ["provider"] = provider,
+                ["organization"] = organization ?? string.Empty,
+                ["returnUrl"] = returnUrl ?? string.Empty,
+                ["isRegistration"] = isRegistration ? "true" : "false"
+            };
+            return QueryHelpers.AddQueryString("/Account/ExternalLogin", qs);
+        }
 
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new ChallengeResult(provider, this);
-            }
-
-            var externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-            if (externalLogin.Email == null)
-            {
-                var uri = CreateErrorUri("emailError");
-                Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                return Redirect(uri);
-            }
-
-            if (externalLogin.LoginProvider != provider)
-            {
-                Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                return new ChallengeResult(provider, this);
-            }
-
-            var user = await _userManager.FindAsync(new UserLoginInfo(externalLogin.LoginProvider, externalLogin.ProviderKey));
-            var hasLogin = user != null;
-
-            if (isRegistration && hasLogin == false)
-            {
-                var isEmailHostValid = await _organizationService.IsOrganizationHostValidAsync(externalLogin.Email, RequestedOrganization);
-                if (!isEmailHostValid)
-                {
-                    var uri = CreateErrorUri("error");
-                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                    return Redirect(uri);
-                }
-            }
-
-            // Linking accounts.
-            if (userId != null)
-            {
-                return await LinkAccountsAsync(externalLogin, userId);
-            }
-
-            // Registration process.
-            if (isRegistration == true)
-            {
-                return await RegisterOrLoginAsync(user, externalLogin, client_Id, hasLogin);
-            }
-
-            // Login process.
-            return await LoginAsync(user, externalLogin, client_Id, hasLogin);
+        private static string AppendHash(string url, string hash)
+        {
+            if (string.IsNullOrEmpty(hash)) return url;
+            var sep = url.Contains('#') ? "&" : "#";
+            return url + sep + hash;
         }
 
         private static bool ContainsProvider(string providerList, string providerName)
         {
             return providerList.ToLower().Contains(providerName.ToLower());
-        }
-
-        private async Task<AuthenticationProperties> CreateInitialRefreshToken(string clientId, ApplicationUser user, ClaimsIdentity oAuthIdentity)
-        {
-            var userOrganization = new UserAndOrganizationDto
-            {
-                OrganizationId = user.OrganizationId,
-                UserId = user.Id
-            };
-
-            await _refreshTokenService.RemoveTokenBySubjectAsync(userOrganization);
-
-            var properties = ApplicationOAuthProvider.CreateProperties(user.Id, clientId);
-
-            var ticket = new AuthenticationTicket(oAuthIdentity, properties);
-            var context = new AuthenticationTokenCreateContext(Request.GetOwinContext(), Startup.OAuthServerOptions.RefreshTokenFormat, ticket);
-
-            await Startup.OAuthServerOptions.RefreshTokenProvider.CreateAsync(context);
-            properties.Dictionary.Add("refresh_token", context.Token);
-            return properties;
         }
 
         private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfoAsync()
@@ -457,32 +417,37 @@ namespace Shrooms.Presentation.Api.Controllers
             var claimsIdentity = User.Identity as ClaimsIdentity;
 
             var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"Authenticated user '{userId}' not found in the database. The token may be stale.");
+            }
+
             var permissions = await _permissionService.GetUserPermissionsAsync(userId, organizationId);
 
             var userInfo = new LoggedInUserInfoViewModel
             {
                 HasRegistered = true,
-                Roles = await _userManager.GetRolesAsync(userId),
+                Roles = await _userManager.GetRolesAsync(user),
                 UserName = User.Identity.Name,
                 UserId = userId,
-                OrganizationName = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationName),
-                OrganizationId = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationId),
-                FullName = claimsIdentity.FindFirstValue(ClaimTypes.GivenName),
+                OrganizationName = User.FindFirstValue(WebApiConstants.ClaimOrganizationName),
+                OrganizationId = User.FindFirstValue(WebApiConstants.ClaimOrganizationId),
+                FullName = User.FindFirstValue(ClaimTypes.GivenName),
                 Permissions = permissions,
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
-                CultureCode = user.CultureCode,
-                TimeZone = user.TimeZone,
-                PictureId = user.PictureId
+                CultureCode = user?.CultureCode,
+                TimeZone = user?.TimeZone,
+                PictureId = user?.PictureId
             };
 
             return userInfo;
         }
 
-        private IHttpActionResult GetErrorResult(IdentityResult result)
+        private IActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)
             {
-                return InternalServerError();
+                return StatusCode(500);
             }
 
             if (result.Succeeded)
@@ -494,149 +459,16 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("", error);
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
             if (ModelState.IsValid)
             {
-                // No ModelState errors are available to send, so just return an empty BadRequest.
                 return BadRequest();
             }
 
             return BadRequest(ModelState);
-        }
-
-        private string CreateUrl(AuthenticationDescription description, string returnUrl, string state, bool isLinkable, bool isRegistration)
-        {
-            var url = Url.RouteFromController("ExternalLogin",
-                        ControllerContext.ControllerDescriptor.ControllerName,
-                        new
-                        {
-                            provider = description.AuthenticationType,
-                            organization = RequestedOrganization,
-                            response_type = "token",
-                            client_id = Startup.JsAppClientId,
-                            redirect_uri = new Uri(Request.RequestUri, $"{returnUrl}?authType={description.AuthenticationType}").AbsoluteUri,
-                            state = state,
-                            userId = isLinkable ? GetUserAndOrganization().UserId : null,
-                            isRegistration = isRegistration ? "true" : null
-                        });
-            return url;
-        }
-
-        private async Task<IHttpActionResult> LinkAccountsAsync(ExternalLoginData externalLogin, string userId)
-        {
-            var info = await Authentication.GetExternalLoginInfoAsync();
-            if (await _userManager.AddLoginAsync(userId, info.Login) == null)
-            {
-                var uri = CreateErrorUri("error");
-                return Redirect(uri);
-            }
-
-            Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
-            Authentication.SignIn(identity);
-            await _administrationService.AddProviderEmailAsync(userId, info.Login.LoginProvider, info.Email);
-
-            return Ok();
-        }
-
-        private async Task<IHttpActionResult> RegisterOrLoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
-        {
-            if (hasLogin)
-            {
-                await UpdateCookiesAndLoginAsync(user, externalLogin, clientId);
-            }
-            else if (await _administrationService.UserEmailExistsAsync(externalLogin.Email))
-            {
-                if (await _administrationService.HasExistingExternalLoginAsync(externalLogin.Email, externalLogin.LoginProvider))
-                {
-                    var uri = CreateErrorUri("providerExists");
-                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                    return Redirect(uri);
-                }
-
-                var userId = (await _userManager.FindByEmailAsync(externalLogin.Email)).Id;
-                var info = await Authentication.GetExternalLoginInfoAsync();
-
-                if (await _userManager.AddLoginAsync(userId, info.Login) == null)
-                {
-                    var uri = CreateErrorUri("error");
-                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                    return Redirect(uri);
-                }
-
-                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
-                Authentication.SignIn(identity);
-            }
-            else
-            {
-                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
-                Authentication.SignIn(identity);
-            }
-
-            return Ok();
-        }
-
-        private async Task<IHttpActionResult> LoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
-        {
-            if (hasLogin)
-            {
-                await UpdateCookiesAndLoginAsync(user, externalLogin, clientId);
-            }
-            else
-            {
-                if (await _administrationService.UserEmailExistsAsync(externalLogin.Email) == false)
-                {
-                    var uri = CreateErrorUri("notFound");
-                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                    return Redirect(uri);
-                }
-
-                if (await _administrationService.HasExistingExternalLoginAsync(externalLogin.Email, externalLogin.LoginProvider))
-                {
-                    var uri = CreateErrorUri("providerExists");
-                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                    return Redirect(uri);
-                }
-
-                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
-                Authentication.SignIn(identity);
-            }
-
-            return Ok();
-        }
-
-        private string CreateErrorUri(string tag)
-        {
-            var hostUri = Request.GetQueryNameValuePairs().First(e => e.Key == "redirect_uri").Value;
-            var encodedError = Uri.EscapeDataString("Access_denied");
-            return $"{hostUri}#{tag}={encodedError}";
-        }
-
-        private async Task UpdateCookiesAndLoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId)
-        {
-            Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            var oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
-            var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
-            var properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
-
-            if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null) || (externalLogin.LoginProvider == "Microsoft" && user.MicrosoftEmail == null))
-            {
-                await _administrationService.AddProviderEmailAsync(user.Id, externalLogin.LoginProvider, externalLogin.Email);
-            }
-
-            Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
-        }
-
-        private void SetCookieExpirationDateToAccessTokenLifeTime(AuthenticationProperties properties)
-        {
-            // Set the .AspNet.Cookies. expiration date to the same date as the access token lifetime
-            var lifeTimeHoursTimeSpan = TimeSpan.FromHours(Convert.ToInt16(_applicationSettings.AccessTokenLifeTimeInHours));
-            var expirationDate = DateTime.UtcNow.Add(lifeTimeHoursTimeSpan);
-
-            properties.ExpiresUtc = DateTime.SpecifyKind(expirationDate, DateTimeKind.Utc);
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
@@ -36,6 +38,13 @@ namespace Shrooms.Tests.DomainService
         private IKudosService _kudosService;
         private DbSet<ApplicationUser> _userDbSet;
         private DbSet<Wall> _wallsDbSet;
+        private HttpClient _httpClient;
+
+        [TearDown]
+        public void TearDown()
+        {
+            _httpClient?.Dispose();
+        }
 
         [SetUp]
         public void TestInitializer()
@@ -52,7 +61,7 @@ namespace Shrooms.Tests.DomainService
             _administrationUsersNotificationService = Substitute.For<IAdministrationNotificationService>();
             _kudosService = Substitute.For<IKudosService>();
 
-            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             uow2.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
             _wallsDbSet = Substitute.For<DbSet<Wall>>();
@@ -60,8 +69,10 @@ namespace Shrooms.Tests.DomainService
 
             var excelBuilder = Substitute.For<IExcelBuilderFactory>();
 
+            _httpClient = new HttpClient(new StubHttpMessageHandler());
+
             _userAdministrationValidator = new UserAdministrationValidator();
-            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
+            _administrationUsersService = new AdministrationUsersService(_httpClient, ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
         }
 
         [Test]
@@ -121,7 +132,14 @@ namespace Shrooms.Tests.DomainService
 
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
-            Assert.IsTrue(users[0].IsTutorialComplete);
+            Assert.That(users[0].IsTutorialComplete, Is.True);
+        }
+
+        private sealed class StubHttpMessageHandler : HttpMessageHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(
+                HttpRequestMessage request, CancellationToken cancellationToken)
+                => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
         }
     }
 }

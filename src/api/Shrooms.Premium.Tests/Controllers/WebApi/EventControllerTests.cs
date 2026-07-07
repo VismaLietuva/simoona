@@ -1,6 +1,7 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Services.Wall.Posts;
@@ -71,10 +72,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _eventController.GetReportEventDetails(eventId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.OK, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -82,16 +82,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             // Arrange
             _eventService.GetReportEventDetailsAsync(Arg.Any<Guid>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var eventId = Guid.NewGuid();
 
             // Act
             var httpActionResult = await _eventController.GetReportEventDetails(eventId);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -102,10 +101,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _eventController.GetEventsByTitle(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.OK, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -121,10 +119,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventController.Validate(reportArgsViewModel);
 
             var httpActionResult = await _eventController.GetEventsByTitle(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -134,16 +131,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetNotStartedEventsFilteredByTitleAsync(
                 Arg.Any<EventReportListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var reportArgsViewModel = new EventReportListingArgsViewModel();
 
             // Act
             var httpActionResult = await _eventController.GetEventsByTitle(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -154,10 +150,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _eventController.GetPagedReportParticipants(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.OK, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -173,10 +168,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventController.Validate(reportArgsViewModel);
 
             var httpActionResult = await _eventController.GetPagedReportParticipants(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -186,16 +180,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetReportParticipantsAsync(
                 Arg.Any<EventParticipantsReportListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var reportArgsViewModel = new EventParticipantsReportListingArgsViewModel();
 
             // Act
             var httpActionResult = await _eventController.GetPagedReportParticipants(reportArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -208,10 +201,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -221,16 +213,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _eventListingService.GetEventParticipantVisitedReportEventsAsync(
                 Arg.Any<EventParticipantVisitedEventsListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
-                .Throws(new EventException("Error"));
+                .ThrowsAsync(new EventException("Error"));
 
             var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
 
             // Act
             var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.BadRequest, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -241,10 +232,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ClassicAssert.AreEqual(HttpStatusCode.OK, httpActionResult.GetStatusCode());
         }
     }
 }

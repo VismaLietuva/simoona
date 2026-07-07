@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -37,6 +38,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             _roomTypeRepository = unitOfWork.GetRepository<RoomType>();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
         public async Task<MapViewModel> GetDefault()
         {
@@ -63,6 +65,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return new MapViewModel();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
         public async Task<MapViewModel> GetByOffice(int officeId)
         {
@@ -71,6 +74,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return await GetModelAsync(floor);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
         public async Task<MapViewModel> GetByRoom(int roomId)
         {
@@ -79,6 +83,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return await GetModelAsync(floor);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
         public async Task<MapViewModel> GetByApplicationUser(string userName)
         {
@@ -87,6 +92,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return await GetModelAsync(floor);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
         public async Task<MapViewModel> GetByFloor(int floorId)
         {
@@ -125,7 +131,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var officeUsersDto = await _officeMapService.GetOfficeUsersAsync(floorId, includeProperties);
 
-            var officeUserPagedViewModel = await officeUsersDto.ToPagedListAsync(page, pageSize);
+            var officeUserPagedViewModel = new PagedList<OfficeUserDto>(officeUsersDto, page, pageSize);
 
             var pagedModel = new PagedViewModel<OfficeUserDto>
             {

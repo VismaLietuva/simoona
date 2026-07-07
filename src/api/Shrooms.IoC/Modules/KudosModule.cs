@@ -1,19 +1,19 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class KudosModule : Module
+    public static class KudosModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddKudos(this IServiceCollection services)
         {
-            builder.RegisterType<KudosServiceValidator>().As<IKudosServiceValidator>().InstancePerRequest();
-            builder.RegisterType<KudosService>().As<IKudosService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<KudosExportService>().As<IKudosExportService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<KudosNotificationService>().As<IKudosNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IKudosServiceValidator, KudosServiceValidator>();
+            services.AddScoped<IKudosService, KudosService>();
+            services.AddScoped<IKudosExportService, KudosExportService>();
+            services.AddScoped<IKudosNotificationService, KudosNotificationService>();
+            return services;
         }
     }
 }

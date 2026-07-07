@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ExternalLink : BaseModelWithOrg
+    public class ExternalLink : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

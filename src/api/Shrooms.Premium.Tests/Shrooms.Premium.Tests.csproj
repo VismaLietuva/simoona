@@ -1,40 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Targets\shared.targets" />
   
   <PropertyGroup>
     <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TestProjectType>UnitTest</TestProjectType>
     <AssemblyTitle>Shrooms.Premium.Tests</AssemblyTitle>
     <Product>Shrooms.Premium.Tests</Product>
     <DebugType>pdbonly</DebugType>
     <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="AutofacContrib.NSubstitute" Version="4.0.1" />
-    <PackageReference Include="EntityFrameworkTesting" Version="1.2.1" />
-    <PackageReference Include="EntityFrameworkTesting.NSubstitute" Version="1.2.1" />
-    <PackageReference Include="Microsoft.CodeCoverage" Version="16.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="NSubstitute" Version="4.2.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
+    <PackageReference Include="ExcelDataReader" Version="3.7.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SharpZipLib" Version="0.86.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="mscorlib" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Shrooms.Tests\Shrooms.Tests.csproj" />
   </ItemGroup>

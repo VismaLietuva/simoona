@@ -1,27 +1,27 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class ApplicationRoleConfiguration : EntityTypeConfiguration<ApplicationRole>
+    internal class ApplicationRoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
     {
-        public ApplicationRoleConfiguration()
+        public void Configure(EntityTypeBuilder<ApplicationRole> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false))
-                .ToTable("AspNetRoles");
+            builder.HasQueryFilter(e => !e.IsDeleted);
+            builder.ToTable("AspNetRoles");
 
-            Property(r => r.Name)
+            builder.Property(r => r.Name)
                 .IsRequired()
                 .HasMaxLength(256);
 
-            HasMany(r => r.Users)
-                .WithRequired()
-                .HasForeignKey(ur => ur.RoleId);
+            // Note: The Users relationship is managed by ASP.NET Core Identity through IdentityUserRole
+            // and doesn't need explicit configuration here
 
-            HasRequired(r => r.Organization)
+            builder.HasOne(r => r.Organization)
                 .WithMany()
                 .HasForeignKey(r => r.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

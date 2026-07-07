@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -131,7 +131,6 @@ namespace Shrooms.Domain.Services.Organizations
             }
 
             var managingDirectors = await _usersDbSet
-                .Include(x => x.Roles)
                 .Where(x => x.OrganizationId == userAndOrganizationDto.OrganizationId)
                 .Where(x => x.IsManagingDirector || x.Id == userId)
                 .ToListAsync();

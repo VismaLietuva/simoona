@@ -1,13 +1,14 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    public class VacationEntityConfig : EntityTypeConfiguration<VacationPage>
+    public class VacationEntityConfig : IEntityTypeConfiguration<VacationPage>
     {
-        public VacationEntityConfig()
+        public void Configure(EntityTypeBuilder<VacationPage> builder)
         {
-            Property(v => v.Content)
+            builder.Property(v => v.Content)
                 .IsRequired();
         }
     }

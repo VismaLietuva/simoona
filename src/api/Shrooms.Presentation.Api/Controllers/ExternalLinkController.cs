@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Contracts.Exceptions;
@@ -8,15 +8,13 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
-using WebApi.OutputCache.V2;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("ExternalLink")]
-    [AutoInvalidateCacheOutput]
-    public class ExternalLinkController : BaseController
+    [Route("ExternalLink")]    public class ExternalLinkController : BaseController
     {
         private readonly IExternalLinkService _externalLinkService;
         private readonly IMapper _mapper;
@@ -29,9 +27,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("List")]
-        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
-        public async Task<IHttpActionResult> GetAll()
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.ExternalLink, AdministrationPermissions.ExternalLink })]
+        [ProducesResponseType(typeof(IEnumerable<ExternalLinkViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
         {
             var externalLinks = await _externalLinkService.GetAllAsync(GetUserAndOrganization().OrganizationId);
             var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDto>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
@@ -40,8 +38,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
-        public async Task<IHttpActionResult> GetExternalLink(int id)
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.ExternalLink, AdministrationPermissions.ExternalLink })]
+        [ProducesResponseType(typeof(ExternalLinkViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetExternalLink(int id)
         {
             var externalLink = await _externalLinkService.GetAsync(id, GetUserAndOrganization());
 
@@ -58,8 +57,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
-        [InvalidateCacheOutput(nameof(GetAll))]
-        public async Task<IHttpActionResult> UpdateLinks(ManageExternalLinkViewModel manageLinksViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateLinks(ManageExternalLinkViewModel manageLinksViewModel)
         {
             if (!ModelState.IsValid)
             {

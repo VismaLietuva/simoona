@@ -1,0 +1,17 @@
+# Email templates use table-based layouts with deprecated HTML attributes
+# for compatibility with email clients (Outlook, Gmail, etc.)
+# Suppress IDE HTML validation warnings for this folder.
+[*.cshtml]
+generated_code = true
+
+# Rider/ReSharper: suppress deprecated HTML attribute/element warnings
+# (align, border, cellpadding, cellspacing, bgcolor, <font>, etc.)
+resharper_html_deprecated_attribute_highlighting = none
+resharper_html_deprecated_element_highlighting = none
+resharper_html_unknown_attribute_highlighting = none
+
+# Suppress Razor view resolution warnings for email templates
+resharper_razor_unknown_identifier_highlighting = none
+resharper_unresolved_reference_highlighting = none
+resharper_inconsistent_naming_highlighting = none
+

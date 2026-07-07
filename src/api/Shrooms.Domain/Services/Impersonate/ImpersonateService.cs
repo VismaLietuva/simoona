@@ -1,66 +1,71 @@
-﻿using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.OAuth;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
-using OwinDate = Microsoft.Owin.Infrastructure;
+using Shrooms.Domain.ServiceExceptions;
+using Shrooms.Domain.Services.Jwt;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.Impersonate
 {
     public class ImpersonateService : IImpersonateService
     {
         private readonly ShroomsUserManager _userManager;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public ImpersonateService(ShroomsUserManager userManager)
+        public ImpersonateService(ShroomsUserManager userManager, IJwtTokenService jwtTokenService)
         {
             _userManager = userManager;
+            _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<string> ImpersonateUserAsync(string userName, OAuthAuthorizationServerOptions serverAuthOptions, ClaimsPrincipal principal)
+        public async Task<string> ImpersonateUserAsync(string userName, ClaimsPrincipal principal)
         {
-            var originalUsername = principal.Claims.Any(c => c.Type == DataLayerConstants.ClaimUserImpersonation && c.Value == true.ToString()) ? principal.Claims.First(c => c.Type == DataLayerConstants.ClaimOriginalUsername).Value : principal.Identity.Name;
-            var impersonatedUser = await _userManager.FindByNameAsync(userName);
-            var impersonatedIdentity = await _userManager.CreateIdentityAsync(impersonatedUser, OAuthDefaults.AuthenticationType);
-
-            if (impersonatedUser.UserName != originalUsername)
+            if (string.IsNullOrEmpty(userName))
             {
-                if (impersonatedIdentity.Claims.Any(c => c.Type == DataLayerConstants.ClaimUserImpersonation && c.Value == true.ToString()))
-                {
-                    var primarySidClaim = impersonatedIdentity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid);
-                    impersonatedIdentity.RemoveClaim(primarySidClaim);
-                    impersonatedIdentity.AddClaim(new Claim(ClaimTypes.PrimarySid, string.Empty));
-                }
-                else
-                {
-                    impersonatedIdentity.AddClaim(new Claim(DataLayerConstants.ClaimUserImpersonation, true.ToString()));
-                    impersonatedIdentity.AddClaim(new Claim(DataLayerConstants.ClaimOriginalUsername, originalUsername));
-
-                    impersonatedIdentity.AddClaim(new Claim(ClaimTypes.PrimarySid, string.Empty));
-                }
+                throw new ServiceException("Target username must not be empty.");
             }
 
-            var ticket = new AuthenticationTicket(impersonatedIdentity, new AuthenticationProperties());
-            var currentUtc = new OwinDate.SystemClock().UtcNow;
-            ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(serverAuthOptions.AccessTokenExpireTimeSpan);
-            return serverAuthOptions.AccessTokenFormat.Protect(ticket);
+            if (principal?.Identity == null || !principal.Identity.IsAuthenticated || string.IsNullOrEmpty(principal.Identity.Name))
+            {
+                throw new ServiceException("Caller principal must be authenticated.");
+            }
+
+            var targetUser = await _userManager.FindByNameAsync(userName);
+            if (targetUser == null)
+            {
+                throw new ServiceException($"User '{userName}' was not found.");
+            }
+
+            var extraClaims = new List<Claim>
+            {
+                new Claim(DataLayerConstants.ClaimUserImpersonation, true.ToString()),
+                new Claim(DataLayerConstants.ClaimOriginalUsername, principal.Identity.Name)
+            };
+
+            return (await _jwtTokenService.GenerateTokenAsync(targetUser, extraClaims)).Token;
         }
 
-        public async Task<string> RevertImpersonationAsync(string originalUserName, OAuthAuthorizationServerOptions serverAuthOptions)
+        public async Task<string> RevertImpersonationAsync(ClaimsPrincipal principal)
         {
+            if (principal == null || !principal.HasClaim(DataLayerConstants.ClaimUserImpersonation, true.ToString()))
+            {
+                throw new ServiceException("Revert is only valid during an active impersonation session.");
+            }
+
+            var originalUserName = principal.FindFirstValue(DataLayerConstants.ClaimOriginalUsername);
+            if (string.IsNullOrEmpty(originalUserName))
+            {
+                throw new ServiceException("Original username claim is missing from the impersonation token.");
+            }
+
             var originalUser = await _userManager.FindByNameAsync(originalUserName);
+            if (originalUser == null)
+            {
+                throw new ServiceException($"User '{originalUserName}' was not found.");
+            }
 
-            var impersonatedIdentity = await _userManager.CreateIdentityAsync(originalUser, OAuthDefaults.AuthenticationType);
-            impersonatedIdentity.AddClaim(new Claim(ClaimTypes.PrimarySid, string.Empty));
-
-            var ticket = new AuthenticationTicket(impersonatedIdentity, new AuthenticationProperties());
-            var currentUtc = new OwinDate.SystemClock().UtcNow;
-            ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(serverAuthOptions.AccessTokenExpireTimeSpan);
-
-            return serverAuthOptions.AccessTokenFormat.Protect(ticket);
+            return (await _jwtTokenService.GenerateTokenAsync(originalUser)).Token;
         }
     }
 }

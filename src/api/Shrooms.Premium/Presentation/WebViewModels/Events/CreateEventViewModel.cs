@@ -15,7 +15,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [StringLength(EventsConstants.EventNameMaxLength)]
         public string Name { get; set; }
 
-        [Required]
         public string ImageName { get; set; }
 
         [Required]

@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -8,7 +8,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 

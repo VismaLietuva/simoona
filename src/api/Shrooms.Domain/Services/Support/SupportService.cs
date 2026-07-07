@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -11,7 +11,7 @@ namespace Shrooms.Domain.Services.Support
 {
     public class SupportService : ISupportService
     {
-        private readonly IDbSet<ApplicationUser> _applicationUsers;
+        private readonly DbSet<ApplicationUser> _applicationUsers;
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _applicationSettings;
 

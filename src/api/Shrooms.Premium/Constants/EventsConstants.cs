@@ -36,4 +36,11 @@
         Host,
         Participant
     }
+
+    public enum EventTimeFrame
+    {
+        Upcoming = 0,
+        Past = 1,
+        All = 2
+    }
 }

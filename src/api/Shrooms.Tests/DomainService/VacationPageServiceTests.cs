@@ -1,6 +1,6 @@
-﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -30,7 +30,7 @@ namespace Shrooms.Tests.DomainService
         {
             _mockDbContext = new MockDbContext();
 
-            _vacationPagesDbSet = Substitute.For<DbSet<VacationPage>, IQueryable<VacationPage>, IDbAsyncEnumerable<VacationPage>>();
+            _vacationPagesDbSet = Substitute.For<DbSet<VacationPage>, IQueryable<VacationPage>, IAsyncEnumerable<VacationPage>>();
             _vacationPagesDbSet.SetDbSetDataForAsync(_mockDbContext.VacationPages);
 
             _uow = Substitute.For<IUnitOfWork2>();
@@ -46,7 +46,7 @@ namespace Shrooms.Tests.DomainService
             var vacationPageDto = await _vacationPageService.GetVacationPage(TestConstants.DefaultOrganizationId);
 
             // Assert
-            Assert.NotNull(vacationPageDto);
+            Assert.That(vacationPageDto, Is.Not.Null);
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Shrooms.Tests.DomainService
             var vacationPageDto = await _vacationPageService.GetVacationPage(int.MaxValue);
 
             // Assert
-            Assert.IsNull(vacationPageDto);
+            Assert.That(vacationPageDto, Is.Null);
         }
 
         [Test]
@@ -103,8 +103,8 @@ namespace Shrooms.Tests.DomainService
             var actualUpdatedVacation = await _vacationPagesDbSet.FirstAsync(page => page.OrganizationId == TestConstants.DefaultOrganizationId);
 
             // Assert
-            Assert.AreEqual(TestConstants.DefaultOrganizationId, actualUpdatedVacation.OrganizationId);
-            Assert.AreEqual(vacationPageUpdate.Content, actualUpdatedVacation.Content);
+            Assert.That(actualUpdatedVacation.OrganizationId, Is.EqualTo(TestConstants.DefaultOrganizationId));
+            Assert.That(actualUpdatedVacation.Content, Is.EqualTo(vacationPageUpdate.Content));
         }
     }
 }

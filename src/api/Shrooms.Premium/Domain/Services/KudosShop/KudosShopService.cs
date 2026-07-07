@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
     public class KudosShopService : IKudosShopService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<KudosShopItem> _kudosShopItemsDbSet;
+        private readonly DbSet<KudosShopItem> _kudosShopItemsDbSet;
 
         public KudosShopService(IUnitOfWork2 uow)
         {

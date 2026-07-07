@@ -3,7 +3,7 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ServiceRequest : BaseModelWithOrg
+    public class ServiceRequest : SoftDeletableModelWithOrg
     {
         public string EmployeeId { get; set; }
 

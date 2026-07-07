@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ServiceRequestStatus : BaseModel
+    public class ServiceRequestStatus : SoftDeletableModel
     {
         public string Title { get; set; }
     }

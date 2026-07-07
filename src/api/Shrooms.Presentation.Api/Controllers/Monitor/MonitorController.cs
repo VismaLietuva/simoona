@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Monitors;
 using Shrooms.Contracts.Exceptions;
@@ -9,12 +9,13 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Monitors;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers.Monitor
 {
     [Authorize]
-    [RoutePrefix("Monitor")]
+    [Route("Monitor")]
     [FeatureToggle(Infrastructure.FeatureToggle.Features.Monitors)]
     public class MonitorController : BaseController
     {
@@ -30,7 +31,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpGet]
         [Route("List")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
-        public async Task<IHttpActionResult> GetMonitorList()
+        [ProducesResponseType(typeof(IEnumerable<MonitorViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMonitorList()
         {
             var monitorsDto = await _monitorService.GetMonitorListAsync(GetUserAndOrganization().OrganizationId);
             var monitorsViewModel = _mapper.Map<IEnumerable<MonitorDto>, IEnumerable<MonitorViewModel>>(monitorsDto);
@@ -40,7 +42,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
-        public async Task<IHttpActionResult> GetMonitorDetails(int monitorId)
+        [ProducesResponseType(typeof(MonitorViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMonitorDetails(int monitorId)
         {
             try
             {
@@ -57,7 +60,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
-        public async Task<IHttpActionResult> CreateMonitor(CreateMonitorViewModel monitor)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateMonitor(CreateMonitorViewModel monitor)
         {
             if (!ModelState.IsValid)
             {
@@ -81,7 +85,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
-        public async Task<IHttpActionResult> UpdateMonitor(MonitorViewModel monitor)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateMonitor(MonitorViewModel monitor)
         {
             if (!ModelState.IsValid)
             {

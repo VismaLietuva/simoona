@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
         public async Task<IList<KudosBasketLogDto>> GetDonationsAsync(UserAndOrganizationDto userAndOrg)
         {
             var kudosBasket = await _kudosBasketsDbSet
-                .Include(basket => basket.KudosLogs.Select(log => log.Employee))
+                .Include(basket => basket.KudosLogs).ThenInclude(log => log.Employee)
                 .FirstOrDefaultAsync(basket => basket.OrganizationId == userAndOrg.OrganizationId);
 
             var kudosLogs = kudosBasket?.KudosLogs.OrderByDescending(log => log.Created);
@@ -206,10 +206,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 Id = b.Id,
                 Title = b.Title,
                 Description = b.Description,
-                KudosDonated = b.KudosLogs
-                    .Select(log => log.Points)
-                    .DefaultIfEmpty(0)
-                    .Sum(),
+                KudosDonated = b.KudosLogs.Sum(log => log.Points),
                 IsActive = b.IsActive
             };
         }

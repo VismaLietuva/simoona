@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public abstract class AbstractClassifier : BaseModelWithOrg
+    public abstract class AbstractClassifier : SoftDeletableModelWithOrg
     {
         public virtual string Name { get; set; }
 

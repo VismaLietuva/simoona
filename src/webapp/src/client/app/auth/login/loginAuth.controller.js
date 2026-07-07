@@ -218,9 +218,14 @@
         }
 
         function getUrl() {
-            var returnUrl = $location.protocol() + '://' + $location.host();
-            if ($location.port() !== '80') {
-                returnUrl += ':' + $location.port();
+            var protocol = $location.protocol();
+            var port = $location.port();
+            var isDefaultPort = (protocol === 'http' && port === 80) ||
+                                (protocol === 'https' && port === 443);
+
+            var returnUrl = protocol + '://' + $location.host();
+            if (!isDefaultPort) {
+                returnUrl += ':' + port;
             }
 
             returnUrl += '/' + vm.organizationName + '/Login';

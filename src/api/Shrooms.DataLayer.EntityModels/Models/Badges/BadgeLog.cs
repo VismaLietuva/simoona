@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.DataLayer.EntityModels.Models.Badges
 {
-    public class BadgeLog : BaseModelWithOrg
+    public class BadgeLog : SoftDeletableModelWithOrg
     {
         public string EmployeeId { get; set; }
         public int BadgeTypeId { get; set; }

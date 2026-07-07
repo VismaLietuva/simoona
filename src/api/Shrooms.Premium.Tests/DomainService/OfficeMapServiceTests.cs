@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -27,7 +27,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var uow = Substitute.For<IUnitOfWork2>();
             var unitOfWork = Substitute.For<IUnitOfWork>();
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
@@ -112,21 +112,21 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_If_Get_Emails_By_Office_Returns_Incorrect_Emails()
         {
             var emails = await _officeMapService.GetEmailsByOfficeAsync(3);
-            Assert.AreEqual(1, emails.Count());
+            ClassicAssert.AreEqual(1, emails.Count());
         }
 
         [Test]
         public async Task Should_Return_If_Get_Emails_By_Floor_Returns_Incorrect_Emails()
         {
             var emails = await _officeMapService.GetEmailsByFloorAsync(1);
-            Assert.AreEqual(3, emails.Count());
+            ClassicAssert.AreEqual(3, emails.Count());
         }
 
         [Test]
         public async Task Should_Return_If_Get_Emails_By_Room_Returns_Incorrect_Emails()
         {
             var emails = await _officeMapService.GetEmailsByRoomAsync(1);
-            Assert.AreEqual(2, emails.Count());
+            ClassicAssert.AreEqual(2, emails.Count());
         }
     }
 }

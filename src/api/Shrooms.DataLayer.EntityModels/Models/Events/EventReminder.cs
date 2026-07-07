@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Events
 {
-    public class EventReminder : BaseModel
+    public class EventReminder : SoftDeletableModel
     {
         public Guid EventId { get; set; }
 

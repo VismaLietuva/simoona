@@ -7,6 +7,17 @@ namespace Shrooms.Presentation.Common.Helpers
 {
     public static class ClaimsHelper
     {
+        public static string GetUserId(this IIdentity identity)
+        {
+            if (identity == null)
+            {
+                return null;
+            }
+
+            var claimsIdentity = identity as ClaimsIdentity;
+            return claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
         public static int GetOrganizationId(this IIdentity identity)
         {
             if (identity == null)

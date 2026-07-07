@@ -15,7 +15,6 @@
         'LocalStorageModule',
         'monospaced.elastic',
         'ApplicationInsightsModule',
-        'SignalR',
         'pascalprecht.translate',
         'tmh.dynamicLocale',
         'angular-loading-bar',
@@ -45,8 +44,8 @@
     ];
 
     window.modules = modulesList;
-    window.isPremium = false; // Enable/disable premium modules
-    window.lotteriesEnabled = false;
+    window.isPremium = true; // Enable/disable premium modules
+    window.lotteriesEnabled = true;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.usePostWatching = true; // Used to show/hide post watching feature
     window.isChatBotEnabled = false;

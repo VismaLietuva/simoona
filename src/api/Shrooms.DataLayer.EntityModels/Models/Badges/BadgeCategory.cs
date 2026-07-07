@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models.Badges
 {
-    public class BadgeCategory : BaseModel
+    public class BadgeCategory : SoftDeletableModel
     {
         public string Title { get; set; }
         public string Description { get; set; }

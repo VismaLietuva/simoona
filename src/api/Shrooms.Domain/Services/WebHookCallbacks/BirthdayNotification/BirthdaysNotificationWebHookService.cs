@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -16,8 +16,8 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
 {
     public class BirthdaysNotificationWebHookService : IBirthdaysNotificationWebHookService
     {
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
         private readonly DateTime _date;
         private readonly IMailingService _mailingService;
         private readonly IRoleService _roleService;
@@ -64,7 +64,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
             var receivers = await _roleService.GetAdministrationRoleEmailsAsync(currentOrganization.Id);
             var model = new BirthdaysNotificationTemplateViewModel(GetFormattedEmployeesList(employees, organizationName, currentOrganization.ShortName),
                 _appSettings.UserNotificationSettingsUrl(organizationName));
-            var content = _mailTemplate.Generate(model, EmailTemplateCacheKeys.BirthdaysNotification);
+            var content = await _mailTemplate.GenerateAsync(model, EmailTemplateCacheKeys.BirthdaysNotification);
             var emailData = new EmailDto(receivers, Resources.Emails.Templates.BirthdaysNotificationEmailSubject, content);
 
             await _mailingService.SendEmailAsync(emailData);

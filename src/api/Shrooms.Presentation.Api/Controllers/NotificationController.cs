@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels.Notifications;
@@ -7,7 +7,8 @@ using Shrooms.Presentation.Common.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -23,6 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public async Task<IEnumerable<NotificationViewModel>> GetAll()
         {
             var result = await _notificationService.GetAllAsync(GetUserAndOrganization());
@@ -31,7 +33,8 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> MarkAsRead(IEnumerable<int> ids)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> MarkAsRead(IEnumerable<int> ids)
         {
             await _notificationService.MarkAsReadAsync(GetUserAndOrganization(), ids);
 
@@ -39,7 +42,8 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<IHttpActionResult> MarkAllAsRead()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> MarkAllAsRead()
         {
             await _notificationService.MarkAllAsReadAsync(GetUserAndOrganization());
 

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
@@ -5,7 +6,6 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
@@ -24,7 +24,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
 
-        private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
+        private readonly DbSet<BlacklistUser> _blacklistUsersDbSet;
 
         public BlacklistService(IUnitOfWork2 uow, IBlacklistValidator validator, ISystemClock systemClock, IPermissionService permissionService)
         {

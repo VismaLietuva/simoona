@@ -1,11 +1,11 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Shrooms.Tests.Extensions;
 using Shrooms.Contracts.DAL;

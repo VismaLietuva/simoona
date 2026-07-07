@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.DataLayer.EntityModels.Models
@@ -31,5 +31,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual ICollection<Permission> Permissions { get; set; }
 
         public DateTime CreatedTime { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

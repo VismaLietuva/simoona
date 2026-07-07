@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NSubstitute;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.DAL;
-using Shrooms.Infrastructure.Configuration;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.Mocks
@@ -14,7 +15,7 @@ namespace Shrooms.Tests.Mocks
         private readonly List<TEntity> _listContext;
 
         public NewMockRepository(IDbContext context)
-            : base(context, new ApplicationSettings())
+            : base(context, CreateMockSettings())
         {
             _listContext = context.Set<TEntity>().ToList();
         }
@@ -87,6 +88,13 @@ namespace Shrooms.Tests.Mocks
             var queryable = _listContext.AsQueryable();
             _dbSet.SetDbSetDataForAsync(queryable);
             return entity;
+        }
+
+        private static IApplicationSettings CreateMockSettings()
+        {
+            var settings = Substitute.For<IApplicationSettings>();
+            settings.DefaultOrganizationId.Returns(TestConstants.DefaultOrganizationId);
+            return settings;
         }
     }
 }

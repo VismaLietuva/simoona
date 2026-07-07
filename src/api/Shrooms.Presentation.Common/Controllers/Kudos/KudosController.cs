@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
@@ -18,15 +18,14 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Common.Controllers.Wall;
 using Shrooms.Presentation.Common.Filters;
+using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models.KudosTypes;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
-using WebApi.OutputCache.V2;
 using X.PagedList;
 
 namespace Shrooms.Presentation.Common.Controllers.Kudos
 {
     [Authorize]
-    [AutoInvalidateCacheOutput]
     public class KudosController : BaseController
     {
         private const int FirstPage = 1;
@@ -50,16 +49,18 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<PagedViewModel<KudosLogViewModel>> GetKudosLogs([FromUri] KudosLogsFilterViewModel filter)
+        public async Task<PagedViewModel<KudosLogViewModel>> GetKudosLogs([FromQuery] KudosLogsFilterViewModel filter)
         {
             var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDto>(filter);
             SetOrganizationAndUser(filterDto);
             var kudosLogsEntriesDto = await _kudosService.GetKudosLogsAsync(filterDto);
-            var kudosLogsViewModel = _mapper.Map<IEnumerable<MainKudosLogDto>, IEnumerable<KudosLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
+            var kudosLogsViewModel = _mapper.Map<IEnumerable<MainKudosLogDto>, IEnumerable<KudosLogViewModel>>(kudosLogsEntriesDto.KudosLogs).ToList();
 
             var pagedKudosLogs = new PagedViewModel<KudosLogViewModel>
             {
-                PagedList = await kudosLogsViewModel.ToPagedListAsync(FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage),
+                PagedList = new StaticPagedList<KudosLogViewModel>(
+                    kudosLogsViewModel.Skip((FirstPage - 1) * BusinessLayerConstants.MaxKudosLogsPerPage).Take(BusinessLayerConstants.MaxKudosLogsPerPage),
+                    FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage, kudosLogsViewModel.Count),
                 ItemCount = kudosLogsEntriesDto.TotalKudosCount,
                 PageSize = BusinessLayerConstants.MaxKudosLogsPerPage
             };
@@ -68,7 +69,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetUserKudosLogs(string userId, int page = 1)
+        [ProducesResponseType(typeof(PagedViewModel<KudosUserLogViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserKudosLogs(string userId, int page = 1)
         {
             if (!ModelState.IsValid)
             {
@@ -76,18 +78,20 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             }
 
             var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId);
-            var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDto>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
+            var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDto>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs).ToList();
             var pagedKudosLogs = new PagedViewModel<KudosUserLogViewModel>
             {
-                PagedList = await userKudosLogsViewModel.ToPagedListAsync(FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage),
+                PagedList = new StaticPagedList<KudosUserLogViewModel>(
+                    userKudosLogsViewModel.Skip((FirstPage - 1) * BusinessLayerConstants.MaxKudosLogsPerPage).Take(BusinessLayerConstants.MaxKudosLogsPerPage),
+                    FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage, userKudosLogsViewModel.Count),
                 ItemCount = kudosLogsEntriesDto.TotalKudosCount,
                 PageSize = BusinessLayerConstants.MaxKudosLogsPerPage
             };
             return Ok(pagedKudosLogs);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>
@@ -109,6 +113,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             return types;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public IEnumerable<string> GetKudosStatuses()
         {
@@ -122,6 +127,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             return statuses;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public async Task<IEnumerable<string>> GetKudosFilteringTypes()
         {
@@ -142,8 +148,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos })]
         public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypes()
         {
             var kudosTypeDto = await _kudosService.GetKudosTypesAsync(GetUserAndOrganization());
@@ -161,10 +166,9 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> EditType(int id)
+        [PermissionAuthorize(AnyOf = new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos })]
+        [ProducesResponseType(typeof(KudosTypeViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditType(int id)
         {
             if (id < 1)
             {
@@ -186,9 +190,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> EditType(KudosTypeViewModel model)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditType([FromBody] KudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -211,9 +214,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> CreateType(NewKudosTypeViewModel model)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateType([FromBody] NewKudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -234,11 +236,10 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> RemoveType(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RemoveType(int id)
         {
             if (id < 1)
             {
@@ -258,7 +259,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetKudosTypeId(string kudosTypeName)
+        public async Task<IActionResult> GetKudosTypeId(string kudosTypeName)
         {
             var typeId = await _kudosService.GetKudosTypeIdAsync(kudosTypeName);
             return Ok(new { kudosTypeId = typeId });
@@ -266,8 +267,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> AddKudosLog(AddKudosLogViewModel kudosLog)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> AddKudosLog([FromBody] AddKudosLogViewModel kudosLog)
         {
             if (!ModelState.IsValid)
             {
@@ -302,8 +303,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public async Task<IHttpActionResult> ApproveKudos(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ApproveKudos(int id)
         {
             try
             {
@@ -318,7 +319,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<IHttpActionResult> RejectKudos(KudosRejectViewModel kudosRejectModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RejectKudos([FromBody] KudosRejectViewModel kudosRejectModel)
         {
             if (!ModelState.IsValid)
             {
@@ -355,8 +357,10 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             return userKudosViewModel;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetApprovedKudosList(string id = null)
+        [ProducesResponseType(typeof(IEnumerable<UserKudosInformationViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetApprovedKudosList(string id = null)
         {
             id = GetUserIdIfNull(id);
 
@@ -374,7 +378,6 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<IEnumerable<WallKudosLogViewModel>> GetLastKudosLogRecords()
         {
             var userAndOrg = GetUserAndOrganization();
@@ -384,7 +387,6 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<IEnumerable<KudosBasicDataViewModel>> GetKudosStats(int months, int amount)
         {
             if (months <= 0 || amount <= 0)
@@ -399,7 +401,6 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<IEnumerable<KudosListBasicDataViewModel>> GetKudosWidgetStats(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
             var result = new List<KudosListBasicDataViewModel>();
@@ -415,20 +416,15 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetKudosLogAsExcel([FromUri] KudosLogsFilterViewModel filter)
+        public async Task<IActionResult> GetKudosLogAsExcel([FromQuery] KudosLogsFilterViewModel filter)
         {
             var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDto>(filter);
             SetOrganizationAndUser(filterDto);
             try
             {
                 var content = await _kudosExportService.ExportToExcelAsync(filterDto);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = content
-                };
-
-                return ResponseMessage(result);
+                var bytes = await content.ReadAsByteArrayAsync();
+                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "kudos.xlsx");
             }
             catch (ValidationException e)
             {
@@ -438,7 +434,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetWelcomeKudos()
+        [ProducesResponseType(typeof(WelcomeKudosViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWelcomeKudos()
         {
             var welcomeKudos = await _kudosService.GetWelcomeKudosAsync();
 

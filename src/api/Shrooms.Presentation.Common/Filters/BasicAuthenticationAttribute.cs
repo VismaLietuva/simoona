@@ -1,83 +1,63 @@
 using System;
-using System.Net;
-using System.Net.Http;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Shrooms.Presentation.Common.Filters
 {
-    public abstract class BasicAuthenticationAttribute : Attribute, IAuthenticationFilter
+    public abstract class BasicAuthenticationAttribute : Attribute, IAsyncAuthorizationFilter
     {
         public string Realm { get; set; }
-        protected HttpRequestMessage Request { get; set; }
 
-        public async Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            Request = context.ActionContext.Request;
+            var request = context.HttpContext.Request;
+            var authHeader = request.Headers.Authorization.ToString();
 
-            var request = context.Request;
-            var authorization = request.Headers.Authorization;
-
-            if (authorization == null)
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
-                // No authentication was attempted (for this authentication method).
-                // Do not set either Principal (which would indicate success) or ErrorResult (indicating an error).
-                context.ErrorResult = new AuthenticationFailureResult("No authentication was attempted", request);
+                context.Result = new UnauthorizedResult();
                 return;
             }
 
-            if (authorization.Scheme != "Basic")
+            var parameter = authHeader.Substring("Basic ".Length).Trim();
+            if (string.IsNullOrEmpty(parameter))
             {
-                // No authentication was attempted (for this authentication method).
-                // Do not set either Principal (which would indicate success) or ErrorResult (indicating an error).
-                context.ErrorResult = new AuthenticationFailureResult("No authentication was attempted", request);
+                context.Result = new UnauthorizedResult();
                 return;
             }
 
-            if (string.IsNullOrEmpty(authorization.Parameter))
-            {
-                // Authentication was attempted but failed. Set ErrorResult to indicate an error.
-                context.ErrorResult = new AuthenticationFailureResult("Missing credentials", request);
-                return;
-            }
-
-            var userNameAndPassword = ExtractUserNameAndPassword(authorization.Parameter);
-
+            var userNameAndPassword = ExtractUserNameAndPassword(parameter);
             if (userNameAndPassword == null)
             {
-                // Authentication was attempted but failed. Set ErrorResult to indicate an error.
-                context.ErrorResult = new AuthenticationFailureResult("Invalid credentials", request);
+                context.Result = new UnauthorizedResult();
                 return;
             }
 
-            var userName = userNameAndPassword.Item1;
-            var password = userNameAndPassword.Item2;
-
-            var principal = await AuthenticateAsync(userName, password, cancellationToken);
+            var principal = await AuthenticateAsync(userNameAndPassword.Item1, userNameAndPassword.Item2,
+                CancellationToken.None, context.HttpContext);
 
             if (principal == null)
             {
-                // Authentication was attempted but failed. Set ErrorResult to indicate an error.
-                context.ErrorResult = new AuthenticationFailureResult("Invalid username or password", request);
+                context.Result = new UnauthorizedResult();
             }
             else
             {
-                // Authentication was attempted and succeeded. Set Principal to the authenticated user.
-                context.Principal = principal;
+                context.HttpContext.User = principal as System.Security.Claims.ClaimsPrincipal
+                    ?? new System.Security.Claims.ClaimsPrincipal(principal.Identity);
             }
         }
 
         protected abstract Task<IPrincipal> AuthenticateAsync(string userName, string password,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken, HttpContext httpContext);
 
         private static Tuple<string, string> ExtractUserNameAndPassword(string authorizationParameter)
         {
             byte[] credentialBytes;
-
             try
             {
                 credentialBytes = Convert.FromBase64String(authorizationParameter);
@@ -87,18 +67,9 @@ namespace Shrooms.Presentation.Common.Filters
                 return null;
             }
 
-            // The currently approved HTTP 1.1 specification says characters here are ISO-8859-1.
-            // However, the current draft updated specification for HTTP 1.1 indicates this encoding is infrequently
-            // used in practice and defines behavior only for ASCII.
-            var encoding = Encoding.ASCII;
-
-            // Make a writable copy of the encoding to enable setting a decoder fallback.
-            encoding = (Encoding)encoding.Clone();
-
-            // Fail on invalid bytes rather than silently replacing and continuing.
+            var encoding = (Encoding)Encoding.ASCII.Clone();
             encoding.DecoderFallback = DecoderFallback.ExceptionFallback;
             string decodedCredentials;
-
             try
             {
                 decodedCredentials = encoding.GetString(credentialBytes);
@@ -114,7 +85,6 @@ namespace Shrooms.Presentation.Common.Filters
             }
 
             var colonIndex = decodedCredentials.IndexOf(':');
-
             if (colonIndex == -1)
             {
                 return null;
@@ -123,39 +93,6 @@ namespace Shrooms.Presentation.Common.Filters
             var userName = decodedCredentials.Substring(0, colonIndex);
             var password = decodedCredentials.Substring(colonIndex + 1);
             return new Tuple<string, string>(userName, password);
-        }
-
-        public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(0);
-        }
-
-        public virtual bool AllowMultiple => false;
-    }
-
-    public class AuthenticationFailureResult : IHttpActionResult
-    {
-        public AuthenticationFailureResult(string reasonPhrase, HttpRequestMessage request)
-        {
-            ReasonPhrase = reasonPhrase;
-            Request = request;
-        }
-
-        public string ReasonPhrase { get; private set; }
-
-        public HttpRequestMessage Request { get; private set; }
-
-        public Task<HttpResponseMessage> ExecuteAsync(CancellationToken cancellationToken)
-        {
-            return Task.FromResult(Execute());
-        }
-
-        private HttpResponseMessage Execute()
-        {
-            var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            response.RequestMessage = Request;
-            response.ReasonPhrase = ReasonPhrase;
-            return response;
         }
     }
 }

@@ -1,5 +1,4 @@
-using AutoMapper;
-using Microsoft.AspNet.Identity;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
@@ -15,13 +14,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
-using WebApi.OutputCache.V2;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("User")]
+    [Route("User")]
     public class UserController : BaseController
     {
         private readonly IMapper _mapper;
@@ -41,9 +40,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GeneralSettings")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> GetLocalizationSettings()
+        [ProducesResponseType(typeof(LocalizationSettingsViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetLocalizationSettings()
         {
             var settingsDto = await _userService.GetUserLocalizationSettingsAsync(GetUserAndOrganization());
             var result = _mapper.Map<LocalizationSettingsDto, LocalizationSettingsViewModel>(settingsDto);
@@ -60,9 +58,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("GeneralSettings")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
-        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
-        public async Task<IHttpActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
         {
             if (!ModelState.IsValid)
             {
@@ -86,7 +83,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("Notifications")]
         [PermissionAuthorize(BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> GetWallNotifications()
+        [ProducesResponseType(typeof(UserNotificationsSettingsViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWallNotifications()
         {
             var settings = await _userService.GetWallNotificationSettingsAsync(GetUserAndOrganization());
             var mappedsettings = _mapper.Map<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>(settings);
@@ -96,7 +94,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Notifications")]
         [PermissionAuthorize(BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> ChangeNotifications(UserNotificationsSettingsViewModel userNotificationsSettings)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ChangeNotifications(UserNotificationsSettingsViewModel userNotificationsSettings)
         {
             if (!ModelState.IsValid)
             {
@@ -118,9 +117,11 @@ namespace Shrooms.Presentation.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("Logins")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> GetUserLogins()
+        [ProducesResponseType(typeof(List<ProviderViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserLogins()
         {
             var id = GetUserAndOrganization().UserId;
             var user = await _userService.GetApplicationUserAsync(id);
@@ -146,7 +147,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("DeleteLogin")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> LoginsUnlink(string providerName)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> LoginsUnlink(string providerName)
         {
             var userId = GetUserAndOrganization().UserId;
             var logins = await _userService.GetUserLoginsAsync(userId);
@@ -157,7 +159,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     foreach (var login in logins.Where(l => l.LoginProvider == providerName))
                     {
-                        await _userService.RemoveLoginAsync(userId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+                        await _userService.RemoveLoginAsync(userId, new Microsoft.AspNetCore.Identity.UserLoginInfo(login.LoginProvider, login.ProviderKey, login.LoginProvider));
                     }
                 }
                 catch (ArgumentException)

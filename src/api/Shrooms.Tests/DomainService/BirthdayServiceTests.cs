@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -137,10 +137,10 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2015, 11, 29);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(3, birthdays.Length);
-            Assert.AreEqual("testUserId2", birthdays[0].Id);
-            Assert.AreEqual("Saturday", birthdays[0].DayOfWeek);
-            Assert.AreEqual("2015-12-05", birthdays[0].DateString);
+            Assert.That(birthdays.Length, Is.EqualTo(3));
+            Assert.That(birthdays[0].Id, Is.EqualTo("testUserId2"));
+            Assert.That(birthdays[0].DayOfWeek, Is.EqualTo("Saturday"));
+            Assert.That(birthdays[0].DateString, Is.EqualTo("2015-12-05"));
         }
 
         [Test]
@@ -149,10 +149,10 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2015, 12, 05);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(2, birthdays.Length);
-            Assert.AreEqual("testUserId3", birthdays[1].Id);
-            Assert.AreEqual("Sunday", birthdays[1].DayOfWeek);
-            Assert.AreEqual("2015-12-06", birthdays[1].DateString);
+            Assert.That(birthdays.Length, Is.EqualTo(2));
+            Assert.That(birthdays[1].Id, Is.EqualTo("testUserId3"));
+            Assert.That(birthdays[1].DayOfWeek, Is.EqualTo("Sunday"));
+            Assert.That(birthdays[1].DateString, Is.EqualTo("2015-12-06"));
         }
 
         [Test]
@@ -161,13 +161,13 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2015, 12, 28);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(4, birthdays.Length);
-            Assert.AreEqual("christmasBirthdayUser", birthdays[3].Id);
-            Assert.AreEqual("2015-12-27", birthdays[3].DateString);
-            Assert.AreEqual("Sunday", birthdays[3].DayOfWeek);
-            Assert.AreEqual("newYearBirthdayUser", birthdays[0].Id);
-            Assert.AreEqual("2016-01-01", birthdays[0].DateString);
-            Assert.AreEqual("Friday", birthdays[0].DayOfWeek);
+            Assert.That(birthdays.Length, Is.EqualTo(4));
+            Assert.That(birthdays[3].Id, Is.EqualTo("christmasBirthdayUser"));
+            Assert.That(birthdays[3].DateString, Is.EqualTo("2015-12-27"));
+            Assert.That(birthdays[3].DayOfWeek, Is.EqualTo("Sunday"));
+            Assert.That(birthdays[0].Id, Is.EqualTo("newYearBirthdayUser"));
+            Assert.That(birthdays[0].DateString, Is.EqualTo("2016-01-01"));
+            Assert.That(birthdays[0].DayOfWeek, Is.EqualTo("Friday"));
         }
 
         [Test]
@@ -176,11 +176,11 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2017, 02, 28);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(3, birthdays.Length);
-            Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
-            Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
-            Assert.AreEqual("2017-03-01", birthdays[1].DateString);
-            Assert.AreEqual("februaryBirthdayUser2", birthdays[2].Id);
+            Assert.That(birthdays.Length, Is.EqualTo(3));
+            Assert.That(birthdays[0].Id, Is.EqualTo("februaryBirthdayUser3"));
+            Assert.That(birthdays[1].Id, Is.EqualTo("februaryBirthdayUser1"));
+            Assert.That(birthdays[1].DateString, Is.EqualTo("2017-03-01"));
+            Assert.That(birthdays[2].Id, Is.EqualTo("februaryBirthdayUser2"));
         }
 
         [Test]
@@ -189,11 +189,11 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2016, 02, 28);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(3, birthdays.Length);
-            Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
-            Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
-            Assert.AreEqual("2016-02-29", birthdays[1].DateString);
-            Assert.AreEqual("februaryBirthdayUser2", birthdays[2].Id);
+            Assert.That(birthdays.Length, Is.EqualTo(3));
+            Assert.That(birthdays[0].Id, Is.EqualTo("februaryBirthdayUser3"));
+            Assert.That(birthdays[1].Id, Is.EqualTo("februaryBirthdayUser1"));
+            Assert.That(birthdays[1].DateString, Is.EqualTo("2016-02-29"));
+            Assert.That(birthdays[2].Id, Is.EqualTo("februaryBirthdayUser2"));
         }
 
         [Test]
@@ -202,10 +202,10 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2020, 12, 28);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(4, birthdays.Length);
-            Assert.AreEqual("newYearBirthdayUser", birthdays[0].Id);
-            Assert.AreEqual("endOfYearBirthdayUser1", birthdays[1].Id);
-            Assert.AreEqual("endOfYearBirthdayUser2", birthdays[2].Id);
+            Assert.That(birthdays.Length, Is.EqualTo(4));
+            Assert.That(birthdays[0].Id, Is.EqualTo("newYearBirthdayUser"));
+            Assert.That(birthdays[1].Id, Is.EqualTo("endOfYearBirthdayUser1"));
+            Assert.That(birthdays[2].Id, Is.EqualTo("endOfYearBirthdayUser2"));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 {
     public class AdministrationUsersNotificationService : NotificationServiceBase, IAdministrationNotificationService
     {
-        private readonly IDbSet<Organization> _organizationDbSet;
+        private readonly DbSet<Organization> _organizationDbSet;
         private readonly IApplicationSettings _appSettings;
         private readonly IUserService _userService;
 

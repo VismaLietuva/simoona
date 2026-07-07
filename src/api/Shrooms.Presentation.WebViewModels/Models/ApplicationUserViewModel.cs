@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Web;
+using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
 
@@ -44,7 +44,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
 
         public string SecurityStamp { get; set; }
 
-        public HttpPostedFileBase PostedUserPhoto { get; set; }
+        public IFormFile PostedUserPhoto { get; set; }
 
         public string Map { get; set; }
 

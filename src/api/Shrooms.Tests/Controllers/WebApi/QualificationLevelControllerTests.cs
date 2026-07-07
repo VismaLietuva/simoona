@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http;
+using System.Net;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -31,9 +30,9 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task QualificationLevel_Get_Should_Return_Correct_Id()
         {
             var result = await _qualificationLevelController.Get(1);
-            var model = await result.Content.ReadAsAsync<QualificationLevelViewModel>();
+            var model = result.GetContent<QualificationLevelViewModel>();
 
-            Assert.AreEqual(1, model.Id);
+            Assert.That(model.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -49,7 +48,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _qualificationLevelController.Validate(model);
             var response = await _qualificationLevelController.Post(model);
 
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            Assert.That(response.GetStatusCode(), Is.EqualTo(HttpStatusCode.Created));
         }
     }
 }

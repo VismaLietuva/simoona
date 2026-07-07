@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Data.Entity.ModelConfiguration.Conventions;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
-using Shrooms.DataLayer.EntityModels.Attributes;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -24,25 +24,24 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
 namespace Shrooms.DataLayer.DAL
 {
-    [DbConfigurationType(typeof(ShroomsContextConfiguration))]
-    public class ShroomsDbContext : DbContext, IDbContext
+    public class ShroomsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IDbContext
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public ShroomsDbContext()
         {
         }
 
-        public ShroomsDbContext(string connectionStringName)
-            : base(connectionStringName)
+        public ShroomsDbContext(DbContextOptions<ShroomsDbContext> options, IHttpContextAccessor httpContextAccessor = null)
+            : base(options)
         {
-            ConnectionName = connectionStringName;
-            Configuration.LazyLoadingEnabled = false;
-            Configuration.ProxyCreationEnabled = false;
-            Database.SetInitializer<ShroomsDbContext>(null);
+            ChangeTracker.LazyLoadingEnabled = false;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public virtual DbSet<ApplicationUser> Users { get; set; }
-
-        public virtual DbSet<ApplicationRole> Roles { get; set; }
+        // Tenant key the DbContext was resolved for. Assigned by the DI factory so
+        // background workers (AsyncRunner) can flow the tenant via _uow.ConnectionName.
+        public string ConnectionName { get; set; }
 
         public virtual DbSet<Office> Offices { get; set; }
 
@@ -60,7 +59,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<QualificationLevel> QualificationLevels { get; set; }
 
-        public virtual DbSet<AbstractClassifier> Classificators { get; set; }
+        public virtual DbSet<AbstractClassifier> AbstractClassifiers { get; set; }
 
         public virtual DbSet<Picture> Pictures { get; set; }
 
@@ -84,7 +83,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<EventReminder> EventReminders { get; set; }
 
-        public virtual DbSet<EventParticipant> EventsParticipants { get; set; }
+        public virtual DbSet<EventParticipant> EventParticipants { get; set; }
 
         public virtual DbSet<EventOption> EventOptions { get; set; }
 
@@ -94,7 +93,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<ServiceRequestPriority> ServiceRequestPriorities { get; set; }
 
-        public virtual DbSet<ServiceRequestStatus> ServiceRequestStatuses { get; set; }
+        public virtual DbSet<ServiceRequestStatus> ServiceRequestStatus { get; set; }
 
         public virtual DbSet<ServiceRequestComment> ServiceRequestComments { get; set; }
 
@@ -104,7 +103,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<BookLog> BookLogs { get; set; }
 
-        public virtual DbSet<BookOffice> BookOffice { get; set; }
+        public virtual DbSet<BookOffice> BookOffices { get; set; }
 
         public virtual DbSet<SyncToken> SyncTokens { get; set; }
 
@@ -122,9 +121,9 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<ExternalLink> ExternalLinks { get; set; }
 
-        public virtual DbSet<Monitor> Monitors { get; set; }
+        public virtual DbSet<EntityModels.Models.Monitors.Monitor> Monitors { get; set; }
 
-        public virtual DbSet<JobPosition> JobPosition { get; set; }
+        public virtual DbSet<JobPosition> JobPositions { get; set; }
 
         public virtual DbSet<Project> Projects { get; set; }
 
@@ -152,7 +151,11 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<Banner> Banners { get; set; }
 
-        public string ConnectionName { get; }
+        public virtual DbSet<CommitteeSuggestion> CommitteeSuggestions { get; set; }
+
+        public virtual DbSet<NotificationUser> NotificationUsers { get; set; }
+
+        public virtual DbSet<PostWatcher> PostWatchers { get; set; }
 
         public int SaveChanges(string userId)
         {
@@ -180,7 +183,7 @@ namespace Shrooms.DataLayer.DAL
             return await base.SaveChangesAsync();
         }
 
-        public int SaveChanges(bool useMetaTracking = true)
+        public new int SaveChanges(bool useMetaTracking = true)
         {
             if (useMetaTracking)
             {
@@ -192,61 +195,98 @@ namespace Shrooms.DataLayer.DAL
             return base.SaveChanges();
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Configurations.Add(new KudosBasketEntityConfig());
-            modelBuilder.Configurations.Add(new KudosLogEntityConfig());
-            modelBuilder.Configurations.Add(new ApplicationUserConfiguration());
-            modelBuilder.Configurations.Add(new IdentityUserRoleEntityConfig());
-            modelBuilder.Configurations.Add(new IdentityUserLoginEntityConfig());
-            modelBuilder.Configurations.Add(new IdentityUserClaimEntityConfig());
-            modelBuilder.Configurations.Add(new ApplicationRoleConfiguration());
-            modelBuilder.Configurations.Add(new AbstractClassifierConfiguration());
-            modelBuilder.Configurations.Add(new RoomEntityConfig());
-            modelBuilder.Configurations.Add(new PageEntityConfig());
-            modelBuilder.Configurations.Add(new PermissionEntityConfig());
-            modelBuilder.Configurations.Add(new EventEntityConfig());
-            modelBuilder.Configurations.Add(new EventTypeEntityConfig());
-            modelBuilder.Configurations.Add(new EventParticipantEntityConfig());
-            modelBuilder.Configurations.Add(new EventOptionEntityConfig());
-            modelBuilder.Configurations.Add(new CommitteeEntityConfig());
-            modelBuilder.Configurations.Add(new BookOfficeEntityConfig());
-            modelBuilder.Configurations.Add(new BookLogEntityConfig());
-            modelBuilder.Configurations.Add(new BookEntityConfig());
-            modelBuilder.Configurations.Add(new OfficeEntityConfig());
-            modelBuilder.Configurations.Add(new OrganizationEntityConfig());
-            modelBuilder.Configurations.Add(new RefreshTokenConfiguration());
-            modelBuilder.Configurations.Add(new WallConfiguration());
-            modelBuilder.Configurations.Add(new WallMembersConfiguration());
-            modelBuilder.Configurations.Add(new WallModeratorsConfiguration());
-            modelBuilder.Configurations.Add(new PostEntityConfig());
-            modelBuilder.Configurations.Add(new ExternalLinkConfig());
-            modelBuilder.Configurations.Add(new MonitorConfig());
-            modelBuilder.Configurations.Add(new NotificationConfig());
-            modelBuilder.Configurations.Add(new NotifiationUserConfig());
-            modelBuilder.Configurations.Add(new PostWatcherConfig());
-            modelBuilder.Configurations.Add(new VacationEntityConfig());
-            modelBuilder.Configurations.Add(new FilterPresetEntityConfig());
-            modelBuilder.Configurations.Add(new BlacklistUserEntityConfig());
-            modelBuilder.Configurations.Add(new EventReminderEntityConfig());
-            modelBuilder.Configurations.Add(new BannerEntityConfiguration());
-
-            var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
-            modelBuilder.Conventions.Add(convention);
+            base.OnModelCreating(modelBuilder);
+            
+            // Apply all entity type configurations
+            modelBuilder.ApplyConfiguration(new KudosBasketEntityConfig());
+            modelBuilder.ApplyConfiguration(new KudosLogEntityConfig());
+            modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+            // Identity configurations are handled by ASP.NET Core Identity
+            // modelBuilder.ApplyConfiguration(new IdentityUserRoleEntityConfig());
+            // modelBuilder.ApplyConfiguration(new IdentityUserLoginEntityConfig());
+            // modelBuilder.ApplyConfiguration(new IdentityUserClaimEntityConfig());
+            modelBuilder.ApplyConfiguration(new ApplicationRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new AbstractClassifierConfiguration());
+            modelBuilder.ApplyConfiguration(new RoomEntityConfig());
+            modelBuilder.ApplyConfiguration(new PageEntityConfig());
+            modelBuilder.ApplyConfiguration(new PermissionEntityConfig());
+            modelBuilder.ApplyConfiguration(new ModuleEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventTypeEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventOptionEntityConfig());
+            modelBuilder.ApplyConfiguration(new CommitteeEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookOfficeEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookLogEntityConfig());
+            modelBuilder.ApplyConfiguration(new BookEntityConfig());
+            modelBuilder.ApplyConfiguration(new OfficeEntityConfig());
+            modelBuilder.ApplyConfiguration(new OrganizationEntityConfig());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+            modelBuilder.ApplyConfiguration(new WallConfiguration());
+            modelBuilder.ApplyConfiguration(new WallMembersConfiguration());
+            modelBuilder.ApplyConfiguration(new WallModeratorsConfiguration());
+            modelBuilder.ApplyConfiguration(new PostEntityConfig());
+            modelBuilder.ApplyConfiguration(new ExternalLinkConfig());
+            modelBuilder.ApplyConfiguration(new MonitorConfig());
+            modelBuilder.ApplyConfiguration(new NotificationConfig());
+            modelBuilder.ApplyConfiguration(new NotifiationUserConfig());
+            modelBuilder.ApplyConfiguration(new PostWatcherConfig());
+            modelBuilder.ApplyConfiguration(new VacationEntityConfig());
+            modelBuilder.ApplyConfiguration(new FilterPresetEntityConfig());
+            modelBuilder.ApplyConfiguration(new BlacklistUserEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventReminderEntityConfig());
+            modelBuilder.ApplyConfiguration(new BannerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeCategoryKudosTypeEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeCategoryEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeLogEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BadgeTypeEntityConfiguration());
 
             new OtherEntitiesConfig(modelBuilder).Add();
+
+            // EntityModels uses Nullable: enable, so non-nullable string properties (string without ?)
+            // are treated by EF Core as required by convention. But the legacy database allows NULL in
+            // most string columns. This pass relaxes string properties that were made required ONLY by
+            // convention (not via explicit fluent config or [Required] annotation).
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(string) && !p.IsKey() && !p.IsNullable
+                                && p.PropertyInfo != null)) // skip shadow properties (e.g. TPH discriminator)
+                {
+                    var conventionProperty = (Microsoft.EntityFrameworkCore.Metadata.IConventionProperty)property;
+                    var source = conventionProperty.GetIsNullableConfigurationSource();
+                    // Only relax properties whose nullability was set by convention (not explicit config)
+                    if (source == null || source == Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)
+                    {
+                        conventionProperty.SetIsNullable(true);
+                    }
+                }
+            }
         }
 
-        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId = "")
+        // EF Core's standard SaveChangesAsync(CancellationToken) is called by Identity's UserManager
+        // and other framework code that bypasses our custom SaveChangesAsync(bool) overloads.
+        // Overriding it here ensures UpdateEntityMetadata always runs, preventing DateTime.MinValue
+        // from being written to brownfield datetime columns (which only accept dates >= 1753-01-01).
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(userId) && HttpContext.Current != null && HttpContext.Current.User != null)
+            UpdateEntityMetadata(ChangeTracker.Entries());
+            await SoftDeleteHandler.ExecuteAsync(ChangeTracker.Entries(), this);
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = null)
+        {
+            if (string.IsNullOrEmpty(userId))
             {
-                userId = HttpContext.Current.User.Identity.GetUserId();
+                userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
             }
 
             var now = DateTime.UtcNow;
             var items = entries
-                .Where(p => p.Entity is ITrackable && p.Entity is ISoftDelete)
+                .Where(p => p.Entity is ITrackable)
                 .Select(x => new
                 {
                     x.State,
@@ -265,6 +305,12 @@ namespace Shrooms.DataLayer.DAL
                 {
                     item.Entity.Modified = now;
                     item.Entity.ModifiedBy = userId;
+                    // Guard against DateTime.MinValue from brownfield NULL columns —
+                    // 0001-01-01 is out of range for SQL Server's datetime type.
+                    if (item.Entity.Created == default)
+                    {
+                        item.Entity.Created = now;
+                    }
                 }
             }
         }

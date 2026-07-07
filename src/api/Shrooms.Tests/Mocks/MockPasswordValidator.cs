@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Tests.Mocks
 {
-    public class MockPasswordValidator<T> : IIdentityValidator<T>
+    public class MockPasswordValidator : IPasswordValidator<ApplicationUser>
     {
         public MockPasswordValidator(bool validateSuccessfully)
         {
@@ -14,7 +15,7 @@ namespace Shrooms.Tests.Mocks
 
         public bool Validated { get; set; }
 
-        public Task<IdentityResult> ValidateAsync(T item)
+        public Task<IdentityResult> ValidateAsync(UserManager<ApplicationUser> manager, ApplicationUser user, string password)
         {
             Validated = true;
             if (ValidateSuccessfully)
@@ -22,7 +23,7 @@ namespace Shrooms.Tests.Mocks
                 return Task.FromResult(IdentityResult.Success);
             }
 
-            return Task.FromResult(IdentityResult.Failed("Failed"));
+            return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = "Failed" }));
         }
     }
 }

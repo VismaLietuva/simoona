@@ -1,13 +1,20 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Microsoft.AspNet.Identity.EntityFramework;
+// This configuration is no longer needed in EF Core with ASP.NET Core Identity
+// The IdentityDbContext in Microsoft.AspNetCore.Identity.EntityFrameworkCore automatically configures these tables
+// Keeping this file for reference but it's not used
+
+/*
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.AspNetCore.Identity;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class IdentityUserClaimEntityConfig : EntityTypeConfiguration<IdentityUserClaim>
+    internal class IdentityUserClaimEntityConfig : IEntityTypeConfiguration<IdentityUserClaim<string>>
     {
-        public IdentityUserClaimEntityConfig()
+        public void Configure(EntityTypeBuilder<IdentityUserClaim<string>> builder)
         {
-            ToTable("AspNetUserClaims");
+            builder.ToTable("AspNetUserClaims");
         }
     }
 }
+*/

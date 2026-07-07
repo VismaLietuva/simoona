@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using System;
 
@@ -18,7 +19,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.IsValid(testValue);
 
             // Assert
-            Assert.IsFalse(result);
+            ClassicAssert.IsFalse(result);
         }
     }
 }

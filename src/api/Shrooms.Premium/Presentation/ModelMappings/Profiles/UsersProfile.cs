@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 
@@ -6,14 +6,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
     public class UsersProfile : Profile
     {
-        protected override void Configure()
+        public UsersProfile()
         {
             CreateDtoToViewModelMappings();
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<EventUserSearchResultDto, EventUserSearchResultViewModel>();
+            CreateMap<EventUserSearchResultDto, EventUserSearchResultViewModel>(MemberList.None);
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -93,10 +93,10 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             var result = await _wallsDbSet.FirstAsync();
-            Assert.AreEqual(updateWallDto.Name, result.Name);
-            Assert.AreEqual(updateWallDto.Logo, result.Logo);
-            Assert.AreEqual(updateWallDto.Description, result.Description);
-            Assert.AreEqual(updateWallDto.Id, result.Id);
+            Assert.That(result.Name, Is.EqualTo(updateWallDto.Name));
+            Assert.That(result.Logo, Is.EqualTo(updateWallDto.Logo));
+            Assert.That(result.Description, Is.EqualTo(updateWallDto.Description));
+            Assert.That(result.Id, Is.EqualTo(updateWallDto.Id));
         }
 
         [Test]
@@ -139,10 +139,10 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             var result = await _wallsDbSet.FirstAsync();
-            Assert.AreEqual(updateWallDto.Name, result.Name);
-            Assert.AreEqual(updateWallDto.Logo, result.Logo);
-            Assert.AreEqual(updateWallDto.Description, result.Description);
-            Assert.AreEqual(updateWallDto.Id, result.Id);
+            Assert.That(result.Name, Is.EqualTo(updateWallDto.Name));
+            Assert.That(result.Logo, Is.EqualTo(updateWallDto.Logo));
+            Assert.That(result.Description, Is.EqualTo(updateWallDto.Description));
+            Assert.That(result.Id, Is.EqualTo(updateWallDto.Id));
         }
 
         [Test]
@@ -185,10 +185,10 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             var result = await _wallsDbSet.FirstAsync();
-            Assert.AreEqual(updateWallDto.Name, result.Name);
-            Assert.AreEqual(updateWallDto.Logo, result.Logo);
-            Assert.AreEqual(updateWallDto.Description, result.Description);
-            Assert.AreEqual(updateWallDto.Id, result.Id);
+            Assert.That(result.Name, Is.EqualTo(updateWallDto.Name));
+            Assert.That(result.Logo, Is.EqualTo(updateWallDto.Logo));
+            Assert.That(result.Description, Is.EqualTo(updateWallDto.Description));
+            Assert.That(result.Id, Is.EqualTo(updateWallDto.Id));
         }
 
         [Test]
@@ -257,7 +257,7 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.UpdateWallAsync(updateWallDto));
-            Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
         [Test]
@@ -279,7 +279,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act, Assert
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.CreateNewWallAsync(newWallDto));
-            Assert.AreEqual(ErrorCodes.WallNameAlreadyExists, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.WallNameAlreadyExists));
         }
 
         [Test]
@@ -311,7 +311,7 @@ namespace Shrooms.Tests.DomainService
             await _wallService.JoinOrLeaveWallAsync(2, userId, userId, tenantId, false);
 
             // Assert
-            Assert.True((await _wallsDbSet.FirstAsync(x => x.Id == 2)).Members.Any(m => m.UserId == userId));
+            Assert.That((await _wallsDbSet.FirstAsync(x => x.Id == 2)).Members.Any(m => m.UserId == userId), Is.True);
         }
 
         [Test]
@@ -377,7 +377,7 @@ namespace Shrooms.Tests.DomainService
             const string userId = "user1";
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.JoinOrLeaveWallAsync(3, userId, userId, tenantId, false));
-            Assert.AreEqual(ErrorCodes.WallModeratorCanNotLeave, ex.ErrorCode);
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.WallModeratorCanNotLeave));
         }
 
         [Test]
@@ -407,7 +407,7 @@ namespace Shrooms.Tests.DomainService
             await _wallService.JoinOrLeaveWallAsync(4, userId, userId, tenantId, true);
 
             // Assert
-            Assert.True((await _wallsDbSet.FirstAsync(w => w.Id == 4)).Members.Any(m => m.UserId == userId));
+            Assert.That((await _wallsDbSet.FirstAsync(w => w.Id == 4)).Members.Any(m => m.UserId == userId), Is.True);
         }
 
         [Test]
@@ -443,7 +443,7 @@ namespace Shrooms.Tests.DomainService
             await _wallService.JoinOrLeaveWallAsync(1, attendingUserId, moderatingUserId, tenantId, false);
 
             // Assert
-            Assert.AreEqual(attendingUserId, walls.First().Members.First().UserId);
+            Assert.That(walls.First().Members.First().UserId, Is.EqualTo(attendingUserId));
         }
 
         [Test]
@@ -614,14 +614,14 @@ namespace Shrooms.Tests.DomainService
 
             var wall = await _wallService.GetWallDetailsAsync(1, userOrg);
 
-            Assert.AreEqual(1, wall.Id);
-            Assert.AreEqual("Wall", wall.Name);
-            Assert.AreEqual(true, wall.IsFollowing);
-            Assert.AreEqual(1, wall.Moderators.Count());
-            Assert.AreEqual("user1", wall.Moderators.First().Id);
-            Assert.AreEqual("Description", wall.Description);
-            Assert.AreEqual("Logo.jpg", wall.Logo);
-            Assert.AreEqual(WallType.UserCreated, wall.Type);
+            Assert.That(wall.Id, Is.EqualTo(1));
+            Assert.That(wall.Name, Is.EqualTo("Wall"));
+            Assert.That(wall.IsFollowing, Is.EqualTo(true));
+            Assert.That(wall.Moderators.Count(), Is.EqualTo(1));
+            Assert.That(wall.Moderators.First().Id, Is.EqualTo("user1"));
+            Assert.That(wall.Description, Is.EqualTo("Description"));
+            Assert.That(wall.Logo, Is.EqualTo("Logo.jpg"));
+            Assert.That(wall.Type, Is.EqualTo(WallType.UserCreated));
         }
 
         [Test]
@@ -637,14 +637,14 @@ namespace Shrooms.Tests.DomainService
 
             var wall = await _wallService.GetWallDetailsAsync(2, userOrg);
 
-            Assert.AreEqual(2, wall.Id);
-            Assert.AreEqual("Wall2", wall.Name);
-            Assert.AreEqual(false, wall.IsFollowing);
-            Assert.AreEqual(1, wall.Moderators.Count());
-            Assert.AreEqual("user1", wall.Moderators.First().Id);
-            Assert.AreEqual("Description2", wall.Description);
-            Assert.AreEqual("Logo2.jpg", wall.Logo);
-            Assert.AreEqual(WallType.UserCreated, wall.Type);
+            Assert.That(wall.Id, Is.EqualTo(2));
+            Assert.That(wall.Name, Is.EqualTo("Wall2"));
+            Assert.That(wall.IsFollowing, Is.EqualTo(false));
+            Assert.That(wall.Moderators.Count(), Is.EqualTo(1));
+            Assert.That(wall.Moderators.First().Id, Is.EqualTo("user1"));
+            Assert.That(wall.Description, Is.EqualTo("Description2"));
+            Assert.That(wall.Logo, Is.EqualTo("Logo2.jpg"));
+            Assert.That(wall.Type, Is.EqualTo(WallType.UserCreated));
         }
 
         [Test]

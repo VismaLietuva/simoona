@@ -1,11 +1,11 @@
-﻿using System.Web;
+using Microsoft.AspNetCore.Http;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models
 {
     public class RoomTypeViewModel : RoomTypePostViewModel
     {
-        public HttpPostedFileBase PostedIcon { get; set; }
+        public IFormFile PostedIcon { get; set; }
 
         public RoomTypeViewModel()
         {

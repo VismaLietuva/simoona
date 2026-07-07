@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 
@@ -6,7 +6,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class BlacklistUsers : Profile
     {
-        protected override void Configure()
+        public BlacklistUsers()
         {
             CreateViewModelToDtoMappings();
             CreateDtoToViewModelMappings();
@@ -14,7 +14,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateBlacklistUserViewModel, BlacklistUserDto>()
+            CreateMap<CreateBlacklistUserViewModel, BlacklistUserDto>(MemberList.None)
                 .Ignore(opt => opt.Modified)
                 .Ignore(opt => opt.ModifiedBy)
                 .Ignore(opt => opt.ModifiedByUserFirstName)
@@ -24,7 +24,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .Ignore(opt => opt.CreatedByUserFirstName)
                 .Ignore(opt => opt.CreatedByUserLastName)
                 .Ignore(opt => opt.Status);
-            CreateMap<UpdateBlacklistUserViewModel, BlacklistUserDto>()
+            CreateMap<UpdateBlacklistUserViewModel, BlacklistUserDto>(MemberList.None)
                 .Ignore(opt => opt.Modified)
                 .Ignore(opt => opt.ModifiedBy)
                 .Ignore(opt => opt.ModifiedByUserFirstName)
@@ -34,13 +34,13 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .Ignore(opt => opt.CreatedByUserFirstName)
                 .Ignore(opt => opt.CreatedByUserLastName)
                 .Ignore(opt => opt.Status);
-            CreateMap<CreateBlacklistUserViewModel, CreateBlacklistUserDto>();
-            CreateMap<UpdateBlacklistUserViewModel, UpdateBlacklistUserDto>();
+            CreateMap<CreateBlacklistUserViewModel, CreateBlacklistUserDto>(MemberList.None);
+            CreateMap<UpdateBlacklistUserViewModel, UpdateBlacklistUserDto>(MemberList.None);
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<BlacklistUserDto, BlacklistUserViewModel>();
+            CreateMap<BlacklistUserDto, BlacklistUserViewModel>(MemberList.None);
         }
     }
 }

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -15,6 +15,7 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using X.PagedList;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -46,7 +47,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
-        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        [ProducesResponseType(typeof(QualificationLevelViewModel), StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Get(int id, string includeProperties = "")
         {
             return await base.Get(id, includeProperties);
         }
@@ -84,7 +86,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override async Task<HttpResponseMessage> Post([FromBody] QualificationLevelPostViewModel crudViewModel)
+        public override async Task<IActionResult> Post([FromBody] QualificationLevelPostViewModel crudViewModel)
         {
             return await base.Post(crudViewModel);
         }
@@ -92,14 +94,15 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override async Task<HttpResponseMessage> Put([FromBody] QualificationLevelPostViewModel crudViewModel)
+        public override async Task<IActionResult> Put([FromBody] QualificationLevelPostViewModel crudViewModel)
         {
             return await base.Put(crudViewModel);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);
         }

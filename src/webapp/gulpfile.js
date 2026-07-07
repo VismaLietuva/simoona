@@ -754,12 +754,7 @@ function startBrowserSync(isDev, specRunner) {
     var options = {
         proxy: 'http://localhost:' + port,
         port: 3000,
-        ghostMode: { // these are the defaults t,f,t,t
-            clicks: true,
-            location: false,
-            forms: true,
-            scroll: true
-        },
+        ghostMode: false,
         injectChanges: true,
         logFileChanges: true,
         logLevel: 'debug',

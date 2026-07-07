@@ -27,6 +27,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall
 
         public int TotalMembers { get; set; }
 
+        public int PostsCount { get; set; }
+
         public bool IsWallModerator { get; set; }
     }
 }

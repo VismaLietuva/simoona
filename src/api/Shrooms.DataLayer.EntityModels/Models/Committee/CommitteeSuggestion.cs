@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models.Committee
 {
-    public class CommitteeSuggestion : BaseModel
+    public class CommitteeSuggestion : SoftDeletableModel
     {
         public string Title { get; set; }
 

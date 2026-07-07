@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Presentation.WebViewModels.Models.KudosBaskets;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Widgets;
@@ -7,7 +7,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class KudosBasket : Profile
     {
-        protected override void Configure()
+        public KudosBasket()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -15,18 +15,18 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<KudosBasketLogDto, KudosBasketLogViewModel>();
-            CreateMap<KudosBasketLogUserDto, KudosBasketLogUserViewModel>();
-            CreateMap<KudosBasketDto, KudosBasketViewModel>();
-            CreateMap<KudosBasketDto, KudosBasketWidgetViewModel>();
-            CreateMap<KudosBasketCreateDto, KudosBasketCreateViewModel>();
+            CreateMap<KudosBasketLogDto, KudosBasketLogViewModel>(MemberList.None);
+            CreateMap<KudosBasketLogUserDto, KudosBasketLogUserViewModel>(MemberList.None);
+            CreateMap<KudosBasketDto, KudosBasketViewModel>(MemberList.None);
+            CreateMap<KudosBasketDto, KudosBasketWidgetViewModel>(MemberList.None);
+            CreateMap<KudosBasketCreateDto, KudosBasketCreateViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<KudosBasketCreateViewModel, KudosBasketCreateDto>();
-            CreateMap<KudosBasketEditViewModel, KudosBasketEditDto>();
-            CreateMap<KudosBasketDonateViewModel, KudosBasketDonationDto>();
+            CreateMap<KudosBasketCreateViewModel, KudosBasketCreateDto>(MemberList.None);
+            CreateMap<KudosBasketEditViewModel, KudosBasketEditDto>(MemberList.None);
+            CreateMap<KudosBasketDonateViewModel, KudosBasketDonationDto>(MemberList.None);
         }
     }
 }

@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.VacationPages;
 using Shrooms.Domain.Services.VacationPages;
@@ -6,12 +6,13 @@ using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.VacationPage;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("VacationPage")]
+    [Route("VacationPage")]
     public class VacationPageController : BaseController
     {
         private readonly IVacationPageService _vacationPageService;
@@ -25,7 +26,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Get")]
-        public async Task<IHttpActionResult> GetVacationPage()
+        [ProducesResponseType(typeof(VacationPageViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetVacationPage()
         {
             var vacationPageDto = await _vacationPageService.GetVacationPage(GetOrganizationId());
 
@@ -40,7 +42,8 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Vacation)]
-        public async Task<IHttpActionResult> EditVacationPage(VacationPageViewModel vacationPageViewModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditVacationPage(VacationPageViewModel vacationPageViewModel)
         {
             if (!ModelState.IsValid)
             {

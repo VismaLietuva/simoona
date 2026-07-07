@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
@@ -9,7 +9,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 {
     public class Posts : Profile
     {
-        protected override void Configure()
+        public Posts()
         {
             CreateDtoToViewModelMappings();
             CreateViewModelToDtoMappings();
@@ -17,17 +17,17 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<NewlyCreatedPostDto, WallPostViewModel>();
-            CreateMap<NewPostDto, WallPostViewModel>();
-            CreateMap<PostDto, WallPostViewModel>();
+            CreateMap<NewlyCreatedPostDto, WallPostViewModel>(MemberList.None);
+            CreateMap<NewPostDto, WallPostViewModel>(MemberList.None);
+            CreateMap<PostDto, WallPostViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateWallPostViewModel, NewPostDto>()
+            CreateMap<CreateWallPostViewModel, NewPostDto>(MemberList.None)
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
 
-            CreateMap<EditPostViewModel, EditPostDto>()
+            CreateMap<EditPostViewModel, EditPostDto>(MemberList.None)
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
         }
     }

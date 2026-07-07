@@ -1,6 +1,7 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -14,6 +15,7 @@ using Shrooms.Premium.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +34,10 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             _lotteryService = Substitute.For<ILotteryService>();
             _lotteryExportService = Substitute.For<ILotteryExportService>();
+
+            _lotteryExportService
+                .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(new ByteArrayContent(Array.Empty<byte>()));
 
             _sut = new LotteryController(ModelMapper.Create(), _lotteryService, _lotteryExportService);
             _sut.SetUpControllerForTesting();
@@ -53,10 +59,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -74,10 +79,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -97,10 +101,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -126,10 +129,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -156,10 +158,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
 
@@ -195,10 +196,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -217,10 +217,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -253,10 +252,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -285,7 +283,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             _sut.Validate(buyViewModel);
 
@@ -293,10 +291,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -325,7 +322,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             _sut.Validate(buyViewModel);
 
@@ -333,10 +330,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expected, actual.StatusCode);
+            ClassicAssert.AreEqual(expected, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -347,10 +343,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetAllLotteries();
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -365,10 +360,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetPagedLotteries(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -383,10 +377,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetPagedLotteries(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -404,10 +397,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetPagedLotteries(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -426,10 +418,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetPagedLotteries(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -445,10 +436,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetLottery(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -464,10 +454,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetLottery(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -490,10 +479,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -514,16 +502,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .CreateLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             _sut.Validate(args);
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -545,10 +532,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -571,10 +557,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -597,10 +582,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -622,10 +606,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -647,10 +630,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -673,10 +655,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -698,10 +679,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -724,10 +704,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.CreateLottery(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -743,10 +722,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.Abort(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -762,10 +740,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.Abort(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -777,10 +754,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.RefundParticipants(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -792,10 +768,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.GetStatus(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -819,10 +794,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -844,16 +818,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .EditDraftedLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -876,10 +849,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
 
@@ -903,10 +875,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -929,10 +900,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -956,10 +926,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -982,10 +951,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1009,10 +977,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1036,10 +1003,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1062,10 +1028,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1088,10 +1053,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1114,10 +1078,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1141,10 +1104,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateDrafted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1163,10 +1125,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateStarted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1181,7 +1142,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .EditStartedLotteryAsync(Arg.Any<EditStartedLotteryDto>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             var expectedStatus = HttpStatusCode.BadRequest;
 
@@ -1189,10 +1150,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateStarted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1210,10 +1170,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateStarted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1232,10 +1191,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _sut.Validate(args);
 
             var httpActionResult = await _sut.UpdateStarted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1247,10 +1205,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.FinishLottery(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1262,14 +1219,13 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryService
                 .FinishLotteryAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             var httpActionResult = await _sut.FinishLottery(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1285,10 +1241,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.LotteryStats(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1304,10 +1259,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.LotteryStats(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1319,10 +1273,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Act
             var httpActionResult = await _sut.Export(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
 
         [Test]
@@ -1334,14 +1287,13 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryExportService
                 .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
-                .Throws(new LotteryException("Error"));
+                .ThrowsAsync(new LotteryException("Error"));
 
             // Act
             var httpActionResult = await _sut.Export(id);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
+            ClassicAssert.AreEqual(expectedStatus, httpActionResult.GetStatusCode());
         }
     }
 }

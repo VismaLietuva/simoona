@@ -1,49 +1,50 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class EventEntityConfig : EntityTypeConfiguration<Event>
+    internal class EventEntityConfig : IEntityTypeConfiguration<Event>
     {
-        public EventEntityConfig()
+        public void Configure(EntityTypeBuilder<Event> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            Property(e => e.Name)
+            builder.Property(e => e.Name)
                 .IsRequired();
 
-            Property(e => e.Place)
+            builder.Property(e => e.Place)
                 .IsRequired();
 
-            Property(e => e.MaxParticipants)
+            builder.Property(e => e.MaxParticipants)
                 .IsRequired();
 
-            Property(e => e.StartDate)
-                .IsRequired()
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(
-                       new IndexAttribute("ix_start_date")));
+            builder.Property(e => e.StartDate)
+                .IsRequired();
 
-            Property(e => e.EndDate)
-                .IsRequired()
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(
-                       new IndexAttribute("ix_end_date")));
+            builder.HasIndex(e => e.StartDate)
+                .HasDatabaseName("ix_start_date");
 
-            HasRequired(e => e.Organization)
+            builder.Property(e => e.EndDate)
+                .IsRequired();
+
+            builder.HasIndex(e => e.EndDate)
+                .HasDatabaseName("ix_end_date");
+
+            builder.HasOne(e => e.Organization)
                 .WithMany()
                 .HasForeignKey(x => x.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasMany(e => e.EventOptions)
-                .WithRequired(e => e.Event)
+            builder.HasMany(e => e.EventOptions)
+                .WithOne(e => e.Event)
                 .HasForeignKey(e => e.EventId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasMany(e => e.Reminders)
-                .WithRequired(e => e.Event)
+            builder.HasMany(e => e.Reminders)
+                .WithOne(e => e.Event)
                 .HasForeignKey(e => e.EventId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

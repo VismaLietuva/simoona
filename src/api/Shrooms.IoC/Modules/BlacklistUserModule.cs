@@ -1,20 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
 
 namespace Shrooms.IoC.Modules
 {
-    public class BlacklistUserModule : Module
+    public static class BlacklistUserModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddBlacklistUsers(this IServiceCollection services)
         {
-            builder.RegisterType<BlacklistService>()
-                .As<IBlacklistService>()
-                .InstancePerRequest();
-
-            builder.RegisterType<BlacklistValidator>()
-                .As<IBlacklistValidator>()
-                .InstancePerRequest();
+            services.AddScoped<IBlacklistService, BlacklistService>();
+            services.AddScoped<IBlacklistValidator, BlacklistValidator>();
+            return services;
         }
     }
 }

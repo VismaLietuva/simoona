@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -14,8 +14,8 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
     public class OfficeMapService : IOfficeMapService
     {
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
-        private readonly IDbSet<Office> _officeDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Office> _officeDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly IMapper _mapper;
         private readonly IRoleService _roleService;
 

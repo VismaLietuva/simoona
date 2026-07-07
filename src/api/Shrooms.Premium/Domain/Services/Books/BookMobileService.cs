@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -22,11 +22,11 @@ namespace Shrooms.Premium.Domain.Services.Books
         private static readonly SemaphoreSlim _newBookLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<Book> _bookDbSet;
-        private readonly IDbSet<BookLog> _bookLogDbSet;
-        private readonly IDbSet<Office> _officeDbSet;
-        private readonly IDbSet<BookOffice> _bookOfficeDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<Book> _bookDbSet;
+        private readonly DbSet<BookLog> _bookLogDbSet;
+        private readonly DbSet<Office> _officeDbSet;
+        private readonly DbSet<BookOffice> _bookOfficeDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IBookMobileServiceValidator _serviceValidator;
         private readonly IBookInfoService _bookInfoService;
 

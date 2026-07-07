@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
@@ -18,8 +18,8 @@ namespace Shrooms.Domain.Services.Kudos
 {
     public class KudosExportService : IKudosExportService
     {
-        private readonly IDbSet<KudosLog> _kudosLogsDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<KudosLog> _kudosLogsDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
 
         public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)
@@ -31,16 +31,20 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<ByteArrayContent> ExportToExcelAsync(KudosLogsFilterDto filter)
         {
-            var kudos = await _kudosLogsDbSet
+            var logsQuery = _kudosLogsDbSet
                 .Include(log => log.Employee)
                 .Where(log =>
                     log.OrganizationId == filter.OrganizationId &&
                     log.KudosBasketId == null)
                 .Where(KudosServiceHelper.StatusFilter(filter.Status))
                 .Where(KudosServiceHelper.UserFilter(filter.SearchUserId))
-                .GroupJoin(_userDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto())
-                .OrderBy(string.Concat(filter.SortBy, " ", filter.SortOrder))
-                .ToListAsync();
+                .GroupJoin(_userDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto());
+
+            var sortedLogs = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
+                logsQuery.AsQueryable(),
+                string.Concat(filter.SortBy, " ", filter.SortOrder));
+
+            var kudos = await sortedLogs.ToListAsync();
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
 

@@ -1,8 +1,9 @@
-﻿using System;
-using System.Data.Entity;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Premium.Infrastructure.GoogleBookApiService;
@@ -11,12 +12,12 @@ namespace Shrooms.Premium.Domain.Services.Books
 {
     public class BookCoverService : IBackgroundWorker, IBookCoverService
     {
-        private readonly IDbSet<Book> _booksDbSet;
+        private readonly DbSet<Book> _booksDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly IBookInfoService _bookService;
-        private readonly ILogger _logger;
+        private readonly ILogger<BookCoverService> _logger;
 
-        public BookCoverService(IUnitOfWork2 uow, IBookInfoService bookService, ILogger logger)
+        public BookCoverService(IUnitOfWork2 uow, IBookInfoService bookService, ILogger<BookCoverService> logger)
         {
             _uow = uow;
             _bookService = bookService;
@@ -44,7 +45,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
         }

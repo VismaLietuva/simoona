@@ -1,7 +1,8 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -29,21 +30,10 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         {
             _mockDbContext = new MockDbContext();
 
-            _organizationsDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IDbAsyncEnumerable<Organization>>();
+            _organizationsDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IAsyncEnumerable<Organization>>();
             _organizationsDbSet.SetDbSetDataForAsync(_mockDbContext.Organizations);
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(_mockDbContext.ApplicationUsers);
-
-            var mockDbSqlQuery = Substitute.For<DbSqlQuery<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
-            var asyncEnumerator = new MockDbAsyncEnumerator<ApplicationUser>(_mockDbContext.ApplicationUsers.GetEnumerator());
-
-            ((IDbAsyncEnumerable<ApplicationUser>)mockDbSqlQuery).GetAsyncEnumerator().Returns(asyncEnumerator);
-
-            mockDbSqlQuery.AsNoTracking().Returns(mockDbSqlQuery);
-            mockDbSqlQuery.GetEnumerator().Returns(_mockDbContext.ApplicationUsers.GetEnumerator());
-
-            _usersDbSet.SqlQuery(Arg.Any<string>(), Arg.Any<object[]>())
-                .Returns(mockDbSqlQuery);
 
             _uow = Substitute.For<IUnitOfWork2>();
             _uow.GetDbSet<ApplicationUser>().ReturnsForAnyArgs(_usersDbSet);
@@ -51,7 +41,8 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             _pictureService = Substitute.For<IPictureService>();
 
-            _usersAnonymizationWebHookService = new UsersAnonymizationWebHookService(_uow, _pictureService);
+            var configuration = Substitute.For<Microsoft.Extensions.Configuration.IConfiguration>();
+            _usersAnonymizationWebHookService = new UsersAnonymizationWebHookService(_uow, _pictureService, configuration);
         }
 
         [Test]
@@ -60,11 +51,33 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
             // Arrange
             var organization = _mockDbContext.Organizations.First();
 
+            var deletedUsers = new List<ApplicationUser>
+            {
+                new()
+                {
+                    Id = "d1",
+                    OrganizationId = organization.Id,
+                    IsDeleted = true,
+                    IsAnonymized = false,
+                    Modified = DateTime.UtcNow.AddDays(-30)
+                },
+                new()
+                {
+                    Id = "d2",
+                    OrganizationId = organization.Id,
+                    IsDeleted = true,
+                    IsAnonymized = false,
+                    Modified = DateTime.UtcNow.AddDays(-30)
+                }
+            };
+
+            _usersDbSet.SetDbSetDataForAsync(deletedUsers);
+
             // Act
             await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
 
             // Assert
-            Assert.IsFalse(_usersDbSet.Any(user => !user.IsAnonymized));
+            Assert.That(_usersDbSet.Any(user => !user.IsAnonymized), Is.False);
         }
     }
 }

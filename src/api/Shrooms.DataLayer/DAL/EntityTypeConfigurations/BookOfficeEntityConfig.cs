@@ -1,49 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class BookOfficeEntityConfig : EntityTypeConfiguration<BookOffice>
+    internal class BookOfficeEntityConfig : IEntityTypeConfiguration<BookOffice>
     {
-        public BookOfficeEntityConfig()
+        public void Configure(EntityTypeBuilder<BookOffice> builder)
         {
-            Map(e => e.Requires("IsDeleted")
-                .HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(u => u.Book)
+            builder.HasOne(u => u.Book)
                 .WithMany(x => x.BookOffices)
                 .HasForeignKey(x => x.BookId)
-                .WillCascadeOnDelete(true);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasRequired(u => u.Office)
+            builder.HasOne(u => u.Office)
                 .WithMany(x => x.BookOffices)
                 .HasForeignKey(x => x.OfficeId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(u => u.Organization)
+            builder.HasOne(u => u.Organization)
                 .WithMany()
                 .HasForeignKey(x => x.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(u => u.ModifiedBy)
+            builder.Property(u => u.ModifiedBy)
                 .HasMaxLength(50);
 
-            Property(u => u.CreatedBy)
+            builder.Property(u => u.CreatedBy)
                 .HasMaxLength(50);
 
-            Property(u => u.BookId)
-               .HasColumnAnnotation(
-                   IndexAnnotation.AnnotationName,
-                   new IndexAnnotation(
-                       new IndexAttribute("BookId_OfficeId", 1) { IsUnique = true }));
-
-            Property(u => u.OfficeId)
-               .HasColumnAnnotation(
-                   IndexAnnotation.AnnotationName,
-                   new IndexAnnotation(
-                       new IndexAttribute("BookId_OfficeId", 2) { IsUnique = true }));
+            builder.HasIndex(u => new { u.BookId, u.OfficeId })
+                .IsUnique()
+                .HasDatabaseName("BookId_OfficeId");
         }
     }
 }

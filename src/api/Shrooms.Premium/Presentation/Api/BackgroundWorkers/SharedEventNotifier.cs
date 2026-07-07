@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
@@ -22,19 +23,22 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
         private readonly INotificationService _notificationService;
         private readonly IEventNotificationService _eventNotificationService;
         private readonly IEventService _eventService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public SharedEventNotifier(
             IMapper mapper,
             IWallService wallService,
             INotificationService notificationService,
             IEventNotificationService eventNotificationService,
-            IEventService eventService)
+            IEventService eventService,
+            IHubContext<NotificationHub> hubContext)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
             _eventNotificationService = eventNotificationService;
             _eventService = eventService;
+            _hubContext = hubContext;
         }
 
         public async Task NotifyAsync(NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
@@ -52,8 +56,8 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
             var wallMemberIds = wallMembers.Select(member => member.Id).ToList();
             var notificationDto = await _notificationService.CreateForPostAsync(userHubDto, createdPost, createdPost.WallId, wallMemberIds);
             var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
-            await NotificationHub.SendNotificationToParticularUsersAsync(notificationViewModel, userHubDto, wallMemberIds);
-            await NotificationHub.SendWallNotificationAsync(createdPost.WallId, wallMemberIds, createdPost.WallType, userHubDto);
+            await NotificationHub.SendNotificationToParticularUsersAsync(_hubContext, notificationViewModel, userHubDto, wallMemberIds);
+            await NotificationHub.SendWallNotificationAsync(_hubContext, createdPost.WallId, wallMemberIds, createdPost.WallType, userHubDto);
         }
     }
 }

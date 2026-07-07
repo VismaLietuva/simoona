@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
@@ -9,8 +10,6 @@ using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -35,11 +34,10 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GetAll_Should_Return_Ok()
         {
             // Act
-            var httpActionResult = await _externalLinkController.GetAll();
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _externalLinkController.GetAll();
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
         }
 
         [Test]
@@ -49,11 +47,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             var updateLinksViewModel = new ManageExternalLinkViewModel();
 
             // Act
-            var httpActionResult = await _externalLinkController.UpdateLinks(updateLinksViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _externalLinkController.UpdateLinks(updateLinksViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<OkResult>());
         }
 
         [Test]
@@ -71,14 +68,13 @@ namespace Shrooms.Tests.Controllers.WebApi
                 }
             };
 
-            _externalLinkController.Validate(updateLinksViewModel);
+            _externalLinkController.ModelState.AddModelError("Priority", "Invalid value");
 
             // Act
-            var httpActionResult = await _externalLinkController.UpdateLinks(updateLinksViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _externalLinkController.UpdateLinks(updateLinksViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
 
@@ -87,16 +83,15 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             // Arrange
             _externalLinkService.UpdateLinksAsync(Arg.Any<ManageExternalLinkDto>())
-                .Throws(new ValidationException(0));
+                .ThrowsAsync(new ValidationException(0));
 
             var updateLinksViewModel = new ManageExternalLinkViewModel();
 
             // Act
-            var httpActionResult = await _externalLinkController.UpdateLinks(updateLinksViewModel);
-            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+            var result = await _externalLinkController.UpdateLinks(updateLinksViewModel);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
     }
 }

@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -11,13 +11,15 @@ using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using X.PagedList.Extensions;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList.EF;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -32,12 +34,14 @@ namespace Shrooms.Presentation.Api.Controllers
             _filterPresetService = filterPresetService;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public override async Task<IEnumerable<OfficeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
             return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public async Task<OfficeViewModel> GetDefault()
         {
@@ -51,6 +55,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return office ?? new OfficeViewModel();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public async Task<IEnumerable<OfficeDropdownViewModel>> GetAllOfficesForDropdown()
         {
@@ -67,6 +72,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return mappedOffices;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<PagedViewModel<OfficeViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
@@ -112,7 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 });
             }));
 
-            var pagedList = await officeViewModels.ToPagedListAsync(page, pageSize);
+            var pagedList = officeViewModels.ToPagedList(page, pageSize);
 
             var pagedModel = new PagedViewModel<OfficeViewModel>
             {
@@ -125,12 +131,13 @@ namespace Shrooms.Presentation.Api.Controllers
             return pagedModel;
         }
 
+        [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override async Task<HttpResponseMessage> Post([FromBody] OfficePostViewModel model)
+        public override async Task<IActionResult> Post([FromBody] OfficePostViewModel model)
         {
             if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var office = _mapper.Map<OfficePostViewModel, Office>(model);
@@ -143,15 +150,16 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Insert(office);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
+        [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override async Task<HttpResponseMessage> Put([FromBody] OfficePostViewModel viewModel)
+        public override async Task<IActionResult> Put([FromBody] OfficePostViewModel viewModel)
         {
             if (viewModel == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var model = await _repository.GetByIdAsync(viewModel.Id);
@@ -166,17 +174,19 @@ namespace Shrooms.Presentation.Api.Controllers
             _repository.Update(model);
             await _unitOfWork.SaveAsync();
 
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
+        [HttpDelete("{id}")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Delete(int id)
         {
             var office = await _repository.Get(o => o.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefaultAsync();
 
             if (office == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             office.Floors.ForEach(f =>
@@ -200,7 +210,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 FilterType.Offices,
                 GetOrganizationId());
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         private async Task ResetDefaultOfficeAsync()

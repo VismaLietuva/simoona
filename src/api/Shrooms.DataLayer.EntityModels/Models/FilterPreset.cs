@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class FilterPreset : BaseModelWithOrg
+    public class FilterPreset : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

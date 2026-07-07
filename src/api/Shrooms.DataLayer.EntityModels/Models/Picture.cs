@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class Picture : BaseModelWithOrg
+    public class Picture : SoftDeletableModelWithOrg
     {
         public string Name { get; set; }
 

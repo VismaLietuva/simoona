@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -37,22 +37,22 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
+            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
-            _serviceRequestCommentsDbSet = Substitute.For<DbSet<ServiceRequestComment>, IQueryable<ServiceRequestComment>, IDbAsyncEnumerable<ServiceRequestComment>>();
+            _serviceRequestCommentsDbSet = Substitute.For<DbSet<ServiceRequestComment>, IQueryable<ServiceRequestComment>, IAsyncEnumerable<ServiceRequestComment>>();
             _uow.GetDbSet<ServiceRequestComment>().Returns(_serviceRequestCommentsDbSet);
 
-            _serviceRequestCategoryDbSet = Substitute.For<DbSet<ServiceRequestCategory>, IQueryable<ServiceRequestCategory>, IDbAsyncEnumerable<ServiceRequestCategory>>();
+            _serviceRequestCategoryDbSet = Substitute.For<DbSet<ServiceRequestCategory>, IQueryable<ServiceRequestCategory>, IAsyncEnumerable<ServiceRequestCategory>>();
             _uow.GetDbSet<ServiceRequestCategory>().Returns(_serviceRequestCategoryDbSet);
 
-            _serviceRequestPriorityDbSet = Substitute.For<DbSet<ServiceRequestPriority>, IQueryable<ServiceRequestPriority>, IDbAsyncEnumerable<ServiceRequestPriority>>();
+            _serviceRequestPriorityDbSet = Substitute.For<DbSet<ServiceRequestPriority>, IQueryable<ServiceRequestPriority>, IAsyncEnumerable<ServiceRequestPriority>>();
             _uow.GetDbSet<ServiceRequestPriority>().Returns(_serviceRequestPriorityDbSet);
 
-            _serviceRequestStatusDbSet = Substitute.For<DbSet<ServiceRequestStatus>, IQueryable<ServiceRequestStatus>, IDbAsyncEnumerable<ServiceRequestStatus>>();
+            _serviceRequestStatusDbSet = Substitute.For<DbSet<ServiceRequestStatus>, IQueryable<ServiceRequestStatus>, IAsyncEnumerable<ServiceRequestStatus>>();
             _uow.GetDbSet<ServiceRequestStatus>().Returns(_serviceRequestStatusDbSet);
 
             _permissionService = Substitute.For<IPermissionService>();
@@ -206,10 +206,10 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
-            Assert.AreEqual("test1", updatedServiceRequest.CategoryName);
-            Assert.AreEqual(serviceRequestDto.Title, updatedServiceRequest.Title);
-            Assert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
-            Assert.AreEqual(serviceRequestDto.KudosAmmount, updatedServiceRequest.KudosAmmount);
+            ClassicAssert.AreEqual("test1", updatedServiceRequest.CategoryName);
+            ClassicAssert.AreEqual(serviceRequestDto.Title, updatedServiceRequest.Title);
+            ClassicAssert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
+            ClassicAssert.AreEqual(serviceRequestDto.KudosAmmount, updatedServiceRequest.KudosAmmount);
 
             await _uow.Received(1).SaveChangesAsync(false);
         }
@@ -243,11 +243,11 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
-            Assert.AreEqual(null, updatedServiceRequest.CategoryName);
-            Assert.AreEqual(null, updatedServiceRequest.Title);
-            Assert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
-            Assert.AreEqual(null, updatedServiceRequest.KudosAmmount);
-            Assert.AreEqual(1, updatedServiceRequest.StatusId);
+            ClassicAssert.AreEqual(null, updatedServiceRequest.CategoryName);
+            ClassicAssert.AreEqual(null, updatedServiceRequest.Title);
+            ClassicAssert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
+            ClassicAssert.AreEqual(null, updatedServiceRequest.KudosAmmount);
+            ClassicAssert.AreEqual(1, updatedServiceRequest.StatusId);
 
             await _uow.Received(1).SaveChangesAsync(false);
         }
@@ -341,7 +341,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
-            Assert.AreEqual(serviceRequestDto.StatusId, updatedServiceRequest.StatusId);
+            ClassicAssert.AreEqual(serviceRequestDto.StatusId, updatedServiceRequest.StatusId);
 
             await _uow.Received(1).SaveChangesAsync(false);
         }

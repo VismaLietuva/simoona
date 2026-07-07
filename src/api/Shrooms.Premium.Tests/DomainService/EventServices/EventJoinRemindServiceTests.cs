@@ -114,7 +114,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await _sut.SendNotificationsAsync("visma");
 
             await _notificationService.ReceivedWithAnyArgs().CreateForEventJoinReminderAsync(users, 1);
-            await _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEventAsync(Arg.Is<IEnumerable<EventTypeDto>>(e => e.FirstOrDefault().Id == eventType.Id), users, 1);
+            await _eventNotificationService.Received().RemindUsersToJoinEventAsync(Arg.Is<IEnumerable<EventTypeDto>>(e => e.FirstOrDefault().Id == eventType.Id), Arg.Is<IEnumerable<string>>(e => e.SequenceEqual(users)), 1);
         }
 
         [Test]

@@ -1,6 +1,7 @@
-﻿using System;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -16,8 +17,9 @@ namespace Shrooms.Domain.Services.Roles
 {
     public class RoleService : IRoleService
     {
-        private readonly IDbSet<ApplicationRole> _roleDbSet;
-        private readonly IDbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<ApplicationRole> _roleDbSet;
+        private readonly DbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
 
         private readonly IPermissionService _permissionService;
 
@@ -25,12 +27,14 @@ namespace Shrooms.Domain.Services.Roles
         {
             _roleDbSet = uow.GetDbSet<ApplicationRole>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
+            _userRolesDbSet = uow.GetDbSet<IdentityUserRole<string>>();
             _permissionService = permissionService;
         }
 
         public Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleId)
         {
-            return x => x.Roles.All(y => y.RoleId != roleId);
+            // In EF Core, can't use navigation property in expression - check if user ID is NOT in UserRoles for this role
+            return x => !_userRolesDbSet.Any(ur => ur.UserId == x.Id && ur.RoleId == roleId);
         }
 
         public async Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
@@ -60,9 +64,11 @@ namespace Shrooms.Domain.Services.Roles
 
         public async Task<bool> HasRoleAsync(string userId, string roleName)
         {
-            return await _roleDbSet
-                .Include(x => x.Users)
-                .AnyAsync(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
+            // In EF Core, join with UserRoles instead of using navigation property
+            return await (from role in _roleDbSet
+                         join userRole in _userRolesDbSet on role.Id equals userRole.RoleId
+                         where role.Name == roleName && userRole.UserId == userId
+                         select role).AnyAsync();
         }
 
         public async Task<string> GetRoleIdByNameAsync(string roleName)
@@ -96,15 +102,16 @@ namespace Shrooms.Domain.Services.Roles
 
         private async Task<IEnumerable<RoleUserDto>> GetUsersWithRoleAsync(string roleId)
         {
-            return await _userDbSet
-                .Where(x => x.Roles.Any(y => y.RoleId == roleId))
-                .Select(x => new RoleUserDto
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FirstName + " " + x.LastName
-                })
-                .ToListAsync();
+            // In EF Core, query via UserRoles junction table
+            return await (from user in _userDbSet
+                         join userRole in _userRolesDbSet on user.Id equals userRole.UserId
+                         where userRole.RoleId == roleId
+                         select new RoleUserDto
+                         {
+                             Id = user.Id,
+                             Email = user.Email,
+                             FullName = user.FirstName + " " + user.LastName
+                         }).ToListAsync();
         }
 
         private async Task<IEnumerable<PermissionGroupDto>> GetGroupNamesByRoleAsync(int orgId, string roleId)

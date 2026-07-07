@@ -220,3 +220,9 @@ src/.nuget/nuget.config
 src/Shrooms.Premium.Tests/Shrooms.Premium.Tests.props
 src/Shrooms.Premium/Shrooms.Premium.props
 src/Premium.WithForkedOss.sln
+
+# IIS app_offline.htm (created/deleted during Debug builds to release file locks)
+app_offline.htm
+
+# Local developer appsettings
+appsettings.Development.json

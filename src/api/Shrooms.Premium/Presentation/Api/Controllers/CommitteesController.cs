@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -27,21 +27,24 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             _committeesService = committeesService;
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
         public override async Task<IEnumerable<CommitteeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
             return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override async Task<HttpResponseMessage> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);
         }
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override async Task<HttpResponseMessage> Put(CommitteePostViewModel postViewModel)
+        public override async Task<IActionResult> Put(CommitteePostViewModel postViewModel)
         {
             var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDto>(postViewModel);
             try
@@ -52,37 +55,38 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.NameDescriptionError });
+                    return NotFound(new[] { Resources.Models.Committee.Committee.NameDescriptionError });
                 }
             }
             catch (ServiceException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { ex.Message });
+                return BadRequest(new[] { ex.Message });
             }
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public async Task<HttpResponseMessage> KudosCommittee()
+        [ProducesResponseType(typeof(CommitteeViewDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> KudosCommittee()
         {
             var kudosCommittee = await _committeesService.GetKudosCommitteeAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK, kudosCommittee);
+            return Ok(kudosCommittee);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public async Task<HttpResponseMessage> KudosCommitteeId()
+        public async Task<IActionResult> KudosCommitteeId()
         {
             var id = await _committeesService.GetKudosCommitteeIdAsync();
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { id });
+            return Ok(new { id });
         }
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override async Task<HttpResponseMessage> Post(CommitteePostViewModel postViewModel)
+        public override async Task<IActionResult> Post(CommitteePostViewModel postViewModel)
         {
             var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDto>(postViewModel);
             try
@@ -93,33 +97,33 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.NameDescriptionError });
+                    return NotFound(new[] { Resources.Models.Committee.Committee.NameDescriptionError });
                 }
             }
             catch (ServiceException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { ex.Message });
+                return BadRequest(new[] { ex.Message });
             }
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public async Task<HttpResponseMessage> PostSuggestion(CommitteeSuggestionPostViewModel postViewModel)
+        public async Task<IActionResult> PostSuggestion(CommitteeSuggestionPostViewModel postViewModel)
         {
             if (string.IsNullOrWhiteSpace(postViewModel.Title))
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionTitleError });
+                return NotFound(new[] { Resources.Models.Committee.Committee.SuggestionTitleError });
             }
 
             if (string.IsNullOrWhiteSpace(postViewModel.Description))
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionTitleError });
+                return NotFound(new[] { Resources.Models.Committee.Committee.SuggestionTitleError });
             }
 
             if (postViewModel.CommitteeId == 0)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
+                return NotFound(new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
             }
 
             var dto = _mapper.Map<CommitteeSuggestionPostDto>(postViewModel);
@@ -130,13 +134,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
             catch (ServiceException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { ex.Message });
+                return BadRequest(new[] { ex.Message });
             }
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return StatusCode(201);
         }
 
+        [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public async Task<HttpResponseMessage> DeleteSuggestion(int committeeId, int suggestionId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteSuggestion(int committeeId, int suggestionId)
         {
             var userAndOrg = GetUserAndOrganization();
             try
@@ -145,23 +151,24 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
             catch (ServiceException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { ex.Message });
+                return BadRequest(new[] { ex.Message });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public async Task<HttpResponseMessage> GetSuggestions(int id)
+        [ProducesResponseType(typeof(IEnumerable<CommitteeSuggestionViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSuggestions(int id)
         {
             if (id == 0)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
+                return NotFound(new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
             }
             var suggestions = await _committeesService.GetCommitteeSuggestionsAsync(id);
 
-            return Request.CreateResponse(HttpStatusCode.OK, _mapper.Map<IEnumerable<CommitteeSuggestionViewModel>>(suggestions));
+            return Ok(_mapper.Map<IEnumerable<CommitteeSuggestionViewModel>>(suggestions));
         }
     }
 }

@@ -1,22 +1,24 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class RoomEntityConfig : EntityTypeConfiguration<Room>
+    internal class RoomEntityConfig : IEntityTypeConfiguration<Room>
     {
-        public RoomEntityConfig()
+        public void Configure(EntityTypeBuilder<Room> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false))
-                .HasMany(r => r.ApplicationUsers)
-                .WithOptional(e => e.Room)
-                .HasForeignKey(e => e.RoomId)
-                .WillCascadeOnDelete(false);
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            HasRequired(r => r.Organization)
+            builder.HasMany(r => r.ApplicationUsers)
+                .WithOne(e => e.Room)
+                .HasForeignKey(e => e.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(r => r.Organization)
                 .WithMany()
                 .HasForeignKey(r => r.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

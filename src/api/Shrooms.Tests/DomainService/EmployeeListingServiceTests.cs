@@ -1,11 +1,11 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Employees;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Shrooms.Tests.Extensions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -269,7 +269,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
 
             // Assert
-            CollectionAssert.AreEqual(expectedEmployeeIdsOrder, result.Select(employee => employee.Id));
+            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(expectedEmployeeIdsOrder));
         }
 
         private IList<ApplicationUser> GetTestDataForGetPagedEmployeesAsync()

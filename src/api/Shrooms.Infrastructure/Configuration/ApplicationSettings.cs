@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Web;
+using System.Net;
+using Microsoft.Extensions.Configuration;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 
@@ -10,39 +9,47 @@ namespace Shrooms.Infrastructure.Configuration
 {
     public class ApplicationSettings : IApplicationSettings
     {
-        public string StorageConnectionString => ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+        private readonly IConfiguration _configuration;
 
-        public bool IsEmailEnabled => bool.Parse(ConfigurationManager.AppSettings["EmailEnabled"]);
+        public ApplicationSettings(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public string StorageConnectionString => _configuration.GetConnectionString("StorageConnectionString") ?? string.Empty;
+
+        public bool IsEmailEnabled => bool.TryParse(_configuration["EmailEnabled"], out var val) && val;
+
         public EmailBuildingStrategy EmailBuildingStrategy =>
-            Enum.TryParse(ConfigurationManager.AppSettings["EmailBuildingStrategy"], out EmailBuildingStrategy strat) ? strat : EmailBuildingStrategy.AllTo;
+            Enum.TryParse(_configuration["EmailBuildingStrategy"], out EmailBuildingStrategy strat) ? strat : EmailBuildingStrategy.AllTo;
 
-        public int DefaultOrganizationId => int.Parse(ConfigurationManager.AppSettings["DefaultOrganizationId"]);
+        public int DefaultOrganizationId => int.TryParse(_configuration["DefaultOrganizationId"], out var id) ? id : 1;
 
-        public int AccessTokenLifeTimeInHours => int.Parse(ConfigurationManager.AppSettings["AccessTokenLifeTimeInHours"]);
+        public int AccessTokenLifeTimeInHours => int.TryParse(_configuration["AccessTokenLifeTimeInHours"], out var h) ? h : 24;
 
-        public int? KudosAvailableToSendPerMonth => ConfigurationManager.AppSettings["KudosAvailableToSendPerMonth"] is { } kudosPerMonth
-            ? int.Parse(kudosPerMonth)
-            : null;
+        public int? KudosAvailableToSendPerMonth => int.TryParse(_configuration["KudosAvailableToSendPerMonth"], out var k) ? k : null;
 
-        public bool IsProductionBuild => bool.TryParse(ConfigurationManager.AppSettings["IsProductionBuild"], out var result) && result;
+        public bool IsProductionBuild => bool.TryParse(_configuration["IsProductionBuild"], out var result) && result;
 
-        public IEnumerable<string> OAuthRedirectUris => ConfigurationManager.AppSettings["OAuthRedirectUri"].Split(',');
+        public IEnumerable<string> OAuthRedirectUris => (_configuration["OAuthRedirectUri"] ?? string.Empty).Split(',');
 
-        public string DemoAccountDefaultPictureId => ConfigurationManager.AppSettings["DemoAccountDefaultPictureID"];
+        public string DemoAccountDefaultPictureId => _configuration["DemoAccountDefaultPictureID"] ?? string.Empty;
 
-        public string ClientUrl => string.Format(ConfigurationManager.AppSettings["ClientUrl"]);
+        public string ClientUrl => _configuration["ClientUrl"] ?? string.Empty;
 
-        public string BasicUsername => ConfigurationManager.AppSettings["BasicUsername"];
+        public string BasicUsername => _configuration["BasicUsername"] ?? string.Empty;
 
-        public string BasicPassword => ConfigurationManager.AppSettings["BasicPassword"];
+        public string BasicPassword => _configuration["BasicPassword"] ?? string.Empty;
 
-        public string CorsOriginsSetting => ConfigurationManager.AppSettings["CorsOriginsSettingKey"];
+        public string CorsOriginsSetting => _configuration["CorsOriginsSettingKey"] ?? string.Empty;
 
-        public string SupportEmail => ConfigurationManager.AppSettings["SupportEmail"];
+        public string SupportEmail => _configuration["SupportEmail"] ?? string.Empty;
 
-        public string VacationsBotAuthToken => ConfigurationManager.AppSettings["VacationsBotAuthToken"];
+        public string VacationsBotAuthToken => _configuration["VacationsBotAuthToken"] ?? string.Empty;
 
-        public string VacationsBotHistoryUrl => ConfigurationManager.AppSettings["VacationsBotHistoryUrl"];
+        public string VacationsBotHistoryUrl => _configuration["VacationsBotHistoryUrl"] ?? string.Empty;
+
+        public string ApiUrl => _configuration["ApiUrl"] ?? string.Empty;
 
         public string ClientUrlWithOrg(string tenant) => GetClientPath(tenant);
 
@@ -68,14 +75,16 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string ServiceRequestUrl(string tenant, int id) => GetClientPath($"{tenant}/ServiceRequests/List?Id={id}");
 
-        public string ResetPasswordUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Reset?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}");
+        public string ResetPasswordUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Reset?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}");
 
-        public string VerifyEmailUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Verify?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}");
+        public string VerifyEmailUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Verify?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}");
 
         public string FeedUrl(string tenant) => GetClientPath($"{tenant}/Wall/Feed");
 
-        public string ApiUrl => string.Format(ConfigurationManager.AppSettings["ApiUrl"]);
-
-        private string GetClientPath(string relativePath) => Path.Combine(ClientUrl, relativePath);
+        private string GetClientPath(string relativePath)
+        {
+            var baseUrl = ClientUrl.TrimEnd('/');
+            return $"{baseUrl}/{relativePath}";
+        }
     }
 }

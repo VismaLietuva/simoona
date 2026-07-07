@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -33,10 +32,10 @@ namespace Shrooms.Tests.DomainService
         [SetUp]
         public void TestInitializer()
         {
-            _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
-            _kudosBasketDbSet = Substitute.For<DbSet<KudosBasket>, IQueryable<KudosBasket>, IDbAsyncEnumerable<KudosBasket>>();
-            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
-            _kudosTypesDbSet = Substitute.For<DbSet<KudosType>, IQueryable<KudosType>, IDbAsyncEnumerable<KudosType>>();
+            _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IAsyncEnumerable<KudosLog>>();
+            _kudosBasketDbSet = Substitute.For<DbSet<KudosBasket>, IQueryable<KudosBasket>, IAsyncEnumerable<KudosBasket>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
+            _kudosTypesDbSet = Substitute.For<DbSet<KudosType>, IQueryable<KudosType>, IAsyncEnumerable<KudosType>>();
 
             _kudosBasketDbSet.SetDbSetDataForAsync(MockKudosBaskets());
             _usersDbSet.SetDbSetDataForAsync(MockDonator());
@@ -150,7 +149,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -162,8 +161,8 @@ namespace Shrooms.Tests.DomainService
             };
 
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
-            Assert.AreEqual(15, result.First().DonationAmount);
-            Assert.AreEqual(DateTime.Parse("2015-11-02"), result.First().DonationDate);
+            Assert.That(result.First().DonationAmount, Is.EqualTo(15));
+            Assert.That(result.First().DonationDate, Is.EqualTo(DateTime.Parse("2015-11-02")));
         }
 
         [Test]
@@ -174,8 +173,8 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
-            Assert.AreEqual("testUserId", result.First().Donator.Id);
-            Assert.AreEqual("Testas Testauskas", result.First().Donator.FullName);
+            Assert.That(result.First().Donator.Id, Is.EqualTo("testUserId"));
+            Assert.That(result.First().Donator.FullName, Is.EqualTo("Testas Testauskas"));
         }
 
         [Test]
@@ -204,7 +203,7 @@ namespace Shrooms.Tests.DomainService
             });
 
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
-            Assert.AreEqual("Deleted Account", result.First().Donator.FullName);
+            Assert.That(result.First().Donator.FullName, Is.EqualTo("Deleted Account"));
         }
 
         [Test]
@@ -272,8 +271,8 @@ namespace Shrooms.Tests.DomainService
             _kudosBasketDbSet.Remove(kudosBasket);
 
             var result = await _kudosBasketService.GetKudosBasketAsync(userAndOrg);
-            Assert.AreEqual(10, result.Id);
-            Assert.AreEqual("test", result.Description);
+            Assert.That(result.Id, Is.EqualTo(10));
+            Assert.That(result.Description, Is.EqualTo("test"));
         }
 
         [Test]
@@ -292,7 +291,7 @@ namespace Shrooms.Tests.DomainService
             activeKudosBasket.IsActive = false;
 
             var result = await _kudosBasketService.GetKudosBasketWidgetAsync(userAndOrg);
-            Assert.AreEqual(null, result);
+            Assert.That(result, Is.EqualTo(null));
         }
 
         [Test]
@@ -336,10 +335,10 @@ namespace Shrooms.Tests.DomainService
             await _kudosBasketService.EditKudosBasketAsync(kudosBasketDto);
             var editedBasket = await _kudosBasketDbSet.FirstAsync(basket => basket.Id == 10);
 
-            Assert.AreEqual(kudosBasketDto.Title, editedBasket.Title);
-            Assert.AreEqual(kudosBasketDto.Description, editedBasket.Description);
-            Assert.AreEqual(kudosBasketDto.IsActive, editedBasket.IsActive);
-            Assert.AreEqual("testUserId", editedBasket.ModifiedBy);
+            Assert.That(editedBasket.Title, Is.EqualTo(kudosBasketDto.Title));
+            Assert.That(editedBasket.Description, Is.EqualTo(kudosBasketDto.Description));
+            Assert.That(editedBasket.IsActive, Is.EqualTo(kudosBasketDto.IsActive));
+            Assert.That(editedBasket.ModifiedBy, Is.EqualTo("testUserId"));
         }
 
         [Test]
@@ -356,7 +355,7 @@ namespace Shrooms.Tests.DomainService
             await _kudosBasketService.MakeDonationAsync(donationDto);
             var basket = await _kudosBasketDbSet.FirstAsync(b => b.Id == 10);
 
-            Assert.AreEqual(45, basket.KudosLogs.Sum(l => l.Points));
+            Assert.That(basket.KudosLogs.Sum(l => l.Points), Is.EqualTo(45));
         }
 
         [Test]

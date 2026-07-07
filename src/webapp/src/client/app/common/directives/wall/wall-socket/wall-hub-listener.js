@@ -7,7 +7,6 @@
 
     notificationHub.$inject = [
         '$rootScope',
-        'Hub',
         '$timeout',
         'authService',
         'endPoint',
@@ -15,18 +14,10 @@
         'notificationFactory'
     ];
 
-    function notificationHub($rootScope, Hub, $timeout, authService, endPoint, wallService, notificationFactory) {
+    function notificationHub($rootScope, $timeout, authService, endPoint, wallService, notificationFactory) {
 
-        let hubConnection = null;
-
+        let connection = null;
         let allowConnection = false;
-
-        const hubConnectionStates = {
-            connecting: 0,
-            connected: 1,
-            reconnecting: 2,
-            disconnected: 4
-        };
 
         const factory = {
             initHubConnection: initHubConnection,
@@ -37,52 +28,56 @@
 
         /////////
 
+        function buildConnection() {
+            var token = authService.identity.token;
+            var org = authService.identity.organizationName;
+            var url = endPoint + '/signalr?Organization=' + encodeURIComponent(org);
+
+            var conn = new signalR.HubConnectionBuilder()
+                .withUrl(url, { accessTokenFactory: function() { return token; } })
+                .withAutomaticReconnect([0, 2000, 10000, 30000, 60000])
+                .build();
+
+            conn.on('newContent', function(wallId, wallType) {
+                $rootScope.$apply(function() {
+                    wallService.notifyAboutNewContentAvailable(wallId, wallType);
+                });
+            });
+
+            conn.on('newNotification', function(notification) {
+                notificationFactory.addNotification(notification);
+            });
+
+            conn.onclose(function() {
+                if (allowConnection) {
+                    $timeout(function() { startConnection(); }, 60000);
+                }
+            });
+
+            return conn;
+        }
+
+        function startConnection() {
+            connection.start().catch(function(err) {
+                console.error('SignalR connection error: ' + err);
+            });
+        }
+
         function initHubConnection() {
             allowConnection = true;
 
-            if (!hubConnection) {
-                const hub = new Hub('Notification', {
-
-                    rootPath: endPoint + '/signalr',
-
-                    queryParams: {
-                        'Organization': authService.identity.organizationName,
-                        'Token': authService.identity.token
-                    },
-                    //client side methods
-                    listeners: {
-                        'newContent': function(wallId, wallType) {
-                            $rootScope.$apply(function() {
-                                wallService.notifyAboutNewContentAvailable(wallId, wallType);
-                            });
-                        },
-                        'newNotification': function(notification) {
-                            notificationFactory.addNotification(notification);
-                        }
-                    },
-
-                    'stateChanged': function(state) {
-                        if (state.newState === hubConnectionStates.disconnected) {
-                            if (allowConnection) {
-                                $timeout(function() {
-                                    hubConnection.connect();
-                                }, 60000);
-                            }
-                        }
-                    }
-                });
-
-                hubConnection = hub;
-            } else
-                if (hubConnection.connection.state === hubConnectionStates.disconnected) {
-                    hubConnection.connect();
-                }
+            if (!connection) {
+                connection = buildConnection();
+                startConnection();
+            } else if (connection.state === signalR.HubConnectionState.Disconnected) {
+                startConnection();
+            }
         }
 
         function disconnectFromHub() {
-            if (hubConnection) {
+            if (connection) {
                 allowConnection = false;
-                hubConnection.disconnect();
+                connection.stop();
             }
         }
     }

@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -33,9 +33,9 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IPostService _postService;
         private readonly IMarkdownConverter _markdownConverter;
 
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<Project> _projectsDbSet;
-        private readonly IDbSet<Comment> _commentsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<Project> _projectsDbSet;
+        private readonly DbSet<Comment> _commentsDbSet;
 
         public CommentNotificationService(
             IUnitOfWork2 uow,

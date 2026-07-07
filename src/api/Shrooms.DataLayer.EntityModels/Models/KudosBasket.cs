@@ -3,7 +3,7 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class KudosBasket : BaseModelWithOrg
+    public class KudosBasket : SoftDeletableModelWithOrg
     {
         public string Title { get; set; }
         public string Description { get; set; }

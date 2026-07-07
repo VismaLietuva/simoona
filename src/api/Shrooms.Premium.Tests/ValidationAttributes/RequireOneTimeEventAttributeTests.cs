@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events;
 using System;
@@ -32,7 +33,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Number, context);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
 
         [Test]
@@ -51,7 +52,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Number, context);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
             var result = attribute.GetValidationResult(model.Number, context);
 
             // Assert
-            Assert.AreEqual(ValidationResult.Success, result);
+            ClassicAssert.AreEqual(ValidationResult.Success, result);
         }
 
         [Test]

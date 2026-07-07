@@ -1,23 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
-    internal class PostEntityConfig : EntityTypeConfiguration<Post>
+    internal class PostEntityConfig : IEntityTypeConfiguration<Post>
     {
-        public PostEntityConfig()
+        public void Configure(EntityTypeBuilder<Post> builder)
         {
-            Property(x => x.LastActivity)
-                .HasColumnType("datetime2")
-                .HasColumnAnnotation("Index", new IndexAnnotation(
-                    new IndexAttribute("IX_LastActivity")
-                    {
-                        IsUnique = false,
-                        IsClustered = false
-                    }))
-                ;
+            builder.Property(x => x.LastActivity)
+                .HasColumnType("datetime2");
+
+            builder.HasIndex(x => x.LastActivity)
+                .HasDatabaseName("IX_LastActivity");
         }
     }
 }

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
@@ -25,7 +26,7 @@ using Shrooms.Presentation.WebViewModels.Models.Wall.Widgets;
 namespace Shrooms.Presentation.Common.Controllers.Wall
 {
     [Authorize]
-    [RoutePrefix("WallWidgets")]
+    [Route("[controller]")]
     public class WallWidgetsController : BaseController
     {
         private readonly IMapper _mapper;
@@ -54,8 +55,9 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
         }
 
         [HttpGet]
+        [Route("Get")]
         [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.FiveMinutes)]
-        public async Task<WidgetsViewModel> Get([FromUri] GetWidgetsViewModel getWidgetsViewModel)
+        public async Task<WidgetsViewModel> Get([FromQuery] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
 

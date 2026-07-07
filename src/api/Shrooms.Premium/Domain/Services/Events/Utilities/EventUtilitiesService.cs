@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.SqlServer;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -19,9 +18,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
     public class EventUtilitiesService : IEventUtilitiesService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<EventType> _eventTypesDbSet;
-        private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<EventType> _eventTypesDbSet;
+        private readonly DbSet<EventOption> _eventOptionsDbSet;
 
         private readonly IFilterPresetService _filterPresetService;
 
@@ -212,10 +211,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 
         public async Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds)
         {
+            var now = DateTime.UtcNow;
+            var startOfWeek = now.Date.AddDays(-(int)now.DayOfWeek);
+            var endOfWeek = startOfWeek.AddDays(7);
             return await _eventsDbSet
-                .AnyAsync(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
+                .AnyAsync(x => x.StartDate >= startOfWeek && x.StartDate < endOfWeek &&
                           eventTypeIds.Contains(x.EventType.Id) &&
-                          x.RegistrationDeadline > DateTime.UtcNow);
+                          x.RegistrationDeadline > now);
         }
 
         public async Task<IEnumerable<string>> GetEventTypesSingleJoinGroupsAsync(int organizationId)

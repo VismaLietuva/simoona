@@ -1,17 +1,14 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Employees;
-using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
-    public class EmployeeModule : Module
+    public static class EmployeeModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddEmployees(this IServiceCollection services)
         {
-            builder.RegisterType<EmployeeListingService>()
-                .As<IEmployeeListingService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
+            services.AddScoped<IEmployeeListingService, EmployeeListingService>();
+            return services;
         }
     }
 }

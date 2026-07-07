@@ -1,51 +1,50 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
+using Shrooms.Infrastructure.FeatureToggle;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Common.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Helpers;
-using System.Configuration;
-using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     public partial class UserDeprecatedController : BaseController
     {
         [HttpGet]
-        [FeatureToggle(Infrastructure.FeatureToggle.Features.Impersonation)]
+        [FeatureToggle(Features.Impersonation)]
         [Route("Impersonate")]
-        [AllowAnonymous]
-        public async Task<HttpResponseMessage> Impersonate(string username)
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
+        public async Task<IActionResult> Impersonate(string username)
         {
             var principal = User as ClaimsPrincipal;
-            var accessToken = await _impersonateService.ImpersonateUserAsync(username, Startup.OAuthServerOptions, principal);
+            var accessToken = await _impersonateService.ImpersonateUserAsync(username, principal);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { access_token = accessToken });
+            return Ok(new { access_token = accessToken });
         }
 
         [HttpGet]
-        [FeatureToggle(Infrastructure.FeatureToggle.Features.Impersonation)]
+        [FeatureToggle(Features.Impersonation)]
         [Route("RevertImpersonate")]
-        [AllowAnonymous]
-        public async Task<HttpResponseMessage> RevertImpersonate()
+        [Authorize]
+        public async Task<IActionResult> RevertImpersonate()
         {
-            var accessToken = await _impersonateService.RevertImpersonationAsync(User.GetOriginalUsername(), Startup.OAuthServerOptions);
+            var accessToken = await _impersonateService.RevertImpersonationAsync(User as ClaimsPrincipal);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { access_token = accessToken });
+            return Ok(new { access_token = accessToken });
         }
 
         [HttpGet]
-        [FeatureToggle(Infrastructure.FeatureToggle.Features.Impersonation)]
+        [FeatureToggle(Features.Impersonation)]
         [Route("ImpersonateEnabled")]
         [AllowAnonymous]
-        public HttpResponseMessage ImpersonateEnabled()
+        public IActionResult ImpersonateEnabled([FromServices] IFeatureConfiguration featureConfiguration)
         {
-            var key = ConfigurationManager.AppSettings[WebApiConstants.ClaimUserImpersonation];
-            var enabled = key != null && bool.Parse(key);
+            var enabled = featureConfiguration.IsAvailable(Features.Impersonation);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { enabled });
+            return Ok(new { enabled });
         }
     }
 }

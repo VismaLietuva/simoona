@@ -2,81 +2,73 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels.Notifications;
-using X.PagedList;
 
 namespace Shrooms.Presentation.Common.Hubs
 {
-    [HubName("Notification")]
     public class NotificationHub : BaseHub
     {
         private static readonly ConcurrentDictionary<UserAndOrganizationHubDto, HubUser> _notificationHubUsers =
             new ConcurrentDictionary<UserAndOrganizationHubDto, HubUser>();
 
-        public static async Task SendWallNotificationAsync(int wallId, IEnumerable<string> membersIds, WallType wallType, UserAndOrganizationHubDto userOrg)
+        public static async Task SendWallNotificationAsync(IHubContext<NotificationHub> hubContext, int wallId, IEnumerable<string> membersIds, WallType wallType, UserAndOrganizationHubDto userOrg)
         {
-            var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
-
-            var connectionIds = await _notificationHubUsers
+            var connectionIds = _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationName == userOrg.OrganizationName &&
                             u.Key.OrganizationId == userOrg.OrganizationId)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToListAsync();
+                .ToList();
 
-            notificationHub.Clients.Clients(connectionIds).newContent(wallId, wallType);
+            await hubContext.Clients.Clients(connectionIds).SendAsync("newContent", wallId, wallType);
         }
 
-        public static async Task SendNotificationToAllUsersAsync(NotificationViewModel notification, UserAndOrganizationHubDto userOrg)
+        public static async Task SendNotificationToAllUsersAsync(IHubContext<NotificationHub> hubContext, NotificationViewModel notification, UserAndOrganizationHubDto userOrg)
         {
-            var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
-
-            var connectionIds = await _notificationHubUsers
+            var connectionIds = _notificationHubUsers
                 .Where(x => x.Key.UserId != userOrg.UserId &&
                             x.Key.OrganizationId == userOrg.OrganizationId &&
                             x.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToListAsync();
+                .ToList();
 
-            notificationHub.Clients.Clients(connectionIds).newNotification(notification);
+            await hubContext.Clients.Clients(connectionIds).SendAsync("newNotification", notification);
         }
 
         public static async Task SendNotificationToParticularUsersAsync(
+            IHubContext<NotificationHub> hubContext,
             NotificationViewModel notification,
             UserAndOrganizationHubDto userOrg,
             IEnumerable<string> membersIds)
         {
-            var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
-
-            var connectionIds = await _notificationHubUsers
+            var connectionIds = _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationId == userOrg.OrganizationId &&
                             u.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToListAsync();
+                .ToList();
 
-            notificationHub.Clients.Clients(connectionIds).newNotification(notification);
+            await hubContext.Clients.Clients(connectionIds).SendAsync("newNotification", notification);
         }
 
-        public override Task OnConnected()
+        public override Task OnConnectedAsync()
         {
             var userOrg = GetUserAndTenant();
             MapUserWithConnection(userOrg);
 
-            return base.OnConnected();
+            return base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnected(bool stopCalled)
+        public override Task OnDisconnectedAsync(System.Exception exception)
         {
             var userOrg = GetUserAndTenant();
             RemoveUserConnections(userOrg);
 
-            return base.OnDisconnected(stopCalled);
+            return base.OnDisconnectedAsync(exception);
         }
 
         private void RemoveUserConnections(UserAndOrganizationHubDto userOrg)

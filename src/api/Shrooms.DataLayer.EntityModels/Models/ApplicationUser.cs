@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
@@ -97,6 +97,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public DateTime Modified { get; set; }
 
         public string ModifiedBy { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         public virtual ICollection<Exam> Exams { get; set; }
 

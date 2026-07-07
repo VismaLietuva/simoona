@@ -1,4 +1,5 @@
-﻿using System.Web.Http.Routing;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Presentation.Api.Helpers;
@@ -11,9 +12,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void RouteFromController_when_prefix_api()
         {
-            var helper = Substitute.For<UrlHelper>();
+            var helper = Substitute.For<IUrlHelper>();
 
-            helper.Route(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 
@@ -23,9 +24,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void RouteFromController_when_no_prefix()
         {
-            var helper = Substitute.For<UrlHelper>();
+            var helper = Substitute.For<IUrlHelper>();
 
-            helper.Route(Arg.Any<string>(), Arg.Any<object>()).Returns("/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 
@@ -35,9 +36,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void RouteFromController_when_controller_name_empty()
         {
-            var helper = Substitute.For<UrlHelper>();
+            var helper = Substitute.For<IUrlHelper>();
 
-            helper.Route(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "", null);
 
@@ -47,9 +48,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void RouteFromController_when_controller_name_null()
         {
-            var helper = Substitute.For<UrlHelper>();
+            var helper = Substitute.For<IUrlHelper>();
 
-            helper.Route(Arg.Any<string>(), Arg.Any<object>()).Returns("/api/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/api/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", null, null);
 
@@ -59,9 +60,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void RouteFromController_when_prefix_is_short()
         {
-            var helper = Substitute.For<UrlHelper>();
+            var helper = Substitute.For<IUrlHelper>();
 
-            helper.Route(Arg.Any<string>(), Arg.Any<object>()).Returns("/a/Account/Action/");
+            helper.RouteUrl(Arg.Any<UrlRouteContext>()).Returns("/a/Account/Action/");
 
             var result = helper.RouteFromController("ExternalLogin", "Account", null);
 

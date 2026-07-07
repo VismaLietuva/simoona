@@ -1,124 +1,130 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Shrooms.Contracts.Constants;
-using Shrooms.Presentation.Api.GeneralCode;
-using Shrooms.Resources.Helpers;
 
 namespace Shrooms.Presentation.Api.Middlewares
 {
-    public class MultiTenancyMiddleware : OwinMiddleware
+    public class MultiTenancyMiddleware
     {
-        public MultiTenancyMiddleware(OwinMiddleware next)
-            : base(next)
+        private readonly RequestDelegate _next;
+        private readonly IConfiguration _configuration;
+
+        public MultiTenancyMiddleware(RequestDelegate next, IConfiguration configuration)
         {
+            _next = next;
+            _configuration = configuration;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var request = context.Request;
+            var requestPath = "/" + context.Request.Path.ToString().TrimStart('/');
 
-            if (request.Path.ToString().StartsWith("/signin-google") || request.Path.ToString().StartsWith("/signin-facebook") || request.Path.ToString().StartsWith("/signin-microsoft") || request.Path.ToString().StartsWith("/swagger"))
+            if (requestPath.StartsWith("/signin-google", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/signin-facebook", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/signin-microsoft", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase))
             {
-                await Next.Invoke(context);
+                await _next(context);
+                return;
             }
-            else
+
+            var tenantKey = ExtractTenant(context);
+
+            if (string.IsNullOrEmpty(tenantKey))
             {
-                var tenantKey = ExtractTenant(context);
+                context.Response.StatusCode = 401;
+                return;
+            }
 
-                if (string.IsNullOrEmpty(tenantKey))
-                {
-                    Unauthorized(context);
-                }
-                else if (!TryFindTenant(out var tenantName, tenantKey))
-                {
-                    await ReturnInvalidOrganizationResponse(context);
-                }
-                else
-                {
-                    request.Set("tenantName", tenantName);
+            if (!TryFindTenant(out var tenantName, tenantKey))
+            {
+                await ReturnInvalidOrganizationResponseAsync(context);
+                return;
+            }
 
-                    try
-                    {
-                        await Next.Invoke(context);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                    }
-                }
+            context.Items["tenantName"] = tenantName;
+
+            try
+            {
+                await _next(context);
+            }
+            catch (OperationCanceledException)
+            {
             }
         }
 
-        private static string ExtractTenant(IOwinContext context)
+        private static string ExtractTenant(HttpContext context)
         {
             var tenantKey = default(string);
-            var requestPath = context.Request.Path.ToString();
+            var requestPath = "/" + context.Request.Path.ToString().TrimStart('/');
 
-            if (requestPath.StartsWith("/storage"))
+            if (requestPath.StartsWith("/storage", StringComparison.OrdinalIgnoreCase))
             {
-                tenantKey = context.Request.Path.ToString().Split('/')[2];
+                var parts = requestPath.Split('/');
+                tenantKey = parts.Length > 2 ? parts[2] : null;
             }
-            else if (context.Authentication.User != null &&
-                context.Authentication.User.Identity.IsAuthenticated &&
-                context.Authentication.User.Claims.Any(x => x.Type == "OrganizationName"))
+            else if (context.User != null &&
+                context.User.Identity.IsAuthenticated &&
+                context.User.Claims.Any(x => x.Type == "OrganizationName"))
             {
-                tenantKey = context.Authentication.User.Claims.First(x => x.Type == "OrganizationName").Value.ToLowerInvariant();
+                tenantKey = context.User.Claims.First(x => x.Type == "OrganizationName").Value.ToLowerInvariant();
             }
-            else if (requestPath.StartsWith("/token") ||
-                requestPath.StartsWith("/externaljobs") ||
-                requestPath.StartsWith("/externalpremiumjobs") ||
-                requestPath.StartsWith("/Account/ExternalLogin") ||
-                requestPath.StartsWith("/Account/RegisterExternal") ||
-                requestPath.StartsWith("/Account/InternalLogins") ||
-                requestPath.StartsWith("/Account/UserInfo") ||
-                requestPath.StartsWith("/Account/Register") ||
-                requestPath.StartsWith("/Account/ResetPassword") ||
-                requestPath.StartsWith("/Account/RequestPasswordReset") ||
-                requestPath.StartsWith("/Account/VerifyEmail") ||
-                requestPath.StartsWith("/bookmobile"))
+            else if (requestPath.StartsWith("/token", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/externaljobs", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/externalpremiumjobs", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/ExternalLogin", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/RegisterExternal", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/InternalLogins", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/UserInfo", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/Register", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/ResetPassword", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/RequestPasswordReset", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/Account/VerifyEmail", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/bookmobile", StringComparison.OrdinalIgnoreCase))
             {
-                var organizationFromHeader = context.Request.Headers.Get("Organization");
-                var organizationFromUri = context.Request.Query.Get("organization");
+                var organizationFromHeader = context.Request.Headers["Organization"].FirstOrDefault();
+                var organizationFromUri = context.Request.Query["organization"].FirstOrDefault();
 
-                if (organizationFromHeader != null)
-                {
-                    tenantKey = organizationFromHeader;
-                }
-                else if (organizationFromUri != null)
-                {
-                    tenantKey = organizationFromUri;
-                }
+                tenantKey = organizationFromHeader ?? organizationFromUri;
             }
 
             return tenantKey;
         }
 
-        private static async Task ReturnInvalidOrganizationResponse(IOwinContext context)
+        private static async Task ReturnInvalidOrganizationResponseAsync(HttpContext context)
         {
             context.Response.StatusCode = 400;
-            context.Response.ReasonPhrase = "Invalid organization";
             context.Response.ContentType = "application/json";
             var responseBody = new
             {
                 errorCode = ErrorCodes.InvalidOrganization,
                 errorMessage = "Invalid organization"
             };
-
-            await context.Response.WriteAsync(Encoding.UTF8.GetBytes(responseBody.ToJson()));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(responseBody));
         }
 
-        private static void Unauthorized(IOwinContext context)
+        private bool TryFindTenant(out string tenantName, string tenantKey)
         {
-            context.Response.StatusCode = 401;
-            context.Response.ReasonPhrase = "Unauthorized";
-        }
+            // A tenant is only valid in the current environment if both:
+            //   1. it's registered in the Organizations section, AND
+            //   2. it has a non-empty connection string.
+            // This prevents accepting requests for tenants whose DB isn't provisioned here.
+            var organizationsEntry = _configuration[$"Organizations:{tenantKey}"];
+            var connStr = _configuration.GetConnectionString(tenantKey);
+            if (organizationsEntry != null && !string.IsNullOrWhiteSpace(connStr))
+            {
+                tenantName = tenantKey;
+                return true;
+            }
 
-        private static bool TryFindTenant(out string tenantName, string tenantKey)
-        {
-            var tenantMatch = OrganizationUtils.AvailableOrganizations.TryGetValue(tenantKey, out tenantName);
-            return tenantMatch;
+            tenantName = null;
+            return false;
         }
     }
 }

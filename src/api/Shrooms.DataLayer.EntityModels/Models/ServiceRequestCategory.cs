@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ServiceRequestCategory : BaseModel
+    public class ServiceRequestCategory : SoftDeletableModel
     {
         public string Name { get; set; }
 

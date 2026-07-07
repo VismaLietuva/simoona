@@ -1,36 +1,37 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
 {
-    internal class BadgeCategoryEntityConfiguration : EntityTypeConfiguration<BadgeCategory>
+    internal class BadgeCategoryEntityConfiguration : IEntityTypeConfiguration<BadgeCategory>
     {
-        public BadgeCategoryEntityConfiguration()
+        public void Configure(EntityTypeBuilder<BadgeCategory> builder)
         {
-            Map(e => e.Requires("IsDeleted").HasValue(false));
+            builder.HasQueryFilter(e => !e.IsDeleted);
 
-            Property(u => u.Title)
+            builder.Property(u => u.Title)
                 .IsRequired()
                 .HasMaxLength(50);
 
-            Property(u => u.Description)
+            builder.Property(u => u.Description)
                 .HasMaxLength(4000);
 
-            Property(u => u.ModifiedBy)
+            builder.Property(u => u.ModifiedBy)
                 .HasMaxLength(50);
 
-            Property(u => u.CreatedBy)
+            builder.Property(u => u.CreatedBy)
                 .HasMaxLength(50);
 
-            HasMany(x => x.RelationshipsWithKudosTypes)
-                .WithRequired()
+            builder.HasMany(x => x.RelationshipsWithKudosTypes)
+                .WithOne(x => x.BadgeCategory)
                 .HasForeignKey(x => x.BadgeCategoryId)
-                .WillCascadeOnDelete(value: false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasMany(x => x.BadgeTypes)
-                .WithRequired()
+            builder.HasMany(x => x.BadgeTypes)
+                .WithOne(x => x.BadgeCategory)
                 .HasForeignKey(x => x.BadgeCategoryId)
-                .WillCascadeOnDelete(value: true);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

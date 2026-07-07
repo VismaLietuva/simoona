@@ -1,15 +1,16 @@
-﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Presentation.Api.BackgroundWorkers;
 
 namespace Shrooms.Premium.IoC.Modules
 {
-    public class BackgroundWorkersModule : Module
+    public static class BackgroundWorkersModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public static IServiceCollection AddPremiumBackgroundWorkers(this IServiceCollection services)
         {
-            builder.RegisterType<NewEventNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
-            builder.RegisterType<SharedEventNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
+            services.AddTransient<NewEventNotifier>();
+            services.AddTransient<SharedEventNotifier>();
+            return services;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class RoomType : BaseModelWithOrg
+    public class RoomType : SoftDeletableModelWithOrg
     {
         public const string DefaultColor = "#FFFFFF";
 

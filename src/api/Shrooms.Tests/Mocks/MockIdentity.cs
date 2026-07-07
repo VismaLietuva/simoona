@@ -2,49 +2,55 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Web.Http;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.DataProtection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Tests.Mocks
 {
     public static class MockIdentity
     {
-        public static IRoleStore<ApplicationRole, string> MockRoleStore()
+        public static IRoleStore<ApplicationRole> MockRoleStore()
         {
             var mockRoleStore = Substitute.For<IRoleStore<ApplicationRole>>();
-            mockRoleStore.FindByNameAsync(Roles.NewUser).Returns(Task.FromResult(new ApplicationRole { Name = Roles.NewUser }));
-            mockRoleStore.FindByNameAsync(Roles.User).Returns(Task.FromResult(new ApplicationRole { Name = Roles.User }));
-            mockRoleStore.FindByNameAsync(Roles.Admin).Returns(Task.FromResult(new ApplicationRole { Name = Roles.Admin }));
+            mockRoleStore.FindByNameAsync(Roles.NewUser, default).Returns(Task.FromResult(new ApplicationRole { Name = Roles.NewUser }));
+            mockRoleStore.FindByNameAsync(Roles.User, default).Returns(Task.FromResult(new ApplicationRole { Name = Roles.User }));
+            mockRoleStore.FindByNameAsync(Roles.Admin, default).Returns(Task.FromResult(new ApplicationRole { Name = Roles.Admin }));
             return mockRoleStore;
         }
 
-        public static ShroomsUserStore MockShroomsUserStore(IDbContext context)
+        public static IUserStore<ApplicationUser> MockShroomsUserStore(IDbContext context)
         {
-            var mockShroomsUserStore = Substitute.For<ShroomsUserStore>(context);
-            var mockPermissionService = Substitute.For<IPermissionService>();
-            mockShroomsUserStore.FindByNameAsync(string.Empty).Returns(Task.FromResult((ApplicationUser)null));
-            mockShroomsUserStore.FindByNameAsync("user").Returns(Task.FromResult(new ApplicationUser { UserName = "user", Email = "user@test.lt" }));
-            mockShroomsUserStore.FindByNameAsync("admin").Returns(Task.FromResult(new ApplicationUser { UserName = "admin", Email = "admin@test.lt" }));
-            mockShroomsUserStore.FindByIdAsync(string.Empty).Returns(Task.FromResult(new ApplicationUser { UserName = "test", Email = "test@test.lt" }));
-            mockPermissionService.UserHasPermissionAsync(new UserAndOrganizationDto { UserId = string.Empty }, AdministrationPermissions.ApplicationUser).Returns(true);
+            var mockShroomsUserStore = Substitute.For<IUserStore<ApplicationUser>>();
+            mockShroomsUserStore.FindByNameAsync(string.Empty, default).Returns(Task.FromResult((ApplicationUser)null));
+            mockShroomsUserStore.FindByNameAsync("user", default).Returns(Task.FromResult(new ApplicationUser { UserName = "user", Email = "user@test.lt" }));
+            mockShroomsUserStore.FindByNameAsync("admin", default).Returns(Task.FromResult(new ApplicationUser { UserName = "admin", Email = "admin@test.lt" }));
+            mockShroomsUserStore.FindByIdAsync(string.Empty, default).Returns(Task.FromResult(new ApplicationUser { UserName = "test", Email = "test@test.lt" }));
             return mockShroomsUserStore;
         }
 
         public static ShroomsUserManager MockUserManager(IUserStore<ApplicationUser> userStore, IDbContext ctx)
         {
-            var claimsIdentityFactory = Substitute.For<ShroomsClaimsIdentityFactory>(ctx);
-            var dataProtectionProvider = Substitute.For<IDataProtectionProvider>();
             var customCacheMock = Substitute.For<ICustomCache<string, IEnumerable<string>>>();
-            var mockUserManager = Substitute.For<ShroomsUserManager>(userStore, dataProtectionProvider, null, claimsIdentityFactory, customCacheMock);
+            var mockUserManager = Substitute.For<ShroomsUserManager>(
+                userStore,
+                Substitute.For<IOptions<IdentityOptions>>(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Substitute.For<ILogger<UserManager<ApplicationUser>>>(),
+                customCacheMock);
             mockUserManager.FindByNameAsync(string.Empty).Returns(Task.FromResult((ApplicationUser)null));
             mockUserManager.FindByNameAsync("user").Returns(Task.FromResult(new ApplicationUser { UserName = "user", Email = "user@test.lt" }));
             mockUserManager.FindByNameAsync("admin").Returns(Task.FromResult(new ApplicationUser { UserName = "admin", Email = "admin@test.lt" }));
@@ -52,20 +58,23 @@ namespace Shrooms.Tests.Mocks
             return mockUserManager;
         }
 
-        public static ShroomsRoleManager MockRoleManager(IRoleStore<ApplicationRole, string> roleStore)
+        public static ShroomsRoleManager MockRoleManager(IRoleStore<ApplicationRole> roleStore)
         {
-            var mockRoleManager = Substitute.For<ShroomsRoleManager>(roleStore);
+            var mockRoleManager = Substitute.For<ShroomsRoleManager>(roleStore, null, null, null, null);
             mockRoleManager.FindByNameAsync(Roles.NewUser).Returns(Task.FromResult(new ApplicationRole { Name = Roles.NewUser }));
             mockRoleManager.FindByNameAsync(Roles.User).Returns(Task.FromResult(new ApplicationRole { Name = Roles.User }));
             mockRoleManager.FindByNameAsync(Roles.Admin).Returns(Task.FromResult(new ApplicationRole { Name = Roles.Admin }));
             return mockRoleManager;
         }
 
-        public static void MockIdentityAndPrincipal(ApiController controller)
+        public static void MockIdentityAndPrincipal(ControllerBase controller)
         {
             var mockPrincipal = GetPrincipalMock();
-            controller.RequestContext.Principal = mockPrincipal;
-            controller.User = mockPrincipal;
+            var httpContext = new DefaultHttpContext
+            {
+                User = (ClaimsPrincipal)mockPrincipal
+            };
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
 
         public static IPrincipal GetPrincipalMock()

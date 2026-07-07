@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -7,7 +8,6 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
 {
     public class ExternalLinkService : IExternalLinkService
     {
-        private readonly IDbSet<ExternalLink> _externalLinkDbSet;
+        private readonly DbSet<ExternalLink> _externalLinkDbSet;
         private readonly IUnitOfWork2 _uow;
 
         public ExternalLinkService(IUnitOfWork2 uow)
