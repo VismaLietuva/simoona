@@ -143,6 +143,21 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(1, res.Id);
             ClassicAssert.AreEqual(1, res.BookLogs.First().LogId);
             ClassicAssert.AreEqual("name1 surname1", res.BookLogs.First().FullName);
+            ClassicAssert.AreEqual(0, res.AvailableCount);
+        }
+
+        [Test]
+        public async Task Should_Return_Available_Count_When_No_Books_Are_Borrowed()
+        {
+            MockGetBookDetails();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser2"
+            };
+            var res = await _bookService.GetBookDetailsAsync(1, userOrg);
+            ClassicAssert.AreEqual(2, res.AvailableCount);
+            ClassicAssert.IsTrue(res.CanBeTaken);
         }
 
         [Test]
