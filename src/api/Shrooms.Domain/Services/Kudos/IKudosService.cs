@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 
@@ -37,6 +38,8 @@ namespace Shrooms.Domain.Services.Kudos
         Task<UserKudosDto> GetUserKudosInformationByIdAsync(string id, int organizationId);
 
         Task<IEnumerable<WallKudosLogDto>> GetLastKudosLogsForWallAsync(UserAndOrganizationDto userAndOrg);
+
+        Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg);
 
         Task<decimal[]> GetMonthlyKudosStatisticsAsync(string id);
 

@@ -59,11 +59,13 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.Entity<NotificationsSettings>()
                 .HasQueryFilter(e => !e.IsDeleted);
 
-            // LikesCollection is an owned type stored as a JSON column on Post and Comment
+            // LikesCollection is an owned type stored as a JSON column on Post, Comment and KudosLog
             _modelBuilder.Entity<Post>()
                 .OwnsOne(p => p.Likes, b => b.Property(x => x.Serialized).HasColumnName("Likes"));
             _modelBuilder.Entity<Comment>()
                 .OwnsOne(c => c.Likes, b => b.Property(x => x.Serialized).HasColumnName("Likes"));
+            _modelBuilder.Entity<KudosLog>()
+                .OwnsOne(k => k.Likes, b => b.Property(x => x.Serialized).HasColumnName("Likes"));
 
             // ImageCollection is an owned type stored as a JSON column on Post and Comment
             _modelBuilder.Entity<Post>()

@@ -14,11 +14,13 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.FilterPresets;
@@ -293,12 +295,90 @@ namespace Shrooms.Domain.Services.Kudos
                     log.KudosSystemType != KudosTypeEnum.Minus &&
                     log.KudosSystemType != KudosTypeEnum.Refund &&
                     log.OrganizationId == userAndOrg.OrganizationId)
-                .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, MapKudosLogToWallKudosLogDto())
-                .OrderByDescending(log => log.Created)
+                .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, (log, sender) => new { Log = log, Sender = sender })
+                .OrderByDescending(x => x.Log.Created)
                 .Take(BusinessLayerConstants.WallKudosLogCount)
                 .ToListAsync();
 
-            return approvedKudos;
+            var likerIds = approvedKudos
+                .Where(x => x.Log.Likes != null)
+                .SelectMany(x => x.Log.Likes.Select(like => like.UserId))
+                .Distinct()
+                .ToList();
+
+            var likers = likerIds.Count == 0
+                ? new List<ApplicationUser>()
+                : await _usersDbSet.Where(u => likerIds.Contains(u.Id)).ToListAsync();
+
+            return approvedKudos
+                .Select(x => new WallKudosLogDto
+                {
+                    Id = x.Log.Id,
+                    Comment = x.Log.Comments,
+                    Points = x.Log.Points,
+                    Created = x.Log.Created,
+                    PictureId = x.Log.PictureId,
+                    Receiver = new KudosLogUserDto
+                    {
+                        FullName = x.Log.Employee != null ? x.Log.Employee.FirstName + " " + x.Log.Employee.LastName : null,
+                        Id = x.Log.Employee != null ? x.Log.Employee.Id : null
+                    },
+                    Sender = new KudosLogUserDto
+                    {
+                        FullName = x.Sender.FirstName + " " + x.Sender.LastName,
+                        Id = x.Log.KudosSystemType == KudosTypeEnum.Send ? x.Log.CreatedBy : null
+                    },
+                    Likes = MapLikesToDto(x.Log.Likes, likers)
+                })
+                .ToList();
+        }
+
+        public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
+        {
+            var kudosLog = await _kudosLogsDbSet
+                .FirstOrDefaultAsync(log =>
+                    log.Id == addLikeDto.Id &&
+                    log.OrganizationId == userOrg.OrganizationId &&
+                    log.Status == KudosStatus.Approved);
+
+            if (kudosLog == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Kudos log does not exist");
+            }
+
+            kudosLog.Likes ??= new LikesCollection();
+
+            var like = kudosLog.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
+            if (like == null)
+            {
+                kudosLog.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
+            }
+            else
+            {
+                kudosLog.Likes.Remove(like);
+            }
+
+            await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        private static IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)
+        {
+            if (likes == null)
+            {
+                return new List<LikeDto>();
+            }
+
+            return likes
+                .Select(like => new { User = users.FirstOrDefault(user => user.Id == like.UserId), Like = like })
+                .Where(likeWithUserData => likeWithUserData.User != null)
+                .Select(likeWithUserData => new LikeDto
+                {
+                    UserId = likeWithUserData.User.Id,
+                    FullName = likeWithUserData.User.FullName,
+                    PictureId = likeWithUserData.User.PictureId,
+                    Type = likeWithUserData.Like.Type
+                })
+                .ToList();
         }
 
         public async Task<IEnumerable<KudosPieChartSliceDto>> GetKudosPieChartDataAsync(int organizationId, string userId)
@@ -693,27 +773,6 @@ namespace Shrooms.Domain.Services.Kudos
                               kudosType.Type == KudosTypeEnum.Minus ||
                               kudosType.Type == KudosTypeEnum.Other,
                 IsActive = kudosType.IsActive
-            };
-        }
-
-        private static Expression<Func<KudosLog, ApplicationUser, WallKudosLogDto>> MapKudosLogToWallKudosLogDto()
-        {
-            return (log, sender) => new WallKudosLogDto
-            {
-                Comment = log.Comments,
-                Points = log.Points,
-                Created = log.Created,
-                PictureId = log.PictureId,
-                Receiver = new KudosLogUserDto
-                {
-                    FullName = log.Employee != null ? log.Employee.FirstName + " " + log.Employee.LastName : null,
-                    Id = log.Employee != null ? log.Employee.Id : null
-                },
-                Sender = new KudosLogUserDto
-                {
-                    FullName = sender.FirstName + " " + sender.LastName,
-                    Id = log.KudosSystemType == KudosTypeEnum.Send ? log.CreatedBy : null
-                }
             };
         }
 

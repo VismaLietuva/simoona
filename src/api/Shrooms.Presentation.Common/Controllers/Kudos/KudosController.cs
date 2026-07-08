@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels;
+using Shrooms.Contracts.ViewModels.Wall.Likes;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Kudos;
@@ -383,6 +385,29 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             var userAndOrg = GetUserAndOrganization();
             var wallKudosLogsDto = await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg);
             return _mapper.Map<IEnumerable<WallKudosLogDto>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
+        }
+
+        [HttpPut]
+        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Like(AddLikeViewModel addLikeViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var addLikeDto = _mapper.Map<AddLikeDto>(addLikeViewModel);
+
+            try
+            {
+                await _kudosService.ToggleLikeAsync(addLikeDto, GetUserAndOrganization());
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
 
         [HttpGet]

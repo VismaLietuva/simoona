@@ -12,10 +12,13 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions.Kudos;
 using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Kudos;
@@ -190,6 +193,140 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result.First().Comment, Is.EqualTo("Comment2"));
+        }
+
+        [Test]
+        public async Task Should_Return_Wall_Kudos_Logs_With_Id_And_Likes()
+        {
+            var log = new KudosLog
+            {
+                Status = KudosStatus.Approved,
+                Id = 10,
+                EmployeeId = "testUserId",
+                Employee = new ApplicationUser
+                {
+                    Id = "testUserId",
+                    FirstName = "name",
+                    LastName = "surname"
+                },
+                KudosTypeName = "Type2",
+                KudosSystemType = KudosTypeEnum.Ordinary,
+                OrganizationId = 2,
+                CreatedBy = "testUserId2",
+                Comments = "With likes",
+                Likes = new LikesCollection
+                {
+                    new Like("testUserId3", LikeTypeEnum.Congrats),
+                    new Like("deletedUserId", LikeTypeEnum.Like)
+                }
+            };
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+
+            var result = (await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg)).ToList();
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Id, Is.EqualTo(10));
+            // Likes from users that no longer exist are filtered out.
+            var likes = result.First().Likes.ToList();
+            Assert.That(likes.Count, Is.EqualTo(1));
+            Assert.That(likes.First().UserId, Is.EqualTo("testUserId3"));
+            Assert.That(likes.First().Type, Is.EqualTo(LikeTypeEnum.Congrats));
+            Assert.That(likes.First().FullName, Is.Not.Empty);
+        }
+
+        [Test]
+        public async Task Should_Like_Kudos_Log()
+        {
+            var log = ApprovedKudosLogForLikes();
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 });
+
+            Assert.That(log.Likes.Count, Is.EqualTo(1));
+            Assert.That(log.Likes.First().UserId, Is.EqualTo("testUserId3"));
+        }
+
+        [Test]
+        public async Task Should_Unlike_Kudos_Log()
+        {
+            var log = ApprovedKudosLogForLikes();
+            log.Likes = new LikesCollection { new Like("testUserId3", LikeTypeEnum.Like) };
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 });
+
+            Assert.That(log.Likes.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Should_Add_Second_Kudos_Log_Reaction_Of_Different_Type()
+        {
+            var log = ApprovedKudosLogForLikes();
+            log.Likes = new LikesCollection { new Like("testUserId3", LikeTypeEnum.Like) };
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Love },
+                new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 });
+
+            Assert.That(log.Likes.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Should_Throw_When_Liking_Nonexistent_Kudos_Log()
+        {
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>().AsQueryable());
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Like },
+                    new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 }));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
+        }
+
+        [Test]
+        public void Should_Throw_When_Liking_Pending_Kudos_Log()
+        {
+            var log = ApprovedKudosLogForLikes();
+            log.Status = KudosStatus.Pending;
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Like },
+                    new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 }));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
+        }
+
+        [Test]
+        public void Should_Throw_When_Liking_Kudos_Log_From_Other_Organization()
+        {
+            var log = ApprovedKudosLogForLikes();
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Like },
+                    new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 1 }));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
+        }
+
+        private static KudosLog ApprovedKudosLogForLikes()
+        {
+            return new KudosLog
+            {
+                Status = KudosStatus.Approved,
+                Id = 10,
+                EmployeeId = "testUserId",
+                KudosTypeName = "Type2",
+                KudosSystemType = KudosTypeEnum.Ordinary,
+                OrganizationId = 2,
+                CreatedBy = "testUserId2"
+            };
         }
 
         [Test]
