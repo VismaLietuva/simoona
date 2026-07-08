@@ -134,24 +134,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        [ProducesResponseType(typeof(BookDetailsViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetBookDetails(int bookOfficeId)
-        {
-            if (bookOfficeId < 1)
-            {
-                return BadRequest();
-            }
-
-            var bookWithLogs = await _bookService.GetBookDetailsAsync(bookOfficeId, GetUserAndOrganization());
-            var result = _mapper.Map<BookDetailsDto, BookDetailsViewModel>(bookWithLogs);
-            return Ok(result);
-        }
-
-        [HttpGet]
-        [Route("DetailsForAdmin")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
         [ProducesResponseType(typeof(BookDetailsAdministrationViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetBookDetailsForAdministrator(int bookOfficeId)
+        public async Task<IActionResult> GetBookDetails(int bookOfficeId)
         {
             if (bookOfficeId < 1)
             {

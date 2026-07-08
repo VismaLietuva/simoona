@@ -161,6 +161,19 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Set_CanBeTaken_True_When_Copies_Are_Available()
+        {
+            MockGetBookDetails();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser2"
+            };
+            var res = await _bookService.GetBookDetailsAsync(1, userOrg);
+            ClassicAssert.IsTrue(res.CanBeTaken);
+        }
+
+        [Test]
         public async Task Should_Return_Correctly_Mapped_Book_Details_To_Administrator()
         {
             MockGetBookDetails();
@@ -171,8 +184,14 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             var res = await _bookService.GetBookDetailsWithOfficesAsync(2, userOrg);
             ClassicAssert.AreEqual(2, res.QuantityByOffice.Count());
-            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 1));
-            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 2));
+
+            var office1 = res.QuantityByOffice.First(x => x.OfficeId == 1);
+            ClassicAssert.AreEqual(2, office1.BookQuantity);
+            ClassicAssert.AreEqual(2, office1.AvailableCount);
+
+            var office2 = res.QuantityByOffice.First(x => x.OfficeId == 2);
+            ClassicAssert.AreEqual(2, office2.BookQuantity);
+            ClassicAssert.AreEqual(0, office2.AvailableCount);
         }
 
         [Test]

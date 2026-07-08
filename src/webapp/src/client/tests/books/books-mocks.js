@@ -56,8 +56,7 @@ beforeEach(function () {
             getAllOffices: function () {},
             getFilteredBooks: function () {},
             findBookByIsbn: function () {},
-            getBookDetails: function () {},
-            getBookDetailsForAdministrator: function () {}
+            getBookDetails: function () {}
         },
         bookCreateEditService: {
             filterOffices: function () {},

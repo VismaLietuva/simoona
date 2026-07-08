@@ -20,12 +20,6 @@ describe('booksCreateEditController', function () {
 
         spyOn(bookMocks.bookRepository, 'getBookDetails').and.callFake(function () {
             var deferred = $q.defer();
-            deferred.resolve(bookMocks.bookInfo);
-            return deferred.promise;
-        });
-
-        spyOn(bookMocks.bookRepository, 'getBookDetailsForAdministrator').and.callFake(function () {
-            var deferred = $q.defer();
             deferred.resolve(bookMocks.bookInfoForAdmin);
             return deferred.promise;
         });
@@ -144,7 +138,7 @@ describe('booksCreateEditController', function () {
             });
             admScope.$digest();
 
-            expect(bookMocks.bookRepository.getBookDetailsForAdministrator).toHaveBeenCalled();
+            expect(bookMocks.bookRepository.getBookDetails).toHaveBeenCalled();
             expect(admCtrl.book).toBeDefined();
             expect(admCtrl.book.quantityByOffice).toBeDefined();
         });
