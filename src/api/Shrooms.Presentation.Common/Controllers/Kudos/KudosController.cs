@@ -390,7 +390,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Like(AddLikeViewModel addLikeViewModel)
+        public async Task<IActionResult> Like([FromBody] AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
             {

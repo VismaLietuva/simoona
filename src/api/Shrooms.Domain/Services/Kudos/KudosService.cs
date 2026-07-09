@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
 using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -33,6 +34,8 @@ namespace Shrooms.Domain.Services.Kudos
     public class KudosService : IKudosService
     {
         private const int LastPage = 1;
+
+        private static readonly SemaphoreSlim _kudosLogLikeLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
         private readonly IMapper _mapper;
@@ -288,14 +291,16 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<IEnumerable<WallKudosLogDto>> GetLastKudosLogsForWallAsync(UserAndOrganizationDto userAndOrg)
         {
+            // The receiver is projected explicitly (not via Include) so it is part of
+            // the SQL query shape and cannot be dropped by the join into an anonymous
+            // type. Owned Likes always materialize together with the Log entity.
             var approvedKudos = await _kudosLogsDbSet
-                .Include(log => log.Employee)
                 .Where(log =>
                     log.Status == KudosStatus.Approved &&
                     log.KudosSystemType != KudosTypeEnum.Minus &&
                     log.KudosSystemType != KudosTypeEnum.Refund &&
                     log.OrganizationId == userAndOrg.OrganizationId)
-                .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, (log, sender) => new { Log = log, Sender = sender })
+                .Join(_usersDbSet, l => l.CreatedBy, s => s.Id, (log, sender) => new { Log = log, Sender = sender, Receiver = log.Employee })
                 .OrderByDescending(x => x.Log.Created)
                 .Take(BusinessLayerConstants.WallKudosLogCount)
                 .ToListAsync();
@@ -306,9 +311,9 @@ namespace Shrooms.Domain.Services.Kudos
                 .Distinct()
                 .ToList();
 
-            var likers = likerIds.Count == 0
-                ? new List<ApplicationUser>()
-                : await _usersDbSet.Where(u => likerIds.Contains(u.Id)).ToListAsync();
+            var likersById = likerIds.Count == 0
+                ? new Dictionary<string, ApplicationUser>()
+                : await _usersDbSet.Where(u => likerIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
 
             return approvedKudos
                 .Select(x => new WallKudosLogDto
@@ -320,48 +325,60 @@ namespace Shrooms.Domain.Services.Kudos
                     PictureId = x.Log.PictureId,
                     Receiver = new KudosLogUserDto
                     {
-                        FullName = x.Log.Employee != null ? x.Log.Employee.FirstName + " " + x.Log.Employee.LastName : null,
-                        Id = x.Log.Employee != null ? x.Log.Employee.Id : null
+                        FullName = x.Receiver != null ? x.Receiver.FirstName + " " + x.Receiver.LastName : null,
+                        Id = x.Receiver != null ? x.Receiver.Id : null
                     },
                     Sender = new KudosLogUserDto
                     {
                         FullName = x.Sender.FirstName + " " + x.Sender.LastName,
                         Id = x.Log.KudosSystemType == KudosTypeEnum.Send ? x.Log.CreatedBy : null
                     },
-                    Likes = MapLikesToDto(x.Log.Likes, likers)
+                    Likes = MapLikesToDto(x.Log.Likes, likersById)
                 })
                 .ToList();
         }
 
         public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
-            var kudosLog = await _kudosLogsDbSet
-                .FirstOrDefaultAsync(log =>
-                    log.Id == addLikeDto.Id &&
-                    log.OrganizationId == userOrg.OrganizationId &&
-                    log.Status == KudosStatus.Approved);
+            // Serialize toggles: the Likes JSON column has no concurrency token, so two
+            // concurrent read-modify-write cycles would silently drop one reaction.
+            // Same protection PostService.ToggleLikeAsync uses.
+            await _kudosLogLikeLock.WaitAsync();
 
-            if (kudosLog == null)
+            try
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Kudos log does not exist");
+                var kudosLog = await _kudosLogsDbSet
+                    .FirstOrDefaultAsync(log =>
+                        log.Id == addLikeDto.Id &&
+                        log.OrganizationId == userOrg.OrganizationId &&
+                        log.Status == KudosStatus.Approved);
+
+                if (kudosLog == null)
+                {
+                    throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Kudos log does not exist");
+                }
+
+                kudosLog.Likes ??= new LikesCollection();
+
+                var like = kudosLog.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
+                if (like == null)
+                {
+                    kudosLog.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
+                }
+                else
+                {
+                    kudosLog.Likes.Remove(like);
+                }
+
+                await _uow.SaveChangesAsync(userOrg.UserId);
             }
-
-            kudosLog.Likes ??= new LikesCollection();
-
-            var like = kudosLog.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
-            if (like == null)
+            finally
             {
-                kudosLog.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
+                _kudosLogLikeLock.Release();
             }
-            else
-            {
-                kudosLog.Likes.Remove(like);
-            }
-
-            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private static IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)
+        private static IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IReadOnlyDictionary<string, ApplicationUser> usersById)
         {
             if (likes == null)
             {
@@ -369,7 +386,7 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             return likes
-                .Select(like => new { User = users.FirstOrDefault(user => user.Id == like.UserId), Like = like })
+                .Select(like => new { User = usersById.GetValueOrDefault(like.UserId), Like = like })
                 .Where(likeWithUserData => likeWithUserData.User != null)
                 .Select(likeWithUserData => new LikeDto
                 {

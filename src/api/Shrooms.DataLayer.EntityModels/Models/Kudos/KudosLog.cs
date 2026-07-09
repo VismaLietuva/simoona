@@ -9,7 +9,9 @@ namespace Shrooms.DataLayer.EntityModels.Models.Kudos
 {
     public class KudosLog : BaseModelWithOrg
     {
-        public virtual LikesCollection Likes { get; set; }
+        // Initialized so freshly created logs (AddKudosLog, refunds, lottery, ...)
+        // never carry a null owned collection — same pattern as Post/Comment.
+        public virtual LikesCollection Likes { get; set; } = new LikesCollection();
 
         [ForeignKey("Employee")]
         public string EmployeeId { get; set; }
