@@ -291,9 +291,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<IEnumerable<WallKudosLogDto>> GetLastKudosLogsForWallAsync(UserAndOrganizationDto userAndOrg)
         {
-            // The receiver is projected explicitly (not via Include) so it is part of
-            // the SQL query shape and cannot be dropped by the join into an anonymous
-            // type. Owned Likes always materialize together with the Log entity.
             var approvedKudos = await _kudosLogsDbSet
                 .Where(log =>
                     log.Status == KudosStatus.Approved &&
@@ -340,9 +337,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
-            // Serialize toggles: the Likes JSON column has no concurrency token, so two
-            // concurrent read-modify-write cycles would silently drop one reaction.
-            // Same protection PostService.ToggleLikeAsync uses.
             await _kudosLogLikeLock.WaitAsync();
 
             try
