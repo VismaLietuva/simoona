@@ -1,14 +1,18 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
 {
     public class WallKudosLogDto
     {
+        public int Id { get; set; }
         public KudosLogUserDto Sender { get; set; }
         public KudosLogUserDto Receiver { get; set; }
         public decimal Points { get; set; }
         public string Comment { get; set; }
         public DateTime Created { get; set; }
         public string PictureId { get; set; }
+        public IEnumerable<LikeDto> Likes { get; set; }
     }
 }

@@ -3,11 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Kudos
 {
     public class KudosLog : BaseModelWithOrg
     {
+        public virtual LikesCollection Likes { get; set; } = new LikesCollection();
+
         [ForeignKey("Employee")]
         public string EmployeeId { get; set; }
 

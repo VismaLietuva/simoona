@@ -627,6 +627,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
@@ -691,6 +694,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
@@ -741,6 +747,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("Modified")
@@ -1583,7 +1592,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("PictureId")
                         .HasColumnType("nvarchar(max)");
-
 
                     b.HasKey("Id");
 
@@ -3945,9 +3953,29 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("Shrooms.DataLayer.EntityModels.Models.Multiwall.LikesCollection", "Likes", b1 =>
+                        {
+                            b1.Property<int>("KudosLogId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Serialized")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Likes");
+
+                            b1.HasKey("KudosLogId");
+
+                            b1.ToTable("KudosLogs");
+
+                            b1.WithOwner()
+                                .HasForeignKey("KudosLogId");
+                        });
+
                     b.Navigation("Employee");
 
                     b.Navigation("KudosBasket");
+
+                    b.Navigation("Likes")
+                        .IsRequired();
 
                     b.Navigation("Organization");
                 });
