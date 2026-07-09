@@ -447,9 +447,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
             SetOrganizationAndUser(filterDto);
             try
             {
-                var content = await _kudosExportService.ExportToExcelAsync(filterDto);
-                var bytes = await content.ReadAsByteArrayAsync();
-                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "kudos.xlsx");
+                var export = await _kudosExportService.ExportToExcelAsync(filterDto);
+                return File(export.Content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", export.FileName);
             }
             catch (ValidationException e)
             {

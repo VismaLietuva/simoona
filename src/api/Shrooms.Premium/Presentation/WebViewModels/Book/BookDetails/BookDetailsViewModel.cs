@@ -18,6 +18,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails
 
         public bool CanBeTaken { get; set; }
 
+        public int AvailableCount { get; set; }
+
         public IEnumerable<BookDetailsLogViewModel> BookLogs { get; set; }
 
         public string OwnerId { get; set; }

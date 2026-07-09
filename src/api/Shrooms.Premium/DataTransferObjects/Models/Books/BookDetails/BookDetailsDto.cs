@@ -12,6 +12,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails
         public string Url { get; set; }
         public IEnumerable<BookDetailsLogDto> BookLogs { get; set; }
         public bool CanBeTaken { get; set; }
+        public int AvailableCount { get; set; }
         public string OwnerId { get; set; }
         public string OwnerFullName { get; set; }
         public string Note { get; set; }

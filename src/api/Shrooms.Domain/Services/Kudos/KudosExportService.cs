@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -21,15 +23,17 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly DbSet<KudosLog> _kudosLogsDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
+        private readonly ISystemClock _systemClock;
 
-        public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)
+        public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory, ISystemClock systemClock)
         {
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
             _excelBuilderFactory = excelBuilderFactory;
+            _systemClock = systemClock;
         }
 
-        public async Task<ByteArrayContent> ExportToExcelAsync(KudosLogsFilterDto filter)
+        public async Task<FileExportDto> ExportToExcelAsync(KudosLogsFilterDto filter)
         {
             var logsQuery = _kudosLogsDbSet
                 .Include(log => log.Employee)
@@ -63,7 +67,11 @@ namespace Shrooms.Domain.Services.Kudos
                     Resources.Models.Kudos.Kudos.ExportColumnRejectionMessage)
                 .AddRows(kudos.AsQueryable(), MapKudosLogToExcelCell());
 
-            return new ByteArrayContent(excelBuilder.Build());
+            var fileName = FileExportName.Sanitize(
+                $"kudos {_systemClock.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}",
+                "kudos",
+                ".xlsx");
+            return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
         private static Expression<Func<MainKudosLogDto, IExcelRow>> MapKudosLogToExcelCell()

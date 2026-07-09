@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _lotteryExportService
                 .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
-                .Returns(new ByteArrayContent(Array.Empty<byte>()));
+                .Returns(new FileExportDto(Array.Empty<byte>(), "lottery.xlsx"));
 
             _sut = new LotteryController(ModelMapper.Create(), _lotteryService, _lotteryExportService);
             _sut.SetUpControllerForTesting();

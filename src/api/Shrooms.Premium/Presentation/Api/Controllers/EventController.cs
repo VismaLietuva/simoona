@@ -299,8 +299,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var userOrg = GetUserAndOrganization();
-                var bytes = await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId);
-                return File(bytes, "text/calendar");
+                var export = await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId);
+                return File(export.Content, "text/calendar", export.FileName);
             }
             catch (EventException e)
             {
@@ -562,9 +562,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                var content = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
-                var bytes = await content.ReadAsByteArrayAsync();
-                return File(bytes, "application/vnd.ms-excel");
+                var export = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
+                return File(export.Content, "application/vnd.ms-excel", export.FileName);
             }
             catch (EventException e)
             {

@@ -1,11 +1,12 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
@@ -18,14 +19,16 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
     {
         private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
+        private readonly ISystemClock _systemClock;
 
-        public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)
+        public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory, ISystemClock systemClock)
         {
             _serviceRequestsDbSet = uow.GetDbSet<ServiceRequest>();
             _excelBuilderFactory = excelBuilderFactory;
+            _systemClock = systemClock;
         }
 
-        public async Task<ByteArrayContent> ExportToExcelAsync(UserAndOrganizationDto userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
+        public async Task<FileExportDto> ExportToExcelAsync(UserAndOrganizationDto userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
         {
             var query = _serviceRequestsDbSet
                 .Include(x => x.Status)
@@ -60,7 +63,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                     Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameModified)
                 .AddRows(serviceRequests.AsQueryable(), MapServiceRequestToExcelRow());
 
-            return new ByteArrayContent(excelBuilder.Build());
+            var fileName = FileExportName.Sanitize(
+                $"service-requests {_systemClock.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}",
+                "service-requests",
+                ".xlsx");
+            return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
         private static Expression<Func<ServiceRequest, IExcelRow>> MapServiceRequestToExcelRow()

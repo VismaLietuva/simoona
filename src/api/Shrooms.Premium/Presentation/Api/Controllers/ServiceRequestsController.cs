@@ -428,9 +428,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var content = await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter);
-                var bytes = await content.ReadAsByteArrayAsync();
-                return File(bytes, "application/vnd.ms-excel");
+                var export = await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter);
+                return File(export.Content, "application/vnd.ms-excel", export.FileName);
             }
             catch (ValidationException e)
             {

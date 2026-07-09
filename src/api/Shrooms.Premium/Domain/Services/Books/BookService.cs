@@ -147,6 +147,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return x => new BookQuantityByOfficeDto
             {
                 BookQuantity = x.Quantity,
+                AvailableCount = x.Quantity - x.BookLogs.Count(v => v.Returned == null),
                 OfficeId = x.OfficeId,
                 OfficeName = x.Office.Name
             };
@@ -457,6 +458,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Isbn = x.Book.Code,
                 Title = x.Book.Title,
                 CanBeTaken = (x.Quantity - x.BookLogs.Count(v => v.Returned == null)) > BookQuantityZero,
+                AvailableCount = x.Quantity - x.BookLogs.Count(v => v.Returned == null),
                 OwnerId = x.Book.ApplicationUserId,
                 OwnerFullName = (x.Book.ApplicationUserId != null) ? x.Book.ApplicationUser.FirstName + " " + x.Book.ApplicationUser.LastName : null,
                 Note = x.Book.Note,

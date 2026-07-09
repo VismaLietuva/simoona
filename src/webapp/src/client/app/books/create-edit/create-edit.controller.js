@@ -89,12 +89,12 @@
         function getBookDetails() {
             if (!vm.isBookAdministrator) {
                 bookRepository.getBookDetails($stateParams.id).then(function (response) {
-                    vm.book = response;
+                    vm.book = response.bookDetails;
 
                     vm.isActionColumn = bookCreateEditService.getActionColumn(vm.book.bookLogs, vm.identity);
                 });
             } else {
-                bookRepository.getBookDetailsForAdministrator($stateParams.id).then(function (response) {
+                bookRepository.getBookDetails($stateParams.id).then(function (response) {
                     vm.book = response.bookDetails;
                     vm.owner.id = vm.book.ownerId;
                     vm.owner.fullName = vm.book.ownerFullName;

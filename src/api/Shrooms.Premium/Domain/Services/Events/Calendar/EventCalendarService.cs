@@ -61,12 +61,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 
             using (var stream = new MemoryStream(calByteArray))
             {
-                emailDto.Attachment = new MailAttachment(stream, "invite.ics");
+                emailDto.Attachment = new MailAttachment(stream, FileExportName.Sanitize(@event.Name, "invite", ".ics"));
                 await _mailingService.SendEmailAsync(emailDto);
             }
         }
 
-        public async Task<byte[]> DownloadEventAsync(Guid eventId, int orgId)
+        public async Task<FileExportDto> DownloadEventAsync(Guid eventId, int orgId)
         {
             var @event = await _eventsDbSet.FindAsync(eventId);
 
@@ -91,7 +91,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
             var calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
 
-            return calByteArray;
+            var fileName = FileExportName.Sanitize(@event.Name, "event", ".ics");
+            return new FileExportDto(calByteArray, fileName);
         }
 
         private async Task AddEventLinkToDescriptionAsync(CalendarEvent calEvent, Guid eventId, int orgId)

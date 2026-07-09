@@ -27,7 +27,6 @@
             findBookByIsbn: findBookByIsbn,
             getBookDetails: getBookDetails,
             getFilteredBooks: getFilteredBooks,
-            getBookDetailsForAdministrator: getBookDetailsForAdministrator,
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
             updateBooksCovers: updateBooksCovers
         };
@@ -37,10 +36,6 @@
 
         function getBookDetails(bookOfficeId) {
             return $resource(bookUrl + 'Details?bookOfficeId=' + bookOfficeId).get().$promise;
-        }
-
-        function getBookDetailsForAdministrator(bookOfficeId) {
-            return $resource(bookUrl + 'DetailsForAdmin?bookOfficeId=' + bookOfficeId).get().$promise;
         }
 
         function getFilteredBooks(params) {

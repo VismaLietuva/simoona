@@ -11,6 +11,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
@@ -35,7 +36,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _excelBuilder = new ExcelBuilderFactory();
 
-            _serviceRequestExportService = new ServiceRequestExportService(_uow, _excelBuilder);
+            _serviceRequestExportService = new ServiceRequestExportService(_uow, _excelBuilder, Substitute.For<ISystemClock>());
         }
 
         [Test]
@@ -47,10 +48,9 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             MockServiceRequests();
 
-            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
@@ -75,10 +75,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
             Expression<Func<ServiceRequest, bool>> filter = f => f.CategoryName == "Hardware";
 
-            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;

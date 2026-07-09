@@ -178,14 +178,16 @@ builder.Services.AddCors(options =>
         {
             // AllowAnyOrigin() cannot be combined with AllowCredentials() per CORS spec.
             // SetIsOriginAllowed echoes the actual request origin, satisfying withCredentials.
-            policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+            policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+                  .WithExposedHeaders("Content-Disposition");
         }
         else
         {
             policy.WithOrigins(corsOrigins.Split(';'))
                   .AllowAnyMethod()
                   .AllowAnyHeader()
-                  .AllowCredentials();
+                  .AllowCredentials()
+                  .WithExposedHeaders("Content-Disposition");
         }
     });
 });

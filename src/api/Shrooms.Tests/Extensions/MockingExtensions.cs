@@ -113,10 +113,7 @@ namespace Shrooms.Tests.Extensions
             var dbSetMock = Substitute.For<DbSet<T>, IQueryable<T>, IAsyncEnumerable<T>>();
             uow.GetDbSet<T>().Returns(dbSetMock);
 
-            if (data != null)
-            {
-                dbSetMock.SetDbSetDataForAsync(data);
-            }
+            dbSetMock.SetDbSetDataForAsync(data ?? Enumerable.Empty<T>());
 
             return dbSetMock;
         }

@@ -45,9 +45,10 @@
                     type: 'text/calendar;'
                 });
                 var dateFormat = new Date(vm.calendarItem.startDate).toISOString().split('T')[0];
-                var fileName = `${vm.calendarItem.name.replace(/\s/g, '')}_${dateFormat}`;
+                var fallback = `${vm.calendarItem.name.replace(/\s/g, '')}_${dateFormat}.ics`;
+                var fileName = parseContentDispositionFilename(response.headers('content-disposition')) || fallback;
 
-                saveAs(file,fileName);
+                saveAs(file, fileName);
             }, function (error) {
                 errorHandler.handleErrorMessage(error);
             });

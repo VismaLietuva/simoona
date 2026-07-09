@@ -143,6 +143,34 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(1, res.Id);
             ClassicAssert.AreEqual(1, res.BookLogs.First().LogId);
             ClassicAssert.AreEqual("name1 surname1", res.BookLogs.First().FullName);
+            ClassicAssert.AreEqual(0, res.AvailableCount);
+        }
+
+        [Test]
+        public async Task Should_Return_Available_Count_When_No_Books_Are_Borrowed()
+        {
+            MockGetBookDetails();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser2"
+            };
+            var res = await _bookService.GetBookDetailsAsync(1, userOrg);
+            ClassicAssert.AreEqual(2, res.AvailableCount);
+            ClassicAssert.IsTrue(res.CanBeTaken);
+        }
+
+        [Test]
+        public async Task Should_Set_CanBeTaken_True_When_Copies_Are_Available()
+        {
+            MockGetBookDetails();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser2"
+            };
+            var res = await _bookService.GetBookDetailsAsync(1, userOrg);
+            ClassicAssert.IsTrue(res.CanBeTaken);
         }
 
         [Test]
@@ -156,8 +184,14 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             var res = await _bookService.GetBookDetailsWithOfficesAsync(2, userOrg);
             ClassicAssert.AreEqual(2, res.QuantityByOffice.Count());
-            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 1));
-            ClassicAssert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 2));
+
+            var office1 = res.QuantityByOffice.First(x => x.OfficeId == 1);
+            ClassicAssert.AreEqual(2, office1.BookQuantity);
+            ClassicAssert.AreEqual(2, office1.AvailableCount);
+
+            var office2 = res.QuantityByOffice.First(x => x.OfficeId == 2);
+            ClassicAssert.AreEqual(2, office2.BookQuantity);
+            ClassicAssert.AreEqual(0, office2.AvailableCount);
         }
 
         [Test]

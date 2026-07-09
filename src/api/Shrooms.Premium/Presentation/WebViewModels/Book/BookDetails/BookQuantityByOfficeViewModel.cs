@@ -7,5 +7,7 @@
         public string OfficeName { get; set; }
 
         public int BookQuantity { get; set; }
+
+        public int AvailableCount { get; set; }
     }
 }

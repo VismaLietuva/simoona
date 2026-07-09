@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
@@ -41,7 +42,8 @@ namespace Shrooms.Tests.DomainService
 
             _kudosExportService = new KudosExportService(
                 _uow,
-                _excelBuilder);
+                _excelBuilder,
+                Substitute.For<ISystemClock>());
         }
 
         [Test]
@@ -56,10 +58,9 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var content = await _kudosExportService.ExportToExcelAsync(filter);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _kudosExportService.ExportToExcelAsync(filter);
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
@@ -89,10 +90,9 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var content = await _kudosExportService.ExportToExcelAsync(filter);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _kudosExportService.ExportToExcelAsync(filter);
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;

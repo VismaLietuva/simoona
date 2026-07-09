@@ -269,9 +269,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         {
             try
             {
-                var content = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
-                var bytes = await content.ReadAsByteArrayAsync();
-                return File(bytes, "application/vnd.ms-excel");
+                var export = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
+                return File(export.Content, "application/vnd.ms-excel", export.FileName);
             }
             catch (LotteryException e)
             {
