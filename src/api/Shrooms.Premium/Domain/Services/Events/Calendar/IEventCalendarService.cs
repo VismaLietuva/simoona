@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Events.Calendar
@@ -9,6 +10,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
     {
         Task SendInvitationAsync(EventJoinValidationDto @event, IEnumerable<string> userIds, int orgId);
 
-        Task<byte[]> DownloadEventAsync(Guid eventId, int orgId);
+        Task<FileExportDto> DownloadEventAsync(Guid eventId, int orgId);
     }
 }

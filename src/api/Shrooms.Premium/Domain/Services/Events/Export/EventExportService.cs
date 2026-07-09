@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Constants;
@@ -29,8 +29,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             _excelBuilderFactory = excelBuilderFactory;
         }
 
-        public async Task<ByteArrayContent> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
+        public async Task<FileExportDto> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
+            var eventName = await _eventUtilitiesService.GetEventNameAsync(eventId);
             var participants = await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg);
             var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg)).ToList();
 
@@ -44,20 +45,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 .AddRows(participants.AsQueryable(), MapEventParticipantToExcelRow())
                 .AutoFitColumns();
 
-            if (!options.Any())
+            if (options.Any())
             {
-                return new ByteArrayContent(excelBuilder.Build());
+                excelBuilder
+                    .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
+                    .AddHeader(
+                        Resources.Models.Events.Events.Option,
+                        Resources.Models.Events.Events.Count)
+                    .AddRows(options.AsQueryable(), MapEventOptionToExcelRow())
+                    .AutoFitColumns();
             }
 
-            excelBuilder
-                .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
-                .AddHeader(
-                    Resources.Models.Events.Events.Option,
-                    Resources.Models.Events.Events.Count)
-                .AddRows(options.AsQueryable(), MapEventOptionToExcelRow())
-                .AutoFitColumns();
-
-            return new ByteArrayContent(excelBuilder.Build());
+            var fileName = FileExportName.Sanitize($"{eventName} - participants", "event - participants", ".xlsx");
+            return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
         private static Expression<Func<EventOptionCountDto, IExcelRow>> MapEventOptionToExcelRow()

@@ -49,6 +49,30 @@ Math.toPrecise = function (number) {
     return +(number).toPrecision(15);
 };
 
+// Parses the filename from a Content-Disposition header value.
+// Prefers RFC 5987 filename*=UTF-8''... over the plain filename= form so non-ASCII names decode correctly.
+window.parseContentDispositionFilename = function (headerValue) {
+    if (!headerValue) {
+        return null;
+    }
+
+    var utf8Match = headerValue.match(/filename\*\s*=\s*(?:UTF-8|utf-8)''([^;\r\n]+)/i);
+    if (utf8Match && utf8Match[1]) {
+        try {
+            return decodeURIComponent(utf8Match[1].trim());
+        } catch (e) {
+            // fall through to the plain form
+        }
+    }
+
+    var plainMatch = headerValue.match(/filename\s*=\s*"?([^";\r\n]+)"?/i);
+    if (plainMatch && plainMatch[1]) {
+        return plainMatch[1].trim();
+    }
+
+    return null;
+};
+
 if (!Array.prototype.remove) {
     Array.prototype.remove = function () {
         var args = arguments[0].constructor === Array ? arguments[0] : Array.prototype.slice.call(arguments);

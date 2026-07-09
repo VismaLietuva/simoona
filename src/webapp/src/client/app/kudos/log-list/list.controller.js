@@ -156,7 +156,8 @@
                 var file = new Blob([response.data], {
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
                 });
-                saveAs(file, 'kudos_log.xlsx');
+                var fileName = parseContentDispositionFilename(response.headers('content-disposition')) || 'kudos_log.xlsx';
+                saveAs(file, fileName);
             }, function (error) {
                 vm.isExcelLoading = false;
                 errorHandler.handleErrorMessage(error);

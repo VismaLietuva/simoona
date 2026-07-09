@@ -56,7 +56,8 @@
                 var file = new Blob([response.data], {
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
                 });
-                saveAs(file, 'participants.xlsx');
+                var fileName = parseContentDispositionFilename(response.headers('content-disposition')) || 'participants.xlsx';
+                saveAs(file, fileName);
             }, handleErrorMessage);
         }
 

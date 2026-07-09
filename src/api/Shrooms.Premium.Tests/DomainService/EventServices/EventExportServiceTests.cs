@@ -44,10 +44,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[0].Rows;
@@ -66,10 +65,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
-            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 ClassicAssert.AreEqual(1, excelData.Tables.Count);
@@ -85,10 +83,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
-            var bytes = await content.ReadAsByteArrayAsync();
+            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(bytes)))
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
             {
                 var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
                 var excelRows = excelData.Tables[1].Rows;

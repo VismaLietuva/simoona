@@ -138,7 +138,8 @@
                 var file = new Blob([response.data], {
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
                 });
-                saveAs(file, 'service_requests.xlsx');
+                var fileName = parseContentDispositionFilename(response.headers('content-disposition')) || 'service_requests.xlsx';
+                saveAs(file, fileName);
             }, errorHandler.handleErrorMessage);
         }
 
