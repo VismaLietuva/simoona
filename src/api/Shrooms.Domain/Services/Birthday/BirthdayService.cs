@@ -37,7 +37,7 @@ namespace Shrooms.Domain.Services.Birthday
 
             return userBirthdays
                 .Select(MapUserBirthdayInfoToBirthdayDto(firstDayOfTheWeek, lastDayOfTheWeek))
-                .OrderByDescending(b => b.Date);
+                .OrderBy(b => b.Date);
         }
 
         private async Task<IEnumerable<UserBirthdayInfoDto>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
@@ -48,8 +48,6 @@ namespace Shrooms.Domain.Services.Birthday
                 .Where(u => u.BirthDay.HasValue)
                 .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
-                .OrderByDescending(x => x.BirthDay.Value.Month)
-                .ThenByDescending(x => x.BirthDay.Value.Day)
                 .Select(MapUserBirthdayInfo())
                 .ToListAsync();
         }
