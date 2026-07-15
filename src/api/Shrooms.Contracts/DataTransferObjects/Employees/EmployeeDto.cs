@@ -15,6 +15,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Employees
 
         public string JobTitle { get; set; }
 
+        public string PictureId { get; set; }
+
         public string PhoneNumber { get; set; }
 
         public WorkingHourslWithOutLunchDto WorkingHours { get; set; }

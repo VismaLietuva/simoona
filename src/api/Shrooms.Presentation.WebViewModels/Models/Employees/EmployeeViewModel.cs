@@ -14,6 +14,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Employees
 
         public string JobTitle { get; set; }
 
+        public string PictureId { get; set; }
+
         public string PhoneNumber { get; set; }
 
         public WorkingHourslWithOutLunchViewModel WorkingHours { get; set; }
