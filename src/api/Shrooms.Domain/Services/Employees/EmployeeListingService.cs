@@ -62,6 +62,7 @@ namespace Shrooms.Domain.Services.Employees
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     JobTitle = user.JobPosition.Title,
+                    PictureId = user.PictureId,
                     BirthDay = user.BirthDay,
                     PhoneNumber = user.PhoneNumber,
                     WorkingHours = new WorkingHourslWithOutLunchDto
