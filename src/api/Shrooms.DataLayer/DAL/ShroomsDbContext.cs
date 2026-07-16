@@ -15,6 +15,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
+using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
@@ -157,6 +158,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<PostWatcher> PostWatchers { get; set; }
 
+        public virtual DbSet<CustomEmoji> CustomEmojis { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -242,6 +245,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new BadgeCategoryEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BadgeLogEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BadgeTypeEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomEmojiConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
