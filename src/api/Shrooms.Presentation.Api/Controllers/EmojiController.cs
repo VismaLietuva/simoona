@@ -22,8 +22,6 @@ namespace Shrooms.Presentation.Api.Controllers
     [Route("Emoji")]
     public class EmojiController : BaseController
     {
-        private static readonly string[] AllowedContentTypes = { "image/png", "image/gif", "image/jpeg", "image/webp" };
-
         private readonly IMapper _mapper;
         private readonly ICustomEmojiService _customEmojiService;
 
@@ -54,12 +52,12 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (file.Length > WebApiConstants.MaximumCustomEmojiSizeInBytes)
             {
-                return BadRequest("File is too large");
+                return BadRequest($"File is too large. Maximum size is {WebApiConstants.MaximumCustomEmojiSizeInBytes / 1024} KB");
             }
 
-            if (!Array.Exists(AllowedContentTypes, t => t.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase)))
+            if (!Array.Exists(WebApiConstants.AllowedCustomEmojiContentTypes, t => t.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase)))
             {
-                return UnsupportedMediaType();
+                return StatusCode(415, $"Unsupported media type. Allowed types: {string.Join(", ", WebApiConstants.AllowedCustomEmojiContentTypes)}");
             }
 
             await using var stream = new MemoryStream();
@@ -84,7 +82,7 @@ namespace Shrooms.Presentation.Api.Controllers
             if (imageInfo.Width > WebApiConstants.MaximumCustomEmojiDimensionInPixels ||
                 imageInfo.Height > WebApiConstants.MaximumCustomEmojiDimensionInPixels)
             {
-                return BadRequest("Image dimensions are too large");
+                return BadRequest($"Image dimensions are too large. Maximum is {WebApiConstants.MaximumCustomEmojiDimensionInPixels}x{WebApiConstants.MaximumCustomEmojiDimensionInPixels} pixels");
             }
 
             stream.Position = 0;
