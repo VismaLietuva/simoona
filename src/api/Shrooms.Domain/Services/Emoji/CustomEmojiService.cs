@@ -49,6 +49,7 @@ namespace Shrooms.Domain.Services.Emoji
         {
             _validator.CheckNameFormat(emojiDto.Name);
             await _validator.CheckIfNameIsTakenAsync(emojiDto.Name, userOrg.OrganizationId);
+            await _validator.CheckImageAsync(emojiDto.Content);
 
             var blobName = await _pictureService.UploadFromStreamAsync(emojiDto.Content, emojiDto.MimeType, emojiDto.FileName, userOrg.OrganizationId);
 

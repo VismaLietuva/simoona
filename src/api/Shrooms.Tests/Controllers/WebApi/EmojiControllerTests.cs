@@ -96,26 +96,6 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public async Task Create_WhenFileIsNotAnImage_ReturnsBadRequest()
-        {
-            var file = CreateFormFile(new byte[] { 1, 2, 3, 4 }, "image/png");
-
-            var result = await _emojiController.Create("party-parrot", file);
-
-            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task Create_WhenImageDimensionsTooLarge_ReturnsBadRequest()
-        {
-            var file = CreateFormFile(CreatePngBytes(600, 600), "image/png");
-
-            var result = await _emojiController.Create("party-parrot", file);
-
-            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
-        }
-
-        [Test]
         public async Task Create_WhenFileIsValid_ReturnsOk()
         {
             var file = CreateFormFile(CreatePngBytes(128, 128), "image/png");

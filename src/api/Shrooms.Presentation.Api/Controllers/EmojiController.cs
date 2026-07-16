@@ -10,7 +10,6 @@ using Shrooms.Domain.Services.Emoji;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Emoji;
-using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,29 +61,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
             await using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
-            stream.Position = 0;
-
-            IImageInfo imageInfo;
-            try
-            {
-                imageInfo = await Image.IdentifyAsync(stream);
-            }
-            catch (ImageFormatException)
-            {
-                return BadRequest("Image file is corrupted or could not be decoded");
-            }
-
-            if (imageInfo == null)
-            {
-                return BadRequest("File is not a recognized image format");
-            }
-
-            if (imageInfo.Width > WebApiConstants.MaximumCustomEmojiDimensionInPixels ||
-                imageInfo.Height > WebApiConstants.MaximumCustomEmojiDimensionInPixels)
-            {
-                return BadRequest($"Image dimensions are too large. Maximum is {WebApiConstants.MaximumCustomEmojiDimensionInPixels}x{WebApiConstants.MaximumCustomEmojiDimensionInPixels} pixels");
-            }
-
             stream.Position = 0;
 
             var newEmojiDto = new NewCustomEmojiDto

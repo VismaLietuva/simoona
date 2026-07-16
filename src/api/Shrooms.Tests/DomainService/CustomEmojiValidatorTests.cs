@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -9,6 +10,8 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.Domain.ServiceValidators.Validators.Emoji;
 using Shrooms.Tests.Extensions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -26,6 +29,15 @@ namespace Shrooms.Tests.DomainService
             _customEmojisDbSet = uow.MockDbSetForAsync<CustomEmoji>();
 
             _validator = new CustomEmojiValidator(uow);
+        }
+
+        private static MemoryStream CreatePngStream(int width, int height)
+        {
+            using var image = new Image<Rgba32>(width, height);
+            var stream = new MemoryStream();
+            image.SaveAsPng(stream);
+            stream.Position = 0;
+            return stream;
         }
 
         [TestCase("party-parrot")]
@@ -92,5 +104,33 @@ namespace Shrooms.Tests.DomainService
             Assert.DoesNotThrowAsync(async () => await _validator.CheckIfNameIsTakenAsync("party-parrot", 2));
         }
 
+        [Test]
+        public void Should_Not_Throw_For_Valid_Image()
+        {
+            using var stream = CreatePngStream(128, 128);
+
+            Assert.DoesNotThrowAsync(async () => await _validator.CheckImageAsync(stream));
+            Assert.That(stream.Position, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Should_Throw_If_File_Is_Not_A_Valid_Image()
+        {
+            using var stream = new MemoryStream(new byte[] { 1, 2, 3, 4 });
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _validator.CheckImageAsync(stream));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.InvalidCustomEmojiImage));
+        }
+
+        [Test]
+        public void Should_Throw_If_Image_Dimensions_Are_Too_Large()
+        {
+            using var stream = CreatePngStream(600, 600);
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _validator.CheckImageAsync(stream));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.CustomEmojiImageTooLarge));
+        }
     }
 }

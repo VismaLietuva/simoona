@@ -64,5 +64,7 @@
 
         // Custom emoji, 17**
         public const int InvalidCustomEmojiName = 1700;
+        public const int InvalidCustomEmojiImage = 1701;
+        public const int CustomEmojiImageTooLarge = 1702;
     }
 }

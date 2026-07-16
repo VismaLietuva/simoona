@@ -105,6 +105,7 @@ namespace Shrooms.Tests.DomainService
             {
                 _validator.CheckNameFormat("party-parrot");
                 _validator.CheckIfNameIsTakenAsync("party-parrot", 2);
+                _validator.CheckImageAsync(stream);
                 _pictureService.UploadFromStreamAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2);
             });
         }
