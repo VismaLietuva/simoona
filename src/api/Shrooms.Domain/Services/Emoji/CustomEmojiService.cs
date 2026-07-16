@@ -45,16 +45,16 @@ namespace Shrooms.Domain.Services.Emoji
             return emojis.Select(x => MapToDto(x, tenant)).ToList();
         }
 
-        public async Task<CustomEmojiDto> CreateAsync(string name, Stream stream, string mimeType, string fileName, UserAndOrganizationDto userOrg, string tenantName)
+        public async Task<CustomEmojiDto> CreateAsync(NewCustomEmojiDto emojiDto, UserAndOrganizationDto userOrg, string tenantName)
         {
-            _validator.CheckNameFormat(name);
-            await _validator.CheckIfNameIsTakenAsync(name, userOrg.OrganizationId);
+            _validator.CheckNameFormat(emojiDto.Name);
+            await _validator.CheckIfNameIsTakenAsync(emojiDto.Name, userOrg.OrganizationId);
 
-            var blobName = await _pictureService.UploadFromStreamAsync(stream, mimeType, fileName, userOrg.OrganizationId);
+            var blobName = await _pictureService.UploadFromStreamAsync(emojiDto.Content, emojiDto.MimeType, emojiDto.FileName, userOrg.OrganizationId);
 
             var emoji = new CustomEmojiEntity
             {
-                Name = name,
+                Name = emojiDto.Name,
                 BlobName = blobName,
                 AuthorId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.Domain.Exceptions.Exceptions;
@@ -58,7 +59,15 @@ namespace Shrooms.Tests.DomainService
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
 
-            var result = await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg, "Visma");
+            var newEmojiDto = new NewCustomEmojiDto
+            {
+                Name = "party-parrot",
+                Content = stream,
+                MimeType = "image/png",
+                FileName = "parrot.png"
+            };
+
+            var result = await _customEmojiService.CreateAsync(newEmojiDto, _userOrg, "Visma");
 
             _customEmojisDbSet.Received().Add(
                 Arg.Is<CustomEmoji>(x =>
@@ -82,7 +91,15 @@ namespace Shrooms.Tests.DomainService
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
 
-            await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg, "Visma");
+            var newEmojiDto = new NewCustomEmojiDto
+            {
+                Name = "party-parrot",
+                Content = stream,
+                MimeType = "image/png",
+                FileName = "parrot.png"
+            };
+
+            await _customEmojiService.CreateAsync(newEmojiDto, _userOrg, "Visma");
 
             Received.InOrder(() =>
             {
