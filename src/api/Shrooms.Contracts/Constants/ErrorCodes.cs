@@ -61,5 +61,8 @@
 
         // Service requests, 16**
         public const int InvalidCategoryChange = 1600;
+
+        // Custom emoji, 17**
+        public const int InvalidCustomEmojiName = 1700;
     }
 }

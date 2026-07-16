@@ -39,5 +39,6 @@
         public const string Blacklist = "BLACKLIST_BASIC";
 
         public const string Lottery = "LOTTERY_BASIC";
+        public const string CustomEmoji = "CUSTOMEMOJI_BASIC";
     }
 }

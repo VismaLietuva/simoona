@@ -25,6 +25,8 @@
 
         #region Pictures
         public const int MaximumPictureSizeInBytes = 12000000;
+        public const int MaximumCustomEmojiSizeInBytes = 262144;
+        public const int MaximumCustomEmojiDimensionInPixels = 512;
         #endregion
 
 #if DEBUG
