@@ -71,12 +71,12 @@ namespace Shrooms.Presentation.Api.Controllers
             }
             catch (ImageFormatException)
             {
-                imageInfo = null;
+                return BadRequest("Image file is corrupted or could not be decoded");
             }
 
             if (imageInfo == null)
             {
-                return BadRequest("File is not a valid image");
+                return BadRequest("File is not a recognized image format");
             }
 
             if (imageInfo.Width > WebApiConstants.MaximumCustomEmojiDimensionInPixels ||
