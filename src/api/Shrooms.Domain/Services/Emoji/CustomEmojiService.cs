@@ -1,14 +1,9 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
@@ -24,7 +19,6 @@ namespace Shrooms.Domain.Services.Emoji
         private readonly IPermissionService _permissionService;
         private readonly ICustomEmojiValidator _validator;
         private readonly DbSet<CustomEmojiEntity> _customEmojisDbSet;
-        private readonly DbSet<Organization> _organizationsDbSet;
 
         public CustomEmojiService(
             IUnitOfWork2 uow,
@@ -37,12 +31,11 @@ namespace Shrooms.Domain.Services.Emoji
             _permissionService = permissionService;
             _validator = validator;
             _customEmojisDbSet = uow.GetDbSet<CustomEmojiEntity>();
-            _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public async Task<IEnumerable<CustomEmojiDto>> GetAllAsync(UserAndOrganizationDto userOrg)
+        public async Task<IEnumerable<CustomEmojiDto>> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
         {
-            var tenant = await GetTenantContainerAsync(userOrg.OrganizationId);
+            var tenant = tenantName.ToLowerInvariant();
 
             var emojis = await _customEmojisDbSet
                 .Where(x => x.OrganizationId == userOrg.OrganizationId && !x.IsDeleted)
@@ -52,7 +45,7 @@ namespace Shrooms.Domain.Services.Emoji
             return emojis.Select(x => MapToDto(x, tenant)).ToList();
         }
 
-        public async Task<CustomEmojiDto> CreateAsync(string name, Stream stream, string mimeType, string fileName, UserAndOrganizationDto userOrg)
+        public async Task<CustomEmojiDto> CreateAsync(string name, Stream stream, string mimeType, string fileName, UserAndOrganizationDto userOrg, string tenantName)
         {
             _validator.CheckNameFormat(name);
             await _validator.CheckIfNameIsTakenAsync(name, userOrg.OrganizationId);
@@ -70,9 +63,7 @@ namespace Shrooms.Domain.Services.Emoji
             _customEmojisDbSet.Add(emoji);
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            var tenant = await GetTenantContainerAsync(userOrg.OrganizationId);
-
-            return MapToDto(emoji, tenant);
+            return MapToDto(emoji, tenantName.ToLowerInvariant());
         }
 
         public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
@@ -104,13 +95,6 @@ namespace Shrooms.Domain.Services.Emoji
                 Url = $"/storage/{tenant}/{emoji.BlobName}",
                 AuthorId = emoji.AuthorId
             };
-        }
-
-        private async Task<string> GetTenantContainerAsync(int organizationId)
-        {
-            var organization = await _organizationsDbSet.FirstAsync(x => x.Id == organizationId);
-
-            return organization.ShortName.ToLowerInvariant();
         }
     }
 }

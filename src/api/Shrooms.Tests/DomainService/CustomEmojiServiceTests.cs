@@ -9,7 +9,6 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Emoji;
@@ -24,7 +23,6 @@ namespace Shrooms.Tests.DomainService
     public class CustomEmojiServiceTests
     {
         private DbSet<CustomEmoji> _customEmojisDbSet;
-        private DbSet<Organization> _organizationsDbSet;
         private IPictureService _pictureService;
         private IPermissionService _permissionService;
         private ICustomEmojiValidator _validator;
@@ -42,13 +40,6 @@ namespace Shrooms.Tests.DomainService
             var uow = Substitute.For<IUnitOfWork2>();
 
             _customEmojisDbSet = uow.MockDbSetForAsync<CustomEmoji>();
-            _organizationsDbSet = uow.MockDbSetForAsync<Organization>();
-
-            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization>
-            {
-                new()
-                    { Id = 2, ShortName = "Visma" }
-            }.AsQueryable());
 
             _pictureService = Substitute.For<IPictureService>();
             _permissionService = Substitute.For<IPermissionService>();
@@ -67,7 +58,7 @@ namespace Shrooms.Tests.DomainService
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
 
-            var result = await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg);
+            var result = await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg, "Visma");
 
             _customEmojisDbSet.Received().Add(
                 Arg.Is<CustomEmoji>(x =>
@@ -91,7 +82,7 @@ namespace Shrooms.Tests.DomainService
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
 
-            await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg);
+            await _customEmojiService.CreateAsync("party-parrot", stream, "image/png", "parrot.png", _userOrg, "Visma");
 
             Received.InOrder(() =>
             {
@@ -115,7 +106,7 @@ namespace Shrooms.Tests.DomainService
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
-            var result = (await _customEmojiService.GetAllAsync(_userOrg)).ToList();
+            var result = (await _customEmojiService.GetAllAsync(_userOrg, "Visma")).ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[0].Name, Is.EqualTo("party-parrot"));
@@ -133,7 +124,7 @@ namespace Shrooms.Tests.DomainService
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
-            var result = await _customEmojiService.GetAllAsync(_userOrg);
+            var result = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
 
             Assert.That(result, Is.Empty);
         }
