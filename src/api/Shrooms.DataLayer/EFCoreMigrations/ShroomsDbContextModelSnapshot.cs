@@ -1126,6 +1126,58 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("CommitteeSuggestions");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Emoji.CustomEmoji", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BlobName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CustomEmojis_OrganizationId_Name")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("CustomEmojis");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.Event", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3784,6 +3836,25 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Emoji.CustomEmoji", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.Event", b =>
