@@ -92,18 +92,5 @@ namespace Shrooms.Tests.DomainService
             Assert.DoesNotThrowAsync(async () => await _validator.CheckIfNameIsTakenAsync("party-parrot", 2));
         }
 
-        [Test]
-        public void Should_Throw_If_Emoji_Does_Not_Exist()
-        {
-            var ex = Assert.Throws<ValidationException>(() => _validator.CheckIfEmojiExists(null));
-
-            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
-        }
-
-        [Test]
-        public void Should_Not_Throw_If_Emoji_Exists()
-        {
-            Assert.DoesNotThrow(() => _validator.CheckIfEmojiExists(new CustomEmoji { Id = 1 }));
-        }
     }
 }

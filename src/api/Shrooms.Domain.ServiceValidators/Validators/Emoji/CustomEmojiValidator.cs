@@ -34,13 +34,5 @@ namespace Shrooms.Domain.ServiceValidators.Validators.Emoji
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Emoji name already exists");
             }
         }
-
-        public void CheckIfEmojiExists(CustomEmoji emoji)
-        {
-            if (emoji == null)
-            {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Emoji does not exist");
-            }
-        }
     }
 }
