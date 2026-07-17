@@ -21,29 +21,36 @@ namespace Shrooms.Domain.Services.Emoji
         private readonly IPermissionService _permissionService;
         private readonly ICustomEmojiValidator _validator;
         private readonly DbSet<CustomEmojiEntity> _customEmojisDbSet;
-        private readonly ICustomCache<int, CustomEmojiListDto> _emojiListCache;
+        private readonly ICustomCache<int, EmojiListCacheEntry> _emojiListCache;
+        private readonly ICustomCache<int, long> _generationCache;
 
         public CustomEmojiService(
             IUnitOfWork2 uow,
             IPictureService pictureService,
             IPermissionService permissionService,
             ICustomEmojiValidator validator,
-            ICustomCache<int, CustomEmojiListDto> emojiListCache)
+            ICustomCache<int, EmojiListCacheEntry> emojiListCache,
+            ICustomCache<int, long> generationCache)
         {
             _uow = uow;
             _pictureService = pictureService;
             _permissionService = permissionService;
             _validator = validator;
             _emojiListCache = emojiListCache;
+            _generationCache = generationCache;
             _customEmojisDbSet = uow.GetDbSet<CustomEmojiEntity>();
         }
 
         public async Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
         {
-            if (_emojiListCache.TryGetValue(userOrg.OrganizationId, out var cached))
+            var generation = GetGeneration(userOrg.OrganizationId);
+
+            if (_emojiListCache.TryGetValue(userOrg.OrganizationId, out var entry) && entry.Generation == generation)
             {
-                return cached;
+                return entry.List;
             }
+
+            _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
 
             var tenant = tenantName.ToLowerInvariant();
 
@@ -58,7 +65,10 @@ namespace Shrooms.Domain.Services.Emoji
                 ETag = Guid.NewGuid().ToString("N")
             };
 
-            _emojiListCache.TryAdd(userOrg.OrganizationId, result);
+            if (GetGeneration(userOrg.OrganizationId) == generation)
+            {
+                _emojiListCache.TryAdd(userOrg.OrganizationId, new EmojiListCacheEntry { List = result, Generation = generation });
+            }
 
             return result;
         }
@@ -81,6 +91,7 @@ namespace Shrooms.Domain.Services.Emoji
 
             _customEmojisDbSet.Add(emoji);
             await _uow.SaveChangesAsync(userOrg.UserId);
+            BumpGeneration(userOrg.OrganizationId);
             _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
 
             return MapToDto(emoji, tenantName.ToLowerInvariant());
@@ -104,7 +115,33 @@ namespace Shrooms.Domain.Services.Emoji
 
             _customEmojisDbSet.Remove(emoji);
             await _uow.SaveChangesAsync(userOrg.UserId);
+            BumpGeneration(userOrg.OrganizationId);
             _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
+        }
+
+        private long GetGeneration(int organizationId)
+        {
+            return _generationCache.TryGetValue(organizationId, out var generation) ? generation : 0;
+        }
+
+        private void BumpGeneration(int organizationId)
+        {
+            while (true)
+            {
+                if (_generationCache.TryGetValue(organizationId, out var current))
+                {
+                    _generationCache.TryRemoveEntry(organizationId);
+
+                    if (_generationCache.TryAdd(organizationId, current + 1))
+                    {
+                        return;
+                    }
+                }
+                else if (_generationCache.TryAdd(organizationId, 1))
+                {
+                    return;
+                }
+            }
         }
 
         private static CustomEmojiDto MapToDto(CustomEmojiEntity emoji, string tenant)

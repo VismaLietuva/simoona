@@ -28,7 +28,8 @@ namespace Shrooms.Tests.DomainService
         private IPictureService _pictureService;
         private IPermissionService _permissionService;
         private ICustomEmojiValidator _validator;
-        private CustomCache<int, CustomEmojiListDto> _emojiListCache;
+        private CustomCache<int, EmojiListCacheEntry> _emojiListCache;
+        private CustomCache<int, long> _generationCache;
         private ICustomEmojiService _customEmojiService;
 
         private readonly UserAndOrganizationDto _userOrg = new()
@@ -47,9 +48,10 @@ namespace Shrooms.Tests.DomainService
             _pictureService = Substitute.For<IPictureService>();
             _permissionService = Substitute.For<IPermissionService>();
             _validator = Substitute.For<ICustomEmojiValidator>();
-            _emojiListCache = new CustomCache<int, CustomEmojiListDto>();
+            _emojiListCache = new CustomCache<int, EmojiListCacheEntry>();
+            _generationCache = new CustomCache<int, long>();
 
-            _customEmojiService = new CustomEmojiService(uow, _pictureService, _permissionService, _validator, _emojiListCache);
+            _customEmojiService = new CustomEmojiService(uow, _pictureService, _permissionService, _validator, _emojiListCache, _generationCache);
         }
 
         [Test]
@@ -282,6 +284,27 @@ namespace Shrooms.Tests.DomainService
             var after = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
 
             Assert.That(after.ETag, Is.Not.EqualTo(before.ETag));
+        }
+
+        [Test]
+        public async Task Should_Ignore_Cached_List_When_Generation_Changed()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
+            {
+                new()
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = false }
+            }.AsQueryable());
+
+            var first = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            _generationCache.TryRemoveEntry(2);
+            _generationCache.TryAdd(2, 99);
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+
+            var second = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            Assert.That(second.ETag, Is.Not.EqualTo(first.ETag));
+            Assert.That(second.Emojis, Is.Empty);
         }
     }
 }
