@@ -69,7 +69,7 @@ namespace Shrooms.Domain.Services.Emoji
             await _validator.CheckIfNameIsTakenAsync(emojiDto.Name, userOrg.OrganizationId);
             await _validator.CheckImageAsync(emojiDto.Content);
 
-            var blobName = await _pictureService.UploadFromStreamAsync(emojiDto.Content, emojiDto.MimeType, emojiDto.FileName, userOrg.OrganizationId);
+            var blobName = await _pictureService.UploadOriginalAsync(emojiDto.Content, emojiDto.MimeType, emojiDto.FileName, userOrg.OrganizationId);
 
             var emoji = new CustomEmojiEntity
             {

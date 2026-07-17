@@ -57,7 +57,7 @@ namespace Shrooms.Tests.DomainService
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
             _pictureService
-                .UploadFromStreamAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2)
+                .UploadOriginalAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2)
                 .Returns("blob-guid.png");
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
@@ -89,7 +89,7 @@ namespace Shrooms.Tests.DomainService
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
             _pictureService
-                .UploadFromStreamAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+                .UploadOriginalAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
                 .Returns("blob-guid.png");
 
             await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
@@ -109,7 +109,7 @@ namespace Shrooms.Tests.DomainService
                 _validator.CheckNameFormat("party-parrot");
                 _validator.CheckIfNameIsTakenAsync("party-parrot", 2);
                 _validator.CheckImageAsync(stream);
-                _pictureService.UploadFromStreamAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2);
+                _pictureService.UploadOriginalAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2);
             });
         }
 
@@ -241,7 +241,7 @@ namespace Shrooms.Tests.DomainService
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
             _pictureService
-                .UploadFromStreamAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+                .UploadOriginalAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
                 .Returns("blob-guid.png");
 
             var before = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
