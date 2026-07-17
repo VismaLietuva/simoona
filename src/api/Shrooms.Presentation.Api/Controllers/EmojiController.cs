@@ -34,9 +34,18 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("List")]
         public async Task<IActionResult> List()
         {
-            var emojis = await _customEmojiService.GetAllAsync(GetUserAndOrganization(), GetOrganizationName());
+            var result = await _customEmojiService.GetAllAsync(GetUserAndOrganization(), GetOrganizationName());
 
-            return Ok(_mapper.Map<IEnumerable<CustomEmojiDto>, IEnumerable<CustomEmojiViewModel>>(emojis));
+            var etag = $"\"{result.ETag}\"";
+            Response.Headers.ETag = etag;
+            Response.Headers.CacheControl = "private";
+
+            if (Request.Headers.IfNoneMatch.Contains(etag))
+            {
+                return StatusCode(304);
+            }
+
+            return Ok(_mapper.Map<IEnumerable<CustomEmojiDto>, IEnumerable<CustomEmojiViewModel>>(result.Emojis));
         }
 
         [HttpPost]

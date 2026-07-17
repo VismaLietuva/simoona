@@ -60,11 +60,38 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             _customEmojiService
                 .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
-                .Returns(new List<CustomEmojiDto>());
+                .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
 
             var result = await _emojiController.List();
 
             Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        }
+
+        [Test]
+        public async Task List_SetsETagAndCacheControlHeaders()
+        {
+            _customEmojiService
+                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
+
+            await _emojiController.List();
+
+            Assert.That(_emojiController.Response.Headers.ETag.ToString(), Is.EqualTo("\"abc123\""));
+            Assert.That(_emojiController.Response.Headers.CacheControl.ToString(), Is.EqualTo("private"));
+        }
+
+        [Test]
+        public async Task List_WhenIfNoneMatchMatches_Returns304()
+        {
+            _customEmojiService
+                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
+
+            _emojiController.Request.Headers.IfNoneMatch = "\"abc123\"";
+
+            var result = await _emojiController.List();
+
+            Assert.That(result.GetStatusCode(), Is.EqualTo((HttpStatusCode)304));
         }
 
         [Test]

@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Emoji;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.ServiceValidators.Validators.Emoji;
+using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.DomainService
@@ -27,6 +28,7 @@ namespace Shrooms.Tests.DomainService
         private IPictureService _pictureService;
         private IPermissionService _permissionService;
         private ICustomEmojiValidator _validator;
+        private CustomCache<int, CustomEmojiListDto> _emojiListCache;
         private ICustomEmojiService _customEmojiService;
 
         private readonly UserAndOrganizationDto _userOrg = new()
@@ -45,8 +47,9 @@ namespace Shrooms.Tests.DomainService
             _pictureService = Substitute.For<IPictureService>();
             _permissionService = Substitute.For<IPermissionService>();
             _validator = Substitute.For<ICustomEmojiValidator>();
+            _emojiListCache = new CustomCache<int, CustomEmojiListDto>();
 
-            _customEmojiService = new CustomEmojiService(uow, _pictureService, _permissionService, _validator);
+            _customEmojiService = new CustomEmojiService(uow, _pictureService, _permissionService, _validator, _emojiListCache);
         }
 
         [Test]
@@ -124,7 +127,7 @@ namespace Shrooms.Tests.DomainService
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
-            var result = (await _customEmojiService.GetAllAsync(_userOrg, "Visma")).ToList();
+            var result = (await _customEmojiService.GetAllAsync(_userOrg, "Visma")).Emojis.ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[0].Name, Is.EqualTo("party-parrot"));
@@ -144,7 +147,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
 
-            Assert.That(result, Is.Empty);
+            Assert.That(result.Emojis, Is.Empty);
         }
 
         [Test]
@@ -212,6 +215,73 @@ namespace Shrooms.Tests.DomainService
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _customEmojiService.DeleteAsync(1, _userOrg));
 
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
+        }
+
+        [Test]
+        public async Task Should_Return_Cached_List_On_Second_Fetch()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
+            {
+                new()
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = false }
+            }.AsQueryable());
+
+            var first = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+
+            var second = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            Assert.That(second.ETag, Is.EqualTo(first.ETag));
+            Assert.That(second.Emojis.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Invalidate_Cache_On_Create()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+            _pictureService
+                .UploadFromStreamAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+                .Returns("blob-guid.png");
+
+            var before = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
+            var newEmojiDto = new NewCustomEmojiDto
+            {
+                Name = "party-parrot",
+                Content = stream,
+                MimeType = "image/png",
+                FileName = "parrot.png"
+            };
+            await _customEmojiService.CreateAsync(newEmojiDto, _userOrg, "Visma");
+
+            var after = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            Assert.That(after.ETag, Is.Not.EqualTo(before.ETag));
+        }
+
+        [Test]
+        public async Task Should_Invalidate_Cache_On_Delete()
+        {
+            var emoji = new CustomEmoji
+            {
+                Id = 1,
+                Name = "party-parrot",
+                BlobName = "a.gif",
+                AuthorId = "user1",
+                OrganizationId = 2,
+                IsDeleted = false
+            };
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+
+            var before = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            await _customEmojiService.DeleteAsync(1, _userOrg);
+
+            var after = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+
+            Assert.That(after.ETag, Is.Not.EqualTo(before.ETag));
         }
     }
 }
