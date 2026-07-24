@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
@@ -12,7 +10,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public decimal Value { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
         public KudosTypeEnum Type { get; set; }
     }
 }
