@@ -1,4 +1,8 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Shrooms.Contracts.Enums;
+
+namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 {
     public class KudosLogTypeViewModel
     {
@@ -7,5 +11,8 @@
         public string Name { get; set; }
 
         public decimal Value { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public KudosTypeEnum Type { get; set; }
     }
 }
