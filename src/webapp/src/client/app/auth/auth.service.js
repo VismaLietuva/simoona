@@ -22,35 +22,6 @@
     function authService($resource, $q, $location, $state, $window,
         appConfig, localStorageService, lodash, localeSrv, endPoint, $http) {
 
-        // TEMP: diagnostic for the specific-user 401 bug. Logs every time
-        // authorizationData is written or removed, with a stack, current URL,
-        // and a snapshot of localStorage. REVERT once the bug is understood.
-        (function installAuthDataTracer() {
-            if ($window.__authDataTracerInstalled) return;
-            $window.__authDataTracerInstalled = true;
-            var originalSet = localStorageService.set;
-            var originalRemove = localStorageService.remove;
-            localStorageService.set = function(key, value) {
-                if (key === 'authorizationData') {
-                    console.warn('[AUTH-TRACE] SET authorizationData', {
-                        url: $window.location.href,
-                        hasToken: !!(value && value.token),
-                        stack: new Error().stack
-                    });
-                }
-                return originalSet.apply(localStorageService, arguments);
-            };
-            localStorageService.remove = function(key) {
-                if (key === 'authorizationData') {
-                    console.warn('[AUTH-TRACE] REMOVE authorizationData', {
-                        url: $window.location.href,
-                        stack: new Error().stack
-                    });
-                }
-                return originalRemove.apply(localStorageService, arguments);
-            };
-        })();
-
         var accountUrl = endPoint + '/Account/';
         var applicationUrl = endPoint + '/ApplicationUser/';
         var tokenUrl = endPoint + '/token/';
