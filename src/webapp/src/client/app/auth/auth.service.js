@@ -61,6 +61,7 @@
             getUserNameFromUrl: getUserNameFromUrl,
             isAuthenticated: isAuthenticated,
             isAuthenticatedNotNewUser: isAuthenticatedNotNewUser,
+            isStoredTokenValid: isStoredTokenValid,
             setAuthenticationData: setAuthenticationData,
             logOut: logOut,
             isInRole: isInRole,
@@ -108,6 +109,11 @@
             } catch (e) {
                 return true;
             }
+        }
+
+        function isStoredTokenValid() {
+            var authData = localStorageService.get('authorizationData');
+            return !!authData && !!authData.token && !isTokenExpired(authData.token);
         }
 
         function getHashArrayFromUrl() {

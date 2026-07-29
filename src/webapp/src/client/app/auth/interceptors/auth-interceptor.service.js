@@ -12,6 +12,8 @@
     ];
 
     function authInterceptor($q, $injector, localStorageService) {
+        var loggingOut = false;
+
         var service = {
             request: request,
             response: response,
@@ -47,7 +49,10 @@
             var auth = $injector.get('authService');
 
             if (response.status === 401) {
-                auth.logOut();
+                if (!auth.isStoredTokenValid() && !loggingOut) {
+                    loggingOut = true;
+                    auth.logOut();
+                }
             } else if (response.status === 403) {
                 state.go('Root.WithOrg.AccessDenied');
             } else if (response.status === 400 && response.statusText === 'Invalid organization') {

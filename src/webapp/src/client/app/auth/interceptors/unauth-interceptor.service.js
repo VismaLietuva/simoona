@@ -23,9 +23,16 @@
 
         function redirectIfResponseUnauthorized(response) {
             var state = $injector.get('$state');
+            var auth = $injector.get('authService');
             var organizationName = $location.path().split('/')[1];
 
             if (response.status === 401) {
+                // Same guard as authInterceptor: don't redirect to Login if the
+                // client-side token is still valid. This absorbs transient server-side
+                // 401s (clock skew, tenant race) instead of ejecting the user.
+                if (auth.isStoredTokenValid()) {
+                    return;
+                }
                 state.go('Root.WithOrg.Login', {
                     organizationName: organizationName
                 }, {
