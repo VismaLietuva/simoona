@@ -22,6 +22,35 @@
     function authService($resource, $q, $location, $state, $window,
         appConfig, localStorageService, lodash, localeSrv, endPoint, $http) {
 
+        // TEMP: diagnostic for the specific-user 401 bug. Logs every time
+        // authorizationData is written or removed, with a stack, current URL,
+        // and a snapshot of localStorage. REVERT once the bug is understood.
+        (function installAuthDataTracer() {
+            if ($window.__authDataTracerInstalled) return;
+            $window.__authDataTracerInstalled = true;
+            var originalSet = localStorageService.set;
+            var originalRemove = localStorageService.remove;
+            localStorageService.set = function(key, value) {
+                if (key === 'authorizationData') {
+                    console.warn('[AUTH-TRACE] SET authorizationData', {
+                        url: $window.location.href,
+                        hasToken: !!(value && value.token),
+                        stack: new Error().stack
+                    });
+                }
+                return originalSet.apply(localStorageService, arguments);
+            };
+            localStorageService.remove = function(key) {
+                if (key === 'authorizationData') {
+                    console.warn('[AUTH-TRACE] REMOVE authorizationData', {
+                        url: $window.location.href,
+                        stack: new Error().stack
+                    });
+                }
+                return originalRemove.apply(localStorageService, arguments);
+            };
+        })();
+
         var accountUrl = endPoint + '/Account/';
         var applicationUrl = endPoint + '/ApplicationUser/';
         var tokenUrl = endPoint + '/token/';
@@ -104,7 +133,14 @@
         function isTokenExpired(token) {
             if (!token) return true;
             try {
-                var payload = JSON.parse(atob(token.split('.')[1]));
+                // JWT payload is Base64URL-encoded: '-' and '_' replace '+' and '/',
+                // and padding '=' is stripped. atob() only accepts standard Base64
+                // Convert to standard Base64 before decoding.
+                var b64url = token.split('.')[1];
+                var b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+                var pad = b64.length % 4;
+                if (pad) b64 += new Array(5 - pad).join('=');
+                var payload = JSON.parse(atob(b64));
                 return payload.exp < Math.floor(Date.now() / 1000);
             } catch (e) {
                 return true;
