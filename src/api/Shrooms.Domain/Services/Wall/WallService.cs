@@ -194,7 +194,8 @@ namespace Shrooms.Domain.Services.Wall
                     IsFollowing = x.Type == WallType.Main || x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
                     TotalMembers = x.Members.Count,
-                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls
+                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls,
+                    CreatedBy = x.CreatedBy
                 })
                 .SingleOrDefaultAsync();
 
@@ -852,7 +853,9 @@ namespace Shrooms.Domain.Services.Wall
                     Type = w.Type,
                     Logo = w.Logo,
                     TotalMembers = w.Members.Count,
-                    PostsCount = w.Posts.Count
+                    PostsCount = w.Posts.Count,
+                    IsHiddenFromAllWalls = w.IsHiddenFromAllWalls,
+                    CreatedBy = w.CreatedBy
                 })
                 .ToListAsync();
 
@@ -874,6 +877,8 @@ namespace Shrooms.Domain.Services.Wall
                     Logo = wall.Logo,
                     TotalMembers = wall.Members.Count,
                     PostsCount = wall.Posts.Count,
+                    IsHiddenFromAllWalls = wall.IsHiddenFromAllWalls,
+                    CreatedBy = wall.CreatedBy,
                     UserId = wallUser.UserId
                 })
                 .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
@@ -886,7 +891,9 @@ namespace Shrooms.Domain.Services.Wall
                     IsFollowing = true,
                     Logo = x.Logo,
                     TotalMembers = x.TotalMembers,
-                    PostsCount = x.PostsCount
+                    PostsCount = x.PostsCount,
+                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls,
+                    CreatedBy = x.CreatedBy
                 })
                 .Distinct()
                 .ToListAsync();
