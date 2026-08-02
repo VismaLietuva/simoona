@@ -22,6 +22,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         private const string ServiceRequestStatusDone = "Done";
         private const string ServiceRequestCategoryKudos = "Kudos";
 
+        // A category can only be deleted once nothing is still being worked on under it.
+        // Requests in any other status (Done, Cancelled, Purchased) are historical and keep
+        // the deleted category name for display only.
+        private static readonly string[] PendingServiceRequestStatuses = { "Open", "In Progress" };
+
         private readonly IUnitOfWork2 _uow;
         private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly DbSet<ServiceRequestComment> _serviceRequestCommentsDbSet;
@@ -139,12 +144,20 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             await ValidateServiceRequestForCreateAsync(serviceRequestDto);
             await ValidateServiceRequestForUpdateAsync(serviceRequestDto);
 
-            var serviceRequestCategory = await _serviceRequestCategoryDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequestDto.ServiceRequestCategoryId);
+            // A request whose type was deleted after it was closed has no live category to post
+            // back, so the UIs send 0 - meaning "keep the historical type name".
+            var keepsHistoricalCategory = serviceRequestDto.ServiceRequestCategoryId == 0;
 
-            if (serviceRequestCategory == null)
+            var serviceRequestCategory = keepsHistoricalCategory
+                ? null
+                : await _serviceRequestCategoryDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequestDto.ServiceRequestCategoryId);
+
+            if (!keepsHistoricalCategory && serviceRequestCategory == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request category does not exist");
             }
+
+            var newCategoryName = serviceRequestCategory?.Name ?? serviceRequest.CategoryName;
 
             var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDto, AdministrationPermissions.ServiceRequest);
             var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDto.UserId;
@@ -157,12 +170,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new UnauthorizedAccessException();
             }
 
-            if (serviceRequest.CategoryName == ServiceRequestCategoryKudos && serviceRequestCategory.Name != ServiceRequestCategoryKudos)
+            if (serviceRequest.CategoryName == ServiceRequestCategoryKudos && newCategoryName != ServiceRequestCategoryKudos)
             {
-                throw new ValidationException(ErrorCodes.InvalidCategoryChange, $"Cannot change from {ServiceRequestCategoryKudos} category to {serviceRequestCategory.Name}");
+                throw new ValidationException(ErrorCodes.InvalidCategoryChange, $"Cannot change from {ServiceRequestCategoryKudos} category to {newCategoryName}");
             }
 
-            if (serviceRequest.CategoryName != ServiceRequestCategoryKudos && serviceRequestCategory.Name == ServiceRequestCategoryKudos)
+            if (serviceRequest.CategoryName != ServiceRequestCategoryKudos && newCategoryName == ServiceRequestCategoryKudos)
             {
                 throw new ValidationException(ErrorCodes.InvalidCategoryChange, $"Cannot change from {serviceRequest.CategoryName} category to {ServiceRequestCategoryKudos}");
             }
@@ -171,7 +184,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             {
                 serviceRequest.Title = serviceRequestDto.Title;
                 serviceRequest.StatusId = serviceRequestDto.StatusId;
-                serviceRequest.CategoryName = serviceRequestCategory.Name;
+                serviceRequest.CategoryName = newCategoryName;
                 serviceRequest.KudosAmmount = serviceRequest.KudosShopItemId == null ? serviceRequestDto.KudosAmmount : serviceRequest.KudosAmmount;
             }
 
@@ -333,6 +346,14 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             if (category == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request category does not exist");
+            }
+
+            var hasPendingRequests = await _serviceRequestsDbSet
+                .AnyAsync(x => x.CategoryName == category.Name && PendingServiceRequestStatuses.Contains(x.Status.Title));
+
+            if (hasPendingRequests)
+            {
+                throw new ValidationException(PremiumErrorCodes.ServiceRequestCategoryInUse, "Service request type is used by pending service requests");
             }
 
             _serviceRequestCategoryDbSet.Remove(category);
