@@ -5,5 +5,6 @@
         public string Subject { get; set; }
         public string Message { get; set; }
         public SupportType Type { get; set; }
+        public SupportAttachmentDto Attachment { get; set; }
     }
 }

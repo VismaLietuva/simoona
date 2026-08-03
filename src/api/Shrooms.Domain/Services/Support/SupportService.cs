@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -6,6 +7,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Support;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using MailAttachment = System.Net.Mail.Attachment;
 
 namespace Shrooms.Domain.Services.Support
 {
@@ -28,7 +30,25 @@ namespace Shrooms.Domain.Services.Support
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 
-            await _mailingService.SendEmailAsync(email, true);
+            // The stream backing a MailAttachment must stay open until the message is
+            // sent, so it is disposed only after SendEmailAsync completes.
+            MemoryStream attachmentStream = null;
+
+            try
+            {
+                if (support.Attachment != null)
+                {
+                    attachmentStream = new MemoryStream(support.Attachment.Content);
+                    email.Attachment = new MailAttachment(attachmentStream, support.Attachment.FileName, support.Attachment.ContentType);
+                }
+
+                await _mailingService.SendEmailAsync(email, true);
+            }
+            finally
+            {
+                email.Attachment?.Dispose();
+                attachmentStream?.Dispose();
+            }
         }
     }
 }
