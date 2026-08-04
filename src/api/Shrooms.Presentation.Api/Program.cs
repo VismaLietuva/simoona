@@ -368,6 +368,38 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// Serve the SPA bundle from wwwroot at the site root. Registered before UsePathBase so these
+// only match root-relative asset paths and never intercept anything under /api. Only the Linux
+// deploy bundles a wwwroot; on Windows the API is an IIS virtual application under /api and IIS
+// serves the SPA from the site root, so guard on its presence rather than relying on the
+// behaviour of a null WebRootPath.
+var spaRootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+var spaIndexPath = Path.Combine(spaRootPath, "index.html");
+if (Directory.Exists(spaRootPath))
+{
+    app.Use(async (context, next) =>
+    {
+        var requestPath = context.Request.Path;
+        if (!context.Request.PathBase.HasValue
+            && !requestPath.StartsWithSegments("/api")
+            && !Path.HasExtension(requestPath.Value ?? string.Empty)
+            && File.Exists(spaIndexPath))
+        {
+            context.Request.Path = "/index.html";
+        }
+
+        await next();
+    });
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
+
+// The API used to be an IIS virtual application mounted at /api, which supplied that prefix
+// for free. Linux App Service has no virtual applications, so add it explicitly: controllers
+// are routed at the root ([Route("Account")]) and the SPA calls /api/*.
+app.UsePathBase("/api");
+
 app.UseImageSharp();
 
 app.UseRouting();
