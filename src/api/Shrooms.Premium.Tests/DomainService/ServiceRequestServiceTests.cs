@@ -402,6 +402,90 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg));
         }
 
+        [Test]
+        public async Task Should_Keep_Historical_Category_When_Its_Type_Was_Deleted()
+        {
+            MockServiceRequestForUpdate();
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+            MockPermissioService();
+
+            var serviceRequestDto = new ServiceRequestDto
+            {
+                Id = 3,
+                Description = "testDescription",
+                PriorityId = 1,
+                ServiceRequestCategoryId = 0,
+                Title = "tetsTitle",
+                StatusId = 3
+            };
+
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1,
+                UserId = "AdminId"
+            };
+
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg);
+
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
+            ClassicAssert.AreEqual("deletedType", updatedServiceRequest.CategoryName);
+            ClassicAssert.AreEqual("testDescription", updatedServiceRequest.Description);
+        }
+
+        [Test]
+        public void Should_Throw_When_Deleting_Category_Used_By_Pending_Service_Requests()
+        {
+            MockServiceRequestCategories();
+            MockServiceRequestsForCategoryDeletion();
+
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.DeleteCategoryAsync(1, "AdminId"));
+            _serviceRequestCategoryDbSet.DidNotReceive().Remove(Arg.Any<ServiceRequestCategory>());
+        }
+
+        [Test]
+        public async Task Should_Delete_Category_When_Only_Closed_Service_Requests_Use_It()
+        {
+            MockServiceRequestCategories();
+            MockServiceRequestsForCategoryDeletion();
+
+            await _serviceRequestService.DeleteCategoryAsync(3, "AdminId");
+
+            _serviceRequestCategoryDbSet.Received(1).Remove(Arg.Is<ServiceRequestCategory>(x => x.Id == 3));
+            await _uow.Received(1).SaveChangesAsync("AdminId");
+        }
+
+        private void MockServiceRequestsForCategoryDeletion()
+        {
+            var serviceRequests = new List<ServiceRequest>
+            {
+                new ServiceRequest
+                {
+                    Id = 1,
+                    OrganizationId = 1,
+                    CategoryName = "test1",
+                    Status = new ServiceRequestStatus { Title = "In Progress" }
+                },
+                new ServiceRequest
+                {
+                    Id = 2,
+                    OrganizationId = 1,
+                    CategoryName = "test2",
+                    Status = new ServiceRequestStatus { Title = "Done" }
+                },
+                new ServiceRequest
+                {
+                    Id = 3,
+                    OrganizationId = 1,
+                    CategoryName = "test2",
+                    Status = new ServiceRequestStatus { Title = "Cancelled" }
+                }
+            }.AsQueryable();
+
+            _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
+        }
+
         private void MockPermissioService()
         {
             _permissionService
@@ -443,6 +527,21 @@ namespace Shrooms.Premium.Tests.DomainService
                     CategoryName = "Kudos",
                     StatusId = 1,
                     EmployeeId = "UserId"
+                },
+                new ServiceRequest
+                {
+                    Id = 3,
+                    OrganizationId = 1,
+                    Status = new ServiceRequestStatus
+                    {
+                        Title = "Done"
+                    },
+
+                    // Its type was deleted after the request was closed, so no live
+                    // category maps back to this name.
+                    CategoryName = "deletedType",
+                    StatusId = 3,
+                    EmployeeId = "UserId"
                 }
             }.AsQueryable();
 
@@ -476,6 +575,11 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 2,
                     Name = "Kudos"
+                },
+                new ServiceRequestCategory
+                {
+                    Id = 3,
+                    Name = "test2"
                 }
             }.AsQueryable();
 

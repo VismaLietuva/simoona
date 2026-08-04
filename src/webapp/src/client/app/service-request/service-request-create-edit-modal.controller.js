@@ -93,10 +93,28 @@
                     }
                 );
 
+                if (isEditing() && !$scope.serviceRequest.serviceRequestCategory) {
+                    addDeletedCategory();
+                }
+
                 if (isEditing() && !isKudosCategorySelected()) {
                     removeKudosCategory();
                 }
             });
+        }
+
+        // The request's type was deleted after it was closed (deleting a type used by a
+        // pending request is rejected by the API). Keep showing the historical name
+        // instead of a blank select, but do not let it be reused.
+        function addDeletedCategory() {
+            $scope.isCategoryDeleted = true;
+            $scope.serviceRequest.serviceRequestCategory = {
+                id: 0,
+                name: $scope.serviceRequest.categoryName,
+            };
+            $scope.categories = [
+                $scope.serviceRequest.serviceRequestCategory,
+            ].concat($scope.categories);
         }
 
         function removeKudosCategory() {
@@ -247,8 +265,11 @@
             $scope.serviceRequest.statusId = $scope.serviceRequest.status.id;
             $scope.serviceRequest.priorityId =
                 $scope.serviceRequest.priority.id;
-            $scope.serviceRequest.serviceRequestCategoryId =
-                $scope.serviceRequest.serviceRequestCategory.id;
+            // 0 tells the API to keep the request's existing (deleted) type.
+            $scope.serviceRequest.serviceRequestCategoryId = $scope.serviceRequest
+                .serviceRequestCategory
+                ? $scope.serviceRequest.serviceRequestCategory.id
+                : 0;
         }
 
         function fillShopItemInfo() {

@@ -87,7 +87,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         ValidateIssuer = false,
         ValidateAudience = false,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.FromSeconds(30)
     };
     // Allow token from query string for SignalR
     // Old client sends "token"; new @microsoft/signalr client sends "access_token"
@@ -109,14 +109,12 @@ builder.Services.AddAuthentication(options =>
         OnAuthenticationFailed = context =>
         {
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            if (context.Exception is SecurityTokenException)
-            {
-                logger.LogDebug("JWT rejected for {Path}: {Message}", context.Request.Path, context.Exception.Message);
-            }
-            else
-            {
-                logger.LogError(context.Exception, "JWT authentication failed for {Path}", context.Request.Path);
-            }
+            logger.LogWarning(
+                "JWT auth failed for {Path} from {Ip}: {Type} — {Message}",
+                context.Request.Path,
+                context.HttpContext.Connection.RemoteIpAddress,
+                context.Exception.GetType().Name,
+                context.Exception.Message);
             return Task.CompletedTask;
         }
     };

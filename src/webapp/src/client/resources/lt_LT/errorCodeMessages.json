@@ -35,6 +35,7 @@
     "messageEventAttendTypeCannotBeChangedIfParticipantsJoined": "Keisti dalyvavimo pasirinkimus negalima, kai jau yra dalyvių",
     "messageNameAlreadyExists": "Toks pavadinimas jau egzistuoja",
     "messageShopItemAlreadyExists": "Tokia prekė jau egzistuoja",
+    "messageServiceRequestTypeInUse": "Šio tipo negalima ištrinti, nes jis naudojamas neužbaigtose užklausose",
     "messageAllFieldsAreRequired": "Visi laukai yra privalomi",
     "userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų.",
     "requestedPageNotFound": "Atsiprašome, puslapis nerastas."

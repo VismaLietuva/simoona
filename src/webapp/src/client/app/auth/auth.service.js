@@ -61,6 +61,7 @@
             getUserNameFromUrl: getUserNameFromUrl,
             isAuthenticated: isAuthenticated,
             isAuthenticatedNotNewUser: isAuthenticatedNotNewUser,
+            isStoredTokenValid: isStoredTokenValid,
             setAuthenticationData: setAuthenticationData,
             logOut: logOut,
             isInRole: isInRole,
@@ -103,11 +104,23 @@
         function isTokenExpired(token) {
             if (!token) return true;
             try {
-                var payload = JSON.parse(atob(token.split('.')[1]));
+                // JWT payload is Base64URL-encoded: '-' and '_' replace '+' and '/',
+                // and padding '=' is stripped. atob() only accepts standard Base64
+                // Convert to standard Base64 before decoding.
+                var b64url = token.split('.')[1];
+                var b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+                var pad = b64.length % 4;
+                if (pad) b64 += new Array(5 - pad).join('=');
+                var payload = JSON.parse(atob(b64));
                 return payload.exp < Math.floor(Date.now() / 1000);
             } catch (e) {
                 return true;
             }
+        }
+
+        function isStoredTokenValid() {
+            var authData = localStorageService.get('authorizationData');
+            return !!authData && !!authData.token && !isTokenExpired(authData.token);
         }
 
         function getHashArrayFromUrl() {

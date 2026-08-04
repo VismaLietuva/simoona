@@ -35,6 +35,7 @@
     "messageEventAttendTypeCannotBeChangedIfParticipantsJoined": "Cannot change allowed attend types if there are joined participants",
     "messageNameAlreadyExists": "Name already exists",
     "messageShopItemAlreadyExists": "This item already exists",
+    "messageServiceRequestTypeInUse": "This type cannot be deleted because it is used by service requests that are still open or in progress",
     "messageAllFieldsAreRequired": "All fields are required",
     "userHasPendingKudos": "User has pending kudos",
     "requestedPageNotFound": "Sorry, page not found."

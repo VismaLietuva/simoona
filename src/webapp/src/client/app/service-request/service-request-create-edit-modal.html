@@ -11,7 +11,7 @@
             <label>{{"serviceRequest.category" | translate}}</label>
             <select data-test-id="serviceRequestCategory" name="category"
                 ng-model="serviceRequest.serviceRequestCategory" ng-change="resetShopItemFields()"
-                ng-disabled="(isEditing() && isKudosCategorySelected()) || serviceRequest.status.title === 'Done'"
+                ng-disabled="(isEditing() && isKudosCategorySelected()) || serviceRequest.status.title === 'Done' || isCategoryDeleted"
                 class="form-control"
                 ng-options="category.name for category in categories track by category.id"></select>
         </div>
