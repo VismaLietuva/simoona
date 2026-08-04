@@ -6,6 +6,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Helpers;
@@ -20,20 +21,28 @@ namespace Shrooms.Domain.Services.Employees
 {
     public class EmployeeListingService : IEmployeeListingService
     {
+        private const string BirthDaySortProperty = "BirthDay";
+
+        private const char SortablePropertiesSeparator = ';';
+        private const char SortablePropertySeparator = ' ';
+
         private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
+        private readonly ISystemClock _systemClock;
 
         public EmployeeListingService(
             IUnitOfWork2 uow,
             IPermissionService permissionService,
-            IRoleService roleService)
+            IRoleService roleService,
+            ISystemClock systemClock)
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
 
             _permissionService = permissionService;
             _roleService = roleService;
+            _systemClock = systemClock;
         }
 
         public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg)
@@ -77,8 +86,9 @@ namespace Shrooms.Domain.Services.Employees
                             EndDate = blacklistUser.EndDate
                         })
                         .FirstOrDefault()
-                })
-                .OrderByPropertyNames(employeeArgsDto);
+                });
+
+            employeesQuery = ApplyOrdering(employeesQuery, employeeArgsDto);
 
             // X.PagedList doesn't have async support for IQueryable, need to materialize first
             var totalCount = await employeesQuery.CountAsync();
@@ -92,6 +102,73 @@ namespace Shrooms.Domain.Services.Employees
             HidePrivateInformationBasedOnPermissions(users, hasApplicationUserPermission, hasBlacklistPermission);
 
             return users;
+        }
+
+        // The list only ever shows a birthday's month and day, so ordering by the
+        // stored date would order by age and look random. Order by whose birthday
+        // falls next instead, wrapping at the end of the year.
+        private IQueryable<EmployeeDto> ApplyOrdering(IQueryable<EmployeeDto> employeesQuery, EmployeeListingArgsDto employeeArgsDto)
+        {
+            if (!TryGetBirthDaySortDirection(employeeArgsDto?.SortByProperties, out var isDescending))
+            {
+                return employeesQuery.OrderByPropertyNames(employeeArgsDto);
+            }
+
+            var today = _systemClock.UtcNow.Date;
+            var todayMonthAndDay = (today.Month * 100) + today.Day;
+
+            // 0 = still to come this year, 1 = already passed.
+            Expression<Func<EmployeeDto, int>> hasPassed = employee =>
+                employee.BirthDay.HasValue &&
+                ((employee.BirthDay.Value.Month * 100) + employee.BirthDay.Value.Day) < todayMonthAndDay
+                    ? 1
+                    : 0;
+
+            Expression<Func<EmployeeDto, int>> byMonthAndDay = employee => employee.BirthDay.HasValue
+                ? (employee.BirthDay.Value.Month * 100) + employee.BirthDay.Value.Day
+                : 0;
+
+            // Employees with no birthday stay last either way — there is nothing
+            // to place them among the dates.
+            var ordered = employeesQuery.OrderBy(employee => employee.BirthDay.HasValue ? 0 : 1);
+
+            ordered = isDescending
+                ? ordered.ThenByDescending(hasPassed).ThenByDescending(byMonthAndDay)
+                : ordered.ThenBy(hasPassed).ThenBy(byMonthAndDay);
+
+            // Id last, so paging can't repeat or skip employees sharing a birthday.
+            return ordered
+                .ThenBy(employee => employee.LastName)
+                .ThenBy(employee => employee.FirstName)
+                .ThenBy(employee => employee.Id);
+        }
+
+        private static bool TryGetBirthDaySortDirection(string sortByProperties, out bool isDescending)
+        {
+            isDescending = false;
+
+            var firstProperty = sortByProperties?
+                .Split(SortablePropertiesSeparator, StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault();
+
+            if (firstProperty == null)
+            {
+                return false;
+            }
+
+            var propertyParts = firstProperty.Split(SortablePropertySeparator, StringSplitOptions.RemoveEmptyEntries);
+
+            if (!string.Equals(propertyParts.FirstOrDefault(), BirthDaySortProperty, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            isDescending = string.Equals(
+                propertyParts.LastOrDefault(),
+                SortDirectionConstants.Descending,
+                StringComparison.OrdinalIgnoreCase);
+
+            return true;
         }
 
         private void HidePrivateInformationBasedOnPermissions(IPagedList<EmployeeDto> employees, bool hasApplicationUserPermission, bool hasBlacklistPermission)

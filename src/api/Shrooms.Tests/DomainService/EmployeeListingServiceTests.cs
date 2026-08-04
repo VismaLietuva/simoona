@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Employees;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Helpers;
 using System.Linq;
 using Shrooms.Contracts.Constants;
@@ -26,6 +27,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<ApplicationUser> _usersDbSet;
         private IRoleService _roleService;
         private IPermissionService _permissionService;
+        private ISystemClock _systemClock;
 
         [SetUp]
         public void TestInitializer()
@@ -38,11 +40,14 @@ namespace Shrooms.Tests.DomainService
 
             _roleService = Substitute.For<IRoleService>();
             _permissionService = Substitute.For<IPermissionService>();
+            _systemClock = Substitute.For<ISystemClock>();
+            _systemClock.UtcNow.Returns(DateTime.UtcNow);
 
             _employeeListingService = new EmployeeListingService(
                 uow,
                 _permissionService,
-                _roleService);
+                _roleService,
+                _systemClock);
         }
 
         [Test]
@@ -320,7 +325,8 @@ namespace Shrooms.Tests.DomainService
             var employees = GetTestDataForGetPagedEmployeesAsync();
 
             var expectedEmployeeIdsOrder = employees
-                .OrderByDescending(employee => employee.BirthDay)
+                .OrderBy(employee => employee.LastName)
+                .ThenBy(employee => employee.FirstName)
                 .Select(employee => employee.Id);
 
             _usersDbSet.SetDbSetDataForAsync(employees);
@@ -328,6 +334,78 @@ namespace Shrooms.Tests.DomainService
             _permissionService
                 .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
                 .Returns(false);
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = "LastName asc;FirstName asc;",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(expectedEmployeeIdsOrder));
+        }
+
+        // The list shows the month and day only, so ordering by the stored date
+        // would order by age and look random to everyone reading it.
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenSortedByBirthDay_ReturnsWhoseBirthdayFallsNextFirst()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            _systemClock.UtcNow.Returns(new DateTime(2026, 8, 4));
+            _usersDbSet.SetDbSetDataForAsync(GetTestDataForBirthDaySorting());
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string>());
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = "BirthDay asc;",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(
+                result.Select(employee => employee.FirstName),
+                Is.EqualTo(new[] { "August", "November", "January", "March", "Unknown" }));
+        }
+
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenSortedByBirthDayDescending_ReturnsWhoseBirthdayFallsNextLast()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            _systemClock.UtcNow.Returns(new DateTime(2026, 8, 4));
+            _usersDbSet.SetDbSetDataForAsync(GetTestDataForBirthDaySorting());
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string>());
 
             _roleService
                 .ExcludeUsersWithRole(Arg.Any<string>())
@@ -344,7 +422,89 @@ namespace Shrooms.Tests.DomainService
             var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
 
             // Assert
-            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(expectedEmployeeIdsOrder));
+            Assert.That(
+                result.Select(employee => employee.FirstName),
+                Is.EqualTo(new[] { "March", "January", "November", "August", "Unknown" }));
+        }
+
+        // Without a unique tiebreaker, paging can repeat or skip employees who
+        // share a birthday.
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenEmployeesShareABirthday_OrdersThemByName()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            _systemClock.UtcNow.Returns(new DateTime(2026, 8, 4));
+
+            var employees = GetTestDataForBirthDaySorting();
+            employees.Add(BuildEmployee("August", "Aaronson", new DateTime(1980, 8, 30)));
+
+            _usersDbSet.SetDbSetDataForAsync(employees);
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string>());
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = "BirthDay asc;",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(
+                result.Take(2).Select(employee => employee.LastName),
+                Is.EqualTo(new[] { "Aaronson", "Peterson" }));
+        }
+
+        // First names label the birthday each employee carries; the years differ
+        // so a result ordered by age is distinguishable from one ordered by date.
+        private static IList<ApplicationUser> GetTestDataForBirthDaySorting()
+        {
+            return new List<ApplicationUser>
+            {
+                BuildEmployee("January", "Peterson", new DateTime(1990, 1, 1)),
+                BuildEmployee("November", "Peterson", new DateTime(1971, 11, 2)),
+                BuildEmployee("August", "Peterson", new DateTime(1999, 8, 30)),
+                BuildEmployee("March", "Peterson", new DateTime(1985, 3, 4)),
+                BuildEmployee("Unknown", "Peterson", null)
+            };
+        }
+
+        private static ApplicationUser BuildEmployee(string firstName, string lastName, DateTime? birthDay)
+        {
+            return new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                OrganizationId = 1,
+                FirstName = firstName,
+                LastName = lastName,
+                PictureId = $"{firstName}-picture",
+                JobPosition = new JobPosition
+                {
+                    Title = "Awesome job"
+                },
+                BirthDay = birthDay,
+                PhoneNumber = "+370600000000",
+                WorkingHours = new WorkingHours
+                {
+                    StartTime = new TimeSpan(),
+                    EndTime = new TimeSpan()
+                },
+                BlacklistEntries = new List<BlacklistUser>()
+            };
         }
 
         private IList<ApplicationUser> GetTestDataForGetPagedEmployeesAsync()
