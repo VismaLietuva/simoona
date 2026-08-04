@@ -27,5 +27,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall
         public int PostsCount { get; set; }
 
         public bool IsWallModerator { get; set; }
+
+        public string CreatedBy { get; set; }
     }
 }

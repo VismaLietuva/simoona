@@ -30,5 +30,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall
         public int PostsCount { get; set; }
 
         public bool IsWallModerator { get; set; }
+
+        // Wall creators are authorized to modify the wall alongside its moderators.
+        public string CreatedBy { get; set; }
     }
 }
