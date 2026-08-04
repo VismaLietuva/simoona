@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -622,6 +623,8 @@ namespace Shrooms.Tests.DomainService
             Assert.That(wall.Description, Is.EqualTo("Description"));
             Assert.That(wall.Logo, Is.EqualTo("Logo.jpg"));
             Assert.That(wall.Type, Is.EqualTo(WallType.UserCreated));
+            Assert.That(wall.IsHiddenFromAllWalls, Is.True);
+            Assert.That(wall.CreatedBy, Is.EqualTo("creator1"));
         }
 
         [Test]
@@ -645,6 +648,55 @@ namespace Shrooms.Tests.DomainService
             Assert.That(wall.Description, Is.EqualTo("Description2"));
             Assert.That(wall.Logo, Is.EqualTo("Logo2.jpg"));
             Assert.That(wall.Type, Is.EqualTo(WallType.UserCreated));
+            Assert.That(wall.IsHiddenFromAllWalls, Is.False);
+            Assert.That(wall.CreatedBy, Is.EqualTo("creator2"));
+        }
+
+        [TestCase(WallsListFilter.All)]
+        [TestCase(WallsListFilter.NotFollowed)]
+        public async Task Should_Populate_IsHiddenFromAllWalls_And_CreatedBy_For_Not_Followed_Walls_List(WallsListFilter filter)
+        {
+            // Arrange
+            MockWallsForList();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "otherUser"
+            };
+
+            // Act
+            var walls = (await _wallService.GetWallsListAsync(userOrg, filter)).ToList();
+
+            // Assert
+            var hiddenWall = walls.First(w => w.Id == 1);
+            Assert.That(hiddenWall.IsHiddenFromAllWalls, Is.True);
+            Assert.That(hiddenWall.CreatedBy, Is.EqualTo("creator1"));
+
+            var visibleWall = walls.First(w => w.Id == 2);
+            Assert.That(visibleWall.IsHiddenFromAllWalls, Is.False);
+            Assert.That(visibleWall.CreatedBy, Is.EqualTo("creator2"));
+        }
+
+        [Test]
+        public async Task Should_Populate_IsHiddenFromAllWalls_And_CreatedBy_For_Followed_Walls_List()
+        {
+            // Arrange
+            MockWallsForList();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "member1"
+            };
+
+            // Act
+            var walls = (await _wallService.GetWallsListAsync(userOrg, WallsListFilter.Followed)).ToList();
+
+            // Assert
+            var hiddenWall = walls.First(w => w.Id == 1);
+            Assert.That(hiddenWall.IsHiddenFromAllWalls, Is.True);
+            Assert.That(hiddenWall.CreatedBy, Is.EqualTo("creator1"));
         }
 
         [Test]
@@ -1004,7 +1056,9 @@ namespace Shrooms.Tests.DomainService
                     Description = "Description",
                     Logo = "Logo.jpg",
                     Members = members,
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    IsHiddenFromAllWalls = true,
+                    CreatedBy = "creator1"
                 },
                 new()
                 {
@@ -1015,7 +1069,9 @@ namespace Shrooms.Tests.DomainService
                     Logo = "Logo2.jpg",
                     Moderators = moderators,
                     Members = members1,
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    IsHiddenFromAllWalls = false,
+                    CreatedBy = "creator2"
                 }
             };
 
@@ -1041,6 +1097,48 @@ namespace Shrooms.Tests.DomainService
 
             _wallModeratorDbSet.SetDbSetDataForAsync(wallModerators);
             _wallsDbSet.SetDbSetDataForAsync(walls);
+        }
+
+        // Wall 1 is hidden and followed by member1; wall 2 is visible and followed by nobody.
+        private void MockWallsForList()
+        {
+            var wall1Members = new List<WallMember>
+            {
+                new()
+                    { Id = 1, UserId = "member1", WallId = 1 }
+            };
+
+            var walls = new List<Wall>
+            {
+                new()
+                {
+                    Id = 1,
+                    Name = "Hidden wall",
+                    Type = WallType.UserCreated,
+                    OrganizationId = 2,
+                    IsHiddenFromAllWalls = true,
+                    CreatedBy = "creator1",
+                    Members = wall1Members,
+                    Moderators = new List<WallModerator>(),
+                    Posts = new List<Post>()
+                },
+                new()
+                {
+                    Id = 2,
+                    Name = "Visible wall",
+                    Type = WallType.UserCreated,
+                    OrganizationId = 2,
+                    IsHiddenFromAllWalls = false,
+                    CreatedBy = "creator2",
+                    Members = new List<WallMember>(),
+                    Moderators = new List<WallModerator>(),
+                    Posts = new List<Post>()
+                }
+            };
+
+            _wallsDbSet.SetDbSetDataForAsync(walls);
+            _wallUsersDbSet.SetDbSetDataForAsync(wall1Members);
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
         }
 
         private void MockWallsForAddRemoveModerators()
