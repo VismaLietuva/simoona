@@ -19,6 +19,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
@@ -30,6 +31,10 @@ namespace Shrooms.Domain.Services.Wall
     {
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
+        // How long an event's wall keeps feeding the followed-walls post feed
+        // after the event has ended.
+        private const int EventWallFeedDaysAfterEnd = 7;
+
         private readonly IMapper _mapper;
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
@@ -40,6 +45,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly DbSet<WallModerator> _moderatorsDbSet;
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
+        private readonly DbSet<Event> _eventsDbSet;
 
         public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService)
         {
@@ -53,6 +59,7 @@ namespace Shrooms.Domain.Services.Wall
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _wallsDbSet = uow.GetDbSet<DataLayer.EntityModels.Models.Multiwall.Wall>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
+            _eventsDbSet = uow.GetDbSet<Event>();
         }
 
         public async Task<int> CreateNewWallAsync(CreateWallDto newWallDto)
@@ -693,6 +700,11 @@ namespace Shrooms.Domain.Services.Wall
             else
             {
                 wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
+
+                if (wallsListFilter == WallsListFilter.Followed)
+                {
+                    wallsIds.AddRange(await GetRecentEventWallIdsAsync(userOrg));
+                }
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
@@ -711,7 +723,62 @@ namespace Shrooms.Domain.Services.Wall
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
             var users = await GetUsersAsync(posts);
 
-            return MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts);
+            var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts).ToList();
+
+            await AssignEventIdsAsync(mappedPosts);
+
+            return mappedPosts;
+        }
+
+        // Event walls have no wall page, so posts from them carry the event id to
+        // link to instead.
+        private async Task AssignEventIdsAsync(IList<PostDto> posts)
+        {
+            var eventPosts = posts.Where(post => post.WallType == WallType.Events).ToList();
+
+            if (!eventPosts.Any())
+            {
+                return;
+            }
+
+            var eventWallIds = eventPosts.Select(post => post.WallId).Distinct().ToList();
+
+            var eventIdsByWallId = await _eventsDbSet
+                .Where(@event => eventWallIds.Contains(@event.WallId))
+                .Select(@event => new { @event.WallId, @event.Id })
+                .ToDictionaryAsync(x => x.WallId, x => x.Id);
+
+            foreach (var post in eventPosts)
+            {
+                if (eventIdsByWallId.TryGetValue(post.WallId, out var eventId))
+                {
+                    post.EventId = eventId;
+                }
+            }
+        }
+
+        // Walls of events the user joined or hosts, dropped from the feed a week
+        // after the event ends. Kept out of GetWallsListAsync on purpose: event
+        // walls must not show up in the wall lists that feed the sidebar.
+        private async Task<List<int>> GetRecentEventWallIdsAsync(UserAndOrganizationDto userOrg)
+        {
+            // Users without event access get no event posts. Note the endpoint
+            // itself is gated on BasicPermissions.Post, so a user who can see
+            // events but cannot post still gets nothing from this feed.
+            if (!await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event))
+            {
+                return new List<int>();
+            }
+
+            var endedAfter = DateTime.UtcNow.AddDays(-EventWallFeedDaysAfterEnd);
+
+            return await _eventsDbSet
+                .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
+                                 @event.EndDate >= endedAfter &&
+                                 @event.Wall.Members.Any(member => member.UserId == userOrg.UserId))
+                .Select(@event => @event.WallId)
+                .Distinct()
+                .ToListAsync();
         }
 
         private async Task<List<ApplicationUser>> GetUsersAsync(IReadOnlyCollection<Post> posts)

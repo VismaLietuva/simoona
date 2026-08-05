@@ -33,6 +33,10 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 
         public WallType WallType { get; set; }
 
+        // Set only for posts on an event wall, so clients can link to the event
+        // instead of the wall (event walls have no wall page).
+        public Guid? EventId { get; set; }
+
         public DateTime LastActivity { get; set; }
 
         public bool CanModerate { get; set; }
