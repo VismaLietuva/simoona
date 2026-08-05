@@ -258,6 +258,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("MyFoodTeam")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        [ProducesResponseType(typeof(FoodTeamWidgetViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMyFoodTeam()
+        {
+            var foodTeamDto = await _eventListingService.GetMyFoodTeamAsync(GetUserAndOrganization());
+            var result = _mapper.Map<FoodTeamWidgetDto, FoodTeamWidgetViewModel>(foodTeamDto);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(typeof(EventOptionsViewModel), StatusCodes.Status200OK)]
