@@ -756,6 +756,89 @@ namespace Shrooms.Tests.DomainService
 
         #endregion
 
+        #region CreateKudosType
+
+        [Test]
+        public void CreateKudosType_WhenNameAlreadyExists_ThrowsValidationException()
+        {
+            var dto = new NewKudosTypeDto
+            {
+                Name = "anythingelse",
+                Multiplier = 5,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _kudosService.CreateKudosTypeAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.KudosTypeNameAlreadyExists));
+            _kudosTypesDbSet.DidNotReceiveWithAnyArgs().Add(default);
+        }
+
+        [Test]
+        public async Task CreateKudosType_WhenNameIsUnique_AddsType()
+        {
+            var dto = new NewKudosTypeDto
+            {
+                Name = "BrandNewType",
+                Multiplier = 5,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            await _kudosService.CreateKudosTypeAsync(dto);
+
+            _kudosTypesDbSet.Received(1).Add(Arg.Is<KudosType>(type => type.Name == dto.Name));
+            await _uow.Received(1).SaveChangesAsync(dto.UserId);
+        }
+
+        #endregion
+
+        #region UpdateKudosType
+
+        [Test]
+        public void UpdateKudosType_WhenNameBelongsToAnotherType_ThrowsValidationException()
+        {
+            var dto = new KudosTypeDto
+            {
+                Id = 3,
+                Name = "Active",
+                Value = 2,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _kudosService.UpdateKudosTypeAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.KudosTypeNameAlreadyExists));
+            _uow.DidNotReceive().SaveChangesAsync(Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task UpdateKudosType_WhenNameBelongsToSameType_UpdatesType()
+        {
+            var dto = new KudosTypeDto
+            {
+                Id = 3,
+                Name = "AnythingElse",
+                Value = 7,
+                Description = "Updated description",
+                IsActive = true,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            await _kudosService.UpdateKudosTypeAsync(dto);
+
+            var updatedType = ((IQueryable<KudosType>)_kudosTypesDbSet).First(type => type.Id == dto.Id);
+
+            Assert.That(updatedType.Value, Is.EqualTo(dto.Value));
+            Assert.That(updatedType.Description, Is.EqualTo(dto.Description));
+            await _uow.Received(1).SaveChangesAsync(dto.UserId);
+        }
+
+        #endregion
+
         #region MockData
 
         private static void MockRoleService(IRoleService roleService)

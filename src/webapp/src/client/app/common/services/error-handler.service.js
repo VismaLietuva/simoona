@@ -33,6 +33,7 @@
             304: 'messageInsufficientKudos',
             305: 'messageSenderReceiverCannotAcceptRejectKudos',
             306: 'messageKudosAlreadyApproved',
+            308: 'messageNameAlreadyExists',
             350: 'messageShopItemAlreadyExists',
             701: 'messageServiceRequestTypeInUse',
             405: 'messageWallNameExists',
