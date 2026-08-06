@@ -114,21 +114,25 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 return new FoodTeamWidgetDto();
             }
 
+            var joined = await GetJoinedFoodTeamEventAsync(foodTypeIds, userOrg);
+
             return new FoodTeamWidgetDto
             {
-                EventTypeId = foodTypeIds[0],
-                JoinedEvent = await GetJoinedFoodTeamEventAsync(foodTypeIds, userOrg)
+                // The joined team's own type wins, so the two fields never point at different
+                // types when an organization has more than one food event type configured.
+                EventTypeId = joined?.EventTypeId ?? foodTypeIds[0],
+                JoinedEvent = joined?.Event
             };
         }
 
-        private async Task<FoodTeamEventDto> GetJoinedFoodTeamEventAsync(List<int> foodTypeIds, UserAndOrganizationDto userOrg)
+        private async Task<(int EventTypeId, FoodTeamEventDto Event)?> GetJoinedFoodTeamEventAsync(List<int> foodTypeIds, UserAndOrganizationDto userOrg)
         {
             var now = DateTime.UtcNow;
             var horizon = now.AddDays(FoodTeamHorizonInDays);
 
             // EndDate > now keeps an ongoing team and skips one that already finished today,
             // so a second team starting later the same day is the one that surfaces.
-            return await _eventsDbSet
+            var joined = await _eventsDbSet
                 .Where(e => e.OrganizationId == userOrg.OrganizationId &&
                             foodTypeIds.Contains(e.EventTypeId) &&
                             e.EndDate > now &&
@@ -138,16 +142,27 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                                                           p.AttendStatus == (int)AttendingStatus.MaybeAttending ||
                                                           p.AttendStatus == (int)AttendingStatus.AttendingVirtually)))
                 .OrderBy(e => e.StartDate)
-                .Select(e => new FoodTeamEventDto
+                .Select(e => new
                 {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Place = e.Place,
-                    ImageName = e.ImageName,
-                    StartDate = e.StartDate,
-                    EndDate = e.EndDate
+                    e.EventTypeId,
+                    Event = new FoodTeamEventDto
+                    {
+                        Id = e.Id,
+                        Name = e.Name,
+                        Place = e.Place,
+                        ImageName = e.ImageName,
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate
+                    }
                 })
                 .FirstOrDefaultAsync();
+
+            if (joined is null)
+            {
+                return null;
+            }
+
+            return (joined.EventTypeId, joined.Event);
         }
 
         public async Task<IPagedList<EventDetailsListItemDto>> GetNotStartedEventsFilteredByTitleAsync(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization)

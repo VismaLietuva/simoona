@@ -693,7 +693,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Return_Joined_Food_Team_Within_The_Next_Seven_Days()
+        public async Task Should_Return_Joined_Food_Team_Within_The_Eight_Day_Horizon()
         {
             // Arrange
             var guids = MockFoodTeamEvents();
@@ -801,11 +801,29 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.IsNull(result.JoinedEvent);
         }
 
+        [Test]
+        public async Task Should_Return_The_Type_Of_The_Joined_Food_Team_When_Organization_Has_Several()
+        {
+            // Arrange
+            var guids = MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedSecondFoodType"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(13, result.EventTypeId);
+            ClassicAssert.AreEqual(guids[6], result.JoinedEvent.Id);
+        }
+
         #region Mocks
 
         private Guid[] MockFoodTeamEvents()
         {
-            var guids = Enumerable.Repeat(0, 6).Select(_ => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 7).Select(_ => Guid.NewGuid()).ToArray();
             var now = DateTime.UtcNow;
 
             var eventTypes = new List<EventType>
@@ -832,6 +850,16 @@ namespace Shrooms.Premium.Tests.DomainService
                     Name = "Food",
                     OrganizationId = 3,
                     IsSingleJoin = false,
+                    SendWeeklyReminders = true
+                },
+
+                // A second food type in the same organization, so the widget has to pick one.
+                new EventType
+                {
+                    Id = 13,
+                    Name = "Breakfast",
+                    OrganizationId = 2,
+                    IsSingleJoin = true,
                     SendWeeklyReminders = true
                 }
             };
@@ -927,6 +955,20 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventParticipants = new List<EventParticipant>
                     {
                         new EventParticipant { Id = 6, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+                new Event
+                {
+                    Id = guids[6],
+                    Name = "Breakfast club",
+                    Place = "Kitchen",
+                    StartDate = now.AddHours(-1),
+                    EndDate = now.AddHours(1),
+                    OrganizationId = 2,
+                    EventTypeId = 13,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 8, ApplicationUserId = "testUserJoinedSecondFoodType", AttendStatus = (int)AttendingStatus.Attending }
                     }
                 }
             };
