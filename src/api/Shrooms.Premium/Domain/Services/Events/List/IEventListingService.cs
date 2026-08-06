@@ -17,6 +17,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventFilteredArgsDto filteredArgsDto, UserAndOrganizationDto userOrganization);
 
+        Task<FoodTeamWidgetDto> GetMyFoodTeamAsync(UserAndOrganizationDto userOrg);
+
         Task<IPagedList<EventDetailsListItemDto>> GetNotStartedEventsFilteredByTitleAsync(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization);
 
         Task<IPagedList<EventParticipantReportDto>> GetReportParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg);

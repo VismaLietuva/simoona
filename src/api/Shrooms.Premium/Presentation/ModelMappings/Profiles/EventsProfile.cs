@@ -24,6 +24,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventListItemDto, EventListItemViewModel>(MemberList.None)
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventDetailsListItemDto, EventDetailsListItemViewModel>(MemberList.None);
+            CreateMap<FoodTeamEventDto, FoodTeamEventViewModel>(MemberList.None);
+            CreateMap<FoodTeamWidgetDto, FoodTeamWidgetViewModel>(MemberList.None);
             CreateMap<EventOptionDto, EventOptionViewModel>(MemberList.None);
             CreateMap<EventDetailsDto, EventDetailsViewModel>(MemberList.None)
                 .Ignore(x => x.Comments)

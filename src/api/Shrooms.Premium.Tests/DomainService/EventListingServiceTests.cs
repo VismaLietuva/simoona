@@ -25,6 +25,7 @@ namespace Shrooms.Premium.Tests.DomainService
     public class EventListingServiceTests
     {
         private DbSet<Event> _eventsDbSet;
+        private DbSet<EventType> _eventTypesDbSet;
         private DbSet<Office> _officeDbSet;
         private DbSet<EventParticipant> _eventParticipantsDbSet;
         private DbSet<KudosType> _kudosTypesDbSet;
@@ -40,6 +41,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var uow = Substitute.For<IUnitOfWork2>();
 
             _eventsDbSet = uow.MockDbSetForAsync<Event>();
+            _eventTypesDbSet = uow.MockDbSetForAsync<EventType>();
             _officeDbSet = uow.MockDbSetForAsync<Office>();
             _eventParticipantsDbSet = uow.MockDbSetForAsync<EventParticipant>();
             _kudosLogDbSet = uow.MockDbSetForAsync<KudosLog>();
@@ -654,7 +656,328 @@ namespace Shrooms.Premium.Tests.DomainService
             CollectionAssert.AreEqual(expectedEventIdsByNameOrder, result.Select(item => item.Id));
         }
 
+        [Test]
+        public async Task Should_Return_No_Food_Team_When_Organization_Has_No_Food_Event_Type()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 3,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.EventTypeId);
+            ClassicAssert.IsNull(result.JoinedEvent);
+        }
+
+        [Test]
+        public async Task Should_Return_Food_Event_Type_Without_Joined_Event_When_User_Has_Not_Joined()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "userWithoutFoodTeam"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(10, result.EventTypeId);
+            ClassicAssert.IsNull(result.JoinedEvent);
+        }
+
+        [Test]
+        public async Task Should_Return_Joined_Food_Team_Within_The_Eight_Day_Horizon()
+        {
+            // Arrange
+            var guids = MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(10, result.EventTypeId);
+            ClassicAssert.AreEqual(guids[0], result.JoinedEvent.Id);
+            ClassicAssert.AreEqual("Pizza Friday", result.JoinedEvent.Name);
+            ClassicAssert.AreEqual("Kitchen", result.JoinedEvent.Place);
+        }
+
+        // This week's food day is over, so the widget rolls over to next week's team even though
+        // it starts a little more than seven days out.
+        [Test]
+        public async Task Should_Return_Next_Weeks_Food_Team_When_This_Weeks_Is_Over()
+        {
+            // Arrange
+            var guids = MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedNextWeek"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(guids[5], result.JoinedEvent.Id);
+            ClassicAssert.AreEqual("Next week pizza", result.JoinedEvent.Name);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Food_Team_Joined_Beyond_The_Coming_Food_Day()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedFarFuture"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent);
+        }
+
+        [Test]
+        public async Task Should_Return_The_Later_Food_Team_When_An_Earlier_One_Already_Finished_Today()
+        {
+            // Arrange
+            var guids = MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserTwoTeamsSameDay"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(guids[4], result.JoinedEvent.Id);
+            ClassicAssert.AreEqual("Late lunch pizza", result.JoinedEvent.Name);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Food_Team_The_User_Declined()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserNotAttending"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Food_Team_Of_A_Non_Food_Event_Type()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedOtherType"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent);
+        }
+
+        [Test]
+        public async Task Should_Return_The_Type_Of_The_Joined_Food_Team_When_Organization_Has_Several()
+        {
+            // Arrange
+            var guids = MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedSecondFoodType"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual(13, result.EventTypeId);
+            ClassicAssert.AreEqual(guids[6], result.JoinedEvent.Id);
+        }
+
         #region Mocks
+
+        private Guid[] MockFoodTeamEvents()
+        {
+            var guids = Enumerable.Repeat(0, 7).Select(_ => Guid.NewGuid()).ToArray();
+            var now = DateTime.UtcNow;
+
+            var eventTypes = new List<EventType>
+            {
+                new EventType
+                {
+                    Id = 10,
+                    Name = "Food",
+                    OrganizationId = 2,
+                    IsSingleJoin = true,
+                    SendWeeklyReminders = true
+                },
+                new EventType
+                {
+                    Id = 11,
+                    Name = "Sports",
+                    OrganizationId = 2,
+                    IsSingleJoin = true,
+                    SendWeeklyReminders = false
+                },
+                new EventType
+                {
+                    Id = 12,
+                    Name = "Food",
+                    OrganizationId = 3,
+                    IsSingleJoin = false,
+                    SendWeeklyReminders = true
+                },
+
+                // A second food type in the same organization, so the widget has to pick one.
+                new EventType
+                {
+                    Id = 13,
+                    Name = "Breakfast",
+                    OrganizationId = 2,
+                    IsSingleJoin = true,
+                    SendWeeklyReminders = true
+                }
+            };
+
+            var events = new List<Event>
+            {
+                // Ongoing, so it always falls inside the current week regardless of when the test runs.
+                new Event
+                {
+                    Id = guids[0],
+                    Name = "Pizza Friday",
+                    Place = "Kitchen",
+                    ImageName = "pizza.png",
+                    StartDate = now.AddHours(-1),
+                    EndDate = now.AddHours(1),
+                    OrganizationId = 2,
+                    EventTypeId = 10,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 1, ApplicationUserId = "testUser1", AttendStatus = (int)AttendingStatus.Attending },
+                        new EventParticipant { Id = 2, ApplicationUserId = "testUserNotAttending", AttendStatus = (int)AttendingStatus.NotAttending }
+                    }
+                },
+                new Event
+                {
+                    Id = guids[1],
+                    Name = "Far future pizza",
+                    Place = "Kitchen",
+                    StartDate = now.AddDays(10),
+                    EndDate = now.AddDays(10).AddHours(2),
+                    OrganizationId = 2,
+                    EventTypeId = 10,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 3, ApplicationUserId = "testUserJoinedFarFuture", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+
+                // Next week's team, scheduled slightly later in the day than this week's.
+                new Event
+                {
+                    Id = guids[5],
+                    Name = "Next week pizza",
+                    Place = "Kitchen",
+                    StartDate = now.AddDays(7).AddHours(2),
+                    EndDate = now.AddDays(7).AddHours(3),
+                    OrganizationId = 2,
+                    EventTypeId = 10,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 7, ApplicationUserId = "testUserJoinedNextWeek", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+                new Event
+                {
+                    Id = guids[2],
+                    Name = "Basketball",
+                    Place = "Court",
+                    StartDate = now.AddHours(-1),
+                    EndDate = now.AddHours(1),
+                    OrganizationId = 2,
+                    EventTypeId = 11,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 4, ApplicationUserId = "testUserJoinedOtherType", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+
+                // Two food teams the same day for one user: the first has already finished.
+                new Event
+                {
+                    Id = guids[3],
+                    Name = "Early lunch pizza",
+                    Place = "Kitchen",
+                    StartDate = now.AddHours(-2),
+                    EndDate = now.AddMinutes(-30),
+                    OrganizationId = 2,
+                    EventTypeId = 10,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 5, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+                new Event
+                {
+                    Id = guids[4],
+                    Name = "Late lunch pizza",
+                    Place = "Kitchen",
+                    StartDate = now.AddMinutes(30),
+                    EndDate = now.AddHours(2),
+                    OrganizationId = 2,
+                    EventTypeId = 10,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 6, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                },
+                new Event
+                {
+                    Id = guids[6],
+                    Name = "Breakfast club",
+                    Place = "Kitchen",
+                    StartDate = now.AddHours(-1),
+                    EndDate = now.AddHours(1),
+                    OrganizationId = 2,
+                    EventTypeId = 13,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { Id = 8, ApplicationUserId = "testUserJoinedSecondFoodType", AttendStatus = (int)AttendingStatus.Attending }
+                    }
+                }
+            };
+
+            _eventTypesDbSet.SetDbSetDataForAsync(eventTypes);
+            _eventsDbSet.SetDbSetDataForAsync(events);
+
+            return guids;
+        }
 
         private Guid[] MockVisitedReportEvents()
         {
