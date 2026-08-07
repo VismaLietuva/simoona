@@ -255,7 +255,9 @@ namespace Shrooms.Domain.Services.Wall
             var postInList = new List<Post> { post };
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, postInList);
             var users = await GetUsersAsync(postInList);
-            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts);
+            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts).ToList();
+
+            await AssignEventIdsAsync(posts);
 
             return posts.FirstOrDefault();
         }
