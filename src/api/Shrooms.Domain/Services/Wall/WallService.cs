@@ -31,9 +31,10 @@ namespace Shrooms.Domain.Services.Wall
     {
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        // How long an event's wall keeps feeding the followed-walls post feed
-        // after the event has ended.
-        private const int EventWallFeedDaysAfterEnd = 7;
+        // How long an event's wall keeps feeding the followed-walls post feed,
+        // measured from whichever is later: the event ending, or its last post
+        // activity. Discussion often outlives the event itself.
+        private const int EventWallFeedRecentDays = 30;
 
         private readonly IMapper _mapper;
         private readonly IUnitOfWork2 _uow;
@@ -257,7 +258,7 @@ namespace Shrooms.Domain.Services.Wall
             var users = await GetUsersAsync(postInList);
             var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts).ToList();
 
-            await AssignEventIdsAsync(posts);
+            await AssignEventIdsAsync(posts, userOrg);
 
             return posts.FirstOrDefault();
         }
@@ -727,14 +728,14 @@ namespace Shrooms.Domain.Services.Wall
 
             var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts).ToList();
 
-            await AssignEventIdsAsync(mappedPosts);
+            await AssignEventIdsAsync(mappedPosts, userOrg);
 
             return mappedPosts;
         }
 
         // Event walls have no wall page, so posts from them carry the event id to
         // link to instead.
-        private async Task AssignEventIdsAsync(IList<PostDto> posts)
+        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg)
         {
             var eventPosts = posts.Where(post => post.WallType == WallType.Events).ToList();
 
@@ -745,10 +746,15 @@ namespace Shrooms.Domain.Services.Wall
 
             var eventWallIds = eventPosts.Select(post => post.WallId).Distinct().ToList();
 
-            var eventIdsByWallId = await _eventsDbSet
-                .Where(@event => eventWallIds.Contains(@event.WallId))
-                .Select(@event => new { @event.WallId, @event.Id })
-                .ToDictionaryAsync(x => x.WallId, x => x.Id);
+            // Grouped rather than keyed directly: nothing enforces one event per
+            // wall, and a duplicate must not take down the whole feed.
+            var eventIdsByWallId = (await _eventsDbSet
+                    .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
+                                     eventWallIds.Contains(@event.WallId))
+                    .Select(@event => new { @event.WallId, @event.Id })
+                    .ToListAsync())
+                .GroupBy(x => x.WallId)
+                .ToDictionary(group => group.Key, group => group.First().Id);
 
             foreach (var post in eventPosts)
             {
@@ -759,9 +765,10 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        // Walls of events the user joined or hosts, dropped from the feed a week
-        // after the event ends. Kept out of GetWallsListAsync on purpose: event
-        // walls must not show up in the wall lists that feed the sidebar.
+        // Walls of events the user joined or hosts, dropped from the feed once
+        // both the event and its conversation have gone quiet. Kept out of
+        // GetWallsListAsync on purpose: event walls must not show up in the wall
+        // lists that feed the sidebar.
         private async Task<List<int>> GetRecentEventWallIdsAsync(UserAndOrganizationDto userOrg)
         {
             // Users without event access get no event posts. Note the endpoint
@@ -772,11 +779,15 @@ namespace Shrooms.Domain.Services.Wall
                 return new List<int>();
             }
 
-            var endedAfter = DateTime.UtcNow.AddDays(-EventWallFeedDaysAfterEnd);
+            var recentSince = DateTime.UtcNow.AddDays(-EventWallFeedRecentDays);
 
+            // Matching on activity as well as the end date keeps a live thread —
+            // the photos and thanks that land after an event — in the feed, and
+            // stops a long-finished event resurfacing on one stray comment.
             return await _eventsDbSet
                 .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
-                                 @event.EndDate >= endedAfter &&
+                                 (@event.EndDate >= recentSince ||
+                                  @event.Wall.Posts.Any(post => post.LastActivity >= recentSince)) &&
                                  @event.Wall.Members.Any(member => member.UserId == userOrg.UserId))
                 .Select(@event => @event.WallId)
                 .Distinct()

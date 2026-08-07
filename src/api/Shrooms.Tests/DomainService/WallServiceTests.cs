@@ -13,6 +13,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
@@ -26,10 +27,17 @@ namespace Shrooms.Tests.DomainService
     [TestFixture]
     public class WallServiceTests
     {
+        private const string FeedUserId = "feedUser";
+        private const int FollowedWallId = 1;
+        private const int EventWallId = 2;
+
         private DbSet<Wall> _wallsDbSet;
         private DbSet<WallModerator> _wallModeratorDbSet;
         private DbSet<WallMember> _wallUsersDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Post> _postsDbSet;
+        private DbSet<PostWatcher> _postWatchersDbSet;
+        private DbSet<Event> _eventsDbSet;
         private WallService _wallService;
         private IPermissionService _permissionService;
         private IUnitOfWork2 _uow;
@@ -43,6 +51,9 @@ namespace Shrooms.Tests.DomainService
             _wallModeratorDbSet = _uow.MockDbSetForAsync<WallModerator>();
             _wallUsersDbSet = _uow.MockDbSetForAsync<WallMember>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
+            _postsDbSet = _uow.MockDbSetForAsync<Post>();
+            _postWatchersDbSet = _uow.MockDbSetForAsync<PostWatcher>();
+            _eventsDbSet = _uow.MockDbSetForAsync<Event>();
 
             _permissionService = Substitute.For<IPermissionService>();
             var roleService = Substitute.For<IRoleService>();
@@ -964,6 +975,227 @@ namespace Shrooms.Tests.DomainService
                     permission,
                     userOrg,
                     checkForAdministrationEventPermission));
+        }
+
+        [Test]
+        public async Task Should_Return_Event_Wall_Posts_With_Event_Id_In_Followed_Feed()
+        {
+            // Arrange
+            var eventId = MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Select(p => p.WallId), Is.EquivalentTo(new[] { FollowedWallId, EventWallId }));
+            Assert.That(posts.First(p => p.WallId == EventWallId).EventId, Is.EqualTo(eventId));
+            Assert.That(posts.First(p => p.WallId == FollowedWallId).EventId, Is.Null);
+        }
+
+        [TestCase(WallsListFilter.All)]
+        [TestCase(WallsListFilter.NotHiddenFromAllWalls)]
+        [TestCase(WallsListFilter.NotFollowed)]
+        public async Task Should_Not_Return_Event_Wall_Posts_For_Filters_Other_Than_Followed(WallsListFilter filter)
+        {
+            // Arrange
+            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), filter)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Event_Wall_Posts_When_User_Has_No_Event_Permission()
+        {
+            // Arrange
+            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            MockEventPermission(false);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
+        [TestCase(1, true)]
+        [TestCase(-29, true)]
+        [TestCase(-31, false)]
+        public async Task Should_Return_Event_Wall_Posts_Only_Until_A_Month_After_The_Event_Ended(int endDateOffsetInDays, bool shouldBeReturned)
+        {
+            // Arrange. The conversation is as stale as the event, so the end date
+            // alone decides.
+            MockPostsForFollowedFeed(
+                DateTime.UtcNow.AddDays(endDateOffsetInDays),
+                eventPostLastActivity: DateTime.UtcNow.AddDays(endDateOffsetInDays));
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.EqualTo(shouldBeReturned));
+        }
+
+        [Test]
+        public async Task Should_Return_Event_Wall_Posts_While_The_Conversation_Is_Still_Active()
+        {
+            // Arrange
+            MockPostsForFollowedFeed(
+                DateTime.UtcNow.AddDays(-90),
+                eventPostLastActivity: DateTime.UtcNow.AddDays(-1));
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.True);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Event_Wall_Posts_When_User_Did_Not_Join_The_Event()
+        {
+            // Arrange
+            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1), isEventWallMember: false);
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Event_Wall_Posts_From_Another_Organization()
+        {
+            // Arrange
+            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1), eventOrganizationId: 3);
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Return_Event_Id_For_A_Single_Event_Wall_Post()
+        {
+            // Arrange
+            var eventId = MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+
+            // Act
+            var eventPost = await _wallService.GetWallPostAsync(FeedUser(), EventWallId);
+            var followedWallPost = await _wallService.GetWallPostAsync(FeedUser(), FollowedWallId);
+
+            // Assert
+            Assert.That(eventPost.EventId, Is.EqualTo(eventId));
+            Assert.That(followedWallPost.EventId, Is.Null);
+        }
+
+        private static UserAndOrganizationDto FeedUser()
+        {
+            return new UserAndOrganizationDto { UserId = FeedUserId, OrganizationId = 2 };
+        }
+
+        private void MockEventPermission(bool hasPermission)
+        {
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.Event).Returns(hasPermission);
+        }
+
+        // Wall 1 is a user created wall the user follows, wall 2 is the wall of an event the user joined; each holds one post with the same id as its wall.
+        private Guid MockPostsForFollowedFeed(
+            DateTime eventEndDate,
+            bool isEventWallMember = true,
+            int eventOrganizationId = 2,
+            DateTime? eventPostLastActivity = null)
+        {
+            var followedWallMember = new WallMember { Id = 1, UserId = FeedUserId, WallId = FollowedWallId };
+            var eventWallMembers = isEventWallMember
+                ? new List<WallMember> { new() { Id = 2, UserId = FeedUserId, WallId = EventWallId } }
+                : new List<WallMember>();
+
+            var followedWall = new Wall
+            {
+                Id = FollowedWallId,
+                Name = "Followed wall",
+                Type = WallType.UserCreated,
+                OrganizationId = 2,
+                Members = new List<WallMember> { followedWallMember },
+                Moderators = new List<WallModerator>(),
+                Posts = new List<Post>()
+            };
+
+            var eventWall = new Wall
+            {
+                Id = EventWallId,
+                Name = "Event wall",
+                Type = WallType.Events,
+                OrganizationId = 2,
+                Members = eventWallMembers,
+                Moderators = new List<WallModerator>(),
+                Posts = new List<Post>()
+            };
+
+            var followedWallPost = new Post
+            {
+                Id = FollowedWallId,
+                WallId = FollowedWallId,
+                Wall = followedWall,
+                AuthorId = FeedUserId,
+                LastActivity = DateTime.UtcNow,
+                Comments = new List<Comment>(),
+                Likes = new LikesCollection()
+            };
+
+            var eventWallPost = new Post
+            {
+                Id = EventWallId,
+                WallId = EventWallId,
+                Wall = eventWall,
+                AuthorId = FeedUserId,
+                LastActivity = eventPostLastActivity ?? DateTime.UtcNow.AddMinutes(-1),
+                Comments = new List<Comment>(),
+                Likes = new LikesCollection()
+            };
+
+            var posts = new List<Post> { followedWallPost, eventWallPost };
+
+            // The feed matches event walls on post activity, so the navigation
+            // collections have to mirror the posts set, not stay empty.
+            followedWall.Posts = new List<Post> { followedWallPost };
+            eventWall.Posts = new List<Post> { eventWallPost };
+
+            var eventId = Guid.NewGuid();
+            var events = new List<Event>
+            {
+                new()
+                {
+                    Id = eventId,
+                    Name = "Event",
+                    OrganizationId = eventOrganizationId,
+                    WallId = EventWallId,
+                    Wall = eventWall,
+                    EndDate = eventEndDate
+                }
+            };
+
+            _wallsDbSet.SetDbSetDataForAsync(new List<Wall> { followedWall, eventWall });
+            _wallUsersDbSet.SetDbSetDataForAsync(new List<WallMember> { followedWallMember }.Concat(eventWallMembers).ToList());
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
+            _postsDbSet.SetDbSetDataForAsync(posts);
+            _postWatchersDbSet.SetDbSetDataForAsync(new List<PostWatcher>());
+            _eventsDbSet.SetDbSetDataForAsync(events);
+
+            return eventId;
         }
 
         private static void MockRoleService(IRoleService roleService)
