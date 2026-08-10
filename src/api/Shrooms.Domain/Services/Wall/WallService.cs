@@ -741,15 +741,17 @@ namespace Shrooms.Domain.Services.Wall
 
             var eventWallIds = eventPosts.Select(post => post.WallId).Distinct().ToList();
 
-            // Grouped rather than keyed directly: nothing enforces one event per
-            // wall, and a duplicate must not take down the whole feed.
+            // Nothing enforces one event per wall, so group and pick the latest
+            // rather than letting a duplicate throw or vary between requests.
             var eventIdsByWallId = (await _eventsDbSet
                     .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
                                      eventWallIds.Contains(@event.WallId))
-                    .Select(@event => new { @event.WallId, @event.Id })
+                    .Select(@event => new { @event.WallId, @event.Id, @event.EndDate })
                     .ToListAsync())
                 .GroupBy(x => x.WallId)
-                .ToDictionary(group => group.Key, group => group.First().Id);
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderByDescending(x => x.EndDate).ThenBy(x => x.Id).First().Id);
 
             foreach (var post in eventPosts)
             {
