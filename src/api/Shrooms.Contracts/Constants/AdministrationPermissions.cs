@@ -13,6 +13,7 @@
         public const string Birthdays = "BIRTHDAYS_ADMINISTRATION";
         public const string Book = "BOOK_ADMINISTRATION";
         public const string Committees = "COMMITTEES_ADMINISTRATION";
+        public const string Groups = "GROUPS_ADMINISTRATION";
         public const string ServiceRequest = "SERVICEREQUESTS_ADMINISTRATION";
         public const string Certificate = "CERTIFICATE_ADMINISTRATION";
         public const string Vacation = "VACATIONS_ADMINISTRATION";

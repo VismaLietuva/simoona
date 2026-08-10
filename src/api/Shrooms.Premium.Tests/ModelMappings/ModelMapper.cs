@@ -12,6 +12,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 cfg.AddProfile<OrganizationalStructureProfile>();
                 cfg.AddProfile<ServiceRequestProfile>();
                 cfg.AddProfile<CommitteeProfile>();
+                cfg.AddProfile<GroupProfile>();
                 cfg.AddProfile<KudosShopProfile>();
                 cfg.AddProfile<LoyaltyKudosProfile>();
                 cfg.AddProfile<EventsProfile>();
