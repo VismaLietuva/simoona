@@ -178,7 +178,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             // Seed the five predefined group types for every organization.
             // CreationPolicy: 0 = administrators only, 1 = anyone, 2 = anyone with approval.
-            // Committee and FoodMaster point at their matching kudos types.
+            // Committee and Food Master point at their matching kudos types.
             // All settings stay editable afterwards - these are defaults, not system types.
             migrationBuilder.Sql(@"
 DECLARE @committeeKudos INT = (SELECT TOP 1 Id FROM dbo.KudosTypes WHERE Name = N'Committee Membership' AND IsDeleted = 0)
@@ -210,11 +210,11 @@ SELECT t.[Name], o.[Id], t.[SortOrder], t.[IsTemporary], t.[HasGroupTag], t.[Kud
        GETDATE(), NULL, GETDATE(), NULL, 0
 FROM   dbo.Organizations o
 CROSS JOIN (VALUES
-    (N'Committee',       1, 0, 1, @committeeKudos, 0, NULL),
-    (N'TaskForce',       2, 1, 1, NULL,            2, @taskForceQuestions),
-    (N'FoodMaster',      3, 0, 1, @foodKudos,      0, NULL),
-    (N'GroupOfInterest', 4, 0, 1, NULL,            1, NULL),
-    (N'Other',           5, 0, 0, NULL,            1, NULL)
+    (N'Committee',          1, 0, 1, @committeeKudos, 0, NULL),
+    (N'Task Force',         2, 1, 1, NULL,            2, @taskForceQuestions),
+    (N'Food Master',        3, 0, 1, @foodKudos,      0, NULL),
+    (N'Group of Interest',  4, 0, 1, NULL,            1, NULL),
+    (N'Other',              5, 0, 0, NULL,            1, NULL)
 ) AS t([Name], [SortOrder], [IsTemporary], [HasGroupTag], [KudosTypeId], [CreationPolicy], [ApprovalQuestions])
 WHERE NOT EXISTS (
     SELECT 1 FROM dbo.GroupTypes gt
