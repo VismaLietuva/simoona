@@ -1,0 +1,100 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!-- Aspire -->
+  <ItemGroup>
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.1.2" />
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.1.2" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.1.2" />
+  </ItemGroup>
+
+  <!-- Microsoft platform: EF Core + ASP.NET Core. Keep on one version. -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Facebook" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+  </ItemGroup>
+
+  <!-- Data access -->
+  <ItemGroup>
+    <PackageVersion Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.5.0" />
+    <PackageVersion Include="X.PagedList" Version="10.5.9" />
+    <PackageVersion Include="X.PagedList.EF" Version="10.5.9" />
+  </ItemGroup>
+
+  <!-- Background jobs -->
+  <ItemGroup>
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.18" />
+    <PackageVersion Include="Hangfire.Core" Version="1.8.18" />
+    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.18" />
+  </ItemGroup>
+
+  <!-- Google APIs. Books lags the core packages by design. -->
+  <ItemGroup>
+    <PackageVersion Include="Google.Apis" Version="1.68.0" />
+    <PackageVersion Include="Google.Apis.Auth" Version="1.68.0" />
+    <PackageVersion Include="Google.Apis.Books.v1" Version="1.68.0.3331" />
+    <PackageVersion Include="Google.Apis.Core" Version="1.68.0" />
+  </ItemGroup>
+
+  <!-- Documents, images and content -->
+  <ItemGroup>
+    <PackageVersion Include="EPPlus" Version="7.5.3" />
+    <PackageVersion Include="ExcelDataReader" Version="3.7.0" />
+    <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
+    <PackageVersion Include="HtmlSanitizer" Version="9.0.873" />
+    <PackageVersion Include="Ical.Net" Version="4.3.0" />
+    <PackageVersion Include="Markdig" Version="1.1.1" />
+    <PackageVersion Include="RazorLight" Version="2.3.1" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.10" />
+    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
+  </ItemGroup>
+
+  <!-- Web API surface -->
+  <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.3.1" />
+  </ItemGroup>
+
+  <!-- Azure and telemetry -->
+  <ItemGroup>
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.24.0" />
+    <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+  </ItemGroup>
+
+  <!-- General purpose -->
+  <ItemGroup>
+    <PackageVersion Include="AutoMapper" Version="13.0.1" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2025.2.0" />
+    <PackageVersion Include="MoreLinq" Version="4.4.0" />
+  </ItemGroup>
+
+  <!-- Analyzers -->
+  <ItemGroup>
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
+  </ItemGroup>
+
+  <!-- Test stack -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
+    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+</Project>
