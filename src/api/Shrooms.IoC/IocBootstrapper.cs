@@ -68,6 +68,7 @@ namespace Shrooms.IoC
             services.AddPremiumBadges();
             services.AddPremiumBooks();
             services.AddPremiumCommittee();
+            services.AddPremiumGroup();
             services.AddPremiumEvents();
             services.AddPremiumKudosShop();
             services.AddPremiumLottery();

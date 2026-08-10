@@ -6,6 +6,7 @@
         public const string Birthday = "BIRTHDAYS_BASIC";
         public const string Book = "BOOK_BASIC";
         public const string Committees = "COMMITTEES_BASIC";
+        public const string Groups = "GROUPS_BASIC";
         public const string ApplicationUser = "APPLICATIONUSER_BASIC";
         public const string OrganizationalStructure = "ORGANIZATIONALSTRUCTURE_BASIC";
         public const string EmployeeList = "EMPLOYEELIST_BASIC";

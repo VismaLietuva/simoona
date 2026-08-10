@@ -21,6 +21,8 @@ using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.DataLayer.EntityModels.Models.Monitors;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
+using Shrooms.DataLayer.EntityModels.Models.Group;
+using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 
 namespace Shrooms.DataLayer.DAL
 {
@@ -98,6 +100,14 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<ServiceRequestComment> ServiceRequestComments { get; set; }
 
         public virtual DbSet<Committee> Committees { get; set; }
+
+        public virtual DbSet<GroupType> GroupTypes { get; set; }
+
+        public virtual DbSet<GroupEntity> Groups { get; set; }
+
+        public virtual DbSet<GroupMember> GroupMembers { get; set; }
+
+        public virtual DbSet<GroupReference> GroupReferences { get; set; }
 
         public virtual DbSet<Book> Books { get; set; }
 
@@ -218,6 +228,10 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
             modelBuilder.ApplyConfiguration(new EventOptionEntityConfig());
             modelBuilder.ApplyConfiguration(new CommitteeEntityConfig());
+            modelBuilder.ApplyConfiguration(new GroupTypeEntityConfig());
+            modelBuilder.ApplyConfiguration(new GroupEntityConfig());
+            modelBuilder.ApplyConfiguration(new GroupMemberEntityConfig());
+            modelBuilder.ApplyConfiguration(new GroupReferenceEntityConfig());
             modelBuilder.ApplyConfiguration(new BookOfficeEntityConfig());
             modelBuilder.ApplyConfiguration(new BookLogEntityConfig());
             modelBuilder.ApplyConfiguration(new BookEntityConfig());

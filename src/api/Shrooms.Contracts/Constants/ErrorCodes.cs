@@ -62,5 +62,20 @@
 
         // Service requests, 16**
         public const int InvalidCategoryChange = 1600;
+
+        // Groups, 17**
+        public const int GroupNotFound = 1700;
+        public const int GroupTypeNotFound = 1701;
+        public const int GroupNameAlreadyExists = 1702;
+        public const int GroupEditNotAllowed = 1703;
+        public const int GroupTypeNameAlreadyExists = 1704;
+        public const int GroupTypeHasGroups = 1706;
+        public const int GroupFieldNotAllowedByType = 1707;
+        public const int GroupEndDateBeforeStartDate = 1709;
+        public const int GroupCreationNotAllowed = 1712;
+        public const int GroupApprovalAnswersRequired = 1713;
+        public const int GroupDeleteNotAllowed = 1714;
+        public const int GroupMemberCannotBeRemoved = 1715;
+        public const int GroupInvalidKudosPeriod = 1716;
     }
 }
