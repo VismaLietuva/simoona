@@ -160,7 +160,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         /// <summary>
-        /// Logic App entry point. Idempotent: re-running for the same period is a no-op.
+        /// Logic App entry point. Not idempotent - the caller owns scheduling, so running
+        /// it twice for the same period awards twice. Defaults to the current month.
         /// </summary>
         [HttpPost]
         [Route("AwardMonthlyKudos")]
@@ -170,12 +171,19 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var now = DateTime.UtcNow;
 
-            var result = await _groupKudosService.AwardMonthlyKudosAsync(
-                GetUserAndOrganization(),
-                year ?? now.Year,
-                month ?? now.Month);
+            try
+            {
+                var result = await _groupKudosService.AwardMonthlyKudosAsync(
+                    GetUserAndOrganization(),
+                    year ?? now.Year,
+                    month ?? now.Month);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
     }
 }

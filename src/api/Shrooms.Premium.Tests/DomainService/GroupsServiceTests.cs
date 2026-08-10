@@ -90,9 +90,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 Name = "Existing",
                 GroupTypeId = 1,
-                Members = new List<GroupMember> { new GroupMember { UserId = "user1" } }
+                Members = new List<GroupMember> { new GroupMember { Id = 40, UserId = "user1" } }
             }
         };
+
+        // The editing member is carried through the payload - dropping an open-ended
+        // membership is a separate operation with its own rule.
+        private static List<GroupMemberPostDto> KeepingMember(int membershipId, string userId) =>
+            new List<GroupMemberPostDto> { new GroupMemberPostDto { MembershipId = membershipId, Id = userId } };
 
         private static GroupPostDto ValidPost(int groupTypeId) => new GroupPostDto
         {
@@ -161,11 +166,59 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Approve_Outright_When_An_Administrator_Creates_An_Approval_Type()
         {
+            // An administrator approves their own group, so the questions are not asked.
             var dto = ValidPost(5);
 
             await _service.CreateAsync(dto);
 
             _groupsDbSet.Received(1).Add(Arg.Is<GroupEntity>(g => g.Status == GroupStatus.Approved));
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Approval_Answers_When_An_Edit_Leaves_Them_Out()
+        {
+            var group = new GroupEntity
+            {
+                Id = 1, OrganizationId = 1, Name = "Existing", GroupTypeId = 5,
+                Status = GroupStatus.Approved,
+                ApprovalAnswers = "Answered at creation",
+                Members = new List<GroupMember> { new GroupMember { Id = 40, UserId = "user1" } }
+            };
+
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity> { group });
+
+            var dto = ValidPost(5);
+            dto.Id = 1;
+            dto.Name = "Existing";
+            dto.Members = KeepingMember(40, "user1");
+
+            await _service.UpdateAsync(dto);
+
+            Assert.That(group.ApprovalAnswers, Is.EqualTo("Answered at creation"));
+        }
+
+        [Test]
+        public async Task Should_Let_An_Edit_Replace_The_Approval_Answers()
+        {
+            var group = new GroupEntity
+            {
+                Id = 1, OrganizationId = 1, Name = "Existing", GroupTypeId = 5,
+                Status = GroupStatus.Approved,
+                ApprovalAnswers = "Answered at creation",
+                Members = new List<GroupMember> { new GroupMember { Id = 40, UserId = "user1" } }
+            };
+
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity> { group });
+
+            var dto = ValidPost(5);
+            dto.Id = 1;
+            dto.Name = "Existing";
+            dto.Members = KeepingMember(40, "user1");
+            dto.ApprovalAnswers = "Revised answers";
+
+            await _service.UpdateAsync(dto);
+
+            Assert.That(group.ApprovalAnswers, Is.EqualTo("Revised answers"));
         }
 
         [Test]
@@ -194,6 +247,61 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Assert.That(forOutsider, Is.Empty);
                 Assert.That(forCreator.Single().IsPending, Is.True);
+            });
+        }
+
+        [Test]
+        public void Should_Hide_A_Pending_Group_From_A_Non_Member_Fetching_It_By_Id()
+        {
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Groups)
+                .Returns(false);
+
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 8, OrganizationId = 1, Name = "Pending force", GroupTypeId = 5,
+                    Status = GroupStatus.Pending,
+                    ApprovalAnswers = "Answered",
+                    Members = new List<GroupMember> { new GroupMember { UserId = "creator" } }
+                }
+            });
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _service.GetAsync(new UserAndOrganizationDto { OrganizationId = 1, UserId = "outsider" }, 8));
+
+            // Reads as missing, so fetching by id does not confirm the group exists.
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupNotFound));
+        }
+
+        [Test]
+        public async Task Should_Show_A_Pending_Group_By_Id_To_Its_Members_And_To_Administrators()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 8, OrganizationId = 1, Name = "Pending force", GroupTypeId = 5,
+                    Status = GroupStatus.Pending,
+                    Members = new List<GroupMember> { new GroupMember { UserId = "creator" } }
+                }
+            });
+
+            var forAdmin = await _service.GetAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, 8);
+
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Groups)
+                .Returns(false);
+
+            var forCreator = await _service.GetAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "creator" }, 8);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(forAdmin.IsPending, Is.True);
+                Assert.That(forCreator.IsPending, Is.True);
             });
         }
 
@@ -288,7 +396,7 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = 1, OrganizationId = 1, Name = "Existing", GroupTypeId = 1,
                 Status = GroupStatus.Approved,
-                Members = new List<GroupMember> { new GroupMember { UserId = "user1" } }
+                Members = new List<GroupMember> { new GroupMember { Id = 40, UserId = "user1" } }
             };
 
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity> { approved });
@@ -297,6 +405,7 @@ namespace Shrooms.Premium.Tests.DomainService
             dto.Id = 1;
             dto.Name = "Renamed by a member";
             dto.UserId = "user1";
+            dto.Members = KeepingMember(40, "user1");
 
             await _service.UpdateAsync(dto);
 
@@ -318,7 +427,7 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = 1, OrganizationId = 1, Name = "Draft", GroupTypeId = 1,
                 Status = GroupStatus.Pending,
-                Members = new List<GroupMember> { new GroupMember { UserId = "user1" } }
+                Members = new List<GroupMember> { new GroupMember { Id = 40, UserId = "user1" } }
             };
 
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity> { pending });
@@ -327,6 +436,7 @@ namespace Shrooms.Premium.Tests.DomainService
             dto.Id = 1;
             dto.Name = "Reshaped draft";
             dto.UserId = "user1";
+            dto.Members = KeepingMember(40, "user1");
 
             await _service.UpdateAsync(dto);
 
@@ -508,6 +618,31 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public void Should_Throw_When_A_Member_Drops_An_Open_Ended_Membership()
+        {
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Groups)
+                .Returns(false);
+
+            // A membership with no start date is open-ended - it counts as a current member
+            // everywhere else, so it cannot be dropped without a trace either.
+            var group = GroupWithMember(new GroupMember { Id = 40, UserId = "user1" });
+            group.Members.Add(new GroupMember { Id = 41, UserId = "user2" });
+
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity> { group });
+
+            var dto = EditPostFor(group);
+            dto.Members = new List<GroupMemberPostDto>
+            {
+                new GroupMemberPostDto { MembershipId = 40, Id = "user1" }
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _service.UpdateAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupMemberCannotBeRemoved));
+        }
+
+        [Test]
         public async Task Should_Let_An_Administrator_Drop_A_Membership_That_Has_Started()
         {
             var group = GroupWithMember(new GroupMember
@@ -575,6 +710,7 @@ namespace Shrooms.Premium.Tests.DomainService
             dto.Name = "Existing";
             dto.UserId = "user1";
             dto.Description = "Edited by a member";
+            dto.Members = KeepingMember(40, "user1");
 
             await _service.UpdateAsync(dto);
 

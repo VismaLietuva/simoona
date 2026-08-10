@@ -35,14 +35,16 @@ namespace Shrooms.DataLayer.EntityModels.Models.Group
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        /// The membership has begun, so it is a matter of record rather than a plan.
+        /// A membership with no start date is open-ended and counts as begun, matching
+        /// how <see cref="IsActiveDuring"/> reads a missing start date.
+        /// </summary>
+        public bool HasStarted(DateTime asOf) => !StartDate.HasValue || StartDate.Value <= asOf;
+
+        /// <summary>
         /// True when the membership overlaps the given period at all - someone who was
         /// a member for any part of the month counts as a member for that month.
         /// </summary>
-        /// <summary>
-        /// The membership has begun, so it is a matter of record rather than a plan.
-        /// </summary>
-        public bool HasStarted(DateTime asOf) => StartDate.HasValue && StartDate.Value <= asOf;
-
         public bool IsActiveDuring(DateTime periodStart, DateTime periodEnd)
         {
             return (StartDate == null || StartDate <= periodEnd)

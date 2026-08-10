@@ -76,5 +76,6 @@
         public const int GroupApprovalAnswersRequired = 1713;
         public const int GroupDeleteNotAllowed = 1714;
         public const int GroupMemberCannotBeRemoved = 1715;
+        public const int GroupInvalidKudosPeriod = 1716;
     }
 }

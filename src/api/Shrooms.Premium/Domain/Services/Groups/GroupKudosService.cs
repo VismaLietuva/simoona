@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -34,14 +36,18 @@ namespace Shrooms.Premium.Domain.Services.Groups
         /// Those are summed per person and per kudos type, so someone in three food teams
         /// gets three times that type's value.
         /// Temporary groups are excluded: they pay out once at the end of their term,
-        /// not every month.
+        /// not every month. So are groups still awaiting approval - a proposal has not
+        /// earned anything yet.
         /// </summary>
         public async Task<IEnumerable<GroupKudosAllocationDto>> GetAllocationsAsync(int organizationId, int year, int month)
         {
+            EnsurePeriodIsValid(year, month);
+
             var groups = await _groupsDbSet
                 .Include(g => g.GroupType).ThenInclude(t => t.KudosType)
                 .Include(g => g.Members)
                 .Where(g => g.OrganizationId == organizationId
+                         && g.Status == GroupStatus.Approved
                          && g.GroupType.KudosTypeId != null
                          && !g.GroupType.IsTemporary)
                 .ToListAsync();
@@ -76,8 +82,11 @@ namespace Shrooms.Premium.Domain.Services.Groups
         }
 
         /// <summary>
-        /// Writes one approved KudosLog entry per allocated member. Not idempotent - the
-        /// external job owns scheduling, so calling it twice for a month awards twice.
+        /// Writes one pending KudosLog entry per allocated member, so the monthly run goes
+        /// through the same approval a kudos admin gives anything else. Profile balances
+        /// are recomputed on approval, not here - a pending log counts towards nothing.
+        /// Not idempotent - the external job owns scheduling, so calling it twice for a
+        /// month awards twice.
         /// </summary>
         public async Task<GroupMonthlyKudosResultDto> AwardMonthlyKudosAsync(
             UserAndOrganizationDto userAndOrg,
@@ -102,7 +111,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
                     KudosTypeName = kudosType?.Name,
                     KudosTypeValue = kudosType?.Value ?? 1,
                     KudosSystemType = KudosTypeEnum.Ordinary,
-                    Status = KudosStatus.Approved,
+                    Status = KudosStatus.Pending,
                     Points = allocation.Amount,
                     MultiplyBy = 1,
                     Comments = $"Monthly group kudos for {string.Join(", ", allocation.GroupNames)}",
@@ -124,6 +133,20 @@ namespace Shrooms.Premium.Domain.Services.Groups
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Year and month arrive straight off the query string, and the period is built
+        /// from them - an out-of-range value would otherwise surface as a 500.
+        /// </summary>
+        private static void EnsurePeriodIsValid(int year, int month)
+        {
+            if (year < 1 || year > 9999 || month < 1 || month > 12)
+            {
+                throw new ValidationException(
+                    ErrorCodes.GroupInvalidKudosPeriod,
+                    "Year must be between 1 and 9999, and month between 1 and 12");
+            }
         }
     }
 }

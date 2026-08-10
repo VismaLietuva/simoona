@@ -67,6 +67,16 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 throw new ValidationException(ErrorCodes.GroupNotFound, "Group does not exist");
             }
 
+            // Same rule as GetAllAsync - a group awaiting approval is only visible to its
+            // members and to administrators. It reads as missing to everyone else, so
+            // fetching one by id does not confirm that it exists.
+            if (group.IsPending
+                && !IsActiveMember(group, userAndOrg.UserId)
+                && !await _permissionService.UserHasPermissionAsync(userAndOrg, AdministrationPermissions.Groups))
+            {
+                throw new ValidationException(ErrorCodes.GroupNotFound, "Group does not exist");
+            }
+
             return MapToDto(group, DateTime.UtcNow, userAndOrg.UserId);
         }
 
@@ -153,6 +163,14 @@ namespace Shrooms.Premium.Domain.Services.Groups
             }
 
             var type = await GetTypeAsync(dto.GroupTypeId, dto.OrganizationId);
+
+            // ApplyPost overwrites the stored answers, and nothing on the edit form has to
+            // send them back, so an omitted field would erase the group's record of why it
+            // exists. Carry the stored answers over instead of deleting them.
+            if (string.IsNullOrWhiteSpace(dto.ApprovalAnswers))
+            {
+                dto.ApprovalAnswers = group.ApprovalAnswers;
+            }
 
             await ValidateAsync(dto, type, dto.Id);
 
@@ -304,7 +322,8 @@ namespace Shrooms.Premium.Domain.Services.Groups
 
         /// <summary>
         /// A type that needs approval asks its questions up front, so the answers are
-        /// required from anyone whose group will actually go through approval.
+        /// required from anyone whose group will actually go through approval. An
+        /// administrator approves their own group, so they are not asked.
         /// </summary>
         private static void ValidateApprovalAnswers(GroupType type, GroupPostDto dto, bool isAdmin)
         {

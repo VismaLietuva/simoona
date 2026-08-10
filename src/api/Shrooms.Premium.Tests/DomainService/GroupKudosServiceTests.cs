@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Domain.Services.Groups;
@@ -68,6 +71,7 @@ namespace Shrooms.Premium.Tests.DomainService
             Name = name,
             GroupTypeId = 3,
             GroupType = KudosReceivingType(),
+            Status = GroupStatus.Approved,
             Members = members.ToList()
         };
 
@@ -81,6 +85,7 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = 4, OrganizationId = 1, Name = "Book club", GroupTypeId = 1,
                 GroupType = new GroupType { Id = 1, OrganizationId = 1, Name = "Other" },
+                Status = GroupStatus.Approved,
                 Members = new List<GroupMember> { Member("alice"), Member("bob") }
             }
         };
@@ -119,6 +124,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 5, OrganizationId = 1, Name = "Task force", GroupTypeId = 3,
                     GroupType = temporaryType,
+                    Status = GroupStatus.Approved,
                     Members = new List<GroupMember> { Member("alice") }
                 }
             });
@@ -126,6 +132,24 @@ namespace Shrooms.Premium.Tests.DomainService
             var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
 
             Assert.That(allocations, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Exclude_Groups_Still_Awaiting_Approval()
+        {
+            // A proposal has not earned anything yet, so it pays nobody until it is approved.
+            var pending = KudosGroup(6, "Proposed team", Member("alice"));
+            pending.Status = GroupStatus.Pending;
+
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                pending,
+                KudosGroup(1, "Team A", Member("bob"))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.That(allocations.Select(a => a.UserId), Is.EquivalentTo(new[] { "bob" }));
         }
 
         [Test]
@@ -193,7 +217,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Write_One_Approved_Kudos_Log_Per_Allocated_Member()
+        public async Task Should_Write_One_Pending_Kudos_Log_Per_Allocated_Member()
         {
             var userAndOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" };
 
@@ -205,10 +229,39 @@ namespace Shrooms.Premium.Tests.DomainService
                 Assert.That(result.TotalAmount, Is.EqualTo(20));
             });
 
+            // Pending, so a kudos administrator still approves the monthly run. Approval is
+            // what recomputes the profile balance; nothing here should touch it.
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(l =>
-                l.EmployeeId == "alice" && l.Points == 15 && l.Status == KudosStatus.Approved));
+                l.EmployeeId == "alice" && l.Points == 15 && l.Status == KudosStatus.Pending));
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(l =>
-                l.EmployeeId == "bob" && l.Points == 5 && l.Status == KudosStatus.Approved));
+                l.EmployeeId == "bob" && l.Points == 5 && l.Status == KudosStatus.Pending));
+        }
+
+        [Test]
+        public async Task Should_Not_Save_When_Nothing_Was_Awarded()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>());
+
+            var result = await _service.AwardMonthlyKudosAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, Year, Month);
+
+            Assert.That(result.AwardedCount, Is.Zero);
+
+            await _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync(default(string));
+        }
+
+        [TestCase(2026, 13)]
+        [TestCase(2026, 0)]
+        [TestCase(0, 8)]
+        [TestCase(10000, 8)]
+        public void Should_Reject_A_Period_That_Is_Not_A_Real_Month(int year, int month)
+        {
+            // year and month come off the query string; an out-of-range pair used to reach
+            // new DateTime(...) and surface as a 500.
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _service.GetAllocationsAsync(1, year, month));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupInvalidKudosPeriod));
         }
     }
 }
