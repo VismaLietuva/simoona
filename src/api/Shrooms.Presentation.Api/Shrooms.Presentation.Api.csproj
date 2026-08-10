@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="Hangfire.SqlServer" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

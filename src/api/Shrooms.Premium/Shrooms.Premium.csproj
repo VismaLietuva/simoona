@@ -23,6 +23,7 @@
     <PackageReference Include="Google.Apis.Core" />
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Ical.Net" />
+    <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="X.PagedList" />
     <PackageReference Include="X.PagedList.EF" />
   </ItemGroup>

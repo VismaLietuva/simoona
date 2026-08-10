@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj" />
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ExcelGenerator\IExcelBuilder.cs" />
