@@ -16,17 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExcelDataReader" Version="3.7.0" />
-    <PackageReference Include="Google.Apis" Version="1.68.0" />
-    <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
-    <PackageReference Include="Google.Apis.Books.v1" Version="1.68.0.3331" />
-    <PackageReference Include="Google.Apis.Core" Version="1.68.0" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
-    <PackageReference Include="Ical.Net" Version="4.3.0" />
-    <PackageReference Include="NodaTime" Version="3.2.0" />
-    <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="X.PagedList" Version="10.5.9" />
-    <PackageReference Include="X.PagedList.EF" Version="10.5.9" />
+    <PackageReference Include="ExcelDataReader" />
+    <PackageReference Include="Google.Apis" />
+    <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="Google.Apis.Books.v1" />
+    <PackageReference Include="Google.Apis.Core" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Ical.Net" />
+    <PackageReference Include="X.PagedList" />
+    <PackageReference Include="X.PagedList.EF" />
   </ItemGroup>
 
   <ItemGroup>
