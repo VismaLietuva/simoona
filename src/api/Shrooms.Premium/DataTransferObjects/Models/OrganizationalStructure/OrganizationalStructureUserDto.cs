@@ -10,6 +10,8 @@
 
         public string LastName { get; set; }
 
+        public string JobTitle { get; set; }
+
         public string PictureId { get; set; }
 
         public bool IsManagingDirector { get; set; }
