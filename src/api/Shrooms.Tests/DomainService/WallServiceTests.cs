@@ -981,7 +981,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Event_Wall_Posts_With_Event_Id_In_Followed_Feed()
         {
             // Arrange
-            var eventId = MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            var eventId = MockPostsForFollowedFeed();
             MockEventPermission(true);
 
             // Act
@@ -999,7 +999,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Not_Return_Event_Wall_Posts_For_Filters_Other_Than_Followed(WallsListFilter filter)
         {
             // Arrange
-            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            MockPostsForFollowedFeed();
             MockEventPermission(true);
 
             // Act
@@ -1013,7 +1013,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Not_Return_Event_Wall_Posts_When_User_Has_No_Event_Permission()
         {
             // Arrange
-            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            MockPostsForFollowedFeed();
             MockEventPermission(false);
 
             // Act
@@ -1023,32 +1023,11 @@ namespace Shrooms.Tests.DomainService
             Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
         }
 
-        [TestCase(1, true)]
-        [TestCase(-29, true)]
-        [TestCase(-31, false)]
-        public async Task Should_Return_Event_Wall_Posts_Only_Until_A_Month_After_The_Event_Ended(int endDateOffsetInDays, bool shouldBeReturned)
-        {
-            // Arrange. The conversation is as stale as the event, so the end date
-            // alone decides.
-            MockPostsForFollowedFeed(
-                DateTime.UtcNow.AddDays(endDateOffsetInDays),
-                eventPostLastActivity: DateTime.UtcNow.AddDays(endDateOffsetInDays));
-            MockEventPermission(true);
-
-            // Act
-            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
-
-            // Assert
-            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.EqualTo(shouldBeReturned));
-        }
-
         [Test]
-        public async Task Should_Return_Event_Wall_Posts_While_The_Conversation_Is_Still_Active()
+        public async Task Should_Return_Event_Wall_Posts_Long_After_The_Event_Ended()
         {
             // Arrange
-            MockPostsForFollowedFeed(
-                DateTime.UtcNow.AddDays(-90),
-                eventPostLastActivity: DateTime.UtcNow.AddDays(-1));
+            MockPostsForFollowedFeed(eventEndDate: DateTime.UtcNow.AddYears(-2), eventPostLastActivity: DateTime.UtcNow.AddYears(-2));
             MockEventPermission(true);
 
             // Act
@@ -1062,7 +1041,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Not_Return_Event_Wall_Posts_When_User_Did_Not_Join_The_Event()
         {
             // Arrange
-            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1), isEventWallMember: false);
+            MockPostsForFollowedFeed(isEventWallMember: false);
             MockEventPermission(true);
 
             // Act
@@ -1076,7 +1055,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Not_Return_Event_Wall_Posts_From_Another_Organization()
         {
             // Arrange
-            MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1), eventOrganizationId: 3);
+            MockPostsForFollowedFeed(eventOrganizationId: 3);
             MockEventPermission(true);
 
             // Act
@@ -1090,7 +1069,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Event_Id_For_A_Single_Event_Wall_Post()
         {
             // Arrange
-            var eventId = MockPostsForFollowedFeed(DateTime.UtcNow.AddDays(-1));
+            var eventId = MockPostsForFollowedFeed();
 
             // Act
             var eventPost = await _wallService.GetWallPostAsync(FeedUser(), EventWallId);
@@ -1113,10 +1092,10 @@ namespace Shrooms.Tests.DomainService
 
         // Wall 1 is a user created wall the user follows, wall 2 is the wall of an event the user joined; each holds one post with the same id as its wall.
         private Guid MockPostsForFollowedFeed(
-            DateTime eventEndDate,
             bool isEventWallMember = true,
             int eventOrganizationId = 2,
-            DateTime? eventPostLastActivity = null)
+            DateTime? eventPostLastActivity = null,
+            DateTime? eventEndDate = null)
         {
             var followedWallMember = new WallMember { Id = 1, UserId = FeedUserId, WallId = FollowedWallId };
             var eventWallMembers = isEventWallMember
@@ -1139,7 +1118,7 @@ namespace Shrooms.Tests.DomainService
                 Id = EventWallId,
                 Name = "Event wall",
                 Type = WallType.Events,
-                OrganizationId = 2,
+                OrganizationId = eventOrganizationId,
                 Members = eventWallMembers,
                 Moderators = new List<WallModerator>(),
                 Posts = new List<Post>()
@@ -1169,8 +1148,6 @@ namespace Shrooms.Tests.DomainService
 
             var posts = new List<Post> { followedWallPost, eventWallPost };
 
-            // The feed matches event walls on post activity, so the navigation
-            // collections have to mirror the posts set, not stay empty.
             followedWall.Posts = new List<Post> { followedWallPost };
             eventWall.Posts = new List<Post> { eventWallPost };
 
@@ -1184,7 +1161,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = eventOrganizationId,
                     WallId = EventWallId,
                     Wall = eventWall,
-                    EndDate = eventEndDate
+                    EndDate = eventEndDate ?? DateTime.UtcNow.AddDays(-1)
                 }
             };
 

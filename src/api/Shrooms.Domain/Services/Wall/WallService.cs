@@ -31,11 +31,6 @@ namespace Shrooms.Domain.Services.Wall
     {
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        // How long an event's wall keeps feeding the followed-walls post feed,
-        // measured from whichever is later: the event ending, or its last post
-        // activity. Discussion often outlives the event itself.
-        private const int EventWallFeedRecentDays = 30;
-
         private readonly IMapper _mapper;
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
@@ -695,6 +690,7 @@ namespace Shrooms.Domain.Services.Wall
             }
 
             List<int> wallsIds;
+            var includeEventWalls = false;
 
             if (wallId.HasValue && WallIsValid(userOrg, wallId.Value))
             {
@@ -703,11 +699,9 @@ namespace Shrooms.Domain.Services.Wall
             else
             {
                 wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
-
-                if (wallsListFilter == WallsListFilter.Followed)
-                {
-                    wallsIds.AddRange(await GetRecentEventWallIdsAsync(userOrg));
-                }
+                // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
+                includeEventWalls = wallsListFilter == WallsListFilter.Followed &&
+                                    await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event);
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
@@ -715,14 +709,15 @@ namespace Shrooms.Domain.Services.Wall
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
-                .Where(post => wallsIds.Contains(post.WallId))
+                .Where(BuildWallScope(userOrg, wallsIds, includeEventWalls))
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
                 .Skip(entriesCountToSkip)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
+            var postWallIds = posts.Select(post => post.WallId).Distinct().ToList();
+            var moderators = await _moderatorsDbSet.Where(x => postWallIds.Contains(x.WallId)).ToListAsync();
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
             var users = await GetUsersAsync(posts);
 
@@ -765,33 +760,18 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        // Walls of events the user joined or hosts, dropped from the feed once
-        // both the event and its conversation have gone quiet. Kept out of
-        // GetWallsListAsync on purpose: event walls must not show up in the wall
-        // lists that feed the sidebar.
-        private async Task<List<int>> GetRecentEventWallIdsAsync(UserAndOrganizationDto userOrg)
+        // Event walls are matched by predicate, not id: they must stay out of GetWallsListAsync, which feeds the sidebar.
+        private static Expression<Func<Post, bool>> BuildWallScope(UserAndOrganizationDto userOrg, List<int> wallsIds, bool includeEventWalls)
         {
-            // Users without event access get no event posts. Note the endpoint
-            // itself is gated on BasicPermissions.Post, so a user who can see
-            // events but cannot post still gets nothing from this feed.
-            if (!await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event))
+            if (!includeEventWalls)
             {
-                return new List<int>();
+                return post => wallsIds.Contains(post.WallId);
             }
 
-            var recentSince = DateTime.UtcNow.AddDays(-EventWallFeedRecentDays);
-
-            // Matching on activity as well as the end date keeps a live thread —
-            // the photos and thanks that land after an event — in the feed, and
-            // stops a long-finished event resurfacing on one stray comment.
-            return await _eventsDbSet
-                .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
-                                 (@event.EndDate >= recentSince ||
-                                  @event.Wall.Posts.Any(post => post.LastActivity >= recentSince)) &&
-                                 @event.Wall.Members.Any(member => member.UserId == userOrg.UserId))
-                .Select(@event => @event.WallId)
-                .Distinct()
-                .ToListAsync();
+            return post => wallsIds.Contains(post.WallId) ||
+                           (post.Wall.Type == WallType.Events &&
+                            post.Wall.OrganizationId == userOrg.OrganizationId &&
+                            post.Wall.Members.Any(member => member.UserId == userOrg.UserId));
         }
 
         private async Task<List<ApplicationUser>> GetUsersAsync(IReadOnlyCollection<Post> posts)
