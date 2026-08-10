@@ -132,7 +132,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                     Arg.Is<NewCustomEmojiDto>(x => x.Name == "party-parrot" && x.MimeType == "image/png" && x.FileName == "emoji.png"),
                     Arg.Any<UserAndOrganizationDto>(),
                     Arg.Any<string>())
-                .Returns(new CustomEmojiDto { Id = 1, Name = "party-parrot", Url = "/storage/visma/a.png", AuthorId = "1" });
+                .Returns(new CustomEmojiDto { Id = 1, Name = "party-parrot", Url = "/storage/visma/a.png", CreatedBy = "1" });
 
             var result = await _emojiController.Create("party-parrot", file);
 

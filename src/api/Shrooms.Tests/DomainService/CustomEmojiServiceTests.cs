@@ -24,6 +24,7 @@ namespace Shrooms.Tests.DomainService
     [TestFixture]
     public class CustomEmojiServiceTests
     {
+        private IUnitOfWork2 _uow;
         private DbSet<CustomEmoji> _customEmojisDbSet;
         private IPictureService _pictureService;
         private IPermissionService _permissionService;
@@ -41,9 +42,9 @@ namespace Shrooms.Tests.DomainService
         [SetUp]
         public void TestInitializer()
         {
-            var uow = Substitute.For<IUnitOfWork2>();
+            _uow = Substitute.For<IUnitOfWork2>();
 
-            _customEmojisDbSet = uow.MockDbSetForAsync<CustomEmoji>();
+            _customEmojisDbSet = _uow.MockDbSetForAsync<CustomEmoji>();
 
             _pictureService = Substitute.For<IPictureService>();
             _permissionService = Substitute.For<IPermissionService>();
@@ -51,7 +52,7 @@ namespace Shrooms.Tests.DomainService
             _emojiListCache = new CustomCache<int, EmojiListCacheEntry>();
             _generationCache = new CustomCache<int, long>();
 
-            _customEmojiService = new CustomEmojiService(uow, _pictureService, _permissionService, _validator, _emojiListCache, _generationCache);
+            _customEmojiService = new CustomEmojiService(_uow, _pictureService, _permissionService, _validator, _emojiListCache, _generationCache);
         }
 
         [Test]
@@ -78,12 +79,13 @@ namespace Shrooms.Tests.DomainService
                 Arg.Is<CustomEmoji>(x =>
                     x.Name == "party-parrot" &&
                     x.BlobName == "blob-guid.png" &&
-                    x.AuthorId == "user1" &&
                     x.OrganizationId == 2));
+
+            // Authorship comes from the CreatedBy audit column, stamped by the save.
+            await _uow.Received().SaveChangesAsync("user1");
 
             Assert.That(result.Name, Is.EqualTo("party-parrot"));
             Assert.That(result.Url, Is.EqualTo("/storage/visma/blob-guid.png"));
-            Assert.That(result.AuthorId, Is.EqualTo("user1"));
         }
 
         [Test]
@@ -121,11 +123,11 @@ namespace Shrooms.Tests.DomainService
             var emojis = new List<CustomEmoji>
             {
                 new()
-                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = false },
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", CreatedBy = "user1", OrganizationId = 2 },
                 new()
-                    { Id = 2, Name = "ship-it", BlobName = "b.png", AuthorId = "user2", OrganizationId = 2, IsDeleted = false },
+                    { Id = 2, Name = "ship-it", BlobName = "b.png", CreatedBy = "user2", OrganizationId = 2 },
                 new()
-                    { Id = 3, Name = "other-org", BlobName = "c.png", AuthorId = "user3", OrganizationId = 3, IsDeleted = false }
+                    { Id = 3, Name = "other-org", BlobName = "c.png", CreatedBy = "user3", OrganizationId = 3 }
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
@@ -138,18 +140,39 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Not_Return_Soft_Deleted_Emojis()
+        public void Should_Throw_When_Deleting_Emoji_Without_Creator_And_Without_Admin_Permission()
         {
-            var emojis = new List<CustomEmoji>
+            var emoji = new CustomEmoji
             {
-                new()
-                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = true }
+                Id = 1,
+                Name = "party-parrot",
+                BlobName = "a.gif",
+                CreatedBy = null,
+                OrganizationId = 2
             };
-            _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(false);
 
-            var result = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _customEmojiService.DeleteAsync(1, _userOrg));
+        }
 
-            Assert.That(result.Emojis, Is.Empty);
+        [Test]
+        public async Task Should_Delete_Emoji_Without_Creator_When_Admin()
+        {
+            var emoji = new CustomEmoji
+            {
+                Id = 1,
+                Name = "party-parrot",
+                BlobName = "a.gif",
+                CreatedBy = null,
+                OrganizationId = 2
+            };
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(true);
+
+            await _customEmojiService.DeleteAsync(1, _userOrg);
+
+            _customEmojisDbSet.Received().Remove(Arg.Is<CustomEmoji>(x => x.Id == 1));
         }
 
         [Test]
@@ -160,15 +183,51 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 Name = "party-parrot",
                 BlobName = "a.gif",
-                AuthorId = "user1",
-                OrganizationId = 2,
-                IsDeleted = false
+                CreatedBy = "user1",
+                OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
 
             await _customEmojiService.DeleteAsync(1, _userOrg);
 
             _customEmojisDbSet.Received().Remove(Arg.Is<CustomEmoji>(x => x.Id == 1));
+        }
+
+        [Test]
+        public async Task Should_Remove_Image_From_Storage_When_Deleting()
+        {
+            var emoji = new CustomEmoji
+            {
+                Id = 1,
+                Name = "party-parrot",
+                BlobName = "a.gif",
+                CreatedBy = "user1",
+                OrganizationId = 2
+            };
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+
+            await _customEmojiService.DeleteAsync(1, _userOrg);
+
+            await _pictureService.Received(1).RemoveImageAsync("a.gif", 2);
+        }
+
+        [Test]
+        public void Should_Not_Remove_Image_From_Storage_When_Delete_Is_Not_Authorized()
+        {
+            var emoji = new CustomEmoji
+            {
+                Id = 1,
+                Name = "party-parrot",
+                BlobName = "a.gif",
+                CreatedBy = "user2",
+                OrganizationId = 2
+            };
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(false);
+
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _customEmojiService.DeleteAsync(1, _userOrg));
+
+            _pictureService.DidNotReceive().RemoveImageAsync(Arg.Any<string>(), Arg.Any<int>());
         }
 
         [Test]
@@ -179,9 +238,8 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 Name = "party-parrot",
                 BlobName = "a.gif",
-                AuthorId = "user2",
-                OrganizationId = 2,
-                IsDeleted = false
+                CreatedBy = "user2",
+                OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
             _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(true);
@@ -199,9 +257,8 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 Name = "party-parrot",
                 BlobName = "a.gif",
-                AuthorId = "user2",
-                OrganizationId = 2,
-                IsDeleted = false
+                CreatedBy = "user2",
+                OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
             _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(false);
@@ -225,7 +282,7 @@ namespace Shrooms.Tests.DomainService
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
             {
                 new()
-                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = false }
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", CreatedBy = "user1", OrganizationId = 2 }
             }.AsQueryable());
 
             var first = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
@@ -271,9 +328,8 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 Name = "party-parrot",
                 BlobName = "a.gif",
-                AuthorId = "user1",
-                OrganizationId = 2,
-                IsDeleted = false
+                CreatedBy = "user1",
+                OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
 
@@ -287,12 +343,31 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Increment_Generation_Once_Per_Mutation()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
+            {
+                new()
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", CreatedBy = "user1", OrganizationId = 2 },
+                new()
+                    { Id = 2, Name = "ship-it", BlobName = "b.png", CreatedBy = "user1", OrganizationId = 2 }
+            }.AsQueryable());
+
+            await _customEmojiService.DeleteAsync(1, _userOrg);
+            await _customEmojiService.DeleteAsync(2, _userOrg);
+
+            _generationCache.TryGetValue(2, out var generation);
+
+            Assert.That(generation, Is.EqualTo(2));
+        }
+
+        [Test]
         public async Task Should_Ignore_Cached_List_When_Generation_Changed()
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
             {
                 new()
-                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", AuthorId = "user1", OrganizationId = 2, IsDeleted = false }
+                    { Id = 1, Name = "party-parrot", BlobName = "a.gif", CreatedBy = "user1", OrganizationId = 2 }
             }.AsQueryable());
 
             var first = await _customEmojiService.GetAllAsync(_userOrg, "Visma");

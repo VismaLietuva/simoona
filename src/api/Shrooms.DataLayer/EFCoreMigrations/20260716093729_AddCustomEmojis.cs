@@ -19,23 +19,15 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     BlobName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     OrganizationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CustomEmojis", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomEmojis_AspNetUsers_AuthorId",
-                        column: x => x.AuthorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CustomEmojis_Organizations_OrganizationId",
                         column: x => x.OrganizationId,
@@ -45,16 +37,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomEmojis_AuthorId",
-                table: "CustomEmojis",
-                column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CustomEmojis_OrganizationId_Name",
                 table: "CustomEmojis",
                 columns: new[] { "OrganizationId", "Name" },
-                unique: true,
-                filter: "[IsDeleted] = 0");
+                unique: true);
 
             migrationBuilder.Sql(@"
 IF NOT EXISTS (SELECT 1 FROM dbo.Permissions WHERE Name = N'CUSTOMEMOJI_BASIC')

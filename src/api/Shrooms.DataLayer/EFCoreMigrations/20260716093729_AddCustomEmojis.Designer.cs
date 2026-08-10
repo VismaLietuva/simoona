@@ -1137,10 +1137,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AuthorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("BlobName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1151,9 +1147,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
@@ -1171,12 +1164,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
-
                     b.HasIndex("OrganizationId", "Name")
                         .IsUnique()
-                        .HasDatabaseName("IX_CustomEmojis_OrganizationId_Name")
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasDatabaseName("IX_CustomEmojis_OrganizationId_Name");
 
                     b.ToTable("CustomEmojis");
                 });
@@ -3843,19 +3833,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Emoji.CustomEmoji", b =>
                 {
-                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Author");
 
                     b.Navigation("Organization");
                 });

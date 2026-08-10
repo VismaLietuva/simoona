@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Emoji
 {
-    public class CustomEmoji : SoftDeletableModelWithOrg
+    public class CustomEmoji : BaseModelWithOrg
     {
         [Required]
         [StringLength(50)]
@@ -10,10 +10,5 @@ namespace Shrooms.DataLayer.EntityModels.Models.Emoji
 
         [Required]
         public string BlobName { get; set; }
-
-        [Required]
-        public string AuthorId { get; set; }
-
-        public ApplicationUser Author { get; set; }
     }
 }

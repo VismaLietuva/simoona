@@ -32,7 +32,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.Emoji
 
         public async Task CheckIfNameIsTakenAsync(string name, int organizationId)
         {
-            if (await _customEmojisDbSet.AnyAsync(x => x.OrganizationId == organizationId && x.Name == name && !x.IsDeleted))
+            if (await _customEmojisDbSet.AnyAsync(x => x.OrganizationId == organizationId && x.Name == name))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Emoji name already exists");
             }

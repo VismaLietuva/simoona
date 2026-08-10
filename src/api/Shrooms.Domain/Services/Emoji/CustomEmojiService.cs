@@ -55,7 +55,7 @@ namespace Shrooms.Domain.Services.Emoji
             var tenant = tenantName.ToLowerInvariant();
 
             var emojis = await _customEmojisDbSet
-                .Where(x => x.OrganizationId == userOrg.OrganizationId && !x.IsDeleted)
+                .Where(x => x.OrganizationId == userOrg.OrganizationId)
                 .OrderBy(x => x.Name)
                 .ToListAsync();
 
@@ -85,7 +85,6 @@ namespace Shrooms.Domain.Services.Emoji
             {
                 Name = emojiDto.Name,
                 BlobName = blobName,
-                AuthorId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
@@ -100,15 +99,17 @@ namespace Shrooms.Domain.Services.Emoji
         public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
         {
             var emoji = await _customEmojisDbSet
-                .FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == userOrg.OrganizationId && !x.IsDeleted);
+                .FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == userOrg.OrganizationId);
 
             if (emoji == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Emoji does not exist");
             }
 
-            if (emoji.AuthorId != userOrg.UserId &&
-                !await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.CustomEmoji))
+            // An emoji with no CreatedBy has no owner to match against, so it is admin-only.
+            var isOwner = !string.IsNullOrEmpty(emoji.CreatedBy) && emoji.CreatedBy == userOrg.UserId;
+
+            if (!isOwner && !await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.CustomEmoji))
             {
                 throw new UnauthorizedException();
             }
@@ -117,6 +118,8 @@ namespace Shrooms.Domain.Services.Emoji
             await _uow.SaveChangesAsync(userOrg.UserId);
             BumpGeneration(userOrg.OrganizationId);
             _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
+
+            await _pictureService.RemoveImageAsync(emoji.BlobName, userOrg.OrganizationId);
         }
 
         private long GetGeneration(int organizationId)
@@ -126,22 +129,7 @@ namespace Shrooms.Domain.Services.Emoji
 
         private void BumpGeneration(int organizationId)
         {
-            while (true)
-            {
-                if (_generationCache.TryGetValue(organizationId, out var current))
-                {
-                    _generationCache.TryRemoveEntry(organizationId);
-
-                    if (_generationCache.TryAdd(organizationId, current + 1))
-                    {
-                        return;
-                    }
-                }
-                else if (_generationCache.TryAdd(organizationId, 1))
-                {
-                    return;
-                }
-            }
+            _generationCache.AddOrUpdate(organizationId, 1, (_, current) => current + 1);
         }
 
         private static CustomEmojiDto MapToDto(CustomEmojiEntity emoji, string tenant)
@@ -151,7 +139,7 @@ namespace Shrooms.Domain.Services.Emoji
                 Id = emoji.Id,
                 Name = emoji.Name,
                 Url = $"/storage/{tenant}/{emoji.BlobName}",
-                AuthorId = emoji.AuthorId
+                CreatedBy = emoji.CreatedBy
             };
         }
     }

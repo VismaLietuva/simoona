@@ -8,6 +8,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.Emoji
 
         public string Url { get; set; }
 
-        public string AuthorId { get; set; }
+        public string CreatedBy { get; set; }
     }
 }

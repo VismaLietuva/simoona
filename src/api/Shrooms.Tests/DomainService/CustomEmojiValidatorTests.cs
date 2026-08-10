@@ -68,7 +68,7 @@ namespace Shrooms.Tests.DomainService
             var emojis = new List<CustomEmoji>
             {
                 new()
-                    { Id = 1, Name = "party-parrot", OrganizationId = 2, IsDeleted = false }
+                    { Id = 1, Name = "party-parrot", OrganizationId = 2 }
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
@@ -79,25 +79,12 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Not_Throw_If_Name_Was_Soft_Deleted()
-        {
-            var emojis = new List<CustomEmoji>
-            {
-                new()
-                    { Id = 1, Name = "party-parrot", OrganizationId = 2, IsDeleted = true }
-            };
-            _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
-
-            Assert.DoesNotThrowAsync(async () => await _validator.CheckIfNameIsTakenAsync("party-parrot", 2));
-        }
-
-        [Test]
         public void Should_Not_Throw_If_Name_Is_Taken_In_Other_Organization()
         {
             var emojis = new List<CustomEmoji>
             {
                 new()
-                    { Id = 1, Name = "party-parrot", OrganizationId = 3, IsDeleted = false }
+                    { Id = 1, Name = "party-parrot", OrganizationId = 3 }
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
 
