@@ -19,6 +19,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
@@ -40,6 +41,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly DbSet<WallModerator> _moderatorsDbSet;
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
+        private readonly DbSet<Event> _eventsDbSet;
 
         public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService)
         {
@@ -53,6 +55,7 @@ namespace Shrooms.Domain.Services.Wall
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _wallsDbSet = uow.GetDbSet<DataLayer.EntityModels.Models.Multiwall.Wall>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
+            _eventsDbSet = uow.GetDbSet<Event>();
         }
 
         public async Task<int> CreateNewWallAsync(CreateWallDto newWallDto)
@@ -194,7 +197,8 @@ namespace Shrooms.Domain.Services.Wall
                     IsFollowing = x.Type == WallType.Main || x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
                     TotalMembers = x.Members.Count,
-                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls
+                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls,
+                    CreatedBy = x.CreatedBy
                 })
                 .SingleOrDefaultAsync();
 
@@ -247,7 +251,9 @@ namespace Shrooms.Domain.Services.Wall
             var postInList = new List<Post> { post };
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, postInList);
             var users = await GetUsersAsync(postInList);
-            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts);
+            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts).ToList();
+
+            await AssignEventIdsAsync(posts, userOrg);
 
             return posts.FirstOrDefault();
         }
@@ -684,6 +690,7 @@ namespace Shrooms.Domain.Services.Wall
             }
 
             List<int> wallsIds;
+            var includeEventWalls = false;
 
             if (wallId.HasValue && WallIsValid(userOrg, wallId.Value))
             {
@@ -692,6 +699,9 @@ namespace Shrooms.Domain.Services.Wall
             else
             {
                 wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
+                // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
+                includeEventWalls = wallsListFilter == WallsListFilter.Followed &&
+                                    await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event);
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
@@ -699,18 +709,71 @@ namespace Shrooms.Domain.Services.Wall
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
-                .Where(post => wallsIds.Contains(post.WallId))
+                .Where(BuildWallScope(userOrg, wallsIds, includeEventWalls))
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
                 .Skip(entriesCountToSkip)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
+            var postWallIds = posts.Select(post => post.WallId).Distinct().ToList();
+            var moderators = await _moderatorsDbSet.Where(x => postWallIds.Contains(x.WallId)).ToListAsync();
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
             var users = await GetUsersAsync(posts);
 
-            return MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts);
+            var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts).ToList();
+
+            await AssignEventIdsAsync(mappedPosts, userOrg);
+
+            return mappedPosts;
+        }
+
+        // Event walls have no wall page, so posts from them carry the event id to
+        // link to instead.
+        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg)
+        {
+            var eventPosts = posts.Where(post => post.WallType == WallType.Events).ToList();
+
+            if (!eventPosts.Any())
+            {
+                return;
+            }
+
+            var eventWallIds = eventPosts.Select(post => post.WallId).Distinct().ToList();
+
+            // Nothing enforces one event per wall, so group and pick the latest
+            // rather than letting a duplicate throw or vary between requests.
+            var eventIdsByWallId = (await _eventsDbSet
+                    .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
+                                     eventWallIds.Contains(@event.WallId))
+                    .Select(@event => new { @event.WallId, @event.Id, @event.EndDate })
+                    .ToListAsync())
+                .GroupBy(x => x.WallId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderByDescending(x => x.EndDate).ThenBy(x => x.Id).First().Id);
+
+            foreach (var post in eventPosts)
+            {
+                if (eventIdsByWallId.TryGetValue(post.WallId, out var eventId))
+                {
+                    post.EventId = eventId;
+                }
+            }
+        }
+
+        // Event walls are matched by predicate, not id: they must stay out of GetWallsListAsync, which feeds the sidebar.
+        private static Expression<Func<Post, bool>> BuildWallScope(UserAndOrganizationDto userOrg, List<int> wallsIds, bool includeEventWalls)
+        {
+            if (!includeEventWalls)
+            {
+                return post => wallsIds.Contains(post.WallId);
+            }
+
+            return post => wallsIds.Contains(post.WallId) ||
+                           (post.Wall.Type == WallType.Events &&
+                            post.Wall.OrganizationId == userOrg.OrganizationId &&
+                            post.Wall.Members.Any(member => member.UserId == userOrg.UserId));
         }
 
         private async Task<List<ApplicationUser>> GetUsersAsync(IReadOnlyCollection<Post> posts)
@@ -852,7 +915,9 @@ namespace Shrooms.Domain.Services.Wall
                     Type = w.Type,
                     Logo = w.Logo,
                     TotalMembers = w.Members.Count,
-                    PostsCount = w.Posts.Count
+                    PostsCount = w.Posts.Count,
+                    IsHiddenFromAllWalls = w.IsHiddenFromAllWalls,
+                    CreatedBy = w.CreatedBy
                 })
                 .ToListAsync();
 
@@ -874,6 +939,8 @@ namespace Shrooms.Domain.Services.Wall
                     Logo = wall.Logo,
                     TotalMembers = wall.Members.Count,
                     PostsCount = wall.Posts.Count,
+                    IsHiddenFromAllWalls = wall.IsHiddenFromAllWalls,
+                    CreatedBy = wall.CreatedBy,
                     UserId = wallUser.UserId
                 })
                 .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
@@ -886,7 +953,9 @@ namespace Shrooms.Domain.Services.Wall
                     IsFollowing = true,
                     Logo = x.Logo,
                     TotalMembers = x.TotalMembers,
-                    PostsCount = x.PostsCount
+                    PostsCount = x.PostsCount,
+                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls,
+                    CreatedBy = x.CreatedBy
                 })
                 .Distinct()
                 .ToListAsync();

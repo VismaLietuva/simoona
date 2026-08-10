@@ -86,13 +86,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task CreateKudosTypeAsync(NewKudosTypeDto dto)
         {
-            var alreadyExists = await _kudosTypesDbSet
-                .AnyAsync(t => t.Name == dto.Name);
-
-            if (alreadyExists)
-            {
-                throw new ValidationException(444, "Kudos type already exists");
-            }
+            await ValidateKudosTypeNameIsUniqueAsync(dto.Name);
 
             var newType = new KudosType
             {
@@ -120,6 +114,8 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (type.Type == KudosTypeEnum.Ordinary)
             {
+                await ValidateKudosTypeNameIsUniqueAsync(dto.Name, dto.Id);
+
                 type.Name = dto.Name;
                 type.Value = dto.Value;
                 type.Description = dto.Description;
@@ -769,6 +765,23 @@ namespace Shrooms.Domain.Services.Kudos
         private static int EntriesCountToSkip(int pageRequested)
         {
             return (pageRequested - LastPage) * BusinessLayerConstants.MaxKudosLogsPerPage;
+        }
+
+        private async Task ValidateKudosTypeNameIsUniqueAsync(string name, int? excludedTypeId = null)
+        {
+            var lowerCaseName = name?.ToLower();
+
+            var typesWithSameName = _kudosTypesDbSet.Where(type => type.Name.ToLower() == lowerCaseName);
+
+            if (excludedTypeId.HasValue)
+            {
+                typesWithSameName = typesWithSameName.Where(type => type.Id != excludedTypeId.Value);
+            }
+
+            if (await typesWithSameName.AnyAsync())
+            {
+                throw new ValidationException(ErrorCodes.KudosTypeNameAlreadyExists, "Kudos type name should be unique");
+            }
         }
 
         private static KudosTypeDto MapKudosTypesToDto(KudosType kudosType)

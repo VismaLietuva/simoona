@@ -31,6 +31,9 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public string WallName { get; set; }
 
+        // Non-null only for event wall posts — see PostDto.EventId.
+        public Guid? EventId { get; set; }
+
         public DateTime LastActivity { get; set; }
 
         public bool CanModerate { get; set; }

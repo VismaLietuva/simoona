@@ -21,6 +21,7 @@
         public const int SenderReceiverCannotAcceptRejectKudos = 305;
         public const int KudosAlreadyApproved = 306;
         public const int KudosTypeAlreadyDisabled = 307;
+        public const int KudosTypeNameAlreadyExists = 308;
 
         // Wall, 4**
         public const int WallPostNotFoundCode = 402;

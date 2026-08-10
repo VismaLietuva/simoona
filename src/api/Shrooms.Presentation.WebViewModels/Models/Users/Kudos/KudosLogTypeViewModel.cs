@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
+using Shrooms.Contracts.Enums;
+
+namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 {
     public class KudosLogTypeViewModel
     {
@@ -7,5 +9,7 @@
         public string Name { get; set; }
 
         public decimal Value { get; set; }
+
+        public KudosTypeEnum Type { get; set; }
     }
 }

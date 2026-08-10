@@ -91,6 +91,81 @@ namespace Shrooms.Tests.DomainService
 
 
         [Test]
+        public async Task GetPagedEmployeesAsync_ReturnsProfilePictures()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            var employees = GetTestDataForGetPagedEmployeesAsync();
+            var expectedPictureIds = employees.ToDictionary(employee => employee.Id, employee => employee.PictureId);
+
+            _usersDbSet.SetDbSetDataForAsync(employees);
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string> { AdministrationPermissions.ApplicationUser, BasicPermissions.Blacklist });
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto
+            {
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.PictureId == expectedPictureIds[employee.Id]));
+        }
+
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenUserIsNotAdmin_StillReturnsProfilePictures()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            var employees = GetTestDataForGetPagedEmployeesAsync();
+            var expectedPictureIds = employees.ToDictionary(employee => employee.Id, employee => employee.PictureId);
+
+            _usersDbSet.SetDbSetDataForAsync(employees);
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string>());
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto
+            {
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.PictureId == expectedPictureIds[employee.Id]));
+
+            // Proves the hiding path ran, so the pictures above really did survive it.
+            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.PhoneNumber == null));
+        }
+
+        [Test]
         public async Task GetPagedEmployeesAsync_WhenSearchStringIsGiven_ReturnsFilteredEmployees()
         {
             // Arrange
@@ -282,6 +357,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 1,
                     FirstName = "David",
                     LastName = "Peterson",
+                    PictureId = "david-picture",
                     JobPosition = new JobPosition
                     {
                         Title = "Awesome job"
@@ -302,6 +378,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 1,
                     FirstName = "Anton",
                     LastName = "Peterson",
+                    PictureId = "anton-picture",
                     JobPosition = new JobPosition
                     {
                         Title = "Awesome job"
@@ -322,6 +399,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 1,
                     FirstName = "Borat",
                     LastName = "Peterson",
+                    PictureId = "borat-picture",
                     JobPosition = new JobPosition
                     {
                         Title = "Awesome job"

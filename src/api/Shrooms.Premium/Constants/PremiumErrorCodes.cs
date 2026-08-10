@@ -42,6 +42,7 @@
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;
+        public const int ServiceRequestCategoryInUse = 701;
 
         // Vacation, 10**
         public const int VacationBotError = 1000;
