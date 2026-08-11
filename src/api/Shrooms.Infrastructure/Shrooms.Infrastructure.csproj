@@ -14,17 +14,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.5.2" />
-    <PackageReference Include="Hangfire.Core" Version="1.8.18" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
-    <PackageReference Include="RazorLight" Version="2.3.1" />
+    <PackageReference Include="EPPlus" />
+    <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Hangfire.SqlServer" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="RazorLight" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj" />
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ExcelGenerator\IExcelBuilder.cs" />

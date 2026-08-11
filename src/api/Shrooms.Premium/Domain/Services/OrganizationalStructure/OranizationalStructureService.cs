@@ -48,6 +48,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
                 IsManagingDirector = user.IsManagingDirector,
                 LastName = user.LastName,
                 Id = user.Id,
+                JobTitle = user.JobPosition == null ? null : user.JobPosition.Title,
                 ManagerId = user.ManagerId,
                 PictureId = user.PictureId
             };
@@ -68,7 +69,9 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
         {
             return new OrganizationalStructureDto
             {
+                Id = user.Id,
                 FullName = user.FirstName + " " + user.LastName,
+                JobTitle = user.JobTitle,
                 PictureId = user.PictureId,
                 Children = GetChildren(userList, user)
             };

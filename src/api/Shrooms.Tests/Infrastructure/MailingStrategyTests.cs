@@ -4,7 +4,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
@@ -16,17 +16,18 @@ namespace Shrooms.Tests.Infrastructure
     [TestFixture]
     public class MailingStrategyTests
     {
-        private Mock<IApplicationSettings> _settings = new ();
-        private Mock<IMailSendingService> _smtpService = new ();
         private readonly string[] _recipients = { "one@one.qqq", "two@two.qqq", "three@three.qqq" };
+        private IApplicationSettings _settings;
+        private IMailSendingService _smtpService;
         private EmailDto _emailDto;
 
-        [OneTimeSetUp]
-        public void SetupCommonMocks()
+        [SetUp]
+        public void TestInitializer()
         {
-            _smtpService
-                .Setup(x => x.IsMailSenderConfigured())
-                .Returns(true);
+            _settings = Substitute.For<IApplicationSettings>();
+            _smtpService = Substitute.For<IMailSendingService>();
+
+            _smtpService.IsMailSenderConfigured().Returns(true);
 
             _emailDto = new EmailDto("sender", "senderemail@yes.no", _recipients, "subject", "body");
         }
@@ -35,11 +36,11 @@ namespace Shrooms.Tests.Infrastructure
         public async Task AllTo_SingleEmailSent()
         {
             // Arrange
-            _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.AllTo);
+            _settings.EmailBuildingStrategy.Returns(EmailBuildingStrategy.AllTo);
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
+            var service = new MailingService(_smtpService, _settings, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
@@ -53,11 +54,11 @@ namespace Shrooms.Tests.Infrastructure
         public async Task AllBcc_SingleEmailSent()
         {
             // Arrange
-            _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.AllBcc);
+            _settings.EmailBuildingStrategy.Returns(EmailBuildingStrategy.AllBcc);
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
+            var service = new MailingService(_smtpService, _settings, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
@@ -71,11 +72,11 @@ namespace Shrooms.Tests.Infrastructure
         public async Task SingleTo_MultipleEmailsSent()
         {
             // Arrange
-            _settings.SetupGet(x => x.EmailBuildingStrategy).Returns(EmailBuildingStrategy.SingleTo);
+            _settings.EmailBuildingStrategy.Returns(EmailBuildingStrategy.SingleTo);
             var actualSent = new List<MailMessage>();
             TrackActualSent(actualSent);
 
-            var service = new MailingService(_smtpService.Object, _settings.Object, new TelemetryClient(new TelemetryConfiguration()));
+            var service = new MailingService(_smtpService, _settings, new TelemetryClient(new TelemetryConfiguration()));
 
             // Act
             await service.SendEmailAsync(_emailDto);
@@ -88,9 +89,8 @@ namespace Shrooms.Tests.Infrastructure
         private void TrackActualSent(List<MailMessage> actualSent)
         {
             _smtpService
-                .Setup(x => x.SendAsync(It.IsAny<IEnumerable<MailMessage>>()))
-                .Callback((IEnumerable<MailMessage> messages) => actualSent.AddRange(messages))
-                .Returns(Task.CompletedTask);
+                .When(x => x.SendAsync(Arg.Any<IEnumerable<MailMessage>>()))
+                .Do(callInfo => actualSent.AddRange(callInfo.Arg<IEnumerable<MailMessage>>()));
         }
     }
 }
