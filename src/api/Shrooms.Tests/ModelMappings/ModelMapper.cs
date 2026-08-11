@@ -30,6 +30,7 @@ namespace Shrooms.Tests.ModelMappings
                 cfg.AddProfile<FilterPresets>();
                 cfg.AddProfile<BlacklistUsers>();
                 cfg.AddProfile<Employees>();
+                cfg.AddProfile<Emojis>();
             };
 
             var configuration = new MapperConfiguration(mappings);

@@ -25,6 +25,9 @@
 
         #region Pictures
         public const int MaximumPictureSizeInBytes = 12000000;
+        public const int MaximumCustomEmojiSizeInBytes = 262144;
+        public const int MaximumCustomEmojiDimensionInPixels = 512;
+        public static readonly string[] AllowedCustomEmojiContentTypes = { "image/png", "image/gif", "image/jpeg", "image/webp" };
         #endregion
 
 #if DEBUG
