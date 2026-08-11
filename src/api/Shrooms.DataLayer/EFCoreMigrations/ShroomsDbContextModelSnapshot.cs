@@ -1685,8 +1685,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

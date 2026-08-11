@@ -17,9 +17,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.Property(m => m.Description).HasMaxLength(1000);
 
-            builder.Property(m => m.UserId)
-                .HasMaxLength(GroupEntityConfig.UserIdLength)
-                .IsRequired();
+            builder.Property(m => m.UserId).IsRequired();
 
             builder.HasOne(m => m.User)
                 .WithMany()

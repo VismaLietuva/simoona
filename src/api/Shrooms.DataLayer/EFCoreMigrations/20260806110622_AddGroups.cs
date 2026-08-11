@@ -93,7 +93,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GroupId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)

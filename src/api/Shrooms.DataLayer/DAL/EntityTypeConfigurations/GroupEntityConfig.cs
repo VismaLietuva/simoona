@@ -6,8 +6,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {
     internal class GroupEntityConfig : IEntityTypeConfiguration<Group>
     {
-        internal const int UserIdLength = 128;
-
         public void Configure(EntityTypeBuilder<Group> builder)
         {
             builder.HasQueryFilter(e => !e.IsDeleted);
