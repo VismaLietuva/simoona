@@ -29,6 +29,7 @@
         public const string Wall = "WALL_ADMINISTRATION";
         public const string Lottery = "LOTTERY_ADMINISTRATION";
         public const string Blacklist = "BLACKLIST_ADMINISTRATION";
+        public const string CustomEmoji = "CUSTOMEMOJI_ADMINISTRATION";
 
         //used only in webApp
         public const string Administration = "ADMINISTRATION_ADMINISTRATION";

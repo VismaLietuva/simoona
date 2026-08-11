@@ -77,5 +77,10 @@
         public const int GroupDeleteNotAllowed = 1714;
         public const int GroupMemberCannotBeRemoved = 1715;
         public const int GroupInvalidKudosPeriod = 1716;
+
+        // Custom emoji, 18**
+        public const int InvalidCustomEmojiName = 1800;
+        public const int InvalidCustomEmojiImage = 1801;
+        public const int CustomEmojiImageTooLarge = 1802;
     }
 }
