@@ -55,8 +55,7 @@ namespace Shrooms.Domain.Services.Kudos
         Task UpdateProfilesFromUserIdsAsync(IEnumerable<string> usersId, UserAndOrganizationDto userOrg);
 
         Task<KudosLogsEntriesDto<MainKudosLogDto>> GetKudosLogsAsync(KudosLogsFilterDto options);
-
-        Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId);
+        Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, IReadOnlyCollection<string> filteringTypes = null);
 
         Task<int> GetKudosTypeIdAsync(string kudosTypeName);
 
