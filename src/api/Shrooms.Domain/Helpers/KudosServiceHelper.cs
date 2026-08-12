@@ -41,14 +41,16 @@ namespace Shrooms.Domain.Helpers
                 Sender = new KudosLogUserDto
                 {
                     Id = log.CreatedBy,
-                    FullName = users.Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? string.Empty
+                    FullName = users.Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? string.Empty,
+                    PictureId = users.Select(u => u.PictureId).FirstOrDefault()
                 },
                 Id = log.Id,
                 Points = log.Points,
                 Receiver = new KudosLogUserDto
                 {
                     Id = log.Employee == null ? null : log.Employee.Id,
-                    FullName = log.Employee == null ? string.Empty : log.Employee.FirstName + " " + log.Employee.LastName
+                    FullName = log.Employee == null ? string.Empty : log.Employee.FirstName + " " + log.Employee.LastName,
+                    PictureId = log.Employee == null ? null : log.Employee.PictureId
                 },
                 Type = new KudosLogTypeDto
                 {

@@ -15,6 +15,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Kudos
         public string EmployeeId { get; set; }
 
         public virtual ApplicationUser Employee { get; set; }
+        
+        public string SentToId { get; set; }
 
         public string KudosTypeName { get; set; }
 

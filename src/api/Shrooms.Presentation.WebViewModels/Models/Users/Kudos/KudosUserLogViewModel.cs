@@ -18,6 +18,10 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public KudosLogUserViewModel Sender { get; set; }
 
+        public KudosLogUserViewModel SentTo { get; set; }
+
+        public int? KudosBasketId { get; set; }
+
         public KudosLogTypeViewModel Type { get; set; }
 
         public string PictureId { get; set; }

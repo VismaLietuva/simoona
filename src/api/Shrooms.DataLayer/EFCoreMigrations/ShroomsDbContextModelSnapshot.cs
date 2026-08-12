@@ -17,7 +17,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1925,6 +1925,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("RejectionMessage")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SentToId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
