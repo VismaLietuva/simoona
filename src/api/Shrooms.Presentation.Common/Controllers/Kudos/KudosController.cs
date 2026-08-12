@@ -72,14 +72,14 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [ProducesResponseType(typeof(PagedViewModel<KudosUserLogViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetUserKudosLogs(string userId, int page = 1)
+        public async Task<IActionResult> GetUserKudosLogs(string userId, int page = 1, [FromQuery] string[] filteringType = null)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId);
+            var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId, filteringType);
             var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDto>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs).ToList();
             var pagedKudosLogs = new PagedViewModel<KudosUserLogViewModel>
             {
