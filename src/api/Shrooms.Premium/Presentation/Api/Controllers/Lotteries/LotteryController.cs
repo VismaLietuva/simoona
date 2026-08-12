@@ -249,6 +249,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Stats")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(typeof(LotteryStatsDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> LotteryStats(int id)
         {
