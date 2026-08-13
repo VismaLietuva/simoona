@@ -157,6 +157,50 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_Only_Matching_Type_When_User_Kudos_Logs_Are_Filtered()
+        {
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1" });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.TotalKudosCount, Is.EqualTo(2));
+                Assert.That(result.KudosLogs.Count(), Is.EqualTo(2));
+                Assert.That(result.KudosLogs.All(log => log.Type.Name == "Type1"), Is.True);
+            });
+        }
+
+        [Test]
+        public async Task Should_Return_Every_Selected_Type_When_User_Kudos_Logs_Are_Filtered_By_Several()
+        {
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1", "Type2" });
+
+            Assert.That(result.TotalKudosCount, Is.EqualTo(3));
+        }
+
+        [Test]
+        public async Task Should_Return_All_Types_When_User_Kudos_Logs_Filter_Is_Not_Set()
+        {
+            var unfiltered = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+            var empty = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new string[0]);
+            var blank = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "  " });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(unfiltered.TotalKudosCount, Is.EqualTo(3));
+                Assert.That(empty.TotalKudosCount, Is.EqualTo(3));
+                Assert.That(blank.TotalKudosCount, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public async Task Should_Treat_All_As_An_Ordinary_Type_Name_When_Filtering_User_Kudos_Logs()
+        {
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { BusinessLayerConstants.KudosFilteringTypeAllFilter });
+
+            Assert.That(result.TotalKudosCount, Is.EqualTo(0));
+        }
+
+        [Test]
         public async Task Should_Return_Specific_User_Kudos_Logs_With_Organization_Filter()
         {
             MockKudosLogsForOrganizationTest();
@@ -347,6 +391,65 @@ namespace Shrooms.Tests.DomainService
             Assert.That(result.First().Value, Is.EqualTo(2));
             Assert.That(result.ToArray()[1].Value, Is.EqualTo(10));
             Assert.That(result.ToArray()[1].Name, Is.EqualTo("Type2"));
+        }
+
+        [Test]
+        public async Task Should_Group_Pie_Chart_Slices_By_Stored_Name_Regardless_Of_System_Type()
+        {
+            var logs = new List<KudosLog>
+            {
+                PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 2),
+                PieChartLog(2, "Other", KudosTypeEnum.Other, 3)
+            };
+            _kudosLogsDbSet.SetDbSetDataForAsync(logs.AsQueryable());
+
+            var forward = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            logs.Reverse();
+            _kudosLogsDbSet.SetDbSetDataForAsync(logs.AsQueryable());
+            var reversed = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(forward.Count, Is.EqualTo(1));
+                Assert.That(forward.Single().TypeName, Is.EqualTo("Other"));
+                Assert.That(forward.Single().Value, Is.EqualTo(5));
+                Assert.That(reversed.Single().Name, Is.EqualTo(forward.Single().Name));
+            });
+        }
+
+        private static KudosLog PieChartLog(int id, string typeName, KudosTypeEnum systemType, decimal points)
+        {
+            return new KudosLog
+            {
+                Id = id,
+                EmployeeId = "UserId",
+                OrganizationId = 2,
+                Status = KudosStatus.Approved,
+                KudosTypeName = typeName,
+                KudosSystemType = systemType,
+                Points = points,
+                Comments = string.Empty
+            };
+        }
+
+        [Test]
+        public async Task Should_Return_Pie_Chart_Slices_In_A_Deterministic_Order()
+        {
+            MockKudosLogsForPieChart();
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+            var names = result.Select(slice => slice.TypeName).ToList();
+            Assert.That(names, Is.EqualTo(names.OrderBy(name => name, StringComparer.Ordinal).ToList()));
+        }
+
+        [Test]
+        public async Task Should_Expose_Untranslated_Type_Name_On_Pie_Chart_Slices()
+        {
+            MockKudosLogsForPieChart();
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.That(result.All(slice => !string.IsNullOrEmpty(slice.TypeName)), Is.True);
+            Assert.That(result.ToArray()[1].TypeName, Is.EqualTo("Type2"));
         }
 
         [Test]

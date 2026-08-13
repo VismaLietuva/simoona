@@ -226,11 +226,19 @@ namespace Shrooms.Domain.Services.Kudos
             };
         }
 
-        public async Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId)
+        public async Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, IReadOnlyCollection<string> filteringTypes = null)
         {
             await ValidateUserAsync(organizationId, userId);
 
-            var userLogsQuery = (from kudLog in _kudosLogsDbSet
+            var typeNames = filteringTypes?
+                .Where(type => !string.IsNullOrWhiteSpace(type))
+                .ToArray();
+
+            var filteredLogs = typeNames == null || typeNames.Length == 0
+                ? _kudosLogsDbSet
+                : _kudosLogsDbSet.Where(log => typeNames.Contains(log.KudosTypeName));
+
+            var userLogsQuery = (from kudLog in filteredLogs
                                  where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
                                  from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
                                  select new KudosUserLogDto
@@ -253,7 +261,7 @@ namespace Shrooms.Domain.Services.Kudos
                                          Id = usr == null ? string.Empty : kudLog.CreatedBy
                                      },
                                      PictureId = kudLog.PictureId
-                                 }).OrderByDescending(o => o.Created);
+                                 }).OrderByDescending(o => o.Created).ThenByDescending(o => o.Id);
 
             var logCount = await userLogsQuery.CountAsync();
 
@@ -401,27 +409,20 @@ namespace Shrooms.Domain.Services.Kudos
                 .ToListAsync();
 
             var user = await _usersDbSet.FindAsync(userId);
-
-            if (user != null)
-            {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
-
-                foreach (var kudosLog in kudosLogs)
-                {
-                    if (IsTranslatableKudosType(kudosLog.KudosSystemType))
-                    {
-                        kudosLog.KudosTypeName = TranslateKudos($"KudosType{kudosLog.KudosTypeName}", culture);
-                    }
-                }
-            }
+            var culture = user == null ? null : CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
             var pieChart = kudosLogs
                 .GroupBy(log => log.KudosTypeName)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
                 .Select(group => new KudosPieChartSliceDto
                 {
-                    Name = group.Key,
+                    TypeName = group.Key,
+                    Name = culture != null && group.Any(log => IsTranslatableKudosType(log.KudosSystemType))
+                        ? TranslateKudos($"KudosType{group.Key}", culture)
+                        : group.Key,
                     Value = group.Sum(log => log.Points)
-                });
+                })
+                .ToList();
 
             return pieChart;
         }
