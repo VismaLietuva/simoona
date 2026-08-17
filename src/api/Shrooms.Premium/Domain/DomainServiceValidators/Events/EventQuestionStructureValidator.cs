@@ -36,6 +36,11 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
             foreach (var question in questions)
             {
+                // A JSON payload with "options": null deserializes to a null list, overriding the
+                // DTO's field initializer. Normalise it here so nothing downstream — including the
+                // SelectMany below — has to guard against a null Options list.
+                question.Options ??= new List<EventQuestionOptionStructureDto>();
+
                 ValidateQuestionShape(question);
             }
 
@@ -106,7 +111,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         {
             if (question.Id == null && string.IsNullOrWhiteSpace(question.ClientId))
             {
-                throw new EventException(PremiumErrorCodes.EventQuestionConditionAmbiguous);
+                throw new EventException(PremiumErrorCodes.EventQuestionClientIdMissing);
             }
 
             if (string.IsNullOrWhiteSpace(question.Title) || question.Title.Length > MaxTitleLength)
@@ -114,7 +119,8 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventQuestionTitleInvalid);
             }
 
-            var options = question.Options ?? new List<EventQuestionOptionStructureDto>();
+            // Normalised to a non-null list in ValidatePayload before this is called.
+            var options = question.Options;
 
             if (options.Count > MaxOptionsPerQuestion)
             {
