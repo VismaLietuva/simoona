@@ -2482,43 +2482,64 @@ helper, use theirs.
 
 - [ ] **Step 1c: Write the failing controller test**
 
-Create `src/api/Shrooms.Premium.Tests/Controllers/WebApi/EventAnswerErrorResponseTests.cs`. This
-is the test that catches the subtle bug — catch-block ordering:
+Catch-block ordering is the subtlest bug in this task: `EventAnswersInvalidException` derives from
+`EventException`, so if the generic catch is listed first it silently swallows the structured one
+and the frontend receives a bare string instead of routable errors. The test must therefore
+exercise the **controller action** and assert the response body — asserting the exception's
+inheritance would pass regardless of catch order and prove nothing.
+
+Add to the existing `src/api/Shrooms.Premium.Tests/Controllers/WebApi/EventControllerTests.cs`,
+reusing that file's existing `[SetUp]` and substituted services:
 
 ```csharp
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using NSubstitute;
-using NUnit.Framework;
-using Shrooms.Premium.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Domain.DomainExceptions.Event;
-
-namespace Shrooms.Premium.Tests.Controllers.WebApi
-{
-    public class EventAnswerErrorResponseTests
-    {
         [Test]
-        public void Should_Confirm_EventAnswersInvalidException_Is_Catchable_As_EventException()
+        public async Task Join_Should_Return_The_Structured_Body_When_Answers_Are_Invalid()
         {
-            // Guards the catch ordering in EventController: the structured catch must come first,
-            // otherwise the generic EventException catch swallows it and returns a bare string.
-            var exception = new EventAnswersInvalidException(new List<EventAnswerErrorDto>
+            _eventParticipationService
+                .JoinAsync(Arg.Any<EventJoinDto>())
+                .Returns<Task>(_ => throw new EventAnswersInvalidException(new List<EventAnswerErrorDto>
+                {
+                    new EventAnswerErrorDto { QuestionId = 12, Reason = EventAnswerErrorReason.RequiredAnswerMissing },
+                    new EventAnswerErrorDto { QuestionId = 14, Reason = EventAnswerErrorReason.AnswerForHiddenQuestion }
+                }));
+
+            var result = await _eventController.Join(new EventJoinViewModel
             {
-                new EventAnswerErrorDto { QuestionId = 12, Reason = EventAnswerErrorReason.RequiredAnswerMissing }
+                EventId = Guid.NewGuid(),
+                ChosenOptions = new List<int>()
             });
 
-            Assert.That(exception, Is.InstanceOf<EventException>());
-            Assert.That(exception.Message, Is.EqualTo("EventAnswersInvalid"));
-            Assert.That(exception.Errors.Count, Is.EqualTo(1));
+            var badRequest = result as BadRequestObjectResult;
+            Assert.That(badRequest, Is.Not.Null, "invalid answers must produce a 400");
+
+            // Serialize rather than reflect over the anonymous type — this asserts the shape the
+            // frontend actually receives.
+            var json = System.Text.Json.JsonSerializer.Serialize(badRequest.Value);
+
+            Assert.That(json, Does.Contain("EventAnswersInvalid"));
+            Assert.That(json, Does.Contain("RequiredAnswerMissing"));
+            Assert.That(json, Does.Contain("AnswerForHiddenQuestion"));
+            Assert.That(json, Does.Contain("12"));
+            Assert.That(json, Does.Contain("14"));
         }
-    }
-}
 ```
+
+If `EventControllerTests` does not already expose `_eventParticipationService` and
+`_eventController` as fields, add them following the pattern the file already uses for its other
+substituted services. Add these `using` directives if absent:
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainExceptions.Event;
+```
+
+**This test must fail before the controller change and pass after.** If it passes before Step 4,
+the assertion is not reaching the catch block — fix the test, do not proceed.
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --filter "FullyQualifiedName~EventParticipantServiceTests|FullyQualifiedName~EventAnswerErrorResponseTests" --nologo`
+Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --filter "FullyQualifiedName~EventParticipantServiceTests|FullyQualifiedName~EventControllerTests" --nologo`
 
 Expected: FAIL — the three new join tests throw nothing, because answers are not yet validated.
 
@@ -2629,7 +2650,7 @@ Already added in Task 5, Step 6. Verify `EventAnswerValidator` is registered; if
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --filter "FullyQualifiedName~EventParticipantServiceTests|FullyQualifiedName~EventAnswerErrorResponseTests" --nologo`
+Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --filter "FullyQualifiedName~EventParticipantServiceTests|FullyQualifiedName~EventControllerTests" --nologo`
 
 Expected: PASS — the three new join tests, the new controller test, and every pre-existing test in
 `EventParticipantServiceTests` (including `Should_Successfully_Join_Event_Without_Options`, which
@@ -2660,7 +2681,7 @@ With the Aspire AppHost running, open `http://localhost:50321/swagger` and:
 git add src/api/Shrooms.Premium/Domain/Services/Events/Participation/EventParticipationService.cs \
         src/api/Shrooms.Premium/Presentation/Api/Controllers/EventController.cs \
         src/api/Shrooms.Premium.Tests/DomainService/EventServices/EventParticipantServiceTests.cs \
-        src/api/Shrooms.Premium.Tests/Controllers/WebApi/EventAnswerErrorResponseTests.cs
+        src/api/Shrooms.Premium.Tests/Controllers/WebApi/EventControllerTests.cs
 git commit -m "feat(events): enforce sign-up answers on join and option change"
 ```
 
