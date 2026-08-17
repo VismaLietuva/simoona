@@ -34,6 +34,11 @@ docker info --format "{{.ServerVersion}}"   # expect a version, not an error
 pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'   # expect 7.6.5
 ```
 
+**Test baseline, measured 2026-08-17 before Task 1:** `Shrooms.Premium.Tests` is
+**488 passed / 0 failed / 0 skipped** in ~8s. `dotnet build` on `Shrooms.Presentation.Api` is
+**0 errors / 3975 warnings** — the warnings are a pre-existing StyleCop baseline, not something
+this plan introduces or needs to fix.
+
 To bring the stack up (needed from Task 1 onward, for applying migrations):
 
 ```bash
@@ -1555,7 +1560,8 @@ Expected: PASS, 3 tests.
 
 Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --nologo`
 
-Expected: no new failures compared with the baseline recorded before Task 1.
+Expected: 0 failures. The baseline measured on 2026-08-17, before any task in this plan, was
+**488 passed / 0 failed**, so the count should only grow.
 
 - [ ] **Step 9: Commit**
 
@@ -2633,7 +2639,7 @@ proves legacy flat-option events still join).
 
 Run: `dotnet test src/api/Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --nologo`
 
-Expected: no new failures against the baseline recorded before Task 1.
+Expected: 0 failures, and a total of **488 + the tests added by this plan**.
 
 - [ ] **Step 8: Verify end-to-end against the running stack**
 
