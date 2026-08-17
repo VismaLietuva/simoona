@@ -131,7 +131,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Treat_A_Question_As_Hidden_When_Its_Trigger_Question_Is_Itself_Hidden()
         {
-            // q3 is triggered by an option of q2, but q2 is hidden because q1 chose 11.
+            // q4's trigger option (20) is not chosen here, so this only covers the shallow
+            // "trigger not chosen" path (stage 1). It does not exercise the owner-reachability
+            // propagation check (stage 2) — see
+            // Should_Hide_A_Question_Whose_Trigger_Was_Chosen_But_Whose_Trigger_Question_Was_Hidden
+            // for that.
+            // q4 is triggered by an option of q2, but q2 is hidden because q1 chose 11.
             var questions = FoodTree();
             questions.Add(new ResolvedEventQuestionDto
             {
@@ -142,6 +147,27 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var ex = Assert.Throws<EventAnswersInvalidException>(
                 () => _validator.Validate(questions, new[] { 11, 40 }, new int[0]));
 
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
+        }
+
+        [Test]
+        public void Should_Hide_A_Question_Whose_Trigger_Was_Chosen_But_Whose_Trigger_Question_Was_Hidden()
+        {
+            // q4's trigger option (20) IS chosen this time, so reachability for q4 must pass
+            // stage 1 (trigger chosen) and fall through to stage 2 (owner-reachability
+            // propagation): q2 owns option 20 but q2 itself is hidden (its trigger, 10, was not
+            // chosen), so q4 must also be treated as hidden.
+            var questions = FoodTree();
+            questions.Add(new ResolvedEventQuestionDto
+            {
+                QuestionId = 4, Order = 3, SelectType = EventQuestionSelectType.Single,
+                IsRequired = true, ShowIfOptionId = 20, OptionIds = new[] { 40 }
+            });
+
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(questions, new[] { 11, 20, 40 }, new int[0]));
+
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 2 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
             Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
         }
 
