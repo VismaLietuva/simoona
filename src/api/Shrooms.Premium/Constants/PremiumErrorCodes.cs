@@ -46,6 +46,7 @@
         public const string EventQuestionConditionAmbiguous = "237";
         public const string EventQuestionConditionInvalid = "238";
         public const string EventQuestionDepthExceeded = "239";
+        public const string EventQuestionClientIdMissing = "240";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

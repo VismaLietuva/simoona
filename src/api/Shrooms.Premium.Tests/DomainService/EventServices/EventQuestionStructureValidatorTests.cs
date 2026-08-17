@@ -145,7 +145,16 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
 
-            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionConditionAmbiguous));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionClientIdMissing));
+        }
+
+        [Test]
+        public void Should_Not_Throw_When_Options_Is_Null()
+        {
+            var question = Question("q1", 0);
+            question.Options = null;
+
+            Assert.DoesNotThrow(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
         }
 
         [Test]
