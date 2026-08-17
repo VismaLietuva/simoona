@@ -63,6 +63,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<NewEventOptionViewModel> NewOptions { get; set; }
 
+        public IList<EventQuestionViewModel> Questions { get; set; } = new List<EventQuestionViewModel>();
+
         [RequireOneTimeEventForCollection(nameof(Recurrence)), ValidateRemindersCollection]
         public IEnumerable<EventReminderViewModel> Reminders { get; set; }
 
