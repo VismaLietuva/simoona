@@ -39,6 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
+        private readonly IEventQuestionWriter _eventQuestionWriter;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -55,7 +56,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IWallService wallService,
             IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService,
-            ISystemClock systemClock)
+            ISystemClock systemClock,
+            IEventQuestionWriter eventQuestionWriter)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -73,6 +75,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
             _systemClock = systemClock;
+            _eventQuestionWriter = eventQuestionWriter;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -181,6 +184,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             MapNewOptions(newEventDto, newEvent);
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
+            await _eventQuestionWriter.WriteAsync(newEvent.Id, newEventDto.Questions, newEventDto.UserId);
+
             newEventDto.Id = newEvent.Id.ToString();
 
             return newEventDto;
@@ -229,6 +234,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             await UpdateWallAsync(eventToUpdate, eventDto);
             await UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
+
+            await _eventQuestionWriter.WriteAsync(eventToUpdate.Id, eventDto.Questions, eventDto.UserId);
 
             await _uow.SaveChangesAsync(false);
 
