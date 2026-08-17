@@ -39,6 +39,13 @@
         public const string EventReminderCannotBeRemoved = "230";
         public const string EventReminderCannotBeUpdated = "231";
         public const string EventReminderCannotBeAdded = "232";
+        public const string EventQuestionLimitExceeded = "233";
+        public const string EventQuestionOptionLimitExceeded = "234";
+        public const string EventQuestionTitleInvalid = "235";
+        public const string EventQuestionOptionNameInvalid = "236";
+        public const string EventQuestionConditionAmbiguous = "237";
+        public const string EventQuestionConditionInvalid = "238";
+        public const string EventQuestionDepthExceeded = "239";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;
