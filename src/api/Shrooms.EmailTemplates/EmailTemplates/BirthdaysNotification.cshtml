@@ -1,0 +1,13 @@
+@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.BirthdaysNotificationTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Birthdays">Birthdays</email-heading>
+<email-card>
+    <p style="margin:0 0 12px;">Good morning! Please do not forget to congratulate these people today:</p>
+    @foreach (var employee in Model.Employees)
+    {
+        <p style="margin:0 0 6px;"><a href="@employee.ProfileUrl">@employee.FullName</a></p>
+    }
+</email-card>

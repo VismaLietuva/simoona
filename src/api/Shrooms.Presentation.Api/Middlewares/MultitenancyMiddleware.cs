@@ -28,7 +28,8 @@ namespace Shrooms.Presentation.Api.Middlewares
                 requestPath.StartsWith("/signin-facebook", StringComparison.OrdinalIgnoreCase) ||
                 requestPath.StartsWith("/signin-microsoft", StringComparison.OrdinalIgnoreCase) ||
                 requestPath.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
-                requestPath.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase))
+                requestPath.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.StartsWith("/dev/email-preview", StringComparison.OrdinalIgnoreCase))
             {
                 await _next(context);
                 return;

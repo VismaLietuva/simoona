@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Razor.Templating.Core;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
@@ -85,6 +86,9 @@ namespace Shrooms.IoC
             services.AddAutoMapper(
                 Assembly.Load("Shrooms.Presentation.ModelMappings"),
                 Assembly.Load("Shrooms.Premium"));
+
+            // Must come after every other registration so views can resolve injected services.
+            services.AddRazorTemplating();
 
             return services;
         }

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using RazorLight;
+using Razor.Templating.Core;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure.Email;
@@ -40,14 +39,14 @@ namespace Shrooms.Tests.Infrastructure
     [TestFixture]
     public class MailTemplateTests
     {
-        private IRazorLightEngine _razorLightEngine;
+        private IRazorTemplateEngine _razorTemplateEngine;
         private MailTemplate _sut;
 
         [SetUp]
         public void TestInitializer()
         {
-            _razorLightEngine = Substitute.For<IRazorLightEngine>();
-            _sut = new MailTemplate(_razorLightEngine);
+            _razorTemplateEngine = Substitute.For<IRazorTemplateEngine>();
+            _sut = new MailTemplate(_razorTemplateEngine);
         }
 
         [Test]
@@ -72,14 +71,14 @@ namespace Shrooms.Tests.Infrastructure
                 "New kudos for you!",
                 "http://profile.example.com/1");
 
-            _razorLightEngine
-                .CompileRenderAsync(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<ExpandoObject>())
+            _razorTemplateEngine
+                .RenderAsync(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<Dictionary<string, object>>())
                 .Returns(Task.FromResult("<html>rendered</html>"));
 
             for (var i = 0; i < retries; i++)
             {
-                await _sut.GenerateAsync(newWallPostEmailTemplateViewModel, "Wall/NewPost.cshtml");
-                await _sut.GenerateAsync(kudosSentEmailTemplateViewModel, "Kudos/KudosSent.cshtml");
+                await _sut.GenerateAsync(newWallPostEmailTemplateViewModel, "/EmailTemplates/Wall/NewPost.cshtml");
+                await _sut.GenerateAsync(kudosSentEmailTemplateViewModel, "/EmailTemplates/Kudos/KudosSent.cshtml");
             }
         }
 
@@ -91,8 +90,8 @@ namespace Shrooms.Tests.Infrastructure
             var templateKey = Guid.NewGuid().ToString();
             const string expectedBody = "2024-01-15";
 
-            _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
+            _razorTemplateEngine
+                .RenderAsync(templateKey, Arg.Any<object>(), Arg.Any<Dictionary<string, object>>())
                 .Returns(Task.FromResult(expectedBody));
 
             // Act
@@ -112,8 +111,8 @@ namespace Shrooms.Tests.Infrastructure
             var templateKey = Guid.NewGuid().ToString();
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKey);
 
-            _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
+            _razorTemplateEngine
+                .RenderAsync(templateKey, Arg.Any<object>(), Arg.Any<Dictionary<string, object>>())
                 .Returns(callInfo =>
                 {
                     // Capture the date that was on the model when render was called
@@ -137,8 +136,8 @@ namespace Shrooms.Tests.Infrastructure
             var viewModel = new EmailViewModelWithoutTimeZoneableProperties(date);
             var templateKey = Guid.NewGuid().ToString();
 
-            _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
+            _razorTemplateEngine
+                .RenderAsync(templateKey, Arg.Any<object>(), Arg.Any<Dictionary<string, object>>())
                 .Returns(callInfo =>
                 {
                     var model = (EmailViewModelWithoutTimeZoneableProperties)callInfo.ArgAt<object>(1);
@@ -186,8 +185,8 @@ namespace Shrooms.Tests.Infrastructure
             var templateKey = Guid.NewGuid().ToString();
             var expectedDate = ConvertUtcToTimeZoneWithoutMilliseconds(date, timeZoneKeys[0]);
 
-            _razorLightEngine
-                .CompileRenderAsync(templateKey, Arg.Any<object>(), Arg.Any<ExpandoObject>())
+            _razorTemplateEngine
+                .RenderAsync(templateKey, Arg.Any<object>(), Arg.Any<Dictionary<string, object>>())
                 .Returns(callInfo =>
                 {
                     var model = (EmailViewModelWithTimeZoneableProperties)callInfo.ArgAt<object>(1);

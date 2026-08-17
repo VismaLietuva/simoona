@@ -1,0 +1,14 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookReminderEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Books">Are you still reading this book?</email-heading>
+<email-card>
+    <p style="margin:0 0 12px;">Hello, @Model.FullName</p>
+    <email-details>
+        <email-detail label="Book">"<strong>@Model.Title</strong>" by @Model.Author</email-detail>
+        <email-detail label="Taken from">@Model.TakenFrom</email-detail>
+    </email-details>
+    <email-button href="@Model.BookUrl">Visit book page</email-button>
+</email-card>

@@ -1,0 +1,14 @@
+@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.KudosSentEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Kudos" emphasis="notification">Kudos</email-heading>
+<email-card>
+    <p style="margin:0;">
+        <strong>@Model.KudosSenderName</strong> has sent you
+        <span style="color:@Shrooms.EmailTemplates.EmailDesign.Secondary;font-weight:600;">+@Model.KudosAmount</span> kudos.
+    </p>
+    <email-quote>@Model.Comment</email-quote>
+    <email-button href="@Model.KudosProfileUrl">Visit your kudos profile</email-button>
+</email-card>

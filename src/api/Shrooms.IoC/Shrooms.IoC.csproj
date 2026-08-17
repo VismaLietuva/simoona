@@ -9,9 +9,12 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Razor.Templating.Core" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shrooms.EmailTemplates\Shrooms.EmailTemplates.csproj" />
+    <ProjectReference Include="..\Shrooms.EmailTemplates.Premium\Shrooms.EmailTemplates.Premium.csproj" />
     <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj" />
     <ProjectReference Include="..\Shrooms.Presentation.ModelMappings\Shrooms.Presentation.ModelMappings.csproj" />
   </ItemGroup>
