@@ -439,4 +439,9 @@ app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename
     return Results.File(stream, contentType);
 }).AllowAnonymous();
 
+app.Logger.LogInformation(
+    "Simoona API starting — environment '{Environment}', content root '{ContentRoot}'.",
+    app.Environment.EnvironmentName,
+    app.Environment.ContentRootPath);
+
 app.Run();
