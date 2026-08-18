@@ -29,6 +29,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Participants")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(typeof(IEnumerable<LotteryParticipantViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetParticipantsCounted(int id)
         {
