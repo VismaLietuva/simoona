@@ -1,33 +1,47 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure.Email;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.EmailTemplates.Seeds;
+using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Presentation.Api.Endpoints
 {
-    // Developer-only preview of every template. Registered only in the Development environment.
+    // Preview of every template, rendered against the shared seed models. Open to organization administrators.
     public static class EmailPreviewEndpoints
     {
-        private const string BasePath = "/dev/email-preview";
+        private const string BasePath = "/email-preview";
 
         public static void MapEmailPreview(this WebApplication app)
         {
-            if (!app.Environment.IsDevelopment())
+            app.MapGet(BasePath, async (ClaimsPrincipal user, IPermissionService permissionService) =>
             {
-                return;
-            }
+                if (!await IsPermittedAsync(user, permissionService))
+                {
+                    return MissingPermission();
+                }
 
-            app.MapGet(BasePath, () => Results.Content(BuildIndex(), "text/html; charset=utf-8"))
-                .AllowAnonymous()
+                return Results.Content(BuildIndex(), "text/html; charset=utf-8");
+            })
+                .RequireAuthorization()
                 .ExcludeFromDescription();
 
             app.MapGet($"{BasePath}/{{**templatePath}}", async (
                 string templatePath,
                 string send,
+                ClaimsPrincipal user,
+                IPermissionService permissionService,
                 IMailTemplate mailTemplate,
                 IMailingService mailingService) =>
             {
+                if (!await IsPermittedAsync(user, permissionService))
+                {
+                    return MissingPermission();
+                }
+
                 var key = "/EmailTemplates/" + templatePath;
                 var seed = EmailTemplateSeeds.All.FirstOrDefault(candidate => candidate.Key == key);
                 if (seed is null)
@@ -45,8 +59,21 @@ namespace Shrooms.Presentation.Api.Endpoints
                 await mailingService.SendEmailAsync(new EmailDto(send, $"[Preview] {templatePath}", html), skipDomainChange: true);
                 return Results.Text($"Sent {templatePath} to {send}.");
             })
-                .AllowAnonymous()
+                .RequireAuthorization()
                 .ExcludeFromDescription();
+        }
+
+        // Opened straight in a browser tab, so answer refusals in kind rather than with an empty 403.
+        private static IResult MissingPermission()
+        {
+            return Results.Text("Missing permission", "text/plain; charset=utf-8", null, StatusCodes.Status403Forbidden);
+        }
+
+        private static async Task<bool> IsPermittedAsync(ClaimsPrincipal user, IPermissionService permissionService)
+        {
+            return await permissionService.UserHasPermissionAsync(
+                user.Identity.GetUserAndOrganization(),
+                AdministrationPermissions.Organization);
         }
 
         private static string BuildIndex()

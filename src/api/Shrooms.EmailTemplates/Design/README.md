@@ -51,7 +51,7 @@ directly in the layout's content slot; the rest go inside a card.
 ```
 
 `EmailTemplates/Design/Showcase.cshtml` renders all five at once. View it at
-`/dev/email-preview/Design/Showcase.cshtml`.
+`/email-preview/Design/Showcase.cshtml`.
 
 ## Matching the frontend
 
