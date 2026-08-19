@@ -17,5 +17,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public decimal TotalPointsSent { get; set; }
 
         public string PictureId { get; set; }
+
+        public string SentToId { get; set; }
     }
 }

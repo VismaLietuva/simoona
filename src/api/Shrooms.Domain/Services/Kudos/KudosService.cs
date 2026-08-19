@@ -241,6 +241,7 @@ namespace Shrooms.Domain.Services.Kudos
             var userLogsQuery = (from kudLog in filteredLogs
                                  where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
                                  from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
+                                 from sentToUsr in _usersDbSet.Where(u => u.Id == kudLog.SentToId).DefaultIfEmpty()
                                  select new KudosUserLogDto
                                  {
                                      Comment = kudLog.Comments,
@@ -258,9 +259,17 @@ namespace Shrooms.Domain.Services.Kudos
                                      Sender = new KudosLogUserDto
                                      {
                                          FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
-                                         Id = usr == null ? string.Empty : kudLog.CreatedBy
+                                         Id = usr == null ? string.Empty : kudLog.CreatedBy,
+                                         PictureId = usr == null ? null : usr.PictureId
                                      },
-                                     PictureId = kudLog.PictureId
+                                     SentTo = new KudosLogUserDto
+                                     {
+                                         FullName = sentToUsr == null ? string.Empty : sentToUsr.FirstName + " " + sentToUsr.LastName,
+                                         Id = sentToUsr == null ? string.Empty : kudLog.SentToId,
+                                         PictureId = sentToUsr == null ? null : sentToUsr.PictureId
+                                     },
+                                     PictureId = kudLog.PictureId,
+                                     KudosBasketId = kudLog.KudosBasketId
                                  }).OrderByDescending(o => o.Created).ThenByDescending(o => o.Id);
 
             var logCount = await userLogsQuery.CountAsync();
@@ -327,12 +336,14 @@ namespace Shrooms.Domain.Services.Kudos
                     Receiver = new KudosLogUserDto
                     {
                         FullName = x.Receiver != null ? x.Receiver.FirstName + " " + x.Receiver.LastName : null,
-                        Id = x.Receiver != null ? x.Receiver.Id : null
+                        Id = x.Receiver != null ? x.Receiver.Id : null,
+                        PictureId = x.Receiver != null ? x.Receiver.PictureId : null
                     },
                     Sender = new KudosLogUserDto
                     {
                         FullName = x.Sender.FirstName + " " + x.Sender.LastName,
-                        Id = x.Log.KudosSystemType == KudosTypeEnum.Send ? x.Log.CreatedBy : null
+                        Id = x.Log.KudosSystemType == KudosTypeEnum.Send ? x.Log.CreatedBy : null,
+                        PictureId = x.Log.KudosSystemType == KudosTypeEnum.Send ? x.Sender.PictureId : null
                     },
                     Likes = MapLikesToDto(x.Log.Likes, likersById)
                 })
@@ -912,7 +923,8 @@ namespace Shrooms.Domain.Services.Kudos
                 SendingUser = kudos.ReceivingUser,
                 TotalKudosPointsInLog = kudos.TotalKudosPointsInLog,
                 KudosType = MapKudosTypesToDto(minusKudosType),
-                PictureId = kudos.PictureId
+                PictureId = kudos.PictureId,
+                SentToId = kudos.ReceivingUser.Id
             };
 
             return minusKudos;
@@ -958,7 +970,8 @@ namespace Shrooms.Domain.Services.Kudos
                 Modified = DateTime.UtcNow,
                 OrganizationId = kudos.KudosLog.OrganizationId,
                 Points = kudos.TotalKudosPointsInLog,
-                PictureId = kudos.PictureId
+                PictureId = kudos.PictureId,
+                SentToId = kudos.SentToId
             };
 
             _kudosLogsDbSet.Add(log);

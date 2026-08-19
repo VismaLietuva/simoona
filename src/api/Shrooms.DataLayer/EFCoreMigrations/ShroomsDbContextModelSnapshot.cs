@@ -17,7 +17,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1926,6 +1926,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("RejectionMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SentToId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -1936,6 +1940,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("KudosBasketId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("SentToId");
 
                     b.ToTable("KudosLogs");
                 });
@@ -4265,6 +4271,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "SentTo")
+                        .WithMany()
+                        .HasForeignKey("SentToId");
+
                     b.OwnsOne("Shrooms.DataLayer.EntityModels.Models.Multiwall.LikesCollection", "Likes", b1 =>
                         {
                             b1.Property<int>("KudosLogId")
@@ -4290,6 +4300,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .IsRequired();
 
                     b.Navigation("Organization");
+
+                    b.Navigation("SentTo");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Kudos.KudosShopItem", b =>

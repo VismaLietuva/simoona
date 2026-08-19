@@ -18,6 +18,8 @@ using X.PagedList.EF;
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class ExamController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -66,10 +68,10 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IEnumerable<ExamAutoCompleteViewModel>> GetExamForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
-            var exams = await _examRepository.Get(e => e.Title.Contains(start))
+            var matches = await _examRepository.Get(e => e.Title.Contains(start))
                    .OrderBy(e => e.Title)
-                   .DistinctBy(d => d.Title)
-                   .ToPagedListAsync(1, pageSize);
+                   .ToListAsync();
+            var exams = matches.DistinctBy(d => d.Title).Take(pageSize).ToList();
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }
@@ -79,10 +81,10 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IEnumerable<ExamAutoCompleteViewModel>> GetExamNumbersForAutoComplete(string title, string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
-            var exams = await _examRepository.Get(e => e.Title == title && e.Number.ToLower().Contains(start))
+            var matches = await _examRepository.Get(e => e.Title == title && e.Number.ToLower().Contains(start))
                   .OrderBy(e => e.Number)
-                  .DistinctBy(e => e.Number)
-                  .ToPagedListAsync(1, pageSize);
+                  .ToListAsync();
+            var exams = matches.DistinctBy(e => e.Number).Take(pageSize).ToList();
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }
@@ -94,10 +96,10 @@ namespace Shrooms.Presentation.Api.Controllers
             number ??= string.Empty;
             title ??= string.Empty;
 
-            var exams = await _examRepository.Get(e => e.Title.Contains(title) && e.Number.Contains(number))
+            var matches = await _examRepository.Get(e => e.Title.Contains(title) && e.Number.Contains(number))
                   .OrderBy(e => e.Number)
-                  .DistinctBy(e => e.Number)
-                  .ToPagedListAsync(1, pageSize);
+                  .ToListAsync();
+            var exams = matches.DistinctBy(e => e.Number).Take(pageSize).ToList();
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }

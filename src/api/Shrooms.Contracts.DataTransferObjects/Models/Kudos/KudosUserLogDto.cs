@@ -11,6 +11,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public string Status { get; set; }
         public DateTime Created { get; set; }
         public KudosLogUserDto Sender { get; set; }
+        public KudosLogUserDto SentTo { get; set; }
+        public int? KudosBasketId { get; set; }
         public KudosLogTypeDto Type { get; set; }
         public string PictureId { get; set; }
     }

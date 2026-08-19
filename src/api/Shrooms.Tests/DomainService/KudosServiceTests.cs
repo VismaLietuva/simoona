@@ -157,6 +157,24 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Name_The_User_A_Log_Sent_Points_To()
+        {
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+
+            var withRecipient = result.KudosLogs.First(log => log.Id == 3);
+            var withoutRecipient = result.KudosLogs.First(log => log.Id == 1);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(withRecipient.SentTo.Id, Is.EqualTo("testUserId2"));
+                Assert.That(withRecipient.SentTo.FullName, Is.EqualTo("second user"));
+                Assert.That(withRecipient.SentTo.PictureId, Is.EqualTo("second.jpg"));
+                Assert.That(withoutRecipient.SentTo.Id, Is.Empty);
+                Assert.That(withoutRecipient.SentTo.FullName, Is.Empty);
+            });
+        }
+
+        [Test]
         public async Task Should_Return_Only_Matching_Type_When_User_Kudos_Logs_Are_Filtered()
         {
             var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1" });
@@ -691,6 +709,36 @@ namespace Shrooms.Tests.DomainService
             await _uow.Received(1).SaveChangesAsync(false);
         }
 
+        [Test]
+        public async Task Should_Record_The_Receiver_On_The_Deduction_Mirroring_A_Send()
+        {
+            var kudosLog = new AddKudosLogDto
+            {
+                OrganizationId = 2,
+                PointsTypeId = 2,
+                UserId = "testUserId2",
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
+                MultiplyBy = 2,
+                Comment = "Comment",
+                IsActive = true
+            };
+
+            await _kudosService.AddKudosLogAsync(kudosLog);
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Minus &&
+                log.EmployeeId == "testUserId2" &&
+                log.SentToId == "testUserId3"));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Minus &&
+                log.EmployeeId == "testUserId2" &&
+                log.SentToId == "testUserId4"));
+
+            _kudosLogsDbSet.Received(2).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Send && log.SentToId == null));
+        }
+
         //Checks if available kudos validation for send kudos operation works properly.
         [Test]
         public void Should_Return_If_User_Has_No_Available_Kudos()
@@ -1026,6 +1074,9 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     Id = "testUserId2",
+                    FirstName = "second",
+                    LastName = "user",
+                    PictureId = "second.jpg",
                     TotalKudos = 4,
                     SpentKudos = 0,
                     RemainingKudos = 4,
@@ -1163,7 +1214,8 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId",
                     Points = 0,
-                    Comments = "Hello"
+                    Comments = "Hello",
+                    SentToId = "testUserId2"
                 },
                 new()
                 {
