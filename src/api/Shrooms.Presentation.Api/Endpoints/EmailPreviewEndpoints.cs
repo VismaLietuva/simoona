@@ -31,11 +31,11 @@ namespace Shrooms.Presentation.Api.Endpoints
 
             app.MapGet($"{BasePath}/{{**templatePath}}", async (
                 string templatePath,
-                string send,
                 ClaimsPrincipal user,
                 IPermissionService permissionService,
                 IMailTemplate mailTemplate,
-                IMailingService mailingService) =>
+                IMailingService mailingService,
+                string send = null) =>
             {
                 if (!await IsPermittedAsync(user, permissionService))
                 {
