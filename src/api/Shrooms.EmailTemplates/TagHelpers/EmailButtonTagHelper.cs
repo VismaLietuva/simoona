@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Shrooms.EmailTemplates.TagHelpers
@@ -25,7 +26,7 @@ namespace Shrooms.EmailTemplates.TagHelpers
             output.Content.SetHtmlContent(
                 $"<tbody><tr><td align=\"center\" bgcolor=\"{EmailDesign.Primary}\" " +
                 $"style=\"background-color:{EmailDesign.Primary};border-radius:{EmailDesign.RadiusMd};\">" +
-                $"<a href=\"{Href}\" target=\"_blank\" style=\"display:inline-block;padding:10px 24px;" +
+                $"<a href=\"{WebUtility.HtmlEncode(Href)}\" target=\"_blank\" style=\"display:inline-block;padding:10px 24px;" +
                 $"font-family:{EmailDesign.FontSans};font-size:{EmailDesign.SmallSize};" +
                 $"line-height:{EmailDesign.SmallLineHeight};font-weight:{EmailDesign.MediumWeight};" +
                 $"color:{EmailDesign.PrimaryForeground};text-decoration:none;\">{label}</a>" +

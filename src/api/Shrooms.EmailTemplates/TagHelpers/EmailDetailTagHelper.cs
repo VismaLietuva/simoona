@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Shrooms.EmailTemplates.TagHelpers
@@ -38,7 +39,7 @@ namespace Shrooms.EmailTemplates.TagHelpers
                 $"font-family:{EmailDesign.FontSans};font-size:{EmailDesign.EyebrowSize};" +
                 $"font-weight:{EmailDesign.EyebrowWeight};letter-spacing:{EmailDesign.EyebrowTracking};" +
                 $"text-transform:uppercase;color:{EmailDesign.MutedForeground};vertical-align:top;" +
-                $"line-height:{EmailDesign.SmallLineHeight};\">{Label}</td>" +
+                $"line-height:{EmailDesign.SmallLineHeight};\">{WebUtility.HtmlEncode(Label)}</td>" +
                 $"<td align=\"left\" style=\"padding:6px 0;font-family:{EmailDesign.FontSans};" +
                 $"font-size:{EmailDesign.SmallSize};line-height:{EmailDesign.SmallLineHeight};" +
                 $"color:{EmailDesign.Foreground};vertical-align:top;word-break:break-word;" +
