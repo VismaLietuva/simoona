@@ -1,12 +1,11 @@
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Razor.Templating.Core;
 using Shrooms.EmailTemplates.Seeds;
 
 namespace Shrooms.EmailTemplates.Tests
 {
-    // Renders every template and compares it to the approved baseline, ignoring inter-tag whitespace.
+    // Renders every template and compares it to the approved baseline, ignoring indentation.
     [TestFixture]
     public class GoldenFileTests
     {
@@ -17,13 +16,6 @@ namespace Shrooms.EmailTemplates.Tests
 
         private static string SourceGoldenRoot =>
             Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "../../../GoldenFiles"));
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            var services = new ServiceCollection();
-            services.AddRazorTemplating();
-        }
 
         private static IEnumerable<TestCaseData> Seeds()
         {
@@ -64,7 +56,9 @@ namespace Shrooms.EmailTemplates.Tests
 
         private static string Normalize(string html)
         {
-            return Regex.Replace(Regex.Replace(html, @">\s+<", "><"), @"\s+", " ").Trim();
+            // Collapses runs rather than deleting them: whitespace between inline elements
+            // is rendered, so "</strong> <span>" must not compare equal to "</strong><span>".
+            return Regex.Replace(html, @"\s+", " ").Trim();
         }
     }
 }

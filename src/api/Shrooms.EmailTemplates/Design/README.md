@@ -17,8 +17,11 @@ Then fold `Design/layout.html` into `EmailTemplates/HeaderFooter.cshtml`:
 3. Replace `SETTINGS_URL_SLOT` with `@Model.UserNotificationSettingsUrl`.
 4. Keep the `@model` line and the generated-file comment at the top.
 
-This is not a CI step on purpose. `appveyor.yml` is a pure .NET pipeline, and adding npm to it to
-regenerate one layout that changes twice a year is a bad trade.
+Recompiling is not a CI step on purpose. `appveyor.yml` is a pure .NET pipeline, and adding npm to
+it to regenerate one layout that changes twice a year is a bad trade. Checking that the two files
+still agree costs nothing, though, so `LayoutIsGeneratedTests` applies the substitutions above to
+`Design/layout.html` and compares — hand-editing the `.cshtml` fails the build instead of drifting
+silently.
 
 ### Why `<mj-font name="Roboto" href="" />` is in the MJML
 
@@ -102,8 +105,10 @@ and `box-shadow`; square, flat corners there are acceptable.
 
 ## Golden files
 
-Design changes are reviewed as diffs of `Shrooms.EmailTemplates.Tests/GoldenFiles/`. When a change
-is intended, rewrite the baseline and read the diff before committing:
+Design changes are reviewed as diffs of `Shrooms.EmailTemplates.Tests/GoldenFiles/`. A baseline only
+exists for what `EmailTemplateSeeds` covers, so `EveryCacheKey_HasASeed` fails when a new template
+key arrives without a seed — otherwise the template would render in production having never been
+looked at. When a change is intended, rewrite the baseline and read the diff before committing:
 
 ```bash
 UPDATE_EMAIL_GOLDEN=1 dotnet test Shrooms.EmailTemplates.Tests

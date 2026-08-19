@@ -23,6 +23,13 @@
     <Content Include="GoldenFiles\**\*.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Compared against each other by LayoutIsGeneratedTests. -->
+    <Content Include="..\Shrooms.EmailTemplates\Design\layout.html" Link="Layout\layout.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Shrooms.EmailTemplates\EmailTemplates\HeaderFooter.cshtml" Link="Layout\HeaderFooter.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
