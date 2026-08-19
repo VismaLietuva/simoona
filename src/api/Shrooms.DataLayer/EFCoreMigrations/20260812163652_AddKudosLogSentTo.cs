@@ -17,7 +17,23 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     WHERE c.object_id = OBJECT_ID('AspNetUsers') AND c.name = 'Id');
 
                 IF @length IS NULL OR @length <= 0
-                    THROW 50000, 'Cannot size KudosLogs.SentToId: AspNetUsers.Id is missing or not a fixed-length nvarchar.', 1;
+                BEGIN
+                    DECLARE @found nvarchar(200) = (
+                        SELECT t.name + '(' + CASE
+                                WHEN c.max_length = -1 THEN 'max'
+                                WHEN t.name IN ('nvarchar', 'nchar') THEN CAST(c.max_length / 2 AS nvarchar(10))
+                                ELSE CAST(c.max_length AS nvarchar(10))
+                            END + ')'
+                        FROM sys.columns c
+                        JOIN sys.types t ON t.user_type_id = c.user_type_id
+                        WHERE c.object_id = OBJECT_ID('AspNetUsers') AND c.name = 'Id');
+
+                    DECLARE @message nvarchar(400) =
+                        N'Cannot size KudosLogs.SentToId from AspNetUsers.Id: expected a fixed-length nvarchar, found '
+                        + ISNULL(@found, N'no AspNetUsers.Id column') + N'.';
+
+                    THROW 50000, @message, 1;
+                END
 
                 DECLARE @current int = (
                     SELECT c.max_length / 2
