@@ -19,6 +19,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.Property(log => log.PictureId)
                 .IsRequired(false);
+
+            builder.Property(log => log.SentToId)
+                .HasMaxLength(450)
+                .IsRequired(false);
         }
     }
 }
