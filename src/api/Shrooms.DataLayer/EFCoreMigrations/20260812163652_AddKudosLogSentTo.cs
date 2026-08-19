@@ -26,7 +26,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                 IF @current IS NULL
                 BEGIN
-                    EXEC('ALTER TABLE KudosLogs ADD SentToId NVARCHAR(' + @length + ') NULL');
+                    DECLARE @add nvarchar(max) = N'ALTER TABLE KudosLogs ADD SentToId NVARCHAR('
+                        + CAST(@length AS nvarchar(10)) + N') NULL';
+                    EXEC sp_executesql @add;
                 END
                 ELSE IF @current <> @length
                 BEGIN
@@ -36,7 +38,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_KudosLogs_SentToId' AND object_id = OBJECT_ID('KudosLogs'))
                         DROP INDEX IX_KudosLogs_SentToId ON KudosLogs;
 
-                    EXEC('ALTER TABLE KudosLogs ALTER COLUMN SentToId NVARCHAR(' + @length + ') NULL');
+                    DECLARE @alter nvarchar(max) = N'ALTER TABLE KudosLogs ALTER COLUMN SentToId NVARCHAR('
+                        + CAST(@length AS nvarchar(10)) + N') NULL';
+                    EXEC sp_executesql @alter;
                 END
             ");
 
