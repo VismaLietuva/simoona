@@ -77,8 +77,11 @@ namespace Shrooms.Presentation.Api.Controllers
                 _repository.Update(model);
                 await _unitOfWork.SaveAsync();
 
-                await RemoveRoomForUsersAsync(roomViewModel);
-                await AddRoomsForUsersAsync(roomViewModel);
+                if (roomViewModel.ApplicationUsers != null)
+                {
+                    await RemoveRoomForUsersAsync(roomViewModel);
+                    await AddRoomsForUsersAsync(roomViewModel);
+                }
             }
             catch (Exception)
             {
