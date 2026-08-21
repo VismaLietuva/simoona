@@ -1,0 +1,12 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookTakenEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Books" emphasis="taken">Book registered as</email-heading>
+<email-card>
+    <p style="margin:0;">
+        "<strong>@Model.BookTitle</strong>" by @Model.BookAuthor was registered as taken.
+    </p>
+    <email-button href="@Model.BookUrl">Visit book page</email-button>
+</email-card>

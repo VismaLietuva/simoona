@@ -1,0 +1,13 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventReminderStartEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Events">Reminder for @Model.Name event</email-heading>
+<email-card>
+    <p style="margin:0;">
+        We remind you that you are registered for the event, which will take place on
+        @Model.StartDate.ToString("yyyy-MM-dd HH:mm").
+    </p>
+    <email-button href="@Model.Url">Visit event page</email-button>
+</email-card>

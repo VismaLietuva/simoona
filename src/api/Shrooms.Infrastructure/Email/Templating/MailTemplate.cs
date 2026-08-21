@@ -1,4 +1,4 @@
-using RazorLight;
+using Razor.Templating.Core;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Attributes;
@@ -14,11 +14,11 @@ namespace Shrooms.Infrastructure.Email.Templating
 {
     public class MailTemplate : IMailTemplate
     {
-        private readonly IRazorLightEngine _razorLightEngine;
+        private readonly IRazorTemplateEngine _razorTemplateEngine;
 
-        public MailTemplate(IRazorLightEngine razorLightEngine)
+        public MailTemplate(IRazorTemplateEngine razorTemplateEngine)
         {
-            _razorLightEngine = razorLightEngine ?? throw new ArgumentNullException(nameof(razorLightEngine));
+            _razorTemplateEngine = razorTemplateEngine ?? throw new ArgumentNullException(nameof(razorTemplateEngine));
         }
 
         public async Task<string> GenerateAsync<TEmailTemplate>(TEmailTemplate viewModel, string key, string timeZoneKey = null)
@@ -126,7 +126,7 @@ namespace Shrooms.Infrastructure.Email.Templating
         private async Task<string> GenerateInternalAsync<TEmailTemplate>(TEmailTemplate viewModel, string key)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            return await _razorLightEngine.CompileRenderAsync(key, viewModel);
+            return await _razorTemplateEngine.RenderAsync(key, viewModel);
         }
     }
 }

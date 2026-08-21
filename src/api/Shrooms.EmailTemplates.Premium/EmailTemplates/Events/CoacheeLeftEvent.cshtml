@@ -1,0 +1,13 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.CoacheeLeftEventEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Events" emphasis="event">Coachee left the</email-heading>
+<email-card>
+    <p style="margin:0;">
+        Your coachee @Model.CoacheeFullName will no longer attend @Model.EventName. This is an
+        informational notice, no action is needed.
+    </p>
+    <email-button href="@Model.EventUrl">Visit event page</email-button>
+</email-card>

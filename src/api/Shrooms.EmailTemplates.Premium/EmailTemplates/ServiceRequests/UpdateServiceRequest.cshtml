@@ -1,0 +1,13 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.ServiceRequestUpdateEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Service requests" emphasis="Request">Update in your Service</email-heading>
+<email-card>
+    <p style="margin:0;">"<strong>@Model.ServiceRequestTitle</strong>"</p>
+    <p style="margin:12px 0 0;">
+        @Model.FullName has changed your service request's status to <strong>@Model.StatusName</strong>.
+    </p>
+    <email-button href="@Model.Url">Service Request in Simoona</email-button>
+</email-card>

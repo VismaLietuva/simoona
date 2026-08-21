@@ -1,0 +1,10 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventParticipantExpelledEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Events" emphasis="notification">Event</email-heading>
+<email-card>
+    <p style="margin:0;">You have been removed from "<strong>@Model.EventTitle</strong>" event</p>
+    <email-button href="@Model.EventUrl">Visit event page</email-button>
+</email-card>

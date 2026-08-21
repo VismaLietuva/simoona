@@ -1,0 +1,18 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+}
+
+<email-heading eyebrow="Lotteries" emphasis="created">New lottery</email-heading>
+<email-card>
+    <email-details>
+        <email-detail label="Lottery title">@Model.Title</email-detail>
+        <email-detail label="One ticket price">@Model.EntryFee Kudos</email-detail>
+        <email-detail label="End date">@Model.ZonedEndDate.ToString("yyyy-MM-dd HH:mm")</email-detail>
+    </email-details>
+    @if (Model.Description != null)
+    {
+        <email-quote>@Model.Description</email-quote>
+    }
+    <email-button href="@Model.LotteryUrl">Check out in Simoona</email-button>
+</email-card>
