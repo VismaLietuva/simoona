@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace Shrooms.EmailTemplates.Tests
@@ -24,7 +24,8 @@ namespace Shrooms.EmailTemplates.Tests
         {
             var expected = Collapse(await File.ReadAllTextAsync(Path.Combine(LayoutRoot, "layout.html")))
                 .Replace(ContentSlotRow, "@RenderBody()")
-                .Replace("SETTINGS_URL_SLOT", "@Model.UserNotificationSettingsUrl");
+                .Replace("SETTINGS_URL_SLOT", "@Model.UserNotificationSettingsUrl")
+                .Replace("HOME_URL_SLOT", "@Model.HomeUrl");
 
             // Undo the blanket @ escaping instead of listing which at-rules mjml emitted.
             var actual = Collapse(await File.ReadAllTextAsync(Path.Combine(LayoutRoot, "HeaderFooter.cshtml")))

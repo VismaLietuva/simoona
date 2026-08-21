@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Razor.Templating.Core;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Attributes;
 using Shrooms.Infrastructure.Email.Templating;
@@ -46,7 +47,7 @@ namespace Shrooms.Tests.Infrastructure
         public void TestInitializer()
         {
             _razorTemplateEngine = Substitute.For<IRazorTemplateEngine>();
-            _sut = new MailTemplate(_razorTemplateEngine);
+            _sut = new MailTemplate(_razorTemplateEngine, Substitute.For<IApplicationSettings>());
         }
 
         [Test]

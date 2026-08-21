@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
@@ -16,6 +16,7 @@ namespace Shrooms.EmailTemplates.Seeds
         public const string ShowcaseKey = "/EmailTemplates/Design/Showcase.cshtml";
 
         private const string SettingsUrl = "https://simoona.example.com/settings/notifications";
+        private const string HomeUrl = "https://simoona.example.com/";
         private const string PictureUrl = "https://simoona.example.com/pictures/avatar.png";
         private static readonly DateTime SampleDate = new DateTime(2026, 3, 17, 9, 30, 0, DateTimeKind.Utc);
         private static readonly DateTime SampleEndDate = new DateTime(2026, 3, 17, 17, 0, 0, DateTimeKind.Utc);
@@ -24,7 +25,7 @@ namespace Shrooms.EmailTemplates.Seeds
 
         private static IReadOnlyList<EmailTemplateSeed> BuildAll()
         {
-            return new List<EmailTemplateSeed>
+            var seeds = new List<EmailTemplateSeed>
             {
                 // Core
                 new(EmailTemplateCacheKeys.NewWallPost, new NewWallPostEmailTemplateViewModel(
@@ -137,6 +138,11 @@ namespace Shrooms.EmailTemplates.Seeds
 
                 new(ShowcaseKey, new KudosSentEmailTemplateViewModel(SettingsUrl, "Rasa Petraitiene", 25, "Sample", "https://simoona.example.com"))
             };
+
+            // MailTemplate fills this from configuration; renders that bypass it need it too.
+            seeds.ForEach(seed => seed.Model.HomeUrl = HomeUrl);
+
+            return seeds;
         }
 
         private static UserEventAttendStatusChangeEmailDto SampleAttendStatus()

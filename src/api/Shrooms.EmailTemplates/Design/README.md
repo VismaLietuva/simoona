@@ -32,7 +32,7 @@ confirm nothing external crept back in:
 
 ```bash
 grep -o 'https\?://[^"() ]*' EmailTemplates/HeaderFooter.cshtml | sort -u
-# expect only http://www.w3.org/1999/xhtml and https://simoona.com
+# expect only http://www.w3.org/1999/xhtml - every real link is a @Model property
 ```
 
 ## Partials
@@ -62,24 +62,20 @@ directly in the layout's content slot; the rest go inside a card.
 from `simoona-nextjs/src/app/globals.css` (email supports neither OKLCH nor `light-dark()`); type
 and component values are the Tailwind/shadcn classes the app actually uses:
 
-There is **no header bar**. The email opens with the sidebar's brand lockup — the `SimoonaMark` SVG
-in its bordered box next to the `S/moona` wordmark — linking to `https://simoona.com`. The footer is
-just the site link and the notification-preferences link.
+There is **no header bar**. The email opens with the sidebar's `S/moona` wordmark, linking to
+`@Model.HomeUrl`, and the footer is just the notification-preferences link.
 
-The mark carries the same paths, strokes and draw-then-pulse animation as `simoona-mark.tsx` and
-`globals.css`, and replays on hover as the sidebar does. Three changes were needed for email:
+`HomeUrl` is the `ClientUrl` setting, filled in by `MailTemplate` rather than by the callers that
+build the view models - so the link points at whichever client the sending environment is configured
+against (`https://app.simoona.com/` in production) instead of a hardcoded host. Renders that bypass
+`MailTemplate`, meaning the golden files, take it from `EmailTemplateSeeds`.
 
-- **Hover replay is CSS, not a remount.** The app bumps a React `key` to remount the SVG; email has
-  no JS, and re-applying an identical `animation` does not restart it — so `a:hover` points at a
-  duplicate set of `-h` keyframes. Hover needs a pointer, so this is desktop-only by nature.
-
-- **The keyframes draw *from* the hidden state**, not to it. The app parks the strokes at
-  `stroke-dashoffset: 70` and animates to `0`; a mail client that keeps CSS but strips `animation`
-  would leave an invisible logo, so the offset lives in the keyframe instead of on the element.
-- **Outlook and Gmail strip inline SVG.** Outlook gets an `mso` fallback of the same three glyphs as
-  text. Gmail gets nothing in the box, but the `S/moona` wordmark beside it is always plain text, so
-  the brand still reads. If the empty box matters, swap the SVG for a hosted PNG — at the cost of
-  the remote fetch this design otherwise avoids.
+The `SimoonaMark` SVG that sits beside the wordmark in the app is **not** in the email. Gmail and
+Outlook strip inline SVG, so it rendered as an empty bordered box for most recipients, and its
+draw-then-pulse animation was dead there too — Gmail keeps `<style>` but drops `animation`. The
+alternatives were both worse than dropping it: a hosted PNG or GIF would be the only remote fetch in
+the whole set, and it needs a publicly reachable URL, which `ClientUrl` is not in development. The
+wordmark is plain text, so it renders everywhere and the brand still reads.
 
 | Element | App | Email |
 |---|---|---|
