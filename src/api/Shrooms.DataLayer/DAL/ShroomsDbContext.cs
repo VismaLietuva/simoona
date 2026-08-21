@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -23,6 +24,7 @@ using Shrooms.DataLayer.EntityModels.Models.Monitors;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
+using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 
 namespace Shrooms.DataLayer.DAL
@@ -170,6 +172,14 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<CustomEmoji> CustomEmojis { get; set; }
 
+        public virtual DbSet<VacationRequest> VacationRequests { get; set; }
+
+        public virtual DbSet<VacationRequestEvent> VacationRequestEvents { get; set; }
+
+        public virtual DbSet<VacationOrder> VacationOrders { get; set; }
+
+        public virtual DbSet<VacationOrderItem> VacationOrderItems { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -260,6 +270,10 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new BadgeLogEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BadgeTypeEntityConfiguration());
             modelBuilder.ApplyConfiguration(new CustomEmojiConfig());
+            modelBuilder.ApplyConfiguration(new VacationRequestEntityConfig());
+            modelBuilder.ApplyConfiguration(new VacationRequestEventEntityConfig());
+            modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
+            modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 

@@ -2737,6 +2737,24 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("TimeZone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("VacationOrderCity")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VacationOrderLetterhead")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VacationOrderPrefix")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("VacationOrderSignature")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("VacationOrderStartNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("WelcomeEmail")
                         .IsRequired()
                         .HasMaxLength(10000)
@@ -3439,6 +3457,266 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("VacationPages");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssuedById")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("IssuedOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PeriodStart")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Prefix")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssuedById");
+
+                    b.HasIndex("OrganizationId", "Prefix", "Number")
+                        .IsUnique()
+                        .HasDatabaseName("IX_VacationOrders_OrganizationId_Prefix_Number");
+
+                    b.HasIndex("OrganizationId", "Type", "PeriodStart")
+                        .HasDatabaseName("IX_VacationOrders_OrganizationId_Type_PeriodStart");
+
+                    b.ToTable("VacationOrders", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EmployeeName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VacationOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VacationRequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VacationOrderId");
+
+                    b.HasIndex("VacationRequestId");
+
+                    b.ToTable("VacationOrderItems", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewComment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewedById")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<double>("WorkingDays")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ReviewedById");
+
+                    b.HasIndex("OrganizationId", "Created")
+                        .HasDatabaseName("IX_VacationRequests_OrganizationId_Created");
+
+                    b.HasIndex("OrganizationId", "DateFrom")
+                        .HasDatabaseName("IX_VacationRequests_OrganizationId_DateFrom");
+
+                    b.HasIndex("OrganizationId", "EmployeeId", "Status")
+                        .HasDatabaseName("IX_VacationRequests_OrganizationId_EmployeeId_Status");
+
+                    b.ToTable("VacationRequests", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequestEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActorId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ChangesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VacationRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("WorkingDays")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("VacationRequestId")
+                        .HasDatabaseName("IX_VacationRequestEvents_VacationRequestId");
+
+                    b.HasIndex("OrganizationId", "OccurredAt")
+                        .HasDatabaseName("IX_VacationRequestEvents_OrganizationId_OccurredAt");
+
+                    b.ToTable("VacationRequestEvents", (string)null);
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.WorkingHours", b =>
@@ -4860,6 +5138,105 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "IssuedBy")
+                        .WithMany()
+                        .HasForeignKey("IssuedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssuedBy");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrderItem", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", "VacationOrder")
+                        .WithMany("Items")
+                        .HasForeignKey("VacationOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequest", "VacationRequest")
+                        .WithMany()
+                        .HasForeignKey("VacationRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VacationOrder");
+
+                    b.Navigation("VacationRequest");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequest", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "ReviewedBy")
+                        .WithMany()
+                        .HasForeignKey("ReviewedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("ReviewedBy");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequestEvent", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationRequest", "VacationRequest")
+                        .WithMany()
+                        .HasForeignKey("VacationRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("VacationRequest");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.WorkingHours", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "ApplicationUser")
@@ -5019,6 +5396,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.RoomType", b =>
                 {
                     b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

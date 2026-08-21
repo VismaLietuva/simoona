@@ -1,0 +1,10 @@
+using System.Threading.Tasks;
+using Shrooms.Premium.DataTransferObjects.Models.Vacations;
+
+namespace Shrooms.Premium.Domain.Services.Vacations
+{
+    public interface IVacationStatisticsService
+    {
+        Task<VacationStatisticsDto> GetStatisticsAsync(VacationStatisticsArgsDto args);
+    }
+}

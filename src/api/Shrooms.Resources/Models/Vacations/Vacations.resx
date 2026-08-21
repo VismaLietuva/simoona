@@ -168,4 +168,43 @@
   <data name="tooManyDeputiesAtTheSameTime" xml:space="preserve">
     <value>There can only be one deputy active at the same time</value>
   </data>
+  <data name="startInPast" xml:space="preserve">
+    <value>You cannot request time off in the past</value>
+  </data>
+  <data name="tooFarAhead" xml:space="preserve">
+    <value>You can only request up to {0} months ahead</value>
+  </data>
+  <data name="noWorkingDays" xml:space="preserve">
+    <value>That period contains no working days</value>
+  </data>
+  <data name="noteTooLong" xml:space="preserve">
+    <value>Keep the note under {0} characters</value>
+  </data>
+  <data name="cannotEditVacation" xml:space="preserve">
+    <value>This request can no longer be changed</value>
+  </data>
+  <data name="cannotReviewVacation" xml:space="preserve">
+    <value>This request is not awaiting a decision</value>
+  </data>
+  <data name="reasonTooShort" xml:space="preserve">
+    <value>Give a reason for the rejection</value>
+  </data>
+  <data name="orderHasNoRequests" xml:space="preserve">
+    <value>There are no leave orders for that period</value>
+  </data>
+  <data name="orderNotFound" xml:space="preserve">
+    <value>No such leave order</value>
+  </data>
+  <data name="importDateRequired" xml:space="preserve">
+    <value>Give the date the payslip figures were measured at</value>
+  </data>
+  <data name="importUnreadable" xml:space="preserve">
+    <value>The file could not be read as a payroll export</value>
+  </data>
+  <data name="orderRaceLost" xml:space="preserve">
+    <value>Somebody else generated these orders a moment ago. Reload and try again</value>
+  </data>
+  <data name="archiveTooLarge" xml:space="preserve">
+    <value>That period holds more than {0} orders. Narrow it and download again</value>
+  </data>
 </root>
