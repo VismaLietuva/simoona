@@ -11,7 +11,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
 {
     public interface IPostService
     {
-        Task EditPostAsync(EditPostDto editPostDto);
+        /// <summary>Returns the users newly mentioned by this edit, to notify.</summary>
+        Task<IEnumerable<string>> EditPostAsync(EditPostDto editPostDto);
 
         Task<NewlyCreatedPostDto> CreateNewPostAsync(NewPostDto newPostDto);
 

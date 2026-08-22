@@ -61,6 +61,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string UserProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/profiles/{userId}");
 
+        public string GroupUrl(string tenant, int groupId) => GetClientPath($"{tenant}/Groups/{groupId}");
+
         public string BookUrl(string tenant, int bookOfficeId, int officeId) => GetClientPath($"{tenant}/Books/Edit/{bookOfficeId}/{officeId}");
 
         public string KudosProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/Kudos/KudosUserInformation/{userId}");

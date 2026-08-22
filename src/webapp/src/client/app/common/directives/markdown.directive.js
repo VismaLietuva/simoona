@@ -3,6 +3,11 @@
 
     angular.module('simoonaApp.Common').directive('markdown', markdown);
 
+    // Mention tokens written by the Next.js composer. Must stay in step with
+    // MentionTokenParser on the API and src/lib/mentions.ts in the web client.
+    var MENTION_TOKEN =
+        /@\[([^\]\n]{1,100})\]\((?:user:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|group:\d{1,9})\)/g;
+
     function markdown() {
         var directive = {
             restrict: 'A',
@@ -14,9 +19,20 @@
 
         function linkFunc(scope, element, attrs) {
             scope.$evalAsync(function () {
-                let text = convertMarkdownToHtml(element[0].innerHTML);
+                let text = convertMarkdownToHtml(
+                    expandMentionTokens(element[0].innerHTML)
+                );
                 element[0].innerHTML = formatMentions(text);
             });
+
+            // This client has no profile or group pages to link to, so a token
+            // becomes the same bold "@Name" it renders for its own mentions -
+            // otherwise showdown turns it into a link with a dead user: scheme.
+            function expandMentionTokens(input) {
+                return input.replace(MENTION_TOKEN, function (match, label) {
+                    return '**@' + label + '**';
+                });
+            }
 
             function convertMarkdownToHtml(input) {
                 const converterInput = input.replace('&gt;', '>'); // Sanitizer encodes this, needed for blockquote.

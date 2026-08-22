@@ -16,6 +16,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts
@@ -26,6 +27,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         private readonly ICommentService _commentService;
         private readonly IWallService _wallService;
+        private readonly IMentionResolver _mentionResolver;
 
         private readonly IUnitOfWork2 _uow;
         private readonly DbSet<Post> _postsDbSet;
@@ -33,11 +35,16 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly DbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public PostService(IUnitOfWork2 uow, ICommentService commentService, IWallService wallService)
+        public PostService(
+            IUnitOfWork2 uow,
+            ICommentService commentService,
+            IWallService wallService,
+            IMentionResolver mentionResolver)
         {
             _uow = uow;
             _commentService = commentService;
             _wallService = wallService;
+            _mentionResolver = mentionResolver;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -86,7 +93,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
                 var postCreator = await _usersDbSet.SingleAsync(user => user.Id == newPostDto.UserId);
                 var postCreatorDto = MapUserToDto(postCreator);
-                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds, wall);
+                var mentionedUserIds = await _mentionResolver.ResolveAsync(post.MessageBody, newPostDto.MentionedUserIds, newPostDto);
+                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, mentionedUserIds, wall);
                 return newlyCreatedPostDto;
             }
             finally
@@ -135,7 +143,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public async Task EditPostAsync(EditPostDto editPostDto)
+        public async Task<IEnumerable<string>> EditPostAsync(EditPostDto editPostDto)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -159,11 +167,21 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     userOrg: editPostDto,
                     checkForAdministrationEventPermission: true);
 
+                var previousMessageBody = post.MessageBody;
+
                 post.MessageBody = editPostDto.MessageBody;
                 post.Images = new ImageCollection(editPostDto.Images);
                 post.LastEdit = DateTime.UtcNow;
 
+                var addedMentions = await _mentionResolver.ResolveAddedAsync(
+                    editPostDto.MessageBody,
+                    previousMessageBody,
+                    editPostDto.MentionedUserIds,
+                    editPostDto);
+
                 await _uow.SaveChangesAsync(editPostDto.UserId);
+
+                return addedMentions;
             }
             finally
             {

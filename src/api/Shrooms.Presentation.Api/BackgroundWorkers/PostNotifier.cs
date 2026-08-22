@@ -10,6 +10,7 @@ using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Presentation.Common.Hubs;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,9 +53,9 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             await NotificationHub.SendWallNotificationAsync(_hubContext, createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
         }
 
-        public async Task NotifyUpdatedPostMentionsAsync(EditPostDto editPostDto)
+        public async Task NotifyUpdatedPostMentionsAsync(EditPostDto editPostDto, IEnumerable<string> mentionedUserIds)
         {
-            await _postNotificationService.NotifyMentionedUsersAsync(editPostDto);
+            await _postNotificationService.NotifyMentionedUsersAsync(editPostDto, mentionedUserIds);
         }
     }
 }
