@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
@@ -24,6 +25,7 @@ using Shrooms.DataLayer.EntityModels.Models.Monitors;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
+using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 
@@ -180,6 +182,12 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VacationOrderItem> VacationOrderItems { get; set; }
 
+        public virtual DbSet<Seat> Seats { get; set; }
+
+        public virtual DbSet<SeatReservation> SeatReservations { get; set; }
+
+        public virtual DbSet<SeatRelease> SeatReleases { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -274,6 +282,9 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new VacationRequestEventEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new SeatEntityConfig());
+            modelBuilder.ApplyConfiguration(new SeatReservationEntityConfig());
+            modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
