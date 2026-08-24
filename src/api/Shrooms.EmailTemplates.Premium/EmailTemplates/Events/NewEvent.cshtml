@@ -7,10 +7,10 @@
 <email-heading eyebrow="Events" emphasis="event">New</email-heading>
 <email-card>
     <p style="margin:0;">
-        📆 <a href="@Model.EventUrl"><strong>@HtmlSanitizerHelper.Sanitize(Model.EventName)</strong></a>
+        📆 <a href="@Model.EventUrl"><strong>@Model.EventName</strong></a>
     </p>
     <email-details>
-        <email-detail label="Location">@HtmlSanitizerHelper.Sanitize(Model.Location)</email-detail>
+        <email-detail label="Location">@Model.Location</email-detail>
         <email-detail label="Starts">@Model.StartDate.ToString("yyyy-MM-dd HH:mm")</email-detail>
     </email-details>
     @if (string.IsNullOrEmpty(Model.Description))

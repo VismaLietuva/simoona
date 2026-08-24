@@ -81,13 +81,13 @@ namespace Shrooms.EmailTemplates.Seeds
                     "Rotating the venue each quarter so every team gets a turn.",
                     "https://simoona.example.com/committees/1")),
                 new(EmailPremiumTemplateCacheKeys.EventNew, new NewEventEmailTemplateViewModel(
-                    "https://simoona.example.com/events/1", "Engineering all-hands",
+                    "https://simoona.example.com/events/1", "Engineering Q&A",
                     "<p>Roadmap review followed by open questions.</p>", "Vilnius HQ, 4th floor",
                     SampleDate, SettingsUrl)),
                 new(EmailPremiumTemplateCacheKeys.EventShared, new SharedEventEmailTemplateViewModel(
                     "https://simoona.example.com/posts/9", "https://simoona.example.com/events/1",
-                    "Rasa Petraitiene", "<p>Worth attending if you work on the API.</p>", "Engineering wall",
-                    "Engineering all-hands", SampleDate, "<p>Roadmap review followed by open questions.</p>",
+                    "Rasa Petraitiene", "<p>Worth attending if you work on the API.</p>", "Sales & Ops wall",
+                    "Engineering Q&A", SampleDate, "<p>Roadmap review followed by open questions.</p>",
                     "Vilnius HQ, 4th floor", SettingsUrl)),
                 new(EmailPremiumTemplateCacheKeys.EventStartRemind, new EventReminderStartEmailTemplateViewModel(
                     SettingsUrl, "Engineering all-hands", "https://simoona.example.com/events/1", SampleDate)),
