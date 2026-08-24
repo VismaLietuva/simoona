@@ -26,7 +26,7 @@ namespace Shrooms.EmailTemplates.TagHelpers
             output.TagName = "tr";
             output.TagMode = TagMode.StartTagAndEndTag;
             output.Content.SetHtmlContent(
-                "<td align=\"left\" style=\"padding:0 4px;\">" +
+                $"<td align=\"left\" style=\"background-color:{EmailDesign.Muted};padding:0 4px;\">" +
                 $"{content}" +
                 $"<h1 style=\"margin:0;font-family:{EmailDesign.FontSans};font-size:{EmailDesign.HeadlineSize};" +
                 $"line-height:{EmailDesign.HeadlineLineHeight};font-weight:{EmailDesign.HeadlineWeight};" +
