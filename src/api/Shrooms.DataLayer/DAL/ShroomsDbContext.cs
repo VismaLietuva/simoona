@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
@@ -304,6 +305,54 @@ namespace Shrooms.DataLayer.DAL
                     if (source == null || source == Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)
                     {
                         conventionProperty.SetIsNullable(true);
+                    }
+                }
+            }
+
+            // Brownfield databases key AspNetUsers/AspNetRoles at nvarchar(128)
+            // (see AddMissingIdentityTables, which derives its FK widths from the
+            // live column), while EF Core's Identity default is 450. SQL Server
+            // refuses a foreign key whose length differs from the key it
+            // references, so the length is declared once here and inherited by
+            // every entity: relying on each config to remember it is how
+            // VacationOrders and Seats both shipped an FK no brownfield database
+            // could create.
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(user => user.Id)
+                .HasMaxLength(DataLayerConstants.IdentityKeyLength);
+
+            modelBuilder.Entity<ApplicationRole>()
+                .Property(role => role.Id)
+                .HasMaxLength(DataLayerConstants.IdentityKeyLength);
+
+            // The Identity join tables are created by AddMissingIdentityTables,
+            // not by EF: it sizes AspNetUserLogins from the live AspNetUsers.Id and
+            // hard-codes 128 for AspNetUserTokens. These four key columns are
+            // therefore 128 in every database, fresh ones included.
+            modelBuilder.Entity<IdentityUserLogin<string>>(login =>
+            {
+                login.Property(x => x.LoginProvider).HasMaxLength(DataLayerConstants.IdentityKeyLength);
+                login.Property(x => x.ProviderKey).HasMaxLength(DataLayerConstants.IdentityKeyLength);
+            });
+
+            modelBuilder.Entity<IdentityUserToken<string>>(token =>
+            {
+                token.Property(x => x.LoginProvider).HasMaxLength(DataLayerConstants.IdentityKeyLength);
+                token.Property(x => x.Name).HasMaxLength(DataLayerConstants.IdentityKeyLength);
+            });
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var identityForeignKeys = entityType.GetForeignKeys()
+                    .Where(foreignKey =>
+                        foreignKey.PrincipalEntityType.ClrType == typeof(ApplicationUser) ||
+                        foreignKey.PrincipalEntityType.ClrType == typeof(ApplicationRole));
+
+                foreach (var foreignKey in identityForeignKeys)
+                {
+                    foreach (var property in foreignKey.Properties)
+                    {
+                        property.SetMaxLength(DataLayerConstants.IdentityKeyLength);
                     }
                 }
             }

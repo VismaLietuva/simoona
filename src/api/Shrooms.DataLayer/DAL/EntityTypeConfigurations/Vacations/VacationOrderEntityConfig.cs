@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Shrooms.Contracts.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 
@@ -12,7 +11,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations
             builder.ToTable("VacationOrders");
 
             builder.Property(x => x.Prefix).IsRequired().HasMaxLength(VacationOrder.MaxPrefixLength);
-            builder.Property(x => x.IssuedById).IsRequired().HasMaxLength(DataLayerConstants.IdentityKeyLength);
+            builder.Property(x => x.IssuedById).IsRequired();
 
             builder.Property(x => x.IssuedOn).HasColumnType("date");
             builder.Property(x => x.PeriodStart).HasColumnType("date");

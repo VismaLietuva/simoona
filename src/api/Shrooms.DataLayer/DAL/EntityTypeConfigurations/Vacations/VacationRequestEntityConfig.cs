@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Shrooms.Contracts.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 
@@ -11,8 +10,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations
         {
             builder.ToTable("VacationRequests");
 
-            builder.Property(x => x.EmployeeId).IsRequired().HasMaxLength(DataLayerConstants.IdentityKeyLength);
-            builder.Property(x => x.ReviewedById).HasMaxLength(DataLayerConstants.IdentityKeyLength);
+            builder.Property(x => x.EmployeeId).IsRequired();
 
             // Calendar days, not instants: a "date" column cannot pick up an
             // offset on the way in or out.
