@@ -15,7 +15,8 @@ Then fold `Design/layout.html` into `EmailTemplates/HeaderFooter.cshtml`:
 2. Replace the `<tr>` holding `CONTENT_SLOT` with `@RenderBody()`. It must land directly inside a
    `<tbody>`, because every template body is a run of `<tr>` rows.
 3. Replace `SETTINGS_URL_SLOT` with `@Model.UserNotificationSettingsUrl`.
-4. Keep the `@model` line and the generated-file comment at the top.
+4. Replace `HOME_URL_SLOT` with `@Model.HomeUrl`.
+5. Keep the `@model` line and the generated-file comment at the top.
 
 Recompiling is not a CI step on purpose. `appveyor.yml` is a pure .NET pipeline, and adding npm to
 it to regenerate one layout that changes twice a year is a bad trade. Checking that the two files
