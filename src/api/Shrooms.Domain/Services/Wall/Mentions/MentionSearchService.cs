@@ -83,7 +83,10 @@ namespace Shrooms.Domain.Services.Wall.Mentions
                                 group.Status == GroupStatus.Approved &&
                                 group.GroupType.HasGroupTag)
                 .Where(group => !hasTerm || group.Name.StartsWith(term) || group.Name.Contains(term))
-                .OrderByDescending(group => group.Name.StartsWith(term))
+                .OrderByDescending(group => group.Members.Any(member =>
+                    (member.StartDate == null || member.StartDate <= today) &&
+                    (member.EndDate == null || member.EndDate >= today)))
+                .ThenByDescending(group => group.Name.StartsWith(term))
                 .ThenBy(group => group.Name)
                 .Take(GroupsLimit)
                 .Select(group => new MentionGroupDto
