@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -121,8 +122,12 @@ namespace Shrooms.Infrastructure.Email
             }
 
             mailMessage.Subject = email.Subject;
-            mailMessage.Body = email.Body;
-            mailMessage.IsBodyHtml = true;
+
+            // multipart/alternative: text first, html last - clients take the last part they support.
+            mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+                HtmlToPlainTextConverter.Convert(email.Body), null, MediaTypeNames.Text.Plain));
+            mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+                email.Body, null, MediaTypeNames.Text.Html));
 
             return mailMessage;
         }
