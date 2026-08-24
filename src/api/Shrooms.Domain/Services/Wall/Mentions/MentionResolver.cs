@@ -127,16 +127,15 @@ namespace Shrooms.Domain.Services.Wall.Mentions
             var utcNow = _systemClock.UtcNow;
             var today = utcNow.Date;
 
-            // The date checks spell out Group.IsExpired and GroupMember.IsActiveDuring
-            // rather than calling them, so the whole thing stays one query. Both are
-            // compared against the date, not the instant: the dates are captured as
-            // date-only, so a timestamp comparison would drop a group on its last day.
+            // The date checks spell out GroupMember.IsActiveDuring rather than calling
+            // it, so the whole thing stays one query. The comparison is against the
+            // date, not the instant: the dates are captured as date-only, so a
+            // timestamp comparison would drop a membership on its last day.
             return await _groupsDbSet
                 .Where(group => groupIds.Contains(group.Id) &&
                                 group.OrganizationId == organizationId &&
                                 group.Status == GroupStatus.Approved &&
-                                group.GroupType.HasGroupTag &&
-                                (group.EndDate == null || group.EndDate >= today))
+                                group.GroupType.HasGroupTag)
                 .SelectMany(group => group.Members)
                 .Where(member => (member.StartDate == null || member.StartDate <= today) &&
                                  (member.EndDate == null || member.EndDate >= today))

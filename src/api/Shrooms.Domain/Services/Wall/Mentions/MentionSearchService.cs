@@ -81,8 +81,7 @@ namespace Shrooms.Domain.Services.Wall.Mentions
             return await _groupsDbSet
                 .Where(group => group.OrganizationId == userOrg.OrganizationId &&
                                 group.Status == GroupStatus.Approved &&
-                                group.GroupType.HasGroupTag &&
-                                (group.EndDate == null || group.EndDate >= today))
+                                group.GroupType.HasGroupTag)
                 .Where(group => !hasTerm || group.Name.StartsWith(term) || group.Name.Contains(term))
                 .OrderByDescending(group => group.Name.StartsWith(term))
                 .ThenBy(group => group.Name)
