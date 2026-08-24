@@ -16,7 +16,12 @@ namespace Shrooms.Contracts.DataTransferObjects
 
         public string Body { get; private set; }
 
-        public Attachment Attachment { get; set; }
+        /// <summary>
+        /// Files attached to the outgoing message. Never null; empty means no
+        /// attachments. Callers own disposal — the streams behind these must stay
+        /// open until the mail has been sent.
+        /// </summary>
+        public IList<Attachment> Attachments { get; } = new List<Attachment>();
 
         public EmailDto(string senderFullName, string senderEmail, IEnumerable<string> receivers, string subject, string body)
         {

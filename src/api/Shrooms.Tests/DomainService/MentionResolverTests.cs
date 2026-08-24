@@ -123,10 +123,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Still_Expand_A_Group_On_Its_Final_Day()
+        public async Task Should_Still_Expand_A_Finished_Group()
         {
             var group = TaggableGroup(12, JaneId);
-            group.EndDate = Now.Date;
+            group.EndDate = Now.AddDays(-30);
             GivenGroups(group);
 
             var resolved = await ResolveAsync("@[Task Force](group:12)");
@@ -135,15 +135,15 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Not_Expand_An_Expired_Group()
+        public async Task Should_Still_Expand_To_A_Member_On_Their_Final_Day()
         {
-            var group = TaggableGroup(12, JaneId);
-            group.EndDate = Now.AddDays(-1);
+            var group = TaggableGroup(12);
+            group.Members.Add(new GroupMember { UserId = JaneId, EndDate = Now.Date });
             GivenGroups(group);
 
             var resolved = await ResolveAsync("@[Task Force](group:12)");
 
-            Assert.That(resolved, Is.Empty);
+            Assert.That(resolved, Is.EquivalentTo(new[] { JaneId }));
         }
 
         [Test]

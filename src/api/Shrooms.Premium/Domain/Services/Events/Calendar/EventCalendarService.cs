@@ -61,7 +61,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 
             using (var stream = new MemoryStream(calByteArray))
             {
-                emailDto.Attachment = new MailAttachment(stream, FileExportName.Sanitize(@event.Name, "invite", ".ics"));
+                emailDto.Attachments.Add(new MailAttachment(stream, FileExportName.Sanitize(@event.Name, "invite", ".ics")));
                 await _mailingService.SendEmailAsync(emailDto);
             }
         }

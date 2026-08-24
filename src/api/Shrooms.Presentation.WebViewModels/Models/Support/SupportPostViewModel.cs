@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.ViewModels;
@@ -19,9 +20,10 @@ namespace Shrooms.Presentation.WebViewModels.Models.Support
         public int Type { get; set; }
 
         /// <summary>
-        /// Optional screenshot. Submitted as multipart/form-data, so this model no
-        /// longer binds from a JSON body.
+        /// Optional screenshots, at most WebApiConstants.MaximumSupportImageCount of
+        /// them. Submitted as multipart/form-data, so this model no longer binds from
+        /// a JSON body.
         /// </summary>
-        public IFormFile Image { get; set; }
+        public List<IFormFile> Images { get; set; }
     }
 }
