@@ -91,10 +91,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _commentService.EditCommentAsync(editCommentDto);
+                var addedMentions = await _commentService.EditCommentAsync(editCommentDto);
 
                 _asyncRunner.Run<CommentNotifier>(async notifier =>
-                    await notifier.NotifyUpdatedCommentMentionsAsync(editCommentDto), GetOrganizationName());
+                    await notifier.NotifyUpdatedCommentMentionsAsync(editCommentDto, addedMentions), GetOrganizationName());
 
                 return Ok();
             }

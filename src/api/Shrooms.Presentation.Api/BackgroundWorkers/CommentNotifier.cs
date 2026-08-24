@@ -62,9 +62,9 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             }
         }
 
-        public async Task NotifyUpdatedCommentMentionsAsync(EditCommentDto editCommentDto)
+        public async Task NotifyUpdatedCommentMentionsAsync(EditCommentDto editCommentDto, IEnumerable<string> mentionedUserIds)
         {
-            await _commentNotificationService.NotifyMentionedUsersAsync(editCommentDto);
+            await _commentNotificationService.NotifyMentionedUsersAsync(editCommentDto, mentionedUserIds);
         }
 
         private async Task SendNotificationAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)

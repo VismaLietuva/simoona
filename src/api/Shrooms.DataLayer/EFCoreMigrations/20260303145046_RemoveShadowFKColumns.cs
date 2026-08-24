@@ -72,7 +72,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             migrationBuilder.AddColumn<string>(
                 name: "ResponsibleUserId1",
                 table: "Events",
-                type: "nvarchar(450)",
+                type: "nvarchar(128)",
                 nullable: false,
                 defaultValue: "");
 

@@ -61,6 +61,7 @@ namespace Shrooms.IoC
             services.AddFilterPresets();
             services.AddBlacklistUsers();
             services.AddCustomEmoji();
+            services.AddSeats();
             services.AddEmployees();
             services.AddWidgets();
             services.AddShroomsServices();

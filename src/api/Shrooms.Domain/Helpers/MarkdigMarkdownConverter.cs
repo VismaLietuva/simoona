@@ -1,5 +1,6 @@
 using Markdig;
 using Markdig.Extensions.EmphasisExtras;
+using Shrooms.Domain.Services.Wall.Mentions;
 
 namespace Shrooms.Domain.Helpers
 {
@@ -11,7 +12,16 @@ namespace Shrooms.Domain.Helpers
                 .UseSoftlineBreakAsHardlineBreak()
                 .Build();
 
-        public string ConvertToHtml(string markdown) =>
-            string.IsNullOrEmpty(markdown) ? string.Empty : Markdown.ToHtml(markdown, Pipeline);
+        public string ConvertToHtml(string markdown)
+        {
+            if (string.IsNullOrEmpty(markdown))
+            {
+                return string.Empty;
+            }
+
+            var withMentions = MentionTokenParser.Replace(markdown, token => $"**@{token.Label}**");
+
+            return Markdown.ToHtml(withMentions, Pipeline);
+        }
     }
 }

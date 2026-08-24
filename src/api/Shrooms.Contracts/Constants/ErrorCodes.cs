@@ -82,5 +82,27 @@
         public const int InvalidCustomEmojiName = 1800;
         public const int InvalidCustomEmojiImage = 1801;
         public const int CustomEmojiImageTooLarge = 1802;
+
+        // Vacations, 19**
+        public const int VacationTypeRequired = 1900;
+        public const int VacationDatesRequired = 1901;
+        public const int VacationWrongPeriod = 1902;
+        public const int VacationStartInPast = 1903;
+        public const int VacationTooFarAhead = 1904;
+        public const int VacationNoWorkingDays = 1905;
+        public const int VacationOverlap = 1906;
+        public const int VacationNoteTooLong = 1907;
+        public const int VacationNotFound = 1908;
+        public const int VacationNotEditable = 1909;
+        public const int VacationNotCancellable = 1910;
+        public const int VacationNotReviewable = 1911;
+        public const int VacationReasonTooShort = 1912;
+        public const int VacationNotAuthorized = 1913;
+        public const int VacationOrderEmpty = 1914;
+        public const int VacationOrderNotFound = 1915;
+        public const int VacationImportDateRequired = 1916;
+        public const int VacationImportUnreadable = 1917;
+        public const int VacationOrderRaceLost = 1918;
+        public const int VacationArchiveTooLarge = 1919;
     }
 }

@@ -11,6 +11,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Domain.Services.Wall.Mentions;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
@@ -19,16 +20,22 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IWallService _wallService;
+        private readonly IMentionResolver _mentionResolver;
 
         private readonly DbSet<Post> _postsDbSet;
         private readonly DbSet<Comment> _commentsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IWallService wallService)
+        public CommentService(
+            IUnitOfWork2 uow,
+            ISystemClock systemClock,
+            IWallService wallService,
+            IMentionResolver mentionResolver)
         {
             _uow = uow;
             _systemClock = systemClock;
             _wallService = wallService;
+            _mentionResolver = mentionResolver;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
@@ -132,11 +139,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 CommentAuthor = comment.AuthorId,
                 PostAuthor = post.AuthorId,
                 PostId = post.Id,
-                MentionedUserIds = commentDto.MentionedUserIds?.Distinct()
+                MentionedUserIds = await _mentionResolver.ResolveAsync(comment.MessageBody, commentDto.MentionedUserIds, commentDto)
             };
         }
 
-        public async Task EditCommentAsync(EditCommentDto commentDto)
+        public async Task<IEnumerable<string>> EditCommentAsync(EditCommentDto commentDto)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
@@ -154,11 +161,21 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 userOrg: commentDto,
                 checkForAdministrationEventPermission: true);
 
+            var previousMessageBody = comment.MessageBody;
+
             comment.MessageBody = commentDto.MessageBody;
             comment.Images = new ImageCollection(commentDto.Images);
             comment.LastEdit = DateTime.UtcNow;
 
+            var addedMentions = await _mentionResolver.ResolveAddedAsync(
+                commentDto.MessageBody,
+                previousMessageBody,
+                commentDto.MentionedUserIds,
+                commentDto);
+
             await _uow.SaveChangesAsync(commentDto.UserId);
+
+            return addedMentions;
         }
 
         public async Task DeleteCommentAsync(int commentId, UserAndOrganizationDto userOrg)

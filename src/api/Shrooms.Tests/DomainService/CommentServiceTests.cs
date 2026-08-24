@@ -18,6 +18,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
 
@@ -33,6 +34,7 @@ namespace Shrooms.Tests.DomainService
         private IPermissionService _permissionService;
         private ICommentService _commentService;
         private IWallService _wallService;
+        private IMentionResolver _mentionResolver;
 
         private readonly string _userId = Guid.NewGuid().ToString();
 
@@ -52,7 +54,15 @@ namespace Shrooms.Tests.DomainService
 
             _wallService = Substitute.For<IWallService>();
 
-            _commentService = new CommentService(uow, _systemClock, _wallService);
+            _mentionResolver = Substitute.For<IMentionResolver>();
+            _mentionResolver
+                .ResolveAsync(Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(Enumerable.Empty<string>());
+            _mentionResolver
+                .ResolveAddedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(Enumerable.Empty<string>());
+
+            _commentService = new CommentService(uow, _systemClock, _wallService, _mentionResolver);
         }
 
         [Test]

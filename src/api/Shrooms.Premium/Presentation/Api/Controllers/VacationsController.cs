@@ -14,6 +14,17 @@ using Shrooms.Presentation.Common.Helpers;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
+    /// <summary>
+    /// The two legacy actions kept for the old letter flow: the balance figure
+    /// and the Vacation Bot history.
+    ///
+    /// Requests, review and administration live in VacationRequestsController
+    /// and VacationsAdministrationController. The entitlement import moved to
+    /// Vacations/Administration/Entitlements/Import, which takes the payslip
+    /// date the old Upload action could not — it stamped the upload time, and
+    /// the whole balance calculation hangs off that date being the day the
+    /// figures were measured.
+    /// </summary>
     [Authorize]
     public class VacationsController : BaseController
     {
@@ -27,27 +38,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             _vacationService = vacationService;
             _vacationHistoryService = vacationHistoryService;
-        }
-
-        [HttpPost]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Vacation)]
-        [ProducesResponseType(typeof(VacationImportStatusDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Upload(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("No file uploaded");
-            }
-
-            if (file.Length >= WebApiConstants.MaximumPictureSizeInBytes)
-            {
-                return BadRequest("File is too large");
-            }
-
-            using var stream = file.OpenReadStream();
-            var importStatus = await _vacationService.UploadVacationReportFileAsync(stream);
-
-            return Ok(importStatus);
         }
 
         [HttpGet]

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 
@@ -8,6 +9,6 @@ namespace Shrooms.Domain.Services.Email.Posting
     {
         Task NotifyAboutNewPostAsync(NewlyCreatedPostDto post);
 
-        Task NotifyMentionedUsersAsync(EditPostDto editPostDto);
+        Task NotifyMentionedUsersAsync(EditPostDto editPostDto, IEnumerable<string> mentionedUserIds);
     }
 }
