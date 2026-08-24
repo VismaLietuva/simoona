@@ -452,6 +452,96 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Exclude_Refund_Logs_From_Pie_Chart()
+        {
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>
+            {
+                PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 10),
+                PieChartLog(2, "Refund", KudosTypeEnum.Refund, 9)
+            }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result.Single().TypeName, Is.EqualTo("Other"));
+                Assert.That(result.Sum(slice => slice.Value), Is.EqualTo(10));
+            });
+        }
+
+        [Test]
+        public async Task Should_Exclude_Basket_Donation_Logs_From_Pie_Chart()
+        {
+            var donation = PieChartLog(2, "Other", KudosTypeEnum.Ordinary, 5);
+            donation.KudosBasketId = 1;
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>
+            {
+                PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 10),
+                donation
+            }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.That(result.Single().Value, Is.EqualTo(10));
+        }
+
+        [Test]
+        public async Task Should_Exclude_Pie_Chart_Logs_Created_Before_The_Employment_Date()
+        {
+            var employmentDate = DateTime.UtcNow.AddMonths(-1);
+            _usersDbSet.FindAsync("PieUserId").Returns(new ApplicationUser
+            {
+                Id = "PieUserId",
+                OrganizationId = 2,
+                CultureCode = "en-US",
+                EmploymentDate = employmentDate
+            });
+
+            var before = PieChartLog(1, "Before", KudosTypeEnum.Ordinary, 7);
+            before.EmployeeId = "PieUserId";
+            before.Created = employmentDate.AddDays(-1);
+
+            var after = PieChartLog(2, "After", KudosTypeEnum.Ordinary, 3);
+            after.EmployeeId = "PieUserId";
+            after.Created = employmentDate.AddDays(1);
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { before, after }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "PieUserId")).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result.Single().TypeName, Is.EqualTo("After"));
+                Assert.That(result.Single().Value, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public async Task Should_Not_Blank_The_Pie_Chart_When_The_Employment_Date_Is_Missing()
+        {
+            _usersDbSet.FindAsync("NoDateUserId").Returns(new ApplicationUser
+            {
+                Id = "NoDateUserId",
+                OrganizationId = 2,
+                CultureCode = "en-US",
+                EmploymentDate = null
+            });
+
+            var log = PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 4);
+            log.EmployeeId = "NoDateUserId";
+            log.Created = DateTime.UtcNow.AddYears(-5);
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "NoDateUserId")).ToList();
+
+            Assert.That(result.Single().Value, Is.EqualTo(4));
+        }
+
+        [Test]
         public async Task Should_Return_Pie_Chart_Slices_In_A_Deterministic_Order()
         {
             MockKudosLogsForPieChart();
