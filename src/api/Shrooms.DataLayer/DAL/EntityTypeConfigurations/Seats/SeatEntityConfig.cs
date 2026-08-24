@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shrooms.Contracts.Constants;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats
@@ -14,7 +13,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats
             builder.HasQueryFilter(e => !e.IsDeleted);
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(Seat.MaxNameLength);
-            builder.Property(x => x.OwnerId).HasMaxLength(DataLayerConstants.IdentityKeyLength);
             builder.Property(x => x.Created).HasColumnType("datetime2");
             builder.Property(x => x.Modified).HasColumnType("datetime2");
 

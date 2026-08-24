@@ -8,7 +8,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
     /// Creates the 5 standard ASP.NET Core Identity tables missing from brownfield databases.
     /// FK column widths are derived at runtime from the actual AspNetRoles/AspNetUsers Id
     /// column length so the migration works on both old Identity v2 databases (NVARCHAR(128))
-    /// and fresh EF Core installs (NVARCHAR(450)).
+    /// so the tables match whatever AspNetUsers.Id is — NVARCHAR(128) in every
+    /// Simoona database, brownfield or created from these migrations.
     /// </summary>
     public partial class AddMissingIdentityTables : Migration
     {

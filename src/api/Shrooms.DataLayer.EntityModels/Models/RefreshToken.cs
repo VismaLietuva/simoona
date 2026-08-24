@@ -6,7 +6,15 @@ namespace Shrooms.DataLayer.EntityModels.Models
 {
     public class RefreshToken : IOrganization, ITrackable
     {
+        /// <summary>
+        /// The deployed column is nvarchar(128) — the legacy EF6 default for a
+        /// string key, see build/initial_db.sql. EF Core would default a string
+        /// key to 450 instead, so the length is declared explicitly.
+        /// </summary>
+        public const int MaxIdLength = 128;
+
         [Key]
+        [StringLength(MaxIdLength)]
         public string Id { get; set; }
 
         public string Subject { get; set; }

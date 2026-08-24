@@ -32,8 +32,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             builder.Property(u => u.CreatedBy)
                 .HasMaxLength(50);
 
-            builder.Property(u => u.ApplicationUserId)
-                .HasMaxLength(450);
         }
     }
 }

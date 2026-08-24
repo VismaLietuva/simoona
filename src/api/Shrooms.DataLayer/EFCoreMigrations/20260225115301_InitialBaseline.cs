@@ -275,7 +275,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     OrganizationId = table.Column<int>(type: "int", nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -780,7 +780,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: false),
                     IssuedUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -917,7 +917,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 columns: table => new
                 {
                     PermissionId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    RoleId = table.Column<string>(type: "nvarchar(128)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1018,7 +1018,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1035,7 +1035,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     RoomId = table.Column<int>(type: "int", nullable: true),
                     PictureId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     QualificationLevelId = table.Column<int>(type: "int", nullable: true),
-                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ManagerId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     OrganizationId = table.Column<int>(type: "int", nullable: false),
                     IsOwner = table.Column<bool>(type: "bit", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1108,7 +1108,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ApplicationUserExams",
                 columns: table => new
                 {
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     ExamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1132,7 +1132,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ServiceRequestCategoryApplicationUsers",
                 columns: table => new
                 {
-                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     ServiceRequestCategory_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1156,7 +1156,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ApplicationUserSkills",
                 columns: table => new
                 {
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     SkillId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1182,7 +1182,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    EmployeeId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     BadgeTypeId = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -1221,13 +1221,13 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     OrganizationId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -1270,7 +1270,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", maxLength: 9000, nullable: true),
                     BookCoverUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1309,7 +1309,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SortOrder = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClassificatorType = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
                     InProgress = table.Column<bool>(type: "bit", nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1347,7 +1347,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1369,7 +1369,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "CommitteesUsersDelegates",
                 columns: table => new
                 {
-                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Committee_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1394,7 +1394,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 columns: table => new
                 {
                     Committee_Id = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(128)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1418,7 +1418,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 columns: table => new
                 {
                     Committee_Id = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(128)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1462,8 +1462,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     MaxVirtualParticipants = table.Column<int>(type: "int", nullable: false),
                     MaxChoices = table.Column<int>(type: "int", nullable: false),
                     EventTypeId = table.Column<int>(type: "int", nullable: false),
-                    ResponsibleUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ResponsibleUserId1 = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ResponsibleUserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
+                    ResponsibleUserId1 = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     WallId = table.Column<int>(type: "int", nullable: false),
                     IsPinned = table.Column<bool>(type: "bit", nullable: false),
                     IsShownInUpcomingEventsWidget = table.Column<bool>(type: "bit", nullable: false),
@@ -1516,7 +1516,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    EmployeeId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     KudosTypeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     KudosTypeValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     KudosSystemType = table.Column<int>(type: "int", nullable: false),
@@ -1562,7 +1562,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LotteryId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Joined = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1604,7 +1604,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     EventWeeklyReminderEmailNotifications = table.Column<bool>(type: "bit", nullable: false),
                     MentionEmailNotifications = table.Column<bool>(type: "bit", nullable: false),
                     CreatedLotteryEmailNotifications = table.Column<bool>(type: "bit", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1634,7 +1634,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 columns: table => new
                 {
                     NotificationId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     IsAlreadySeen = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -1663,7 +1663,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     MessageBody = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     LastActivity = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastEdit = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AuthorId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Images = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsHidden = table.Column<bool>(type: "bit", nullable: false),
                     SharedEventId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1699,7 +1699,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Desc = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    OwnerId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     WallId = table.Column<int>(type: "int", nullable: false),
                     Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1738,7 +1738,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    EmployeeId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PriorityId = table.Column<int>(type: "int", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
@@ -1794,7 +1794,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WallId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     AppNotificationsEnabled = table.Column<bool>(type: "bit", nullable: false),
                     EmailNotificationsEnabled = table.Column<bool>(type: "bit", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1826,7 +1826,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WallId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1861,7 +1861,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     LunchEnd = table.Column<TimeSpan>(type: "time", nullable: true),
                     FullTime = table.Column<bool>(type: "bit", nullable: false),
                     PartTimeHours = table.Column<int>(type: "int", nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -2034,7 +2034,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     AttendStatus = table.Column<int>(type: "int", nullable: false),
                     AttendComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -2067,7 +2067,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MessageBody = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AuthorId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     PostId = table.Column<int>(type: "int", nullable: false),
                     Images = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastEdit = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -2101,7 +2101,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 columns: table => new
                 {
                     PostId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(128)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2124,7 +2124,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "ProjectApplicationUsers",
                 columns: table => new
                 {
-                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ApplicationUser_Id = table.Column<string>(type: "nvarchar(128)", nullable: false),
                     Project_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -2174,7 +2174,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    EmployeeId = table.Column<string>(type: "nvarchar(128)", nullable: true),
                     ServiceRequestId = table.Column<int>(type: "int", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -2212,7 +2212,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     TakenFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Returned = table.Column<DateTime>(type: "datetime2", nullable: true),
                     BookOfficeId = table.Column<int>(type: "int", nullable: false),

@@ -8,6 +8,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
+            builder.Property(x => x.Id)
+                .HasMaxLength(RefreshToken.MaxIdLength);
+
             builder.Property(x => x.Subject)
                 .HasMaxLength(70)
                 .IsRequired();
