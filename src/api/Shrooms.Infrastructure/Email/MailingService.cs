@@ -115,9 +115,9 @@ namespace Shrooms.Infrastructure.Email
                 }
             }
 
-            if (email.Attachment != null)
+            foreach (var attachment in email.Attachments)
             {
-                mailMessage.Attachments.Add(email.Attachment);
+                mailMessage.Attachments.Add(attachment);
             }
 
             mailMessage.Subject = email.Subject;

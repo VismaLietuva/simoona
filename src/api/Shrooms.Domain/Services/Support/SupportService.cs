@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -30,24 +31,32 @@ namespace Shrooms.Domain.Services.Support
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 
-            // The stream backing a MailAttachment must stay open until the message is
-            // sent, so it is disposed only after SendEmailAsync completes.
-            MemoryStream attachmentStream = null;
+            // The streams backing the MailAttachments must stay open until the message
+            // is sent, so they are disposed only after SendEmailAsync completes.
+            var attachmentStreams = new List<MemoryStream>();
 
             try
             {
-                if (support.Attachment != null)
+                foreach (var attachment in support.Attachments)
                 {
-                    attachmentStream = new MemoryStream(support.Attachment.Content);
-                    email.Attachment = new MailAttachment(attachmentStream, support.Attachment.FileName, support.Attachment.ContentType);
+                    var attachmentStream = new MemoryStream(attachment.Content);
+                    attachmentStreams.Add(attachmentStream);
+                    email.Attachments.Add(new MailAttachment(attachmentStream, attachment.FileName, attachment.ContentType));
                 }
 
                 await _mailingService.SendEmailAsync(email, true);
             }
             finally
             {
-                email.Attachment?.Dispose();
-                attachmentStream?.Dispose();
+                foreach (var attachment in email.Attachments)
+                {
+                    attachment.Dispose();
+                }
+
+                foreach (var attachmentStream in attachmentStreams)
+                {
+                    attachmentStream.Dispose();
+                }
             }
         }
     }
