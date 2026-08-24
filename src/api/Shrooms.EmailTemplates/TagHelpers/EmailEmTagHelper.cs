@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Shrooms.EmailTemplates.TagHelpers
@@ -13,9 +14,12 @@ namespace Shrooms.EmailTemplates.TagHelpers
 
             output.TagName = "em";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.SetAttribute(
+            // An IHtmlContent value is written literally; a string would have its quotes encoded,
+            // and FontSerif carries them.
+            output.Attributes.SetAttribute(new TagHelperAttribute(
                 "style",
-                $"font-family:{EmailDesign.FontSerif};font-weight:400;font-style:italic;");
+                new HtmlString($"font-family:{EmailDesign.FontSerif};font-weight:400;font-style:italic;"),
+                HtmlAttributeValueStyle.DoubleQuotes));
             output.Content.SetHtmlContent(content);
         }
     }

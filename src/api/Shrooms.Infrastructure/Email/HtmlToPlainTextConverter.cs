@@ -52,6 +52,10 @@ namespace Shrooms.Infrastructure.Email
             });
 
             text = Breaks.Replace(text, Sentinel);
+
+            // Strip, then decode - not the reverse. Decoding first would turn an escaped "5 &lt; 6"
+            // into a tag for the stripper to eat. The cost is that markup which the html part shows
+            // as literal text shows the same way here, which is faithful: the two parts agree.
             text = Tags.Replace(text, string.Empty);
             text = WebUtility.HtmlDecode(text);
             text = Whitespace.Replace(text, " ");

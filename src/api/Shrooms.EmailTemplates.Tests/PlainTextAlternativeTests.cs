@@ -33,6 +33,28 @@ namespace Shrooms.EmailTemplates.Tests
             });
         }
 
+        // A template that renders markup into a Razor-encoded slot shows the tags as literal text,
+        // and the text part faithfully repeats them. Catching that here beats reading 32 goldens.
+        [Test]
+        public void Convert_OnEveryRenderedEmail_LeavesNoLiteralMarkup()
+        {
+            var offenders = Directory.EnumerateFiles(GoldenRoot, "*.html")
+                .Select(path => new { Name = Path.GetFileName(path), Text = HtmlToPlainTextConverter.Convert(File.ReadAllText(path)) })
+                .Where(x => x.Text.Contains('<') || x.Text.Contains('>'))
+                .Select(x => x.Name)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty, "a seed is feeding markup into an encoded slot");
+        }
+
+        [Test]
+        public void Convert_OnEscapedAngleBracketInText_KeepsIt()
+        {
+            var text = HtmlToPlainTextConverter.Convert("<p>5 &lt; 6 and 7 &gt; 6</p>");
+
+            Assert.That(text, Is.EqualTo("5 < 6 and 7 > 6"));
+        }
+
         [Test]
         public void Convert_OnHiddenPreheader_DropsIt()
         {

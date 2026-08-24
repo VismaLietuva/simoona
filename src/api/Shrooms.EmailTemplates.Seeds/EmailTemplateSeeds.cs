@@ -128,7 +128,7 @@ namespace Shrooms.EmailTemplates.Seeds
                     {
                         Id = 1,
                         Title = "Concert tickets",
-                        Description = "<p>Two tickets to the summer festival.</p>",
+                        Description = "Two tickets to the summer festival.",
                         EntryFee = 20,
                         EndDate = SampleEndDate
                     },

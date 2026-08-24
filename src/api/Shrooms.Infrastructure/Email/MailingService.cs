@@ -123,13 +123,30 @@ namespace Shrooms.Infrastructure.Email
 
             mailMessage.Subject = email.Subject;
 
-            // multipart/alternative: text first, html last - clients take the last part they support.
-            mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
-                HtmlToPlainTextConverter.Convert(email.Body), null, MediaTypeNames.Text.Plain));
-            mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
-                email.Body, null, MediaTypeNames.Text.Html));
+            if (IsRenderedTemplate(email.Body))
+            {
+                // multipart/alternative: text first, html last - clients take the last part they support.
+                mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+                    HtmlToPlainTextConverter.Convert(email.Body), null, MediaTypeNames.Text.Plain));
+                mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+                    email.Body, null, MediaTypeNames.Text.Html));
+            }
+            else
+            {
+                // Support requests and the like pass the sender's own text straight through. Deriving
+                // a text part from it would collapse the line breaks they typed, and a null body has
+                // always been allowed here.
+                mailMessage.Body = email.Body;
+                mailMessage.IsBodyHtml = true;
+            }
 
             return mailMessage;
+        }
+
+        // Only the Razor templates produce a full document; everything else is raw text.
+        private static bool IsRenderedTemplate(string body)
+        {
+            return body != null && body.Contains("<html", StringComparison.OrdinalIgnoreCase);
         }
 
         private void LogSendFailure(SmtpException ex)
