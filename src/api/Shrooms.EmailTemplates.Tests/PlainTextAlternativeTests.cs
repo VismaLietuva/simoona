@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Shrooms.Infrastructure.Email;
 
 namespace Shrooms.EmailTemplates.Tests
@@ -26,6 +26,7 @@ namespace Shrooms.EmailTemplates.Tests
                 Assert.That(text, Does.Not.Contain("font-family"), "css survived");
                 Assert.That(text, Does.Contain("S/moona"), "wordmark is missing");
                 Assert.That(text, Does.Contain("Rasa Petraitiene"), "body copy is missing");
+                Assert.That(text, Does.Contain("You received 25 kudos"), "the headline is missing");
                 Assert.That(text, Does.Contain("Update your notification preferences"), "footer is missing");
                 Assert.That(text, Does.Contain("https://simoona.example.com/kudos"), "the cta url is missing");
                 Assert.That(text, Does.Not.Match(@"\n[ \t]*\n[ \t]*\n"), "blank runs were not collapsed");

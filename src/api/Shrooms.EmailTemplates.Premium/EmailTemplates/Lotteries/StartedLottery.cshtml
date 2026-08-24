@@ -1,18 +1,19 @@
-@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.Title} is open, {Model.EntryFee} kudos per ticket.";
 }
 
-<email-heading eyebrow="Lotteries" emphasis="created">New lottery</email-heading>
+<email-heading eyebrow="Lotteries">New <email-em>lottery</email-em></email-heading>
 <email-card>
     <email-details>
         <email-detail label="Lottery title">@Model.Title</email-detail>
         <email-detail label="One ticket price">@Model.EntryFee Kudos</email-detail>
         <email-detail label="End date">@Model.ZonedEndDate.ToString("yyyy-MM-dd HH:mm")</email-detail>
     </email-details>
-    @if (Model.Description != null)
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
     {
         <email-quote>@Model.Description</email-quote>
     }
-    <email-button href="@Model.LotteryUrl">Check out in Simoona</email-button>
+    <email-button href="@Model.LotteryUrl">See the lottery</email-button>
 </email-card>

@@ -3,13 +3,11 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Shrooms.EmailTemplates.TagHelpers
 {
-    // Uppercase eyebrow over an extrabold headline, with an optional serif-italic accent.
+    // Uppercase eyebrow over an extrabold headline. The serif accent is <email-em>, inline.
     [HtmlTargetElement("email-heading")]
     public class EmailHeadingTagHelper : TagHelper
     {
         public string Eyebrow { get; set; }
-
-        public string Emphasis { get; set; }
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
@@ -23,13 +21,6 @@ namespace Shrooms.EmailTemplates.TagHelpers
                     $"font-size:{EmailDesign.EyebrowSize};font-weight:{EmailDesign.EyebrowWeight};" +
                     $"letter-spacing:{EmailDesign.EyebrowTracking};text-transform:uppercase;" +
                     $"color:{EmailDesign.MutedForeground};\">{WebUtility.HtmlEncode(Eyebrow)}</p>";
-            }
-
-            if (!string.IsNullOrWhiteSpace(Emphasis))
-            {
-                headline +=
-                    $" <em style=\"font-family:{EmailDesign.FontSerif};font-weight:400;" +
-                    $"font-style:italic;\">{WebUtility.HtmlEncode(Emphasis)}</em>";
             }
 
             output.TagName = "tr";

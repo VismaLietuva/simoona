@@ -1,7 +1,8 @@
-@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewWallPostEmailTemplateViewModel
+﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewWallPostEmailTemplateViewModel
 @using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.FullName} posted in {Model.WallTitle}.";
 }
 
 <email-heading eyebrow="Wall">@Model.WallTitle</email-heading>

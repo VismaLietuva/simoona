@@ -1,10 +1,11 @@
-@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.ServiceRequestEmailTemplateViewModel
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.ServiceRequestEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.FullName} raised: {Model.ServiceRequestTitle}.";
 }
 
-<email-heading eyebrow="Service requests" emphasis="Request">New Service</email-heading>
+<email-heading eyebrow="Service requests">New service <email-em>request</email-em></email-heading>
 <email-card>
     <p style="margin:0;">@Model.FullName: "<strong>@Model.ServiceRequestTitle</strong>"</p>
-    <email-button href="@Model.Url">Service Request in Simoona</email-button>
+    <email-button href="@Model.Url">Open the request</email-button>
 </email-card>

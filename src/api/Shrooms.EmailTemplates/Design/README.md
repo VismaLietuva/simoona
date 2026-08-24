@@ -39,12 +39,13 @@ grep -o 'https\?://[^"() ]*' EmailTemplates/HeaderFooter.cshtml | sort -u
 
 ## Partials
 
-Five tag helpers in `TagHelpers/`, registered via `@addTagHelper *, Shrooms.EmailTemplates` in both
+Six tag helpers in `TagHelpers/`, registered via `@addTagHelper *, Shrooms.EmailTemplates` in both
 projects' `_ViewImports.cshtml`. `<email-heading>` and `<email-card>` emit table rows and sit
-directly in the layout's content slot; the rest go inside a card.
+directly in the layout's content slot; the rest go inside a card. `<email-em>` is the serif accent,
+inline so it lands on the word carrying the news rather than on whatever ends the headline.
 
 ```razor
-<email-heading>Kudos notification</email-heading>
+<email-heading eyebrow="Kudos">You received <email-em>25 kudos</email-em></email-heading>
 <email-card>
     <p style="margin:0;">Body copy.</p>
     <email-quote>User-supplied text.</email-quote>
@@ -55,8 +56,12 @@ directly in the layout's content slot; the rest go inside a card.
 </email-card>
 ```
 
-`EmailTemplates/Design/Showcase.cshtml` renders all five at once. View it at
+`EmailTemplates/Design/Showcase.cshtml` renders them all at once. View it at
 `/email-preview/Design/Showcase.cshtml`.
+
+Each template sets `ViewData["Preheader"]` in its `@{ }` block. That is the hidden line mail
+clients show as the inbox preview, next to the subject - without it the preview falls back to the
+wordmark. Keep it to one sentence that adds to the subject rather than repeating it.
 
 ## Matching the frontend
 
