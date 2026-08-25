@@ -91,10 +91,6 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 table: "VideoTypes",
                 columns: new[] { "OrganizationId", "Title" });
 
-            // VIDEOLIBRARY_BASIC lets everyone open the video library; VIDEOLIBRARY_ADMINISTRATION
-            // gates creating videos and managing video types in Administration > Customization.
-            // Role assignments are mirrored from an existing permission with the same audience, so
-            // the feature is reachable on every tenant without a manual roles pass.
             migrationBuilder.Sql(@"
 IF NOT EXISTS (SELECT 1 FROM dbo.Permissions WHERE Name = N'VIDEOLIBRARY_BASIC')
 BEGIN
@@ -113,12 +109,12 @@ DECLARE @adminId  INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'VIDEOLIBR
 DECLARE @mirrorBasicId INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'EMPLOYEELIST_BASIC')
 DECLARE @mirrorAdminId INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'ORGANIZATION_ADMINISTRATION')
 
-IF @basicId IS NOT NULL AND @mirrorBasicId IS NOT NULL
+IF @basicId IS NOT NULL
 BEGIN
     INSERT dbo.RolePermissions ([PermissionId], [RoleId])
-    SELECT @basicId, rp.RoleId
+    SELECT DISTINCT @basicId, rp.RoleId
     FROM   dbo.RolePermissions rp
-    WHERE  rp.PermissionId = @mirrorBasicId
+    WHERE  rp.PermissionId IN (@mirrorBasicId, @mirrorAdminId)
       AND  NOT EXISTS (
                SELECT 1 FROM dbo.RolePermissions rp2
                WHERE  rp2.PermissionId = @basicId AND rp2.RoleId = rp.RoleId

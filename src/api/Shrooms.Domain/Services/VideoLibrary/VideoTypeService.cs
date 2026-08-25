@@ -63,9 +63,6 @@ namespace Shrooms.Domain.Services.VideoLibrary
         public async Task RemoveVideoTypeAsync(int id, UserAndOrganizationDto userOrg)
         {
             var type = await FindAsync(id, userOrg.OrganizationId);
-
-            // Videos keep a Restrict foreign key to their type, so a type that is
-            // still in use cannot be removed without silently orphaning them.
             var videosUsingType = await _videosDbSet
                 .CountAsync(v => v.OrganizationId == userOrg.OrganizationId && v.VideoTypeId == id);
 

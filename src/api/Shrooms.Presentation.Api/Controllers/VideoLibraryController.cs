@@ -3,6 +3,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.VideoLibrary;
+using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.VideoLibrary;
@@ -28,7 +29,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("List")]
-        [PermissionAuthorize(Permission = BasicPermissions.VideoLibrary)]
+        [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
         [ProducesResponseType(typeof(IEnumerable<VideoLibraryItemViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> List()
         {
