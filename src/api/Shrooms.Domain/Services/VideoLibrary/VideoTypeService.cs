@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Shrooms.Domain.Services.VideoLibrary
 {
     public class VideoTypeService : IVideoTypeService
     {
+        private const string DuplicateTitleMessage = "Video type with that title already exists";
+
         private readonly DbSet<VideoType> _videoTypesDbSet;
         private readonly DbSet<VideoLibraryItem> _videosDbSet;
         private readonly IUnitOfWork2 _uow;
@@ -46,7 +49,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 OrganizationId = videoType.OrganizationId
             });
 
-            await _uow.SaveChangesAsync(videoType.UserId);
+            await SaveOrTranslateAsync(videoType.UserId);
         }
 
         public async Task UpdateVideoTypeAsync(VideoTypeDto videoType)
@@ -57,7 +60,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
             type.Title = videoType.Title;
 
-            await _uow.SaveChangesAsync(videoType.UserId);
+            await SaveOrTranslateAsync(videoType.UserId);
         }
 
         public async Task RemoveVideoTypeAsync(int id, UserAndOrganizationDto userOrg)
@@ -76,6 +79,24 @@ namespace Shrooms.Domain.Services.VideoLibrary
             type.IsDeleted = true;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        private async Task SaveOrTranslateAsync(string userId)
+        {
+            try
+            {
+                await _uow.SaveChangesAsync(userId);
+            }
+            catch (DbUpdateException e) when (IsUniqueViolation(e))
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, DuplicateTitleMessage);
+            }
+        }
+
+        private static bool IsUniqueViolation(DbUpdateException e)
+        {
+            return e.InnerException is SqlException sql
+                   && (sql.Number == 2601 || sql.Number == 2627);
         }
 
         private async Task<VideoType> FindAsync(int id, int organizationId)
@@ -100,7 +121,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
             if (alreadyExists)
             {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Video type with that title already exists");
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, DuplicateTitleMessage);
             }
         }
 

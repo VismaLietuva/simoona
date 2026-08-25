@@ -17,6 +17,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.VideoLibrary
             builder.Property(x => x.Modified).HasColumnType("datetime2");
 
             builder.HasIndex(x => new { x.OrganizationId, x.Title })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0")
                 .HasDatabaseName("IX_VideoTypes_OrganizationId_Title");
 
             builder.HasOne(x => x.Organization)

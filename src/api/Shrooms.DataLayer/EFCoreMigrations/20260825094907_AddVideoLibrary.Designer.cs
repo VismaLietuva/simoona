@@ -4014,7 +4014,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrganizationId", "Title")
-                        .HasDatabaseName("IX_VideoTypes_OrganizationId_Title");
+                        .IsUnique()
+                        .HasDatabaseName("IX_VideoTypes_OrganizationId_Title")
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("VideoTypes", (string)null);
                 });

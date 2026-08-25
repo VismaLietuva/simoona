@@ -89,7 +89,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             migrationBuilder.CreateIndex(
                 name: "IX_VideoTypes_OrganizationId_Title",
                 table: "VideoTypes",
-                columns: new[] { "OrganizationId", "Title" });
+                columns: new[] { "OrganizationId", "Title" },
+                unique: true,
+                filter: "[IsDeleted] = 0");
 
             migrationBuilder.Sql(@"
 IF NOT EXISTS (SELECT 1 FROM dbo.Permissions WHERE Name = N'VIDEOLIBRARY_BASIC')
