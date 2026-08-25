@@ -105,6 +105,60 @@ namespace Shrooms.Tests.DomainService
             }
         }
 
+        [Test]
+        public async Task Kudos_Should_Return_Type_Filtered_Excel_File()
+        {
+            var filter = new KudosLogsFilterDto
+            {
+                OrganizationId = 2,
+                SearchUserId = null,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
+                FilteringType = "Other",
+                SortBy = "Created",
+                SortOrder = "desc"
+            };
+
+            var export = await _kudosExportService.ExportToExcelAsync(filter);
+
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(export.Content)))
+            {
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
+                var excelRows = excelData.Tables[0].Rows;
+
+                Assert.That(excelRows.Count, Is.EqualTo(2));
+                Assert.That(excelRows[0].ItemArray[2], Is.EqualTo("Other"));
+                Assert.That(excelRows[1].ItemArray[2], Is.EqualTo("Other"));
+
+                excelReader.Close();
+            }
+        }
+
+        [Test]
+        public async Task Kudos_Should_Return_Every_Type_When_Filtering_Type_Is_All()
+        {
+            var filter = new KudosLogsFilterDto
+            {
+                OrganizationId = 2,
+                SearchUserId = null,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
+                FilteringType = BusinessLayerConstants.KudosFilteringTypeAllFilter,
+                SortBy = "Created",
+                SortOrder = "desc"
+            };
+
+            var export = await _kudosExportService.ExportToExcelAsync(filter);
+
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(export.Content)))
+            {
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
+                var excelRows = excelData.Tables[0].Rows;
+
+                Assert.That(excelRows.Count, Is.EqualTo(4));
+
+                excelReader.Close();
+            }
+        }
+
         private IQueryable<KudosLog> MockKudos()
         {
             return new List<KudosLog>
@@ -113,6 +167,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Status = KudosStatus.Pending,
                     Id = 1,
+                    KudosTypeName = "Other",
                     EmployeeId = "testUserId",
                     Employee = new ApplicationUser
                     {
@@ -127,6 +182,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Status = KudosStatus.Pending,
                     Id = 2,
+                    KudosTypeName = "Send",
                     EmployeeId = "testUserId",
                     Employee = new ApplicationUser
                     {
@@ -141,6 +197,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Status = KudosStatus.Approved,
                     Id = 3,
+                    KudosTypeName = "Other",
                     EmployeeId = "testUserId",
                     Employee = new ApplicationUser
                     {
@@ -155,6 +212,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Status = KudosStatus.Approved,
                     Id = 4,
+                    KudosTypeName = "Welcome",
                     EmployeeId = "testUserId3",
                     Employee = new ApplicationUser
                     {
