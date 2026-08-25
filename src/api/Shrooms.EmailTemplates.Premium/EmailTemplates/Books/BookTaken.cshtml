@@ -1,13 +1,12 @@
-﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookTakenEmailTemplateViewModel
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookTakenEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"\"{Model.BookTitle}\" is now marked as taken.";
 }
 
-<email-heading eyebrow="Books">Book registered as <email-em>taken</email-em></email-heading>
+<email-heading eyebrow="Books" emphasis="taken">Book registered as</email-heading>
 <email-card>
     <p style="margin:0;">
-        "<strong>@Model.BookTitle</strong>" by @Model.BookAuthor.
+        "<strong>@Model.BookTitle</strong>" by @Model.BookAuthor was registered as taken.
     </p>
-    <email-button href="@Model.BookUrl">Open the book</email-button>
+    <email-button href="@Model.BookUrl">Visit book page</email-button>
 </email-card>

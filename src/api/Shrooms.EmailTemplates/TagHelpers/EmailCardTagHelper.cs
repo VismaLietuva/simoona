@@ -17,8 +17,7 @@ namespace Shrooms.EmailTemplates.TagHelpers
                 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\" " +
                 $"style=\"background-color:{EmailDesign.Card};border:1px solid {EmailDesign.Border};" +
                 $"border-radius:{EmailDesign.RadiusXl};box-shadow:{EmailDesign.CardShadow};\">" +
-                $"<tbody><tr><td align=\"left\" style=\"background-color:{EmailDesign.Card};" +
-                $"padding:{EmailDesign.CardPadding};" +
+                $"<tbody><tr><td align=\"left\" style=\"padding:{EmailDesign.CardPadding};" +
                 $"font-family:{EmailDesign.FontSans};font-size:{EmailDesign.BodySize};" +
                 $"line-height:{EmailDesign.BodyLineHeight};color:{EmailDesign.Foreground};" +
                 "word-break:break-word;overflow-wrap:break-word;\">" +

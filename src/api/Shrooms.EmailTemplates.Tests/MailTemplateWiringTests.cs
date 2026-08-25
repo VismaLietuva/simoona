@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Razor.Templating.Core;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.Infrastructure.Email.Templating;
 
 namespace Shrooms.EmailTemplates.Tests
@@ -20,10 +18,7 @@ namespace Shrooms.EmailTemplates.Tests
             services.AddRazorTemplating();
             var provider = services.BuildServiceProvider();
 
-            var appSettings = Substitute.For<IApplicationSettings>();
-            appSettings.ClientUrl.Returns("https://app.simoona.example.com/");
-
-            var sut = new MailTemplate(provider.GetRequiredService<IRazorTemplateEngine>(), appSettings);
+            var sut = new MailTemplate(provider.GetRequiredService<IRazorTemplateEngine>());
             var viewModel = new KudosSentEmailTemplateViewModel(
                 "https://simoona.example.com/settings", "Rasa Petraitiene", 25, "Thanks!", "https://simoona.example.com/kudos");
 
@@ -32,8 +27,7 @@ namespace Shrooms.EmailTemplates.Tests
             Assert.Multiple(() =>
             {
                 Assert.That(html, Does.Contain("Rasa Petraitiene"));
-                Assert.That(html, Does.Contain("Update your notification preferences"), "layout was not applied");
-                Assert.That(html, Does.Contain("https://app.simoona.example.com/"), "home link was not filled in");
+                Assert.That(html, Does.Contain("www.simoona.com"), "layout was not applied");
             });
         }
     }

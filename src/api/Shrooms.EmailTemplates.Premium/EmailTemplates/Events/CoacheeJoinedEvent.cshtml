@@ -1,18 +1,17 @@
-﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.CoacheeJoinedEventEmailTemplateViewModel
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.CoacheeJoinedEventEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"{Model.CoacheeFullName} wants to attend {Model.EventName}.";
 }
 
-<email-heading eyebrow="Events">@Model.CoacheeFullName joined <email-em>@Model.EventName</email-em></email-heading>
+<email-heading eyebrow="Events" emphasis="event">Coachee joined the</email-heading>
 <email-card>
     <p style="margin:0 0 12px;">
-        Running from @Model.EventStartDate.ToString("yyyy-MM-dd") to
-        @Model.EventEndDate.ToString("yyyy-MM-dd").
+        Your coachee @Model.CoacheeFullName wants to attend @Model.EventName
+        from @Model.EventStartDate.ToString("yyyy-MM-dd") to @Model.EventEndDate.ToString("yyyy-MM-dd").
     </p>
     <p style="margin:0;">
         If you think @Model.CoacheeFullName should not or cannot attend this event, get in touch
         with them and let the Competence committee know.
     </p>
-    <email-button href="@Model.EventUrl">Open the event</email-button>
+    <email-button href="@Model.EventUrl">Visit event page</email-button>
 </email-card>

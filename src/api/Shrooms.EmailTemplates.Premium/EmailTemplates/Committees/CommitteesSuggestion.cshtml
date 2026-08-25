@@ -1,12 +1,11 @@
-﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.CommitteeSuggestionEmailTemplateViewModel
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.CommitteeSuggestionEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"{Model.CommitteeName} received a suggestion: {Model.Title}.";
 }
 
-<email-heading eyebrow="Committees">New committee <email-em>suggestion</email-em></email-heading>
+<email-heading eyebrow="Committees" emphasis="suggestion">New committee</email-heading>
 <email-card>
     <p style="margin:0;">@Model.CommitteeName: "<strong>@Model.Title</strong>"</p>
     <email-quote>@Model.Description</email-quote>
-    <email-button href="@Model.CommitteeUrl">See the suggestion</email-button>
+    <email-button href="@Model.CommitteeUrl">Visit committees page</email-button>
 </email-card>

@@ -15,9 +15,7 @@ Then fold `Design/layout.html` into `EmailTemplates/HeaderFooter.cshtml`:
 2. Replace the `<tr>` holding `CONTENT_SLOT` with `@RenderBody()`. It must land directly inside a
    `<tbody>`, because every template body is a run of `<tr>` rows.
 3. Replace `SETTINGS_URL_SLOT` with `@Model.UserNotificationSettingsUrl`.
-4. Replace `HOME_URL_SLOT` with `@Model.HomeUrl`.
-5. Replace `PREHEADER_SLOT` with `@ViewData["Preheader"]`.
-6. Keep the `@model` line and the generated-file comment at the top.
+4. Keep the `@model` line and the generated-file comment at the top.
 
 Recompiling is not a CI step on purpose. `appveyor.yml` is a pure .NET pipeline, and adding npm to
 it to regenerate one layout that changes twice a year is a bad trade. Checking that the two files
@@ -34,18 +32,17 @@ confirm nothing external crept back in:
 
 ```bash
 grep -o 'https\?://[^"() ]*' EmailTemplates/HeaderFooter.cshtml | sort -u
-# expect only http://www.w3.org/1999/xhtml - every real link is a @Model property
+# expect only http://www.w3.org/1999/xhtml and https://simoona.com
 ```
 
 ## Partials
 
-Six tag helpers in `TagHelpers/`, registered via `@addTagHelper *, Shrooms.EmailTemplates` in both
+Five tag helpers in `TagHelpers/`, registered via `@addTagHelper *, Shrooms.EmailTemplates` in both
 projects' `_ViewImports.cshtml`. `<email-heading>` and `<email-card>` emit table rows and sit
-directly in the layout's content slot; the rest go inside a card. `<email-em>` is the serif accent,
-inline so it lands on the word carrying the news rather than on whatever ends the headline.
+directly in the layout's content slot; the rest go inside a card.
 
 ```razor
-<email-heading eyebrow="Kudos">You received <email-em>25 kudos</email-em></email-heading>
+<email-heading>Kudos notification</email-heading>
 <email-card>
     <p style="margin:0;">Body copy.</p>
     <email-quote>User-supplied text.</email-quote>
@@ -56,12 +53,8 @@ inline so it lands on the word carrying the news rather than on whatever ends th
 </email-card>
 ```
 
-`EmailTemplates/Design/Showcase.cshtml` renders them all at once. View it at
+`EmailTemplates/Design/Showcase.cshtml` renders all five at once. View it at
 `/email-preview/Design/Showcase.cshtml`.
-
-Each template sets `ViewData["Preheader"]` in its `@{ }` block. That is the hidden line mail
-clients show as the inbox preview, next to the subject - without it the preview falls back to the
-wordmark. Keep it to one sentence that adds to the subject rather than repeating it.
 
 ## Matching the frontend
 
@@ -69,20 +62,24 @@ wordmark. Keep it to one sentence that adds to the subject rather than repeating
 from `simoona-nextjs/src/app/globals.css` (email supports neither OKLCH nor `light-dark()`); type
 and component values are the Tailwind/shadcn classes the app actually uses:
 
-There is **no header bar**. The email opens with the sidebar's `S/moona` wordmark, linking to
-`@Model.HomeUrl`, and the footer is just the notification-preferences link.
+There is **no header bar**. The email opens with the sidebar's brand lockup — the `SimoonaMark` SVG
+in its bordered box next to the `S/moona` wordmark — linking to `https://simoona.com`. The footer is
+just the site link and the notification-preferences link.
 
-`HomeUrl` is the `ClientUrl` setting, filled in by `MailTemplate` rather than by the callers that
-build the view models - so the link points at whichever client the sending environment is configured
-against (`https://app.simoona.com/` in production) instead of a hardcoded host. Renders that bypass
-`MailTemplate`, meaning the golden files, take it from `EmailTemplateSeeds`.
+The mark carries the same paths, strokes and draw-then-pulse animation as `simoona-mark.tsx` and
+`globals.css`, and replays on hover as the sidebar does. Three changes were needed for email:
 
-The `SimoonaMark` SVG that sits beside the wordmark in the app is **not** in the email. Gmail and
-Outlook strip inline SVG, so it rendered as an empty bordered box for most recipients, and its
-draw-then-pulse animation was dead there too — Gmail keeps `<style>` but drops `animation`. The
-alternatives were both worse than dropping it: a hosted PNG or GIF would be the only remote fetch in
-the whole set, and it needs a publicly reachable URL, which `ClientUrl` is not in development. The
-wordmark is plain text, so it renders everywhere and the brand still reads.
+- **Hover replay is CSS, not a remount.** The app bumps a React `key` to remount the SVG; email has
+  no JS, and re-applying an identical `animation` does not restart it — so `a:hover` points at a
+  duplicate set of `-h` keyframes. Hover needs a pointer, so this is desktop-only by nature.
+
+- **The keyframes draw *from* the hidden state**, not to it. The app parks the strokes at
+  `stroke-dashoffset: 70` and animates to `0`; a mail client that keeps CSS but strips `animation`
+  would leave an invisible logo, so the offset lives in the keyframe instead of on the element.
+- **Outlook and Gmail strip inline SVG.** Outlook gets an `mso` fallback of the same three glyphs as
+  text. Gmail gets nothing in the box, but the `S/moona` wordmark beside it is always plain text, so
+  the brand still reads. If the empty box matters, swap the SVG for a hosted PNG — at the cost of
+  the remote fetch this design otherwise avoids.
 
 | Element | App | Email |
 |---|---|---|

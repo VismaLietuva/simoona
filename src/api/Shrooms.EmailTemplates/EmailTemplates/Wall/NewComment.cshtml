@@ -1,8 +1,7 @@
-﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewCommentEmailTemplateViewModel
+@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewCommentEmailTemplateViewModel
 @using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"{Model.FullName} replied to the post.";
 }
 
 <email-heading eyebrow="Wall">@Model.PostCommentTitle</email-heading>

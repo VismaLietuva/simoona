@@ -1,7 +1,6 @@
-﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventReminderDeadlineEmailTemplateViewModel
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventReminderDeadlineEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"Registration for {Model.Name} closes {Model.DeadlineDate:yyyy-MM-dd HH:mm}.";
 }
 
 <email-heading eyebrow="Events">Registration closes soon for @Model.Name event</email-heading>
@@ -12,5 +11,5 @@
         (@Model.DeadlineDate.ToString("yyyy-MM-dd HH:mm")), so please update your registration in
         case of any changes.
     </p>
-    <email-button href="@Model.Url">Open the event</email-button>
+    <email-button href="@Model.Url">Visit event page</email-button>
 </email-card>

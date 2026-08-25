@@ -1,11 +1,11 @@
-﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventJoinRemindEmailTemplateViewModel
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventJoinRemindEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = "You have not joined a weekly event yet.";
 }
 
-<email-heading eyebrow="Events">Do not miss out <email-em>this week</email-em></email-heading>
+<email-heading eyebrow="Events" emphasis="reminder">Event</email-heading>
 <email-card>
+    <p style="margin:0 0 6px;"><strong>Do not miss out!</strong></p>
     <p style="margin:0;">We see you did not join any weekly event this week.</p>
     @foreach (var eventType in Model.EventTypes)
     {

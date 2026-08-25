@@ -85,17 +85,178 @@
       color: #737373;
       text-decoration: underline;
     }
+
+    /* Sidebar mark animation, lifted from globals.css. Keyframes draw FROM the hidden state
+         so a client that strips `animation` still shows a fully drawn logo. */
+    @keyframes mark-draw-bracket {
+      from {
+        stroke-dashoffset: 70;
+      }
+
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes mark-draw-slash {
+      from {
+        stroke-dashoffset: 46;
+      }
+
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes mark-brace-l {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(-6px);
+      }
+    }
+
+    @keyframes mark-brace-r {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(6px);
+      }
+    }
+
+    @keyframes mark-slash-pulse {
+      0% {
+        transform: translateY(0) rotate(0);
+      }
+
+      50% {
+        transform: translateY(-3px) rotate(8deg);
+      }
+
+      100% {
+        transform: translateY(0) rotate(0);
+      }
+    }
+
+    @keyframes mark-draw-bracket-h {
+      from {
+        stroke-dashoffset: 70;
+      }
+
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes mark-draw-slash-h {
+      from {
+        stroke-dashoffset: 46;
+      }
+
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes mark-brace-l-h {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(-6px);
+      }
+    }
+
+    @keyframes mark-brace-r-h {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(6px);
+      }
+    }
+
+    @keyframes mark-slash-pulse-h {
+      0% {
+        transform: translateY(0) rotate(0);
+      }
+
+      50% {
+        transform: translateY(-3px) rotate(8deg);
+      }
+
+      100% {
+        transform: translateY(0) rotate(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+
+      .mark-bracket-l,
+      .mark-slash,
+      .mark-bracket-r {
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+
+      .mark-bracket-l,
+      .mark-bracket-r {
+        stroke-dasharray: 70;
+      }
+
+      .mark-slash {
+        stroke-dasharray: 46;
+      }
+
+      .mark-bracket-l {
+        animation: mark-draw-bracket .5s cubic-bezier(.65, 0, .35, 1) forwards, mark-brace-l 2s ease-in-out .6s;
+      }
+
+      .mark-slash {
+        animation: mark-draw-slash .4s cubic-bezier(.65, 0, .35, 1) .15s forwards, mark-slash-pulse 2s ease-in-out .7s;
+      }
+
+      .mark-bracket-r {
+        animation: mark-draw-bracket .5s cubic-bezier(.65, 0, .35, 1) forwards, mark-brace-r 2s ease-in-out .6s;
+      }
+
+      /* Replay on hover. The app remounts the SVG via a key bump; CSS needs distinct animation
+           names, since re-applying an identical one does not restart it. */
+      a:hover .mark-bracket-l {
+        animation: mark-draw-bracket-h .5s cubic-bezier(.65, 0, .35, 1) forwards, mark-brace-l-h 2s ease-in-out .6s;
+      }
+
+      a:hover .mark-slash {
+        animation: mark-draw-slash-h .4s cubic-bezier(.65, 0, .35, 1) .15s forwards, mark-slash-pulse-h 2s ease-in-out .7s;
+      }
+
+      a:hover .mark-bracket-r {
+        animation: mark-draw-bracket-h .5s cubic-bezier(.65, 0, .35, 1) forwards, mark-brace-r-h 2s ease-in-out .6s;
+      }
+    }
   </style>
   <meta name="color-scheme" content="light" />
   <meta name="supported-color-schemes" content="light" />
 </head>
 
 <body style="word-spacing:normal;background-color:#f4f5f6;">
-  <div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">Broken monitor at desk 14 is now Done.</div>
   <div aria-label="Simoona" aria-roledescription="email" role="article" lang="en" dir="ltr" style="word-spacing:normal;background-color:#f4f5f6;">
-    <!-- The sidebar's wordmark, linking to the client app for whichever environment sent the
-         mail. The mark itself is not here: Gmail and Outlook strip inline SVG, and a hosted
-         image would be the only remote fetch in the whole set. -->
+    <!-- The sidebar lockup: SimoonaMark SVG plus wordmark, linking home. Outlook and Gmail
+         strip inline SVG, so an mso fallback and the always-text wordmark carry the brand there. -->
     <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#f4f5f6" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
     <div style="background:#f4f5f6;background-color:#f4f5f6;margin:0px auto;max-width:600px;">
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f4f5f6;background-color:#f4f5f6;width:100%;">
@@ -111,9 +272,25 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                           <tbody>
                             <tr>
-                              <td align="left" style="background:#f4f5f6;font-size:0px;padding:0;word-break:break-word;">
-                                <div style="font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:600;line-height:32px;text-align:left;color:#0a0a0a;"><a href="https://simoona.example.com/" target="_blank" style="text-decoration:none;">
-                                    <span style="color:#006199;">S</span><span style="color:#4d8400;">/</span><span style="color:#3180bb;">moona</span>
+                              <td align="left" style="font-size:0px;padding:0;word-break:break-word;">
+                                <div style="font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;text-align:left;color:#0a0a0a;"><a href="https://simoona.com" target="_blank" style="text-decoration:none;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                      <tbody>
+                                        <tr>
+                                          <td width="32" style="width:32px;height:32px;background-color:#fcfcfc;border:1px solid #e2e6e8;border-radius:8px;text-align:center;vertical-align:middle;line-height:30px;">
+                                            <!--[if !mso]><!--><svg width="20" height="20" viewBox="0 0 80 80" fill="none" style="vertical-align:middle;">
+                                              <path class="mark-bracket-l" d="M30 22 L14 40 L30 58" stroke="#006199" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                                              <path class="mark-slash" d="M46 20 L34 60" stroke="#4d8400" stroke-width="6" stroke-linecap="round" />
+                                              <path class="mark-bracket-r" d="M50 22 L66 40 L50 58" stroke="#3180bb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg><!--<![endif]-->
+                                            <!--[if mso]><span style="font-size:15px;font-weight:700;letter-spacing:-1px;"><span style="color:#006199;">&lt;</span><span style="color:#4d8400;">/</span><span style="color:#3180bb;">&gt;</span></span><![endif]-->
+                                          </td>
+                                          <td style="padding-left:10px;vertical-align:middle;font-size:18px;font-weight:600;line-height:32px;">
+                                            <span style="color:#006199;">S</span><span style="color:#4d8400;">/</span><span style="color:#3180bb;">moona</span>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
                                   </a></div>
                               </td>
                             </tr>
@@ -147,12 +324,12 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                           <tbody>
                             
-<tr><td align="left" style="background-color:#f4f5f6;padding:0 4px;"><p style="margin:0 0 4px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#737373;">Service requests</p><h1 style="margin:0;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:30px;line-height:36px;font-weight:800;letter-spacing:-0.025em;color:#0a0a0a;">Update on your <em style="font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-weight:400;font-style:italic;">request</em></h1></td></tr>
-<tr><td align="left" style="padding:16px 0 8px;"><table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="background-color:#fcfcfc;border:1px solid #e2e6e8;border-radius:14px;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);"><tbody><tr><td align="left" style="background-color:#fcfcfc;padding:24px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#0a0a0a;word-break:break-word;overflow-wrap:break-word;"><p style="margin:0;">"<strong>Broken monitor at desk 14</strong>"</p>
+<tr><td align="left" style="padding:0 4px;"><p style="margin:0 0 4px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#737373;">Service requests</p><h1 style="margin:0;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:30px;line-height:36px;font-weight:800;letter-spacing:-0.025em;color:#0a0a0a;">Update in your Service <em style="font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-weight:400;font-style:italic;">Request</em></h1></td></tr>
+<tr><td align="left" style="padding:16px 0 8px;"><table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="background-color:#fcfcfc;border:1px solid #e2e6e8;border-radius:14px;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);"><tbody><tr><td align="left" style="padding:24px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#0a0a0a;word-break:break-word;overflow-wrap:break-word;"><p style="margin:0;">"<strong>Broken monitor at desk 14</strong>"</p>
     <p style="margin:12px 0 0;">
         Rasa Petraitiene has changed your service request's status to <strong>Done</strong>.
     </p>
-    <table border="0" cellpadding="0" cellspacing="0" role="presentation" align="left" style="margin-top:20px;"><tbody><tr><td align="center" bgcolor="#006199" style="background-color:#006199;border-radius:8px;"><a href="https://simoona.example.com/service-requests/1" target="_blank" style="display:inline-block;padding:10px 24px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:500;color:#fafafa;text-decoration:none;">Open the request</a></td></tr></tbody></table></td></tr></tbody></table></td></tr>
+    <table border="0" cellpadding="0" cellspacing="0" role="presentation" align="left" style="margin-top:20px;"><tbody><tr><td align="center" bgcolor="#006199" style="background-color:#006199;border-radius:8px;"><a href="https://simoona.example.com/service-requests/1" target="_blank" style="display:inline-block;padding:10px 24px;font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:500;color:#fafafa;text-decoration:none;">Service Request in Simoona</a></td></tr></tbody></table></td></tr></tbody></table></td></tr>
 
 </tbody>
                         </table>
@@ -178,7 +355,12 @@
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tbody>
                     <tr>
-                      <td align="center" class="simoona-footer" style="background:#f4f5f6;font-size:0px;padding:0;word-break:break-word;">
+                      <td align="center" class="simoona-footer" style="font-size:0px;padding:0 0 6px;word-break:break-word;">
+                        <div style="font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;text-align:center;color:#737373;"><a href="https://simoona.com" target="_blank">www.simoona.com</a></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" class="simoona-footer" style="font-size:0px;padding:0;word-break:break-word;">
                         <div style="font-family:Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;text-align:center;color:#737373;">Update your notification preferences <a href="https://simoona.example.com/settings/notifications" target="_blank">here</a></div>
                       </td>
                     </tr>
