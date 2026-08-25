@@ -335,6 +335,12 @@ namespace Shrooms.Domain.Services.Seats
 
             _seatDbSet.Add(seat);
             await _uow.SaveChangesAsync(args.UserId);
+
+            if (await VacateOtherDesksAsync(seat))
+            {
+                await _uow.SaveChangesAsync(args.UserId);
+            }
+
             await FreeDaysHeldElsewhereAsync(seat, args.UserId);
 
             return await LoadDtoAsync(seat.Id, args.OrganizationId);
@@ -362,6 +368,7 @@ namespace Shrooms.Domain.Services.Seats
             seat.Y = args.Y;
             seat.OwnerId = ownerId;
 
+            await VacateOtherDesksAsync(seat);
             await _uow.SaveChangesAsync(args.UserId);
             await FreeDaysHeldElsewhereAsync(seat, args.UserId);
 
@@ -539,6 +546,42 @@ namespace Shrooms.Domain.Services.Seats
             {
                 throw new InvalidOperationException("Employee not found.");
             }
+        }
+
+        // One permanent desk per person. Enforced here rather than in the client,
+        // which can only pretend: it has no way to write the other rows.
+        private async Task<bool> VacateOtherDesksAsync(Seat seat)
+        {
+            if (seat.Type != SeatType.Permanent || string.IsNullOrEmpty(seat.OwnerId))
+            {
+                return false;
+            }
+
+            var others = await _seatDbSet
+                .Where(candidate => candidate.OrganizationId == seat.OrganizationId
+                                    && candidate.OwnerId == seat.OwnerId
+                                    && candidate.Id != seat.Id)
+                .ToListAsync();
+
+            if (others.Count == 0)
+            {
+                return false;
+            }
+
+            var vacatedIds = others.Select(other => other.Id).ToList();
+            foreach (var other in others)
+            {
+                other.OwnerId = null;
+            }
+
+            // A release records that the desk's owner freed it. With no owner it
+            // says nothing, and would render as a stray "freed up" desk.
+            var strandedReleases = await _releaseDbSet
+                .Where(release => vacatedIds.Contains(release.SeatId))
+                .ToListAsync();
+            _releaseDbSet.RemoveRange(strandedReleases);
+
+            return true;
         }
 
         private async Task FreeDaysHeldElsewhereAsync(Seat seat, string actingUserId)

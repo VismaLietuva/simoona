@@ -22,7 +22,6 @@ build_script:
 test_script:
   - dotnet test src\api\Shrooms.Tests\Shrooms.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
   - dotnet test src\api\Shrooms.Premium.Tests\Shrooms.Premium.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
-  - dotnet test src\api\Shrooms.EmailTemplates.Tests\Shrooms.EmailTemplates.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
 
 artifacts:
   - path: src\api\Shrooms.Presentation.Api\bin\Release\net10.0\
