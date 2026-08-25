@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Targets\shared.targets" />
 
   <PropertyGroup>
@@ -27,6 +27,12 @@
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="X.PagedList" />
     <PackageReference Include="X.PagedList.EF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="EmailTemplates\**\*.cshtml" Exclude="EmailTemplates\_ViewImports.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

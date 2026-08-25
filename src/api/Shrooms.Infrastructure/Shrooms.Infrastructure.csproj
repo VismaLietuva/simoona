@@ -20,7 +20,7 @@
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="Azure.Storage.Blobs" />
-    <PackageReference Include="Razor.Templating.Core" />
+    <PackageReference Include="RazorLight" />
   </ItemGroup>
 
   <ItemGroup>
