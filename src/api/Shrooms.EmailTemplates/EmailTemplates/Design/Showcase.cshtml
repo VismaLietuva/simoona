@@ -1,10 +1,11 @@
-@model Shrooms.Contracts.DataTransferObjects.BaseEmailTemplateViewModel
+﻿@model Shrooms.Contracts.DataTransferObjects.BaseEmailTemplateViewModel
 @* Style reference: every shared partial in one place. Not sent to anyone. *@
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = "Every shared partial in one place.";
 }
 
-<email-heading eyebrow="Design system" emphasis="foundation">Design</email-heading>
+<email-heading eyebrow="Design system">Design <email-em>foundation</email-em></email-heading>
 <email-card>
     <p style="margin:0 0 12px;">
         Body copy sits at 16px/24px, matching the app's base type. Inline <a href="https://simoona.com">links</a>

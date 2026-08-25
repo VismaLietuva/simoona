@@ -1,15 +1,15 @@
-@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.LoyaltyKudosReceivedDecreasedEmailTemplateViewModel
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.LoyaltyKudosReceivedDecreasedEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.KudosAmount} loyalty kudos for {Model.KudosType}.";
 }
 
-<email-heading eyebrow="Loyalty kudos" emphasis="notification">Kudos</email-heading>
+<email-heading eyebrow="Loyalty kudos">You received <email-em>@Model.KudosAmount kudos</email-em></email-heading>
 <email-card>
     <p style="margin:0;">
-        You have received
         <span style="color:@Shrooms.EmailTemplates.EmailDesign.Secondary;font-weight:600;">+@Model.KudosAmount</span>
-        kudos for "@Model.KudosType" from <strong>@Model.KudosSenderName</strong>.
+        for "@Model.KudosType", from <strong>@Model.KudosSenderName</strong>.
     </p>
     <email-quote>@Model.Comment</email-quote>
-    <email-button href="@Model.KudosProfileUrl">Visit your kudos profile</email-button>
+    <email-button href="@Model.KudosProfileUrl">View your kudos</email-button>
 </email-card>

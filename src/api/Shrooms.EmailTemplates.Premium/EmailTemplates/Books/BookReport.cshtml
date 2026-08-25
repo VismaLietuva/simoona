@@ -1,6 +1,7 @@
-@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookReportEmailTemplateViewModel
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.BookReportEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.FullName} reported \"{Model.Title}\".";
 }
 
 <email-heading eyebrow="Books">New book report by @Model.FullName</email-heading>
@@ -15,5 +16,5 @@
             <email-detail label="Report comment">@Model.Comment</email-detail>
         }
     </email-details>
-    <email-button href="@Model.BookUrl">Visit book page</email-button>
+    <email-button href="@Model.BookUrl">Open the book</email-button>
 </email-card>
