@@ -411,15 +411,20 @@ namespace Shrooms.Domain.Services.Kudos
         {
             await ValidateUserAsync(organizationId, userId);
 
+            var user = await _usersDbSet.FindAsync(userId);
+            var employmentDate = user?.EmploymentDate;
+
             var kudosLogs = await _kudosLogsDbSet
                 .Where(kudos =>
                     kudos.EmployeeId == userId &&
                     kudos.Status == KudosStatus.Approved &&
+                    (employmentDate == null || kudos.Created >= employmentDate) &&
                     kudos.KudosSystemType != KudosTypeEnum.Minus &&
+                    kudos.KudosSystemType != KudosTypeEnum.Refund &&
+                    kudos.KudosBasketId == null &&
                     kudos.OrganizationId == organizationId)
                 .ToListAsync();
 
-            var user = await _usersDbSet.FindAsync(userId);
             var culture = user == null ? null : CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
             var pieChart = kudosLogs
