@@ -35,12 +35,12 @@ namespace Shrooms.EmailTemplates.TagHelpers
             output.TagName = "tr";
             output.TagMode = TagMode.StartTagAndEndTag;
             output.Content.SetHtmlContent(
-                $"<td align=\"left\" width=\"35%\" style=\"padding:6px 12px 6px 0;" +
+                $"<td align=\"left\" width=\"35%\" style=\"background-color:{EmailDesign.Card};padding:6px 12px 6px 0;" +
                 $"font-family:{EmailDesign.FontSans};font-size:{EmailDesign.EyebrowSize};" +
                 $"font-weight:{EmailDesign.EyebrowWeight};letter-spacing:{EmailDesign.EyebrowTracking};" +
                 $"text-transform:uppercase;color:{EmailDesign.MutedForeground};vertical-align:top;" +
                 $"line-height:{EmailDesign.SmallLineHeight};\">{WebUtility.HtmlEncode(Label)}</td>" +
-                $"<td align=\"left\" style=\"padding:6px 0;font-family:{EmailDesign.FontSans};" +
+                $"<td align=\"left\" style=\"background-color:{EmailDesign.Card};padding:6px 0;font-family:{EmailDesign.FontSans};" +
                 $"font-size:{EmailDesign.SmallSize};line-height:{EmailDesign.SmallLineHeight};" +
                 $"color:{EmailDesign.Foreground};vertical-align:top;word-break:break-word;" +
                 $"overflow-wrap:break-word;\">{value}</td>");

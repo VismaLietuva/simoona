@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
@@ -16,6 +16,7 @@ namespace Shrooms.EmailTemplates.Seeds
         public const string ShowcaseKey = "/EmailTemplates/Design/Showcase.cshtml";
 
         private const string SettingsUrl = "https://simoona.example.com/settings/notifications";
+        private const string HomeUrl = "https://simoona.example.com/";
         private const string PictureUrl = "https://simoona.example.com/pictures/avatar.png";
         private static readonly DateTime SampleDate = new DateTime(2026, 3, 17, 9, 30, 0, DateTimeKind.Utc);
         private static readonly DateTime SampleEndDate = new DateTime(2026, 3, 17, 17, 0, 0, DateTimeKind.Utc);
@@ -24,7 +25,7 @@ namespace Shrooms.EmailTemplates.Seeds
 
         private static IReadOnlyList<EmailTemplateSeed> BuildAll()
         {
-            return new List<EmailTemplateSeed>
+            var seeds = new List<EmailTemplateSeed>
             {
                 // Core
                 new(EmailTemplateCacheKeys.NewWallPost, new NewWallPostEmailTemplateViewModel(
@@ -80,13 +81,13 @@ namespace Shrooms.EmailTemplates.Seeds
                     "Rotating the venue each quarter so every team gets a turn.",
                     "https://simoona.example.com/committees/1")),
                 new(EmailPremiumTemplateCacheKeys.EventNew, new NewEventEmailTemplateViewModel(
-                    "https://simoona.example.com/events/1", "Engineering all-hands",
+                    "https://simoona.example.com/events/1", "Engineering Q&A",
                     "<p>Roadmap review followed by open questions.</p>", "Vilnius HQ, 4th floor",
                     SampleDate, SettingsUrl)),
                 new(EmailPremiumTemplateCacheKeys.EventShared, new SharedEventEmailTemplateViewModel(
                     "https://simoona.example.com/posts/9", "https://simoona.example.com/events/1",
-                    "Rasa Petraitiene", "<p>Worth attending if you work on the API.</p>", "Engineering wall",
-                    "Engineering all-hands", SampleDate, "<p>Roadmap review followed by open questions.</p>",
+                    "Rasa Petraitiene", "<p>Worth attending if you work on the API.</p>", "Sales & Ops wall",
+                    "Engineering Q&A", SampleDate, "<p>Roadmap review followed by open questions.</p>",
                     "Vilnius HQ, 4th floor", SettingsUrl)),
                 new(EmailPremiumTemplateCacheKeys.EventStartRemind, new EventReminderStartEmailTemplateViewModel(
                     SettingsUrl, "Engineering all-hands", "https://simoona.example.com/events/1", SampleDate)),
@@ -127,7 +128,7 @@ namespace Shrooms.EmailTemplates.Seeds
                     {
                         Id = 1,
                         Title = "Concert tickets",
-                        Description = "<p>Two tickets to the summer festival.</p>",
+                        Description = "Two tickets to the summer festival.",
                         EntryFee = 20,
                         EndDate = SampleEndDate
                     },
@@ -137,6 +138,11 @@ namespace Shrooms.EmailTemplates.Seeds
 
                 new(ShowcaseKey, new KudosSentEmailTemplateViewModel(SettingsUrl, "Rasa Petraitiene", 25, "Sample", "https://simoona.example.com"))
             };
+
+            // MailTemplate fills this from configuration; renders that bypass it need it too.
+            seeds.ForEach(seed => seed.Model.HomeUrl = HomeUrl);
+
+            return seeds;
         }
 
         private static UserEventAttendStatusChangeEmailDto SampleAttendStatus()
