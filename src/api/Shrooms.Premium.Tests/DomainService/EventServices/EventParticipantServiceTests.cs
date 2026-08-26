@@ -208,6 +208,38 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public void Should_Let_A_Mixed_Event_Be_Joined_With_A_Legacy_IgnoreSingleJoin_Option_And_A_Question_Answer()
+        {
+            var eventId = MockEventWithLegacyIgnoreSingleJoinOptionAndQuestion();
+
+            // Use the real EventValidationService here (not the substitute) so the choice checks
+            // actually run instead of being no-ops.
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner,
+                _eventAnswerValidator);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                // Option 10 is the legacy IgnoreSingleJoin option; 90 is the question answer.
+                // Picking both must not trip CheckIfSingleChoiceSelectedWithRule.
+                ChosenOptions = new List<int> { 10, 90 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
         public void Should_Reject_A_Join_That_Skips_A_Required_Question()
         {
             var eventId = MockEventWithRequiredQuestion();
@@ -288,21 +320,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Reject_Edited_Choices_That_Skip_A_Required_Question()
         {
-            // withAttendingUser1: UpdateSelectedOptionsAsync runs CheckIfUserParticipatesInEvent
-            // against a participant list projected to attending statuses only, so without this the
-            // test would fail on participation rather than on the answers.
-            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true);
-            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
-            {
-                new EventParticipant
-                {
-                    Id = 1,
-                    EventId = eventId,
-                    ApplicationUserId = "user1",
-                    AttendStatus = (int)AttendingStatus.Attending,
-                    EventOptions = new List<EventOption>()
-                }
-            });
+            var eventId = MockEventWithRequiredQuestion();
 
             var changeOptionsDto = new EventChangeOptionsDto
             {
@@ -781,7 +799,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
-                .When(x => x.CheckIfProvidedOptionsAreValid(chosenOptionIds, Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
+                .When(x => x.CheckIfProvidedOptionsAreValid(Arg.Is<IEnumerable<int>>(a => a.SequenceEqual(chosenOptionIds)), Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
             Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
@@ -1787,6 +1805,74 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 new ApplicationUser { Id = "user1", OrganizationId = 2 },
                 new ApplicationUser { Id = "user2", OrganizationId = 2 },
                 new ApplicationUser { Id = "host1", OrganizationId = 2 }
+            });
+
+            return eventId;
+        }
+
+        /// <summary>
+        /// Mixed event: one legacy option (10, no QuestionId) carrying <see cref="OptionRules.IgnoreSingleJoin"/>,
+        /// plus a required question (5) with its own option (90). MaxChoices is 1, counting the legacy
+        /// option only. Exercises FIX 1: question answers must not be counted by
+        /// CheckIfSingleChoiceSelectedWithRule alongside the legacy IgnoreSingleJoin option.
+        /// </summary>
+        private Guid MockEventWithLegacyIgnoreSingleJoinOptionAndQuestion()
+        {
+            var eventId = Guid.NewGuid();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
+
+            var legacyOptions = new List<EventOption>
+            {
+                new EventOption { Id = 10, EventId = eventId, Option = "Legacy", QuestionId = null, Rule = OptionRules.IgnoreSingleJoin, Order = 0 }
+            };
+
+            var questionOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "QOption", QuestionId = 5, Order = 0 }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Name = "Mixed event",
+                    MaxChoices = 1,
+                    MaxParticipants = 20,
+                    MaxVirtualParticipants = 0,
+                    StartDate = DateTime.Parse("2026-06-01"),
+                    EndDate = DateTime.Parse("2026-06-02"),
+                    RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    ResponsibleUserId = "host1",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "test type", IsSingleJoin = false },
+                    EventParticipants = new List<EventParticipant>(),
+                    EventOptions = legacyOptions.Concat(questionOptions).ToList(),
+                    EventQuestions = new List<EventQuestion>
+                    {
+                        new EventQuestion
+                        {
+                            Id = 5,
+                            EventId = eventId,
+                            Title = "Pick one",
+                            Order = 0,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = null,
+                            Options = questionOptions
+                        }
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>().AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2 }
             });
 
             return eventId;
