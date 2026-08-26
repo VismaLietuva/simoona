@@ -44,6 +44,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private readonly IEventValidationService _eventValidationService;
         private readonly IWallService _wallService;
         private readonly IAsyncRunner _asyncRunner;
+        private readonly IEventAnswerValidator _eventAnswerValidator;
 
         public EventParticipationService(IUnitOfWork2 uow,
             ISystemClock systemClock,
@@ -51,7 +52,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             IPermissionService permissionService,
             IEventValidationService eventValidationService,
             IWallService wallService,
-            IAsyncRunner asyncRunner)
+            IAsyncRunner asyncRunner,
+            IEventAnswerValidator eventAnswerValidator)
         {
             _uow = uow;
             _eventsDbSet = _uow.GetDbSet<Event>();
@@ -64,6 +66,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _roleService = roleService;
             _wallService = wallService;
             _asyncRunner = asyncRunner;
+            _eventAnswerValidator = eventAnswerValidator;
         }
 
         public async Task ResetVirtualAttendeesAsync(Event @event, UserAndOrganizationDto userOrg) =>
@@ -335,16 +338,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
         {
+            var chosenOptions = joinDto.ChosenOptions.ToList();
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
-            var legacyChosenCount = joinDto.ChosenOptions.Count(legacyOptionIds.Contains);
+            var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventDto.RegistrationDeadline);
-            _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventDto.SelectedOptions);
+            _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventDto.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventDto.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
             _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
+
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
         }
 
         private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)
@@ -594,6 +600,18 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 MaxChoices = e.MaxChoices,
                 Id = e.Id,
                 Options = e.EventOptions,
+                Questions = e.EventQuestions
+                    .OrderBy(q => q.Order)
+                    .Select(q => new ResolvedEventQuestionDto
+                    {
+                        QuestionId = q.Id,
+                        Order = q.Order,
+                        SelectType = q.SelectType,
+                        IsRequired = q.IsRequired,
+                        ShowIfOptionId = q.ShowIfOptionId,
+                        OptionIds = q.Options.Select(o => o.Id).ToList()
+                    })
+                    .ToList(),
                 IsSingleJoin = e.EventType.IsSingleJoin,
                 EventTypeId = e.EventTypeId,
                 SingleJoinGroupName = e.EventType.SingleJoinGroupName,
@@ -714,6 +732,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var eventDto = await _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.EventOptions)
+                .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
                 .Where(x => x.Id == joinDto.EventId && x.OrganizationId == joinDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
