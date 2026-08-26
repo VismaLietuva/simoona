@@ -8,6 +8,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -119,6 +120,36 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(result.Options.Count(), 2);
             ClassicAssert.AreEqual(result.Options.First(o => o.Id == 4).Option, "Option1");
             ClassicAssert.AreEqual(result.Options.First(o => o.Id == 5).Option, "Option2");
+        }
+
+        [Test]
+        public async Task Should_Keep_Question_Options_Out_Of_The_Legacy_Option_List()
+        {
+            var eventId = MockEventWithQuestions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventListingService.GetEventOptionsAsync(eventId, userOrg);
+
+            Assert.That(result.Options.Select(o => o.Id), Is.EquivalentTo(new[] { 40 }));
+        }
+
+        [Test]
+        public async Task Should_Return_Questions_And_Their_Options_In_Order()
+        {
+            var eventId = MockEventWithQuestions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventListingService.GetEventOptionsAsync(eventId, userOrg);
+
+            var questions = result.Questions.ToList();
+            Assert.That(questions.Select(q => q.Id), Is.EqualTo(new int?[] { 5, 6 }));
+            Assert.That(questions[0].Title, Is.EqualTo("Pick your dish"));
+            Assert.That(questions[0].SelectType, Is.EqualTo(EventQuestionSelectType.Single));
+            Assert.That(questions[0].IsRequired, Is.True);
+            Assert.That(questions[0].ShowIfOptionId, Is.Null);
+            Assert.That(questions[0].Options.Select(o => o.Id), Is.EqualTo(new int?[] { 50, 51 }));
+            Assert.That(questions[0].Options[0].Name, Is.EqualTo("Pasta"));
+            Assert.That(questions[1].ShowIfOptionId, Is.EqualTo(51));
         }
 
         [Test]
@@ -1458,7 +1489,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     EventParticipants = new List<EventParticipant>(),
                     EventTypeId = 1,
-                    EventOptions = options1
+                    EventOptions = options1,
+                    EventQuestions = new List<EventQuestion>()
                 },
                 new Event
                 {
@@ -1475,13 +1507,74 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     EventParticipants = new List<EventParticipant>(),
                     EventTypeId = 1,
-                    EventOptions = options2
+                    EventOptions = options2,
+                    EventQuestions = new List<EventQuestion>()
                 }
             };
 
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
 
             return guids;
+        }
+
+        private Guid MockEventWithQuestions()
+        {
+            var eventId = Guid.NewGuid();
+
+            var legacyOption = new EventOption { Id = 40, EventId = eventId, Option = "Vegetarian", QuestionId = null };
+
+            var dishOptions = new List<EventOption>
+            {
+                new EventOption { Id = 51, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1 },
+                new EventOption { Id = 50, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0 }
+            };
+
+            var questions = new List<EventQuestion>
+            {
+                new EventQuestion
+                {
+                    Id = 6,
+                    EventId = eventId,
+                    Title = "Which pizza?",
+                    Order = 1,
+                    SelectType = EventQuestionSelectType.Single,
+                    IsRequired = false,
+                    ShowIfOptionId = 51,
+                    Options = new List<EventOption>()
+                },
+                new EventQuestion
+                {
+                    Id = 5,
+                    EventId = eventId,
+                    Title = "Pick your dish",
+                    Order = 0,
+                    SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true,
+                    ShowIfOptionId = null,
+                    Options = dishOptions
+                }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    MaxChoices = 0,
+                    MaxParticipants = 20,
+                    OrganizationId = 2,
+                    Name = "Question event",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "test type", IsSingleJoin = false },
+                    EventParticipants = new List<EventParticipant>(),
+                    EventOptions = new List<EventOption> { legacyOption, dishOptions[0], dishOptions[1] },
+                    EventQuestions = questions
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+
+            return eventId;
         }
 
         private IList<Event> MockEventReportParticipantsTest()
