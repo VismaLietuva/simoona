@@ -315,20 +315,27 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Where(option => changeOptionsDto.ChosenOptions.Contains(option.Id))
                 .ToList();
 
+            var chosenOptions = changeOptionsDto.ChosenOptions.ToList();
             var legacyOptionIds = LegacyOptionIds(eventEntity.Options);
-            var legacyChosenCount = changeOptionsDto.ChosenOptions.Count(legacyOptionIds.Contains);
+            var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventEntity.RegistrationDeadline);
-            _eventValidationService.CheckIfProvidedOptionsAreValid(changeOptionsDto.ChosenOptions, eventEntity.SelectedOptions);
+            _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventEntity.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
-            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventEntity.SelectedOptions, OptionRules.IgnoreSingleJoin);
+
+            // Only legacy options participate in the single-choice-with-rule check; question
+            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
+                eventEntity.SelectedOptions.Where(option => option.QuestionId == null).ToList(),
+                OptionRules.IgnoreSingleJoin);
+
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
             _eventAnswerValidator.Validate(
                 eventEntity.Questions,
-                changeOptionsDto.ChosenOptions.ToList(),
-                LegacyOptionIds(eventEntity.Options));
+                chosenOptions,
+                legacyOptionIds);
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
@@ -352,7 +359,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventDto.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
-            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventDto.SelectedOptions, OptionRules.IgnoreSingleJoin);
+
+            // Only legacy options participate in the single-choice-with-rule check; question
+            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
+                eventDto.SelectedOptions.Where(option => option.QuestionId == null).ToList(),
+                OptionRules.IgnoreSingleJoin);
+
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
             _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
 

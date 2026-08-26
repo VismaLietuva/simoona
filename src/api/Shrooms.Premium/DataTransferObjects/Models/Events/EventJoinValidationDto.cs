@@ -23,10 +23,12 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public bool AllowNotGoing { get; set; }
 
         public string Location { get; set; }
+
+        /// <summary>All event options, including options owned by questions.</summary>
         public ICollection<EventOption> Options { get; set; }
         public ICollection<EventOption> SelectedOptions { get; set; }
 
-        /// <summary>Resolved question tree, for <see cref="IEventAnswerValidator"/>.</summary>
+        /// <summary>Resolved question tree, for the answer validator.</summary>
         public List<ResolvedEventQuestionDto> Questions { get; set; } = new List<ResolvedEventQuestionDto>();
 
         public DateTime RegistrationDeadline { get; set; }
