@@ -25,6 +25,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public string Location { get; set; }
         public ICollection<EventOption> Options { get; set; }
         public ICollection<EventOption> SelectedOptions { get; set; }
+
+        /// <summary>Resolved question tree, for <see cref="IEventAnswerValidator"/>.</summary>
+        public List<ResolvedEventQuestionDto> Questions { get; set; } = new List<ResolvedEventQuestionDto>();
+
         public DateTime RegistrationDeadline { get; set; }
         public DateTime StartDate { get; set; }
         public List<EventParticipantAttendDto> Participants { get; set; }

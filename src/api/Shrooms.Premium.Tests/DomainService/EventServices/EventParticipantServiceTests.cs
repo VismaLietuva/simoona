@@ -44,6 +44,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
         private IAsyncRunner _asyncRunner;
 
+        private IEventAnswerValidator _eventAnswerValidator;
+
         [SetUp]
         public void TestInitializer()
         {
@@ -69,6 +71,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
+            _eventAnswerValidator = new EventAnswerValidator();
 
             _eventParticipationService =
                 new EventParticipationService(
@@ -78,7 +81,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     permissionService,
                     _eventValidationServiceMock,
                     _wallService,
-                    _asyncRunner);
+                    _asyncRunner,
+                    _eventAnswerValidator);
         }
 
         [Test]
@@ -185,7 +189,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Substitute.For<IPermissionService>(),
                 _eventValidationService,
                 _wallService,
-                _asyncRunner);
+                _asyncRunner,
+                _eventAnswerValidator);
 
             var eventJoinDto = new EventJoinDto
             {
@@ -200,6 +205,84 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Reject_A_Join_That_Skips_A_Required_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.RequiredAnswerMissing }));
+        }
+
+        [Test]
+        public void Should_Reject_An_Answer_For_A_Hidden_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            // 92 belongs to the conditional question, whose trigger (91) was not chosen.
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 90, 92 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.AnswerForHiddenQuestion }));
+        }
+
+        [Test]
+        public void Should_Accept_A_Join_That_Answers_Every_Reachable_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 91, 92 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Validate_Answers_When_A_Host_Adds_Colleagues()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1", "user2" },
+                UserId = "host1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.AddColleagueAsync(eventJoinDto));
         }
 
         [Test]
@@ -1434,6 +1517,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EndDate = DateTime.Parse("2016-04-06"),
                     RegistrationDeadline = DateTime.Parse("2016-04-05"),
                     EventOptions = new List<EventOption>(),
+                    EventQuestions = new List<EventQuestion>(),
                     Id = guid,
                     MaxChoices = 0,
                     MaxParticipants = 20,
@@ -1519,6 +1603,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                             Rule = OptionRules.IgnoreSingleJoin
                         }
                     },
+                    EventQuestions = new List<EventQuestion>(),
                     Id = guid,
                     MaxChoices = 1,
                     MaxParticipants = 20,
