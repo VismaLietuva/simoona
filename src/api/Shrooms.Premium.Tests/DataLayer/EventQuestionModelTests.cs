@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Shrooms.DataLayer.DAL;
@@ -63,6 +64,30 @@ namespace Shrooms.Premium.Tests.DataLayer
             var showIf = entityType.FindNavigation(nameof(EventQuestion.ShowIfOption));
 
             Assert.That(showIf.ForeignKey.DeleteBehavior, Is.EqualTo(DeleteBehavior.Restrict));
+        }
+
+        [Test]
+        public void Should_Expose_EventQuestions_From_Event()
+        {
+            var entityType = _context.Model.FindEntityType(typeof(Event));
+
+            var navigation = entityType.FindNavigation(nameof(Event.EventQuestions));
+
+            Assert.That(navigation, Is.Not.Null);
+            Assert.That(navigation.TargetEntityType.ClrType, Is.EqualTo(typeof(EventQuestion)));
+        }
+
+        [Test]
+        public void Should_Not_Create_A_Shadow_Foreign_Key_For_EventQuestions()
+        {
+            var entityType = _context.Model.FindEntityType(typeof(EventQuestion));
+
+            var foreignKeys = entityType.GetForeignKeys()
+                .Where(fk => fk.PrincipalEntityType.ClrType == typeof(Event))
+                .ToList();
+
+            Assert.That(foreignKeys, Has.Count.EqualTo(1));
+            Assert.That(foreignKeys[0].Properties[0].Name, Is.EqualTo(nameof(EventQuestion.EventId)));
         }
     }
 }
