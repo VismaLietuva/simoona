@@ -311,10 +311,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Where(option => changeOptionsDto.ChosenOptions.Contains(option.Id))
                 .ToList();
 
+            var legacyOptionIds = LegacyOptionIds(eventEntity.Options);
+            var legacyChosenCount = changeOptionsDto.ChosenOptions.Count(legacyOptionIds.Contains);
+
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventEntity.RegistrationDeadline);
             _eventValidationService.CheckIfProvidedOptionsAreValid(changeOptionsDto.ChosenOptions, eventEntity.SelectedOptions);
-            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, changeOptionsDto.ChosenOptions.Count());
-            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, changeOptionsDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
+            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventEntity.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
@@ -332,10 +335,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
         {
+            var legacyOptionIds = LegacyOptionIds(eventDto.Options);
+            var legacyChosenCount = joinDto.ChosenOptions.Count(legacyOptionIds.Contains);
+
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventDto.RegistrationDeadline);
             _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventDto.SelectedOptions);
-            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, joinDto.ChosenOptions.Count());
-            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, joinDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
+            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventDto.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
             _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
@@ -731,6 +737,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private List<EventOption> GetSelectedOptions(EventJoinValidationDto validationDto, EventJoinDto joinDto) =>
             validationDto.Options.Where(option => joinDto.ChosenOptions.Contains(option.Id))
                 .ToList();
+
+        // MaxChoices is derived from flat options only (see EventService.FindOutMaxChoices), so a
+        // question-only event has MaxChoices == 0. Counting answers against it rejects every valid
+        // submission. Question answers are bounded by EventAnswerValidator instead.
+        private static List<int> LegacyOptionIds(ICollection<EventOption> allOptions)
+        {
+            return allOptions
+                .Where(option => option.QuestionId == null)
+                .Select(option => option.Id)
+                .ToList();
+        }
 
         private void SendEventInvitations(EventJoinDto joinDto, EventJoinValidationDto eventDto) =>
             _asyncRunner.Run<IEventCalendarService>(async notifier =>

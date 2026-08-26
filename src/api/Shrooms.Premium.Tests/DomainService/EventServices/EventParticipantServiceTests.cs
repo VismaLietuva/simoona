@@ -172,6 +172,37 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public void Should_Let_A_Question_Only_Event_Be_Joined_With_Answers()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+
+            // Use the real EventValidationService here (not the substitute) so the choice checks
+            // actually run instead of being no-ops.
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                // Answers q5 with Pasta. q6 is conditional on Pizza, so it stays hidden and
+                // unanswered — a valid submission that today trips the MaxChoices check.
+                ChosenOptions = new List<int> { 90 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
         public void Should_Throw_If_Joining_Event_Is_Expired()
         {
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-06-21"));
@@ -1548,6 +1579,101 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _eventParticipantsDbSet.SetDbSetDataForAsync(participants.AsQueryable());
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return guid;
+        }
+
+        /// <summary>
+        /// q5 "Pick your dish" (required, single, always shown): 90 Pasta, 91 Pizza.
+        /// q6 "Which pizza?"   (required, single, shown if 91):   92 Margherita.
+        /// MaxChoices is 0 — every option belongs to a question, so nothing counts as a legacy choice.
+        /// </summary>
+        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false)
+        {
+            var eventId = Guid.NewGuid();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
+
+            var dishOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0 },
+                new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1 }
+            };
+
+            var pizzaOptions = new List<EventOption>
+            {
+                new EventOption { Id = 92, EventId = eventId, Option = "Margherita", QuestionId = 6, Order = 0 }
+            };
+
+            var participants = withAttendingUser1
+                ? new List<EventParticipant>
+                {
+                    new EventParticipant
+                    {
+                        Id = 1,
+                        EventId = eventId,
+                        ApplicationUserId = "user1",
+                        AttendStatus = (int)AttendingStatus.Attending,
+                        EventOptions = new List<EventOption>()
+                    }
+                }
+                : new List<EventParticipant>();
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Name = "Question event",
+                    MaxChoices = 0,
+                    MaxParticipants = 20,
+                    MaxVirtualParticipants = 0,
+                    StartDate = DateTime.Parse("2026-06-01"),
+                    EndDate = DateTime.Parse("2026-06-02"),
+                    RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    ResponsibleUserId = "host1",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "test type", IsSingleJoin = false },
+                    EventParticipants = participants,
+                    EventOptions = dishOptions.Concat(pizzaOptions).ToList(),
+                    EventQuestions = new List<EventQuestion>
+                    {
+                        new EventQuestion
+                        {
+                            Id = 5,
+                            EventId = eventId,
+                            Title = "Pick your dish",
+                            Order = 0,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = null,
+                            Options = dishOptions
+                        },
+                        new EventQuestion
+                        {
+                            Id = 6,
+                            EventId = eventId,
+                            Title = "Which pizza?",
+                            Order = 1,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = 91,
+                            Options = pizzaOptions
+                        }
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(participants.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2 },
+                new ApplicationUser { Id = "user2", OrganizationId = 2 },
+                new ApplicationUser { Id = "host1", OrganizationId = 2 }
+            });
+
+            return eventId;
         }
 
         private void MockUsers()
