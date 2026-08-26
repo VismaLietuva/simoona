@@ -122,6 +122,40 @@ namespace Shrooms.Tests.Controllers.WebApi
             await _videoLibraryService.DidNotReceive().UpdateVideoAsync(Arg.Any<VideoLibraryItemDto>());
         }
 
+        [TestCase(0)]
+        [TestCase(-1)]
+        public async Task Update_Should_Reject_An_Id_That_Cannot_Exist(int id)
+        {
+            var viewModel = new VideoLibraryItemViewModel
+            {
+                Id = id,
+                Title = "Updated",
+                Url = "https://drive.google.com/file/d/abc/view"
+            };
+            _videoLibraryController.Validate(viewModel);
+
+            var result = await _videoLibraryController.Update(viewModel);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _videoLibraryService.DidNotReceive().UpdateVideoAsync(Arg.Any<VideoLibraryItemDto>());
+        }
+
+        [Test]
+        public async Task Update_Should_Accept_A_Real_Id()
+        {
+            var viewModel = new VideoLibraryItemViewModel
+            {
+                Id = 1,
+                Title = "Updated",
+                Url = "https://drive.google.com/file/d/abc/view"
+            };
+            _videoLibraryController.Validate(viewModel);
+
+            var result = await _videoLibraryController.Update(viewModel);
+
+            Assert.That(result, Is.InstanceOf<OkResult>());
+        }
+
         [Test]
         public async Task Update_Should_Return_Ok()
         {

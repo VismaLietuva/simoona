@@ -6,6 +6,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
     public class VideoTypeViewModel
     {
         [Required]
+        [Range(1, int.MaxValue)]
         public int Id { get; set; }
 
         [Required]

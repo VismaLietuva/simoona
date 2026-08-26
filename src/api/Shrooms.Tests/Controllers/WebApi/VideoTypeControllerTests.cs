@@ -99,6 +99,30 @@ namespace Shrooms.Tests.Controllers.WebApi
             await _videoTypeService.DidNotReceive().UpdateVideoTypeAsync(Arg.Any<VideoTypeDto>());
         }
 
+        [TestCase(0)]
+        [TestCase(-1)]
+        public async Task Update_Should_Reject_An_Id_That_Cannot_Exist(int id)
+        {
+            var viewModel = new VideoTypeViewModel { Id = id, Title = "Renamed" };
+            _videoTypeController.Validate(viewModel);
+
+            var result = await _videoTypeController.Update(viewModel);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _videoTypeService.DidNotReceive().UpdateVideoTypeAsync(Arg.Any<VideoTypeDto>());
+        }
+
+        [Test]
+        public async Task Update_Should_Accept_A_Real_Id()
+        {
+            var viewModel = new VideoTypeViewModel { Id = 1, Title = "Renamed" };
+            _videoTypeController.Validate(viewModel);
+
+            var result = await _videoTypeController.Update(viewModel);
+
+            Assert.That(result, Is.InstanceOf<OkResult>());
+        }
+
         [Test]
         public async Task Update_Should_Return_Ok()
         {
