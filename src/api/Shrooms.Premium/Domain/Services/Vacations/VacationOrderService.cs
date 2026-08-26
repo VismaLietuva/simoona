@@ -193,7 +193,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return report;
         }
 
-        public async Task<VacationDocumentDto> GetArchiveAsync(string from, string to, UserAndOrganizationDto userOrg)
+        public async Task<VacationDocumentDto> GetArchiveAsync(string from, string to, VacationDocumentFormat format, UserAndOrganizationDto userOrg)
         {
             var (start, end) = ParseRange(from, to);
 
@@ -236,22 +236,22 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             {
                 foreach (var order in orders)
                 {
-                    var entry = archive.CreateEntry(DocumentName(order), CompressionLevel.Optimal);
+                    var entry = archive.CreateEntry(DocumentName(order, format), CompressionLevel.Optimal);
                     await using var entryStream = entry.Open();
-                    var content = VacationOrderDocumentBuilder.Build(order, settings);
+                    var content = Render(order, settings, format);
                     await entryStream.WriteAsync(content);
                 }
             }
 
             return new VacationDocumentDto
             {
-                FileName = ArchiveName(start, end),
+                FileName = ArchiveName(start, end, format),
                 ContentType = "application/zip",
                 Content = stream.ToArray()
             };
         }
 
-        public async Task<VacationDocumentDto> GetOrderDocumentAsync(int id, UserAndOrganizationDto userOrg)
+        public async Task<VacationDocumentDto> GetOrderDocumentAsync(int id, VacationDocumentFormat format, UserAndOrganizationDto userOrg)
         {
             var order = await _orderDbSet
                 .AsNoTracking()
@@ -274,9 +274,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             return new VacationDocumentDto
             {
-                FileName = DocumentName(order),
-                ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                Content = VacationOrderDocumentBuilder.Build(order, settings)
+                FileName = DocumentName(order, format),
+                ContentType = ContentTypeFor(format),
+                Content = Render(order, settings, format)
             };
         }
 
@@ -316,15 +316,18 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         /// <summary>
         /// A whole calendar month keeps the month in the name, which is what
-        /// payroll files these by; any other period spells both ends out.
+        /// payroll files these by; any other period spells both ends out. The PDF
+        /// archive is marked, so downloading both formats for one month does not
+        /// leave two identically named files in the same folder.
         /// </summary>
-        private static string ArchiveName(DateTime start, DateTime end)
+        private static string ArchiveName(DateTime start, DateTime end, VacationDocumentFormat format)
         {
             var wholeMonth = start.Day == 1 && end == start.AddMonths(1).AddDays(-1);
+            var suffix = format == VacationDocumentFormat.Pdf ? "_pdf" : string.Empty;
 
             return wholeMonth
-                ? $"Isakymai_{start.ToString(MonthFormat, CultureInfo.InvariantCulture)}.zip"
-                : $"Isakymai_{VacationWireFormat.ToDay(start)}_{VacationWireFormat.ToDay(end)}.zip";
+                ? $"Isakymai_{start.ToString(MonthFormat, CultureInfo.InvariantCulture)}{suffix}.zip"
+                : $"Isakymai_{VacationWireFormat.ToDay(start)}_{VacationWireFormat.ToDay(end)}{suffix}.zip";
         }
 
         private static VacationOrderItem NewItem(VacationRequest request, DateTime now)
@@ -365,14 +368,37 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         }
 
         /// <summary>An administrator sets the prefix, so path separators come out here too.</summary>
-        private static string DocumentName(VacationOrder order)
+        private static string DocumentName(VacationOrder order, VacationDocumentFormat format)
         {
             var reference = new string(order.Reference
                 .Where(character => character != '/' && character != '\\' && character != ':')
                 .ToArray())
                 .Replace("..", string.Empty);
 
-            return $"Isakymas_{reference}.docx";
+            return $"Isakymas_{reference}.{ExtensionFor(format)}";
+        }
+
+        private static string ExtensionFor(VacationDocumentFormat format)
+        {
+            return format == VacationDocumentFormat.Pdf ? "pdf" : "docx";
+        }
+
+        private static string ContentTypeFor(VacationDocumentFormat format)
+        {
+            return format == VacationDocumentFormat.Pdf
+                ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        }
+
+        /// <summary>
+        /// One order, one wording, two renderings — see
+        /// <see cref="VacationOrderContent"/>.
+        /// </summary>
+        private static byte[] Render(VacationOrder order, VacationSettingsDto settings, VacationDocumentFormat format)
+        {
+            return format == VacationDocumentFormat.Pdf
+                ? VacationOrderPdfBuilder.Build(order, settings)
+                : VacationOrderDocumentBuilder.Build(order, settings);
         }
     }
 }

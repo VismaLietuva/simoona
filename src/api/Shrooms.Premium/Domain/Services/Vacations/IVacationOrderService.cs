@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 
 namespace Shrooms.Premium.Domain.Services.Vacations
@@ -27,9 +28,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         /// </summary>
         Task<VacationOrderGenerationDto> GenerateAsync(string from, string to, UserAndOrganizationDto userOrg);
 
-        Task<VacationDocumentDto> GetOrderDocumentAsync(int id, UserAndOrganizationDto userOrg);
+        Task<VacationDocumentDto> GetOrderDocumentAsync(int id, VacationDocumentFormat format, UserAndOrganizationDto userOrg);
 
-        /// <summary>Every document of the period, zipped.</summary>
-        Task<VacationDocumentDto> GetArchiveAsync(string from, string to, UserAndOrganizationDto userOrg);
+        /// <summary>Every document of the period, zipped, in one format.</summary>
+        Task<VacationDocumentDto> GetArchiveAsync(string from, string to, VacationDocumentFormat format, UserAndOrganizationDto userOrg);
     }
 }

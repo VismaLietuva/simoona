@@ -27,7 +27,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Vacations
         [Range(1, int.MaxValue)]
         public int Page { get; set; } = 1;
 
-        [Range(1, 200)]
+        [Range(1, 500)]
         public int PageSize { get; set; } = 20;
     }
 

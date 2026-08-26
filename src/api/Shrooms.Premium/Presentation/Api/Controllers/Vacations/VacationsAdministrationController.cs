@@ -197,20 +197,22 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
             return GuardedAsync(() => _orderService.GenerateAsync(period.From, period.To, GetUserAndOrganization()));
         }
 
+        /// <summary>"word" or "pdf"; anything else, including nothing, means Word.</summary>
         [HttpGet]
         [Route("Orders/Archive")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public Task<IActionResult> OrdersArchive([FromQuery] string from, [FromQuery] string to)
+        public Task<IActionResult> OrdersArchive([FromQuery] string from, [FromQuery] string to, [FromQuery] string format)
         {
-            return GuardedFileAsync(() => _orderService.GetArchiveAsync(from, to, GetUserAndOrganization()));
+            return GuardedFileAsync(() => _orderService.GetArchiveAsync(from, to, VacationWireFormat.ParseFormat(format), GetUserAndOrganization()));
         }
 
+        /// <summary>"word" or "pdf"; anything else, including nothing, means Word.</summary>
         [HttpGet]
         [Route("Orders/{id:int}/Document")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public Task<IActionResult> OrderDocument(int id)
+        public Task<IActionResult> OrderDocument(int id, [FromQuery] string format)
         {
-            return GuardedFileAsync(() => _orderService.GetOrderDocumentAsync(id, GetUserAndOrganization()));
+            return GuardedFileAsync(() => _orderService.GetOrderDocumentAsync(id, VacationWireFormat.ParseFormat(format), GetUserAndOrganization()));
         }
     }
 }
