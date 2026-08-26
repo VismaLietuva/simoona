@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
@@ -257,6 +259,31 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             Assert.That(body.Errors, Has.Count.EqualTo(1));
             Assert.That(body.Errors[0].QuestionId, Is.EqualTo(12));
             Assert.That(body.Errors[0].Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));
+        }
+
+        [Test]
+        public void Should_Serialize_Answer_Error_Reason_As_A_String_For_The_Client()
+        {
+            var viewModel = new EventAnswersInvalidViewModel
+            {
+                Code = "EventAnswersInvalid",
+                Errors = new List<EventAnswerErrorViewModel>
+                {
+                    new EventAnswerErrorViewModel
+                    {
+                        QuestionId = 12,
+                        Reason = EventAnswerErrorReason.RequiredAnswerMissing
+                    }
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+
+            Assert.That(json, Does.Contain("\"reason\":\"RequiredAnswerMissing\""));
+            Assert.That(json, Does.Contain("\"questionId\":12"));
         }
     }
 }
