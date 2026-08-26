@@ -188,7 +188,20 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_No_Chosen_Options_When_The_Caller_Has_Not_Joined()
         {
             var eventId = MockEventWithQuestions();
-            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>());
+            // Someone else's answers, and no row for the caller. Seeding an empty list here
+            // would make this test vacuous — MyChosenOptions already defaults to empty, so it
+            // would pass with no implementation at all. With another participant present it
+            // fails the moment the query stops filtering by user.
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    Id = 2,
+                    EventId = eventId,
+                    ApplicationUserId = "someoneElse",
+                    EventOptions = new List<EventOption> { new EventOption { Id = 51 } }
+                }
+            });
             var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
 
             var result = await _eventListingService.GetEventOptionsAsync(eventId, userOrg);
