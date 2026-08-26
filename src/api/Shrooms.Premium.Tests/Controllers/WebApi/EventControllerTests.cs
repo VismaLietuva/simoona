@@ -19,6 +19,7 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +33,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
         private IEventService _eventService;
         private IEventListingService _eventListingService;
+        private IEventParticipationService _eventParticipationService;
 
         [SetUp]
         public void TestInitializer()
@@ -40,9 +42,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _eventService = Substitute.For<IEventService>();
             _eventListingService = Substitute.For<IEventListingService>();
+            _eventParticipationService = Substitute.For<IEventParticipationService>();
 
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
-            var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventCalendarService = Substitute.For<IEventCalendarService>();
             var eventExportService = Substitute.For<IEventExportService>();
             var postService = Substitute.For<IPostService>();
@@ -54,7 +56,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 _eventService,
                 _eventListingService,
                 eventUtilitiesService,
-                eventParticipationService,
+                _eventParticipationService,
                 eventCalendarService,
                 eventExportService,
                 postService,
@@ -235,6 +237,26 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             ClassicAssert.AreEqual(HttpStatusCode.OK, httpActionResult.GetStatusCode());
+        }
+
+        [Test]
+        public async Task Join_Should_Return_The_Offending_Questions_When_Answers_Are_Invalid()
+        {
+            _eventParticipationService
+                .JoinAsync(Arg.Any<EventJoinDto>())
+                .Returns(Task.FromException(new EventAnswersInvalidException(new List<EventAnswerErrorDto>
+                {
+                    new EventAnswerErrorDto { QuestionId = 12, Reason = EventAnswerErrorReason.RequiredAnswerMissing }
+                })));
+
+            var result = await _eventController.Join(new EventJoinViewModel { EventId = Guid.NewGuid() });
+
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
+            var body = result.GetContent<EventAnswersInvalidViewModel>();
+            Assert.That(body.Code, Is.EqualTo("EventAnswersInvalid"));
+            Assert.That(body.Errors, Has.Count.EqualTo(1));
+            Assert.That(body.Errors[0].QuestionId, Is.EqualTo(12));
+            Assert.That(body.Errors[0].Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));
         }
     }
 }
