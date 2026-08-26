@@ -334,6 +334,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 await _eventParticipationService.AddColleagueAsync(eventJoinDto);
                 return Ok();
             }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
+            }
             catch (EventException e)
             {
                 return BadRequest(e.Message);
@@ -359,6 +363,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 await _eventParticipationService.JoinAsync(optionsDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -652,6 +660,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto);
                 return Ok();
             }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
+            }
             catch (EventException e)
             {
                 return BadRequest(e.Message);
@@ -700,6 +712,21 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        private BadRequestObjectResult AnswersInvalid(EventAnswersInvalidException exception)
+        {
+            return BadRequest(new EventAnswersInvalidViewModel
+            {
+                Code = EventAnswersInvalidException.ErrorCode,
+                Errors = exception.Errors
+                    .Select(error => new EventAnswerErrorViewModel
+                    {
+                        QuestionId = error.QuestionId,
+                        Reason = error.Reason
+                    })
+                    .ToList()
+            });
         }
     }
 }
