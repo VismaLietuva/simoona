@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -207,6 +209,59 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             var viewModel = _mapper.Map<EventQuestionStructureDto, EventQuestionViewModel>(dto);
 
             Assert.That(viewModel.ShowIf, Is.Null);
+        }
+
+        [Test]
+        public void Should_Map_Question_Structure_To_The_SignUp_Read_Model()
+        {
+            var dto = new EventQuestionStructureDto
+            {
+                Id = 7,
+                ClientId = "ignored",
+                Title = "Pick your dish",
+                Order = 2,
+                SelectType = EventQuestionSelectType.Multi,
+                IsRequired = true,
+                ShowIfOptionId = 101,
+                ShowIfOptionClientId = "ignored",
+                Options = new List<EventQuestionOptionStructureDto>
+                {
+                    new EventQuestionOptionStructureDto { Id = 11, Name = "Pizza", Order = 0, Rule = OptionRules.Default }
+                }
+            };
+
+            var result = _mapper.Map<EventQuestionStructureDto, EventSignUpQuestionViewModel>(dto);
+
+            Assert.That(result.Id, Is.EqualTo(7));
+            Assert.That(result.Title, Is.EqualTo("Pick your dish"));
+            Assert.That(result.Order, Is.EqualTo(2));
+            Assert.That(result.SelectType, Is.EqualTo(EventQuestionSelectType.Multi));
+            Assert.That(result.IsRequired, Is.True);
+            Assert.That(result.ShowIfOptionId, Is.EqualTo(101));
+            Assert.That(result.Options, Has.Count.EqualTo(1));
+            Assert.That(result.Options[0].Id, Is.EqualTo(11));
+            Assert.That(result.Options[0].Name, Is.EqualTo("Pizza"));
+            Assert.That(result.Options[0].Order, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Should_Serialize_SelectType_As_A_String_For_The_Client()
+        {
+            var viewModel = new EventSignUpQuestionViewModel
+            {
+                Id = 1,
+                Title = "Pick your dish",
+                SelectType = EventQuestionSelectType.Single,
+                ShowIfOptionId = null
+            };
+
+            var json = JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+
+            Assert.That(json, Does.Contain("\"selectType\":\"Single\""));
+            Assert.That(json, Does.Contain("\"showIfOptionId\":null"));
         }
     }
 }
