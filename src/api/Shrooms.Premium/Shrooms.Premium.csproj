@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\LiberationSerif-Regular.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\LiberationSerif-Bold.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" />
     <PackageReference Include="ExcelDataReader" />
     <PackageReference Include="Google.Apis" />
@@ -25,6 +30,7 @@
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Ical.Net" />
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="PDFsharp" />
     <PackageReference Include="X.PagedList" />
     <PackageReference Include="X.PagedList.EF" />
   </ItemGroup>

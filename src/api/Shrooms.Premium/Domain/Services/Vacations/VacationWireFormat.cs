@@ -46,6 +46,21 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 : null;
         }
 
+        /// <summary>
+        /// The file the client asked a document for. Unrecognised and absent both
+        /// mean Word: it is the format that existed before the PDF did, so a link
+        /// saved or bookmarked without the parameter still returns what it always
+        /// returned.
+        /// </summary>
+        public static VacationDocumentFormat ParseFormat(string value)
+        {
+            return (value ?? string.Empty).Trim().ToLowerInvariant() switch
+            {
+                "pdf" => VacationDocumentFormat.Pdf,
+                _ => VacationDocumentFormat.Word
+            };
+        }
+
         public static string TypeToWire(VacationRequestType type)
         {
             return type switch
