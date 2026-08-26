@@ -302,6 +302,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             var eventEntity = await _eventsDbSet
                 .Include(x => x.EventOptions)
+                .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventParticipants)
                 .Where(x => x.Id == changeOptionsDto.EventId && x.OrganizationId == changeOptionsDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
@@ -323,6 +324,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventEntity.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
+
+            _eventAnswerValidator.Validate(
+                eventEntity.Questions,
+                changeOptionsDto.ChosenOptions.ToList(),
+                LegacyOptionIds(eventEntity.Options));
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 

@@ -286,6 +286,37 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public void Should_Reject_Edited_Choices_That_Skip_A_Required_Question()
+        {
+            // withAttendingUser1: UpdateSelectedOptionsAsync runs CheckIfUserParticipatesInEvent
+            // against a participant list projected to attending statuses only, so without this the
+            // test would fail on participation rather than on the answers.
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true);
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    Id = 1,
+                    EventId = eventId,
+                    ApplicationUserId = "user1",
+                    AttendStatus = (int)AttendingStatus.Attending,
+                    EventOptions = new List<EventOption>()
+                }
+            });
+
+            var changeOptionsDto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                ChosenOptions = new List<int>(),
+                UserId = "user1",
+                OrganizationId = 2
+            };
+
+            Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto));
+        }
+
+        [Test]
         public void Should_Throw_If_Joining_Event_Is_Expired()
         {
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-06-21"));
