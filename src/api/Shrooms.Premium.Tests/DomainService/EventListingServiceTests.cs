@@ -153,6 +153,50 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_My_Chosen_Options_For_The_Calling_User()
+        {
+            var eventId = MockEventWithQuestions();
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    Id = 1,
+                    EventId = eventId,
+                    ApplicationUserId = "testUser1",
+                    EventOptions = new List<EventOption>
+                    {
+                        new EventOption { Id = 50 },
+                        new EventOption { Id = 40 }
+                    }
+                },
+                new EventParticipant
+                {
+                    Id = 2,
+                    EventId = eventId,
+                    ApplicationUserId = "someoneElse",
+                    EventOptions = new List<EventOption> { new EventOption { Id = 51 } }
+                }
+            });
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventListingService.GetEventOptionsAsync(eventId, userOrg);
+
+            Assert.That(result.MyChosenOptions, Is.EquivalentTo(new[] { 40, 50 }));
+        }
+
+        [Test]
+        public async Task Should_Return_No_Chosen_Options_When_The_Caller_Has_Not_Joined()
+        {
+            var eventId = MockEventWithQuestions();
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>());
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventListingService.GetEventOptionsAsync(eventId, userOrg);
+
+            Assert.That(result.MyChosenOptions, Is.Empty);
+        }
+
+        [Test]
         public void Should_Throw_If_Event_Deadline_Is_Greater_Than_Start_Date()
         {
             var deadlineDate = DateTime.Parse("2016-05-01");

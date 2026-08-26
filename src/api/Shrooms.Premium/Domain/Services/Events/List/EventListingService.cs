@@ -66,6 +66,14 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(eventOptionsDto);
+
+            // A second small query rather than reshaping MapOptionsToDto: that expression is
+            // static over Event and has no way to see who is asking.
+            eventOptionsDto.MyChosenOptions = await _eventParticipantsDbSet
+                .Where(p => p.EventId == eventId && p.ApplicationUserId == userOrg.UserId)
+                .SelectMany(p => p.EventOptions.Select(o => o.Id))
+                .ToListAsync();
+
             return eventOptionsDto;
         }
 
