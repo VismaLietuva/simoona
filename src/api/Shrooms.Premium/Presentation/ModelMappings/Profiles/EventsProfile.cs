@@ -49,6 +49,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>(MemberList.None);
 
+            // Read side. Id is non-null on anything that came out of the database, so the
+            // nullable write-side Id is flattened here rather than leaking a null to the client.
+            CreateMap<EventQuestionStructureDto, EventSignUpQuestionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
+            CreateMap<EventQuestionOptionStructureDto, EventSignUpOptionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
             CreateMap<EventQuestionStructureDto, EventQuestionViewModel>()
                 .ForMember(dest => dest.ShowIf, opt => opt.MapFrom(src =>
                     src.ShowIfOptionId == null && src.ShowIfOptionClientId == null
