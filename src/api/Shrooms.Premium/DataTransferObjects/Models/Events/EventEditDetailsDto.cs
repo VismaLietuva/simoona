@@ -51,6 +51,13 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<EventOptionDto> Options { get; set; }
 
+        /// <summary>
+        /// The sign-up question tree, so the builder can rehydrate on edit. Same shape the
+        /// options endpoint serves. Without this an edit submits an empty tree and
+        /// EventQuestionWriter.SoftDeleteAbsent wipes every existing question.
+        /// </summary>
+        public IEnumerable<EventQuestionStructureDto> Questions { get; set; } = new List<EventQuestionStructureDto>();
+
         public IEnumerable<EventReminderDetailsDto> Reminders { get; set; }
     }
 }
