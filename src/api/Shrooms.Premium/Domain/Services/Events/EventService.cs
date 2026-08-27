@@ -112,6 +112,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
+                .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
@@ -348,7 +349,29 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Id = o.Id,
                     Option = o.Option,
                     Rule = o.Rule
-                })
+                }),
+                Questions = e.EventQuestions
+                    .OrderBy(q => q.Order)
+                    .Select(q => new EventQuestionStructureDto
+                    {
+                        Id = q.Id,
+                        Title = q.Title,
+                        Order = q.Order,
+                        SelectType = q.SelectType,
+                        IsRequired = q.IsRequired,
+                        ShowIfOptionId = q.ShowIfOptionId,
+                        Options = q.Options
+                            .OrderBy(o => o.Order)
+                            .Select(o => new EventQuestionOptionStructureDto
+                            {
+                                Id = o.Id,
+                                Name = o.Option,
+                                Order = o.Order,
+                                Rule = o.Rule
+                            })
+                            .ToList()
+                    })
+                    .ToList()
             };
         }
 

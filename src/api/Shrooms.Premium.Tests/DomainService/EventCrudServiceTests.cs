@@ -1195,6 +1195,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Description = "desc",
                     EventOptions = eventOptions,
                     EventParticipants = eventParticipants,
+                    EventQuestions = new List<EventQuestion>(),
                     Offices = "[\"1\"]",
                     StartDate = DateTime.UtcNow,
                     EndDate = DateTime.UtcNow,
