@@ -10,6 +10,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
+using Shrooms.Domain.Services.Picture;
 
 namespace Shrooms.Domain.Services.VideoLibrary
 {
@@ -18,10 +19,12 @@ namespace Shrooms.Domain.Services.VideoLibrary
         private readonly DbSet<VideoLibraryItem> _videosDbSet;
         private readonly DbSet<VideoType> _videoTypesDbSet;
         private readonly IUnitOfWork2 _uow;
+        private readonly IPictureService _pictureService;
 
-        public VideoLibraryService(IUnitOfWork2 uow)
+        public VideoLibraryService(IUnitOfWork2 uow, IPictureService pictureService)
         {
             _uow = uow;
+            _pictureService = pictureService;
             _videosDbSet = uow.GetDbSet<VideoLibraryItem>();
             _videoTypesDbSet = uow.GetDbSet<VideoType>();
         }
@@ -60,6 +63,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
             var entity = await FindAsync(video.Id, video.OrganizationId);
+            var replacedPictureId = entity.PictureId;
 
             entity.Title = video.Title;
             entity.Url = video.Url;
@@ -68,6 +72,8 @@ namespace Shrooms.Domain.Services.VideoLibrary
             entity.VideoTypeId = video.VideoTypeId;
 
             await _uow.SaveChangesAsync(video.UserId);
+
+            await RemoveReplacedPictureAsync(replacedPictureId, video.PictureId, video.OrganizationId);
         }
 
         public async Task RemoveVideoAsync(int id, UserAndOrganizationDto userOrg)
@@ -77,6 +83,16 @@ namespace Shrooms.Domain.Services.VideoLibrary
             entity.IsDeleted = true;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        private async Task RemoveReplacedPictureAsync(string previousPictureId, string currentPictureId, int organizationId)
+        {
+            if (string.IsNullOrEmpty(previousPictureId) || previousPictureId == currentPictureId)
+            {
+                return;
+            }
+
+            await _pictureService.RemoveImageAsync(previousPictureId, organizationId);
         }
 
         private async Task<VideoLibraryItem> FindAsync(int id, int organizationId)

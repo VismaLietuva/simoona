@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
+using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Tests.Extensions;
 
@@ -24,6 +25,7 @@ namespace Shrooms.Tests.DomainService
         private IVideoLibraryService _videoLibraryService;
         private DbSet<VideoLibraryItem> _videosDbSet;
         private IUnitOfWork2 _uow;
+        private IPictureService _pictureService;
 
         private List<VideoLibraryItem> _videos;
 
@@ -80,7 +82,9 @@ namespace Shrooms.Tests.DomainService
             _videosDbSet = _uow.MockDbSetForAsync(_videos);
             _uow.MockDbSetForAsync(new List<VideoType> { allHands, foreignType });
 
-            _videoLibraryService = new VideoLibraryService(_uow);
+            _pictureService = Substitute.For<IPictureService>();
+
+            _videoLibraryService = new VideoLibraryService(_uow, _pictureService);
         }
 
         [Test]
@@ -222,6 +226,63 @@ namespace Shrooms.Tests.DomainService
             Assert.That(updated.VideoTypeId, Is.Null);
 
             await _uow.Received(1).SaveChangesAsync(dto.UserId);
+        }
+
+        [Test]
+        public async Task Should_Delete_The_Thumbnail_A_Video_No_Longer_Uses()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 2;
+            dto.PictureId = "replacement.jpg";
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            await _pictureService.Received(1).RemoveImageAsync("picture.jpg", TestConstants.DefaultOrganizationId);
+        }
+
+        [Test]
+        public async Task Should_Delete_The_Thumbnail_When_It_Is_Cleared_Outright()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 2;
+            dto.PictureId = null;
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            await _pictureService.Received(1).RemoveImageAsync("picture.jpg", TestConstants.DefaultOrganizationId);
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Thumbnail_When_The_Update_Leaves_It_Alone()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 2;
+            dto.PictureId = "picture.jpg";
+            dto.Title = "Only the title changed";
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            await _pictureService.DidNotReceive().RemoveImageAsync(Arg.Any<string>(), Arg.Any<int>());
+        }
+
+        [Test]
+        public async Task Should_Not_Try_To_Delete_A_Thumbnail_That_Never_Existed()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.PictureId = "first-picture.jpg";
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            await _pictureService.DidNotReceive().RemoveImageAsync(Arg.Any<string>(), Arg.Any<int>());
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Thumbnail_Of_A_Soft_Deleted_Video()
+        {
+            await _videoLibraryService.RemoveVideoAsync(2, UserOrg());
+
+            await _pictureService.DidNotReceive().RemoveImageAsync(Arg.Any<string>(), Arg.Any<int>());
         }
 
         [Test]
