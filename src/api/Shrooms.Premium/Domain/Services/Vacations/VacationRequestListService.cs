@@ -304,14 +304,22 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                                   && request.DateFrom <= windowTo)
                 .ToListAsync();
 
+            var projectsByEmployee = await LoadProjectMembershipAsync(
+                active.Select(request => request.EmployeeId)
+                    .Concat(candidates.Select(candidate => candidate.EmployeeId)),
+                organizationId);
+
             var result = new Dictionary<int, List<VacationOverlapDto>>();
 
             foreach (var request in active)
             {
+                var projects = Projects(projectsByEmployee, request.EmployeeId);
+
                 var overlaps = candidates
                     .Where(other => other.Id != request.Id
                                     // Own other leave is not a staffing clash.
                                     && other.EmployeeId != request.EmployeeId
+                                    && projects.Overlaps(Projects(projectsByEmployee, other.EmployeeId))
                                     && VacationCalculator.RangesOverlap(request.DateFrom, request.DateTo, other.DateFrom, other.DateTo))
                     .Select(other => new VacationOverlapDto
                     {
@@ -328,6 +336,34 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             return result;
+        }
+
+        private static HashSet<int> Projects(
+            IReadOnlyDictionary<string, HashSet<int>> membership,
+            string employeeId)
+        {
+            return membership.TryGetValue(employeeId, out var projects) ? projects : Empty;
+        }
+
+        private static readonly HashSet<int> Empty = new HashSet<int>();
+
+        private async Task<Dictionary<string, HashSet<int>>> LoadProjectMembershipAsync(
+            IEnumerable<string> employeeIds,
+            int organizationId)
+        {
+            var ids = employeeIds.Distinct().ToList();
+
+            var rows = await _userDbSet
+                .AsNoTracking()
+                .Where(user => user.OrganizationId == organizationId && ids.Contains(user.Id))
+                .Select(user => new
+                {
+                    user.Id,
+                    ProjectIds = user.Projects.Select(project => project.Id).ToList()
+                })
+                .ToListAsync();
+
+            return rows.ToDictionary(row => row.Id, row => row.ProjectIds.ToHashSet());
         }
 
         private async Task<Dictionary<int, VacationLastEditDto>> LoadLastEditsAsync(
