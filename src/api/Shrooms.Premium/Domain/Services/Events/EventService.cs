@@ -344,12 +344,18 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Type = reminder.Type,
                     RemindedCount = reminder.RemindedCount
                 }),
-                Options = e.EventOptions.Select(o => new EventOptionDto
-                {
-                    Id = o.Id,
-                    Option = o.Option,
-                    Rule = o.Rule
-                }),
+                // Legacy flat options only. Question-owned options are returned under Questions;
+                // leaving them here also leaks them into the edit payload's editedOptions, which
+                // inflates totalOptionsProvided and trips CheckIfCreatingEventHasNoChoices on any
+                // question-bearing event. Mirrors EventListingService.MapOptionsToDto().
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventOptionDto
+                    {
+                        Id = o.Id,
+                        Option = o.Option,
+                        Rule = o.Rule
+                    }),
                 Questions = e.EventQuestions
                     .OrderBy(q => q.Order)
                     .Select(q => new EventQuestionStructureDto
@@ -428,13 +434,20 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void UpdateEventOptions(EditEventDto editedEvent, Event @event)
         {
+            // @event.EventOptions also holds question-owned options (QuestionId != null), which
+            // belong solely to EventQuestionWriter. EditedOptions only ever carries legacy
+            // options (see MapToEventEditDetailsDto), so scoping both the edit loop and the
+            // removal sweep to QuestionId == null keeps this method from treating every absent
+            // question option as "removed" and hard-deleting it.
+            var legacyOptions = @event.EventOptions.Where(o => o.QuestionId == null).ToList();
+
             foreach (var editedOption in editedEvent.EditedOptions)
             {
-                var option = @event.EventOptions.Single(o => o.Id == editedOption.Id);
+                var option = legacyOptions.Single(o => o.Id == editedOption.Id);
                 option.Option = editedOption.Option;
             }
 
-            var removedOptions = @event.EventOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
+            var removedOptions = legacyOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
 
             foreach (var option in removedOptions)
             {
