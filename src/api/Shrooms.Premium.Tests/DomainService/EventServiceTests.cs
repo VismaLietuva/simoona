@@ -147,6 +147,80 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(questions[1].ShowIfOptionId, Is.EqualTo(91));
         }
 
+        // Regression test: MapToEventEditDetailsDto used to project every EventOption into the
+        // flat Options list, including ones owned by a question. That leaked question options
+        // into the edit payload's editedOptions on the client. Only legacy (QuestionId == null)
+        // options belong in Options; question-owned options are exposed solely under Questions.
+        [Test]
+        public async Task Should_Only_Return_Legacy_Options_In_Flat_Options_List_When_Editing()
+        {
+            var eventId = MockEventForEditingWithLegacyAndQuestionOptions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventForEditingAsync(eventId, userOrg);
+
+            var flatOptions = result.Options.ToList();
+            Assert.That(flatOptions, Has.Count.EqualTo(1));
+            Assert.That(flatOptions[0].Id, Is.EqualTo(80));
+            Assert.That(flatOptions[0].Option, Is.EqualTo("Legacy option"));
+
+            var questions = result.Questions.ToList();
+            Assert.That(questions, Has.Count.EqualTo(1));
+            Assert.That(questions[0].Options.Select(o => o.Id), Is.EquivalentTo(new int?[] { 90, 91 }));
+        }
+
+        private Guid MockEventForEditingWithLegacyAndQuestionOptions()
+        {
+            var eventId = Guid.NewGuid();
+            var responsibleUser = new ApplicationUser
+            {
+                Id = "responsibleUser1",
+                FirstName = "user1f",
+                LastName = "user1l"
+            };
+
+            var legacyOption = new EventOption { Id = 80, EventId = eventId, Option = "Legacy option", QuestionId = null, Order = 0 };
+
+            var questionOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0 },
+                new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1 }
+            };
+
+            var questions = new List<EventQuestion>
+            {
+                new EventQuestion
+                {
+                    Id = 5,
+                    EventId = eventId,
+                    Title = "Pick your dish",
+                    Order = 0,
+                    SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true,
+                    ShowIfOptionId = null,
+                    Options = questionOptions
+                }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    ResponsibleUser = responsibleUser,
+                    ResponsibleUserId = responsibleUser.Id,
+                    Reminders = new List<EventReminder>(),
+                    EventOptions = new List<EventOption> { legacyOption, questionOptions[0], questionOptions[1] },
+                    EventQuestions = questions
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+
+            return eventId;
+        }
+
         private Guid MockEventForEditingWithQuestions()
         {
             var eventId = Guid.NewGuid();
