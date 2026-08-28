@@ -8,6 +8,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Vacations
     {
         public string Search { get; set; }
 
+        public string EmployeeId { get; set; }
+
         public string Status { get; set; }
 
         public string Type { get; set; }
@@ -33,6 +35,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Vacations
     public class VacationLogArgsDto : UserAndOrganizationDto, IPageable
     {
         public string Search { get; set; }
+
+        public string EmployeeId { get; set; }
 
         public string Kind { get; set; }
 

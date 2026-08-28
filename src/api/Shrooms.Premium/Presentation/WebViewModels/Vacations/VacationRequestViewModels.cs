@@ -10,6 +10,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Vacations
     {
         public string Search { get; set; }
 
+        public string EmployeeId { get; set; }
+
         public string Type { get; set; }
 
         /// <summary>
@@ -42,6 +44,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Vacations
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId,
                 Search = Search,
+                EmployeeId = EmployeeId,
                 Status = Status,
                 Type = Type,
                 From = From,
@@ -65,6 +68,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Vacations
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId,
                 Search = Search,
+                EmployeeId = EmployeeId,
                 Kind = Kind,
                 Type = Type,
                 From = From,
