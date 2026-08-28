@@ -14,6 +14,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC;
 using Shrooms.Presentation.Api.BackgroundWorkers;
+using Shrooms.Presentation.Api.Endpoints;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.Api.Caching;
@@ -418,6 +419,7 @@ app.UseHangfireDashboard();
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
 app.MapHealthChecks("/healthz");
+app.MapEmailPreview();
 
 // Serve uploaded pictures via the configured IStorage so the same provider that handles
 // uploads also handles reads (local FS in dev, Azure Blob in staging/prod). Browser <img>

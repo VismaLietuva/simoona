@@ -1,0 +1,19 @@
+﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.KudosRejectedEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"Your {Model.KudosAmount} kudos for {Model.KudosRecipientName} were not approved.";
+}
+
+<email-heading eyebrow="Kudos">Your kudos request was <email-em>declined</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        Your kudos request to <strong>@Model.KudosRecipientName</strong> for
+        <span style="font-weight:600;">+@Model.KudosAmount</span>
+        kudos for "@Model.KudosType" was rejected.
+    </p>
+    <email-details>
+        <email-detail label="Your comment">@Model.Comment</email-detail>
+        <email-detail label="Rejection reason">@Model.RejectionReason</email-detail>
+    </email-details>
+    <email-button href="@Model.KudosProfileUrl">View the kudos profile</email-button>
+</email-card>

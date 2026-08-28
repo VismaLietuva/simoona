@@ -1,0 +1,50 @@
+<!-- Source for EmailTemplates/HeaderFooter.cshtml. See Design/README.md to regenerate. -->
+<mjml lang="en" dir="ltr">
+  <mj-head>
+    <mj-title>Simoona</mj-title>
+    <mj-raw>
+      <meta name="color-scheme" content="light" />
+      <meta name="supported-color-schemes" content="light" />
+    </mj-raw>
+    <mj-preview>PREHEADER_SLOT</mj-preview>
+    <mj-font name="Roboto" href="" />
+    <mj-attributes>
+      <mj-all font-family="Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#0a0a0a" />
+    </mj-attributes>
+    <mj-style>
+      a { color: #006199; }
+      .simoona-footer a { color: #737373; text-decoration: underline; }
+    </mj-style>
+  </mj-head>
+
+  <mj-body background-color="#f4f5f6" width="600px">
+    <!-- The sidebar's wordmark, linking to the client app for whichever environment sent the
+         mail. The mark itself is not here: Gmail and Outlook strip inline SVG, and a hosted
+         image would be the only remote fetch in the whole set. -->
+    <mj-section background-color="#f4f5f6" padding="24px 24px 0">
+      <mj-column padding="0">
+        <mj-text padding="0" font-size="18px" font-weight="600" line-height="32px" container-background-color="#f4f5f6">
+          <a href="HOME_URL_SLOT" target="_blank" style="text-decoration:none;">
+            <span style="color:#006199;">S</span><span style="color:#4d8400;">/</span><span style="color:#3180bb;">moona</span>
+          </a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Page ground only; cards are drawn by <email-card>. -->
+    <mj-section background-color="#f4f5f6" padding="20px 24px 8px">
+      <mj-column padding="0">
+        <mj-text padding="0">CONTENT_SLOT</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#f4f5f6" padding="8px 24px 32px">
+      <mj-column>
+        <mj-text css-class="simoona-footer" align="center" color="#737373" font-size="12px" padding="0" container-background-color="#f4f5f6">
+          Update your notification preferences <a href="SETTINGS_URL_SLOT" target="_blank">here</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
