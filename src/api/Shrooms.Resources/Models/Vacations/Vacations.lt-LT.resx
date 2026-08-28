@@ -141,6 +141,9 @@
   <data name="vacationInProgress" xml:space="preserve">
     <value>Negalite atšaukti atostogų kurios jau vyksta</value>
   </data>
+  <data name="vacationMonthClosed" xml:space="preserve">
+    <value>Praėjusių mėnesių prašymų keisti nebegalima</value>
+  </data>
   <data name="wrongVacationPeriod" xml:space="preserve">
     <value>Blogai nurodytas atostogų periodas</value>
   </data>
