@@ -40,6 +40,15 @@
             hasCompletedWalkThrough: false
         };
 
+        // isStoredTokenValid() can only read the payload's exp - the signature is
+        // verifiable server-side only. So a token the server permanently rejects
+        // (after a JwtSecret rotation, say) still looks valid here, and the
+        // interceptors absorb its 401s forever, leaving the UI spinning. Absorbing a
+        // few in a row covers the transient cases; past that the session is dead and
+        // has to be ended.
+        var consecutiveUnauthorizedResponses = 0;
+        var maxAbsorbedUnauthorizedResponses = 2;
+
         init();
 
         var service = {
@@ -62,6 +71,9 @@
             isAuthenticated: isAuthenticated,
             isAuthenticatedNotNewUser: isAuthenticatedNotNewUser,
             isStoredTokenValid: isStoredTokenValid,
+            noteUnauthorizedResponse: noteUnauthorizedResponse,
+            noteSuccessfulResponse: noteSuccessfulResponse,
+            hasExhaustedUnauthorizedAbsorption: hasExhaustedUnauthorizedAbsorption,
             setAuthenticationData: setAuthenticationData,
             logOut: logOut,
             isInRole: isInRole,
@@ -121,6 +133,19 @@
         function isStoredTokenValid() {
             var authData = localStorageService.get('authorizationData');
             return !!authData && !!authData.token && !isTokenExpired(authData.token);
+        }
+
+        function noteUnauthorizedResponse() {
+            consecutiveUnauthorizedResponses++;
+            return hasExhaustedUnauthorizedAbsorption();
+        }
+
+        function noteSuccessfulResponse() {
+            consecutiveUnauthorizedResponses = 0;
+        }
+
+        function hasExhaustedUnauthorizedAbsorption() {
+            return consecutiveUnauthorizedResponses > maxAbsorbedUnauthorizedResponses;
         }
 
         function getHashArrayFromUrl() {
@@ -311,6 +336,7 @@
 
             localeSrv.setLocale("en-US");
             localStorageService.remove('authorizationData');
+            noteSuccessfulResponse();
 
             var organizationName = authorizationData.organizationName;
 
