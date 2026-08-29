@@ -11,6 +11,8 @@
         EventComment,
         ProjectComment,
         FollowingComment,
-        EventReminder
+        EventReminder,
+        VacationRequest,
+        VacationReview
     }
 }

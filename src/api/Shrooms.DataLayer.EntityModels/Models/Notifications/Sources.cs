@@ -12,6 +12,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Notifications
 
         public int WallId { get; set; }
 
+        public int VacationRequestId { get; set; }
+
         [JsonIgnore]
         public string Serialized
         {
@@ -29,6 +31,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Notifications
                 EventId = jsonData.EventId;
                 ProjectId = jsonData.ProjectId;
                 WallId = jsonData.WallId;
+                VacationRequestId = jsonData.VacationRequestId;
             }
         }
     }

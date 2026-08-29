@@ -1,6 +1,11 @@
+using System;
+using System.Linq;
+using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
+using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Presentation.ModelMappings.Profiles;
+using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Tests.ModelMappings
 {
@@ -13,6 +18,16 @@ namespace Shrooms.Tests.ModelMappings
         public void TestInitialize()
         {
             _mapper = ModelMapper.Create();
+        }
+
+        // The two shapes are mapped with MemberList.None, which validates nothing:
+        // a switch added to one and not the other is silently dropped on the way in,
+        // and the user sees a setting that will not stick.
+        [Test]
+        public void NotificationSettings_ViewModelAndDto_CarryTheSameSwitches()
+        {
+            Assert.That(SwitchNames(typeof(UserNotificationsSettingsViewModel)),
+                Is.EquivalentTo(SwitchNames(typeof(UserNotificationsSettingsDto))));
         }
 
         [Test]
@@ -79,6 +94,15 @@ namespace Shrooms.Tests.ModelMappings
         public void Mapping_BlacklistUsers_Models()
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid();
+        }
+
+        private static string[] SwitchNames(Type type)
+        {
+            return type
+                .GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .Where(field => field.FieldType == typeof(bool))
+                .Select(field => field.Name)
+                .ToArray();
         }
     }
 }

@@ -2726,6 +2726,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<bool>("ProjectsEmailNotifications")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("VacationsAppNotifications")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
@@ -5458,6 +5461,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                             b1.Property<string>("Serialized")
                                 .HasColumnType("nvarchar(max)")
                                 .HasColumnName("Sources");
+
+                            b1.Property<int>("VacationRequestId")
+                                .HasColumnType("int");
 
                             b1.HasKey("NotificationId");
 

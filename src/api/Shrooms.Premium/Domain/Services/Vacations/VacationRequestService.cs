@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
+using Shrooms.Premium.Domain.Services.Email.Vacations;
 
 namespace Shrooms.Premium.Domain.Services.Vacations
 {
@@ -21,10 +23,19 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
 
-        public VacationRequestService(IUnitOfWork2 uow, IHolidayService holidayService)
+        private readonly IVacationNotificationService _notificationService;
+        private readonly ILogger<VacationRequestService> _logger;
+
+        public VacationRequestService(
+            IUnitOfWork2 uow,
+            IHolidayService holidayService,
+            IVacationNotificationService notificationService,
+            ILogger<VacationRequestService> logger)
         {
             _uow = uow;
             _holidayService = holidayService;
+            _notificationService = notificationService;
+            _logger = logger;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
@@ -119,7 +130,10 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             AddEvent(request, VacationEventKind.Submitted, userOrg.UserId, request.Note);
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            return await LoadDtoAsync(request.Id, userOrg.OrganizationId, today);
+            var submitted = await LoadDtoAsync(request.Id, userOrg.OrganizationId, today);
+            await NotifyAsync(() => _notificationService.NotifySubmittedAsync(submitted, userOrg));
+
+            return submitted;
         }
 
         public async Task<VacationRequestDto> EditAsync(int id, VacationRequestDraftDto draft, UserAndOrganizationDto userOrg)
@@ -169,7 +183,10 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             AddEvent(request, VacationEventKind.Edited, userOrg.UserId, changes: changes);
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            return await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            var edited = await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            await NotifyAsync(() => _notificationService.NotifyChangedAsync(edited, userOrg));
+
+            return edited;
         }
 
         public async Task<VacationRequestDto> CancelAsync(int id, UserAndOrganizationDto userOrg)
@@ -185,6 +202,28 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             AddEvent(request, VacationEventKind.Cancelled, userOrg.UserId);
             await _uow.SaveChangesAsync(userOrg.UserId);
+
+            var cancelled = await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            await NotifyAsync(() => _notificationService.NotifyWithdrawnAsync(cancelled, userOrg));
+
+            return cancelled;
+        }
+
+        public async Task<VacationRequestDto> GetForReviewAsync(int id, UserAndOrganizationDto userOrg)
+        {
+            var today = await _organizationDbSet.TodayAsync(userOrg.OrganizationId);
+
+            var request = await _requestDbSet
+                .AsNoTracking()
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.Id == id && r.OrganizationId == userOrg.OrganizationId);
+
+            if (request == null)
+            {
+                throw VacationRequestValidator.NotFound();
+            }
+
+            EnsureReviewer(request, userOrg);
 
             return await LoadDtoAsync(id, userOrg.OrganizationId, today);
         }
@@ -268,7 +307,34 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             AddEvent(request, VacationEventKind.Edited, userOrg.UserId, changes: changes);
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            return await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            var patched = await LoadDtoAsync(id, userOrg.OrganizationId, today);
+
+            // A status the administrator set is a decision the manager was
+            // waiting to make; anything else is a correction only the employee
+            // needs to hear about.
+            var decided = before.Status != request.Status;
+            await NotifyAsync(() => decided
+                ? _notificationService.NotifyDecidedAsync(patched, userOrg)
+                : _notificationService.NotifyChangedAsync(patched, userOrg));
+
+            return patched;
+        }
+
+        /// <summary>
+        /// A change is saved before anybody is told about it, and a mail server
+        /// that will not take the message must not fail the change that already
+        /// happened.
+        /// </summary>
+        private async Task NotifyAsync(Func<Task> send)
+        {
+            try
+            {
+                await send();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Vacation notification failed");
+            }
         }
 
         private async Task<VacationRequestDto> ReviewAsync(
@@ -288,12 +354,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 throw VacationRequestValidator.NotFound();
             }
 
-            // Only the employee's own manager reviews. No administrator fallback:
-            // a request with no manager stays pending until HR sets one.
-            if (request.Employee?.ManagerId != userOrg.UserId)
-            {
-                throw VacationRequestValidator.NotAuthorized();
-            }
+            EnsureReviewer(request, userOrg);
 
             VacationRequestValidator.EnsureReviewable(request);
 
@@ -310,7 +371,20 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            return await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            var reviewed = await LoadDtoAsync(id, userOrg.OrganizationId, today);
+            await NotifyAsync(() => _notificationService.NotifyDecidedAsync(reviewed, userOrg));
+
+            return reviewed;
+        }
+
+        private static void EnsureReviewer(VacationRequest request, UserAndOrganizationDto userOrg)
+        {
+            // Only the employee's own manager reviews. No administrator fallback:
+            // a request with no manager stays pending until HR sets one.
+            if (request.Employee?.ManagerId != userOrg.UserId)
+            {
+                throw VacationRequestValidator.NotAuthorized();
+            }
         }
 
         private void AddEvent(

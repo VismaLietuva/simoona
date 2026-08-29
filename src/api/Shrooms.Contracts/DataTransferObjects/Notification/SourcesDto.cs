@@ -9,5 +9,7 @@
         public string ProjectId { get; set; }
 
         public int WallId { get; set; }
+
+        public int VacationRequestId { get; set; }
     }
 }

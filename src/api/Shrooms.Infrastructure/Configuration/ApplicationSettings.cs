@@ -75,6 +75,16 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string ProjectUrl(string tenant, string projectId) => GetClientPath($"projects/{projectId}");
 
+        public string VacationRequestsUrl(string tenant) => GetClientPath("vacations");
+
+        public string VacationQueueUrl(string tenant) => GetClientPath("vacations/manage");
+
+        // Approving is one click from the mail: the page does it and reports back.
+        public string VacationApproveUrl(string tenant, int requestId) => GetClientPath($"vacations/approve/{requestId}");
+
+        // Rejecting needs a reason, so this lands on a page that opens the queue with the dialog on it.
+        public string VacationRejectUrl(string tenant, int requestId) => GetClientPath($"vacations/reject/{requestId}");
+
         // Committees are a group type on the client, so the suggestion lands on the group list.
         public string CommitteeSugestionUrl(string tenant) => GetClientPath("groups");
 

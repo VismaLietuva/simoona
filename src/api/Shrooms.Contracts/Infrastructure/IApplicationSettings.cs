@@ -61,6 +61,14 @@ namespace Shrooms.Contracts.Infrastructure
 
         string CommitteeSugestionUrl(string tenant);
 
+        string VacationRequestsUrl(string tenant);
+
+        string VacationQueueUrl(string tenant);
+
+        string VacationApproveUrl(string tenant, int requestId);
+
+        string VacationRejectUrl(string tenant, int requestId);
+
         string ServiceRequestUrl(string tenant, int id);
 
         string ResetPasswordUrl(string organization, string userName, string token);
