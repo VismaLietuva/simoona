@@ -29,8 +29,10 @@
             if (response.status === 401) {
                 // Same guard as authInterceptor: don't redirect to Login if the
                 // client-side token is still valid. This absorbs transient server-side
-                // 401s (clock skew, tenant race) instead of ejecting the user.
-                if (auth.isStoredTokenValid()) {
+                // 401s (clock skew, tenant race) instead of ejecting the user - but
+                // only for a few in a row, so a token the server rejects permanently
+                // sends the user to Login instead of leaving the page spinning.
+                if (auth.isStoredTokenValid() && !auth.hasExhaustedUnauthorizedAbsorption()) {
                     return;
                 }
                 state.go('Root.WithOrg.Login', {
