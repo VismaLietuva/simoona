@@ -1,0 +1,18 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.VacationEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.EmployeeName} withdrew the request for {Model.Period}.";
+}
+
+<email-heading eyebrow="Vacation">@Model.EmployeeName <email-em>withdrew</email-em> a request</email-heading>
+<email-card>
+    <p style="margin:0;">
+        Nothing is waiting for you on this one any more.
+    </p>
+    <email-details>
+        <email-detail label="Period">@Model.Period</email-detail>
+        <email-detail label="Type">@Model.LeaveType</email-detail>
+        <email-detail label="Working days">@Model.WorkingDays</email-detail>
+    </email-details>
+    <email-button href="@Model.RequestUrl">Open the queue</email-button>
+</email-card>

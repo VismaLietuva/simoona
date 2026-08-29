@@ -136,6 +136,32 @@ namespace Shrooms.EmailTemplates.Seeds
                 new(EmailPremiumTemplateCacheKeys.LotteryTicketGifted, new LotteryTicketGiftedEmailTemplateViewModel(
                     "Concert tickets", "https://simoona.example.com/lotteries/1", "Rasa Petraitiene", 3, SettingsUrl)),
 
+                // Vacations
+                new(EmailPremiumTemplateCacheKeys.VacationSubmitted, new VacationSubmittedEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-20", "Annual leave", "4",
+                    "https://simoona.example.com/vacations/manage",
+                    "https://simoona.example.com/vacations/approve/1",
+                    "https://simoona.example.com/vacations/reject/1")
+                    { Note = "Taking the children skiing.", ActorName = "Tomas Kazlauskas" }),
+                new(EmailPremiumTemplateCacheKeys.VacationChanged, new VacationSubmittedEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-18 – 2026-03-20", "Annual leave", "3",
+                    "https://simoona.example.com/vacations/manage",
+                    "https://simoona.example.com/vacations/approve/1",
+                    "https://simoona.example.com/vacations/reject/1")
+                    { Note = "One day shorter than before.", ActorName = "Tomas Kazlauskas" }),
+                new(EmailPremiumTemplateCacheKeys.VacationWithdrawn, new VacationEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-20", "Annual leave", "4",
+                    "https://simoona.example.com/vacations/manage")
+                    { ActorName = "Tomas Kazlauskas" }),
+                new(EmailPremiumTemplateCacheKeys.VacationDecided, new VacationEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-20", "Annual leave", "4",
+                    "https://simoona.example.com/vacations")
+                    { Outcome = "approved", ActorName = "Rasa Petraitiene" }),
+                new(EmailPremiumTemplateCacheKeys.VacationDecidedByAdmin, new VacationEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-20", "Annual leave", "4",
+                    "https://simoona.example.com/vacations/manage")
+                    { Outcome = "rejected", Note = "The team is short that week.", ActorName = "Rasa Petraitiene" }),
+
                 new(ShowcaseKey, new KudosSentEmailTemplateViewModel(SettingsUrl, "Rasa Petraitiene", 25, "Sample", "https://simoona.example.com"))
             };
 

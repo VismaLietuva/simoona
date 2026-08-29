@@ -2,6 +2,11 @@ namespace Shrooms.Premium.Constants
 {
     public static class EmailPremiumTemplateCacheKeys
     {
+        public const string VacationSubmitted = "/EmailTemplates/Vacations/VacationSubmitted.cshtml";
+        public const string VacationChanged = "/EmailTemplates/Vacations/VacationChanged.cshtml";
+        public const string VacationWithdrawn = "/EmailTemplates/Vacations/VacationWithdrawn.cshtml";
+        public const string VacationDecided = "/EmailTemplates/Vacations/VacationDecided.cshtml";
+        public const string VacationDecidedByAdmin = "/EmailTemplates/Vacations/VacationDecidedByAdmin.cshtml";
         public const string BookRemind = "/EmailTemplates/Books/BookRemind.cshtml";
         public const string BookReport = "/EmailTemplates/Books/BookReport.cshtml";
         public const string BookTaken = "/EmailTemplates/Books/BookTaken.cshtml";

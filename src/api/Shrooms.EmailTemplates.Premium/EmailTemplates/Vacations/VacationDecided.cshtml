@@ -1,0 +1,22 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.VacationEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.Period} — {Model.Outcome.ToLowerInvariant()}.";
+}
+
+<email-heading eyebrow="Vacation">Your leave was <email-em>@Model.Outcome.ToLowerInvariant()</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        <strong>@Model.ActorName</strong> answered your request.
+    </p>
+    <email-details>
+        <email-detail label="Period">@Model.Period</email-detail>
+        <email-detail label="Type">@Model.LeaveType</email-detail>
+        <email-detail label="Working days">@Model.WorkingDays</email-detail>
+    </email-details>
+    @if (!string.IsNullOrWhiteSpace(Model.Note))
+    {
+        <email-quote>@Model.Note</email-quote>
+    }
+    <email-button href="@Model.RequestUrl">Open your requests</email-button>
+</email-card>
