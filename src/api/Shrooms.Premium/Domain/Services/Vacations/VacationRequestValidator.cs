@@ -99,24 +99,42 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         }
 
         /// <summary>
-        /// Everything except a withdrawn request. A rejection stays editable
-        /// however old it is — re-dating is how an employee answers one — and an
-        /// approval stays editable even once the leave has started, so it can be
-        /// cut short. Any edit returns the request to Pending for re-approval.
+        /// Everything except a withdrawn request and anything that ended before
+        /// the current month. A rejection stays editable within the open month —
+        /// re-dating is how an employee answers one — and an approval stays
+        /// editable even once the leave has started, so it can be cut short. Any
+        /// edit returns the request to Pending for re-approval.
         /// </summary>
         public static bool CanEdit(VacationRequest request, DateTime today)
         {
-            return request.Status != VacationRequestStatus.Cancelled;
+            return request.Status != VacationRequestStatus.Cancelled
+                   && !IsMonthClosed(request, today);
         }
 
         public static bool CanCancel(VacationRequest request, DateTime today)
         {
-            return request.Status == VacationRequestStatus.Pending
-                   || (request.Status == VacationRequestStatus.Approved && request.DateFrom.Date > today);
+            return !IsMonthClosed(request, today)
+                   && (request.Status == VacationRequestStatus.Pending
+                       || (request.Status == VacationRequestStatus.Approved && request.DateFrom.Date > today));
+        }
+
+        /// <summary>
+        /// Leave that finished before the first of the current month is closed:
+        /// payroll has been run against it, so the employee cannot change it.
+        /// Administrators are exempt — AdminEditAsync does not come through here.
+        /// </summary>
+        public static bool IsMonthClosed(VacationRequest request, DateTime today)
+        {
+            return request.DateTo.Date < new DateTime(today.Year, today.Month, 1);
         }
 
         public static void EnsureEditable(VacationRequest request, DateTime today)
         {
+            if (IsMonthClosed(request, today))
+            {
+                throw Fail(ErrorCodes.VacationNotEditable, "monthClosed", Resx.GetResourceString("vacationMonthClosed"));
+            }
+
             if (!CanEdit(request, today))
             {
                 throw Fail(ErrorCodes.VacationNotEditable, "notEditable", Resx.GetResourceString("cannotEditVacation"));
@@ -125,6 +143,11 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         public static void EnsureCancellable(VacationRequest request, DateTime today)
         {
+            if (IsMonthClosed(request, today))
+            {
+                throw Fail(ErrorCodes.VacationNotCancellable, "monthClosed", Resx.GetResourceString("vacationMonthClosed"));
+            }
+
             if (!CanCancel(request, today))
             {
                 throw Fail(ErrorCodes.VacationNotCancellable, "notCancellable", Resx.GetResourceString("vacationInProgress"));

@@ -67,14 +67,19 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 query = query.Where(entity => entity.OccurredAt < to);
             }
 
+            if (!string.IsNullOrWhiteSpace(args.EmployeeId))
+            {
+                query = query.Where(entity => entity.EmployeeId == args.EmployeeId);
+            }
+
             if (!string.IsNullOrWhiteSpace(args.Search))
             {
                 var term = args.Search.Trim();
                 query = query.Where(entity =>
-                    entity.Employee.FirstName.Contains(term)
-                    || entity.Employee.LastName.Contains(term)
-                    || entity.Actor.FirstName.Contains(term)
-                    || entity.Actor.LastName.Contains(term)
+                    ((entity.Employee.FirstName ?? "") + " " + (entity.Employee.LastName ?? "")).Contains(term)
+                    || ((entity.Employee.LastName ?? "") + " " + (entity.Employee.FirstName ?? "")).Contains(term)
+                    || ((entity.Actor.FirstName ?? "") + " " + (entity.Actor.LastName ?? "")).Contains(term)
+                    || ((entity.Actor.LastName ?? "") + " " + (entity.Actor.FirstName ?? "")).Contains(term)
                     || entity.Comment.Contains(term));
             }
 

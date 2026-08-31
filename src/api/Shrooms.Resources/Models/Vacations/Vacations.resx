@@ -141,6 +141,9 @@
   <data name="vacationInProgress" xml:space="preserve">
     <value>Cannot cancel vacation in progress</value>
   </data>
+  <data name="vacationMonthClosed" xml:space="preserve">
+    <value>Requests from previous months can no longer be changed</value>
+  </data>
   <data name="wrongVacationPeriod" xml:space="preserve">
     <value>Wrong vacation period</value>
   </data>

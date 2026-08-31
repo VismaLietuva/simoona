@@ -62,14 +62,15 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             var booked = VacationCalculator.CommittedAnnualDays(chargeable, balanceAsOf);
             var annualRate = VacationCalculator.AnnualAccrual(user.YearsEmployed);
+            var accruedNow = VacationCalculator.ApproxAccruedNow(entitlement, balanceAsOf, today, annualRate);
 
             return new VacationBalanceDto
             {
                 Entitlement = entitlement,
                 BalanceAsOf = VacationWireFormat.ToDay(balanceAsOf),
                 Booked = booked,
-                Remaining = entitlement - booked,
-                AccruedNow = VacationCalculator.ApproxAccruedNow(entitlement, balanceAsOf, today, annualRate),
+                Remaining = accruedNow - booked,
+                AccruedNow = accruedNow,
                 MonthlyAccrualRate = Math.Round(annualRate / 12, 2),
                 YearsOfService = user.YearsEmployed
             };

@@ -119,12 +119,17 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 query = query.Where(request => request.DateFrom <= to);
             }
 
+            if (!string.IsNullOrWhiteSpace(args.EmployeeId))
+            {
+                query = query.Where(request => request.EmployeeId == args.EmployeeId);
+            }
+
             if (!string.IsNullOrWhiteSpace(args.Search))
             {
                 var term = args.Search.Trim();
                 query = query.Where(request =>
-                    request.Employee.FirstName.Contains(term)
-                    || request.Employee.LastName.Contains(term)
+                    ((request.Employee.FirstName ?? "") + " " + (request.Employee.LastName ?? "")).Contains(term)
+                    || ((request.Employee.LastName ?? "") + " " + (request.Employee.FirstName ?? "")).Contains(term)
                     || request.Note.Contains(term));
             }
 
