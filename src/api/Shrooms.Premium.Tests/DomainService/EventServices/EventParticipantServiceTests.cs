@@ -1746,7 +1746,73 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         /// q6 "Which pizza?"   (required, single, shown if 91):   92 Margherita.
         /// MaxChoices is 0 — every option belongs to a question, so nothing counts as a legacy choice.
         /// </summary>
-        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false)
+        // A client could reach Attending through POST /Events/UpdateAttendStatus alone, which
+        // validated no answers at all — so every required question was skippable outright, and
+        // the frontend's status-then-answers pair left the user Going with nothing saved if the
+        // second call failed. The status call now carries the answers and validates them.
+        [Test]
+        public void Should_Reject_A_Status_Change_To_Going_That_Skips_A_Required_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>()
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.RequiredAnswerMissing }));
+        }
+
+        [Test]
+        public async Task Should_Save_The_Answers_Carried_By_A_Status_Change_To_Going()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int> { 90 }
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        // Maybe and Not going are not answerable states, so a required question must not block
+        // them — only the transition into Going carries answers.
+        [Test]
+        public void Should_Not_Validate_Answers_When_The_New_Status_Is_Not_Going()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.Attending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.MaybeAttending,
+                ChosenOptions = new List<int>()
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+        }
+
+        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false, AttendingStatus user1Status = AttendingStatus.Attending)
         {
             var eventId = Guid.NewGuid();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
@@ -1770,7 +1836,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         Id = 1,
                         EventId = eventId,
                         ApplicationUserId = "user1",
-                        AttendStatus = (int)AttendingStatus.Attending,
+                        AttendStatus = (int)user1Status,
                         EventOptions = new List<EventOption>()
                     }
                 }

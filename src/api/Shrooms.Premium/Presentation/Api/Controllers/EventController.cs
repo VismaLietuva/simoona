@@ -395,6 +395,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
                 return Ok();
             }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
+            }
             catch (EventException e)
             {
                 return BadRequest(e.Message);
