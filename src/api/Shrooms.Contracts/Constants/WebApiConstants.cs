@@ -30,6 +30,12 @@
         public static readonly string[] AllowedCustomEmojiContentTypes = { "image/png", "image/gif", "image/jpeg", "image/webp" };
         #endregion
 
+        #region Support
+        public const int MaximumSupportImageCount = 3;
+
+        public const int MaximumSupportImagesTotalSizeInBytes = 12000000;
+        #endregion
+
 #if DEBUG
         public const string OrganizationManagerUsername = "Admin";
 #else

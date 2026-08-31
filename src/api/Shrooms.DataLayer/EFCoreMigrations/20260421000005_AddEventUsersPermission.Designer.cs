@@ -28,7 +28,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("ApplicationUserExams", b =>
                 {
                     b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
@@ -43,7 +44,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("ApplicationUserSkills", b =>
                 {
                     b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("SkillId")
                         .HasColumnType("int");
@@ -73,7 +75,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("CommitteesUsersDelegates", b =>
                 {
                     b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("Committee_Id")
                         .HasColumnType("int");
@@ -88,7 +91,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("CommitteesUsersLeadership", b =>
                 {
                     b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("Committee_Id")
                         .HasColumnType("int");
@@ -103,7 +107,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("CommitteesUsersMembership", b =>
                 {
                     b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("Committee_Id")
                         .HasColumnType("int");
@@ -160,7 +165,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -184,7 +190,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -196,16 +203,19 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -217,10 +227,12 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -232,13 +244,16 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -266,7 +281,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("ProjectApplicationUsers", b =>
                 {
                     b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("Project_Id")
                         .HasColumnType("int");
@@ -299,7 +315,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("int");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("PermissionId", "RoleId");
 
@@ -311,7 +328,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("ServiceRequestCategoryApplicationUsers", b =>
                 {
                     b.Property<string>("ApplicationUser_Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("ServiceRequestCategory_Id")
                         .HasColumnType("int");
@@ -382,7 +400,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -421,7 +440,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("AbsentComment")
                         .HasColumnType("nvarchar(max)");
@@ -502,7 +522,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnName("LockoutEndDateUtc");
 
                     b.Property<string>("ManagerId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("MicrosoftEmail")
                         .HasColumnType("nvarchar(max)");
@@ -692,7 +713,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("EmployeeId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
@@ -826,7 +848,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -836,7 +859,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("ModifiedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
@@ -849,7 +873,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -873,7 +898,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -936,8 +962,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("BookOfficeId")
                         .HasColumnType("int");
@@ -1111,7 +1137,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -1199,7 +1226,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ResponsibleUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -1277,7 +1305,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("AttendComment")
                         .HasColumnType("nvarchar(max)");
@@ -1656,7 +1685,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int?>("KudosBasketId")
                         .HasColumnType("int");
@@ -1923,7 +1953,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -2007,7 +2038,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -2055,7 +2087,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -2109,7 +2142,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("PostId", "UserId");
 
@@ -2202,7 +2236,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("WallId")
                         .HasColumnType("int");
@@ -2240,7 +2275,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("WallId")
                         .HasColumnType("int");
@@ -2305,7 +2341,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<bool>("IsAlreadySeen")
                         .HasColumnType("bit");
@@ -2330,7 +2367,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -2692,7 +2730,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("int");
 
                     b.Property<string>("OwnerId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("WallId")
                         .HasColumnType("int");
@@ -2747,7 +2786,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.RefreshToken", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -2909,7 +2949,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -3005,7 +3046,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -3213,7 +3255,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -3266,7 +3309,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasBaseType("Shrooms.DataLayer.EntityModels.Models.AbstractClassifier");
 
                     b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<bool>("InProgress")
                         .HasColumnType("bit");

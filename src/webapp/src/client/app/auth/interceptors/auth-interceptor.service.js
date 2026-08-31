@@ -41,6 +41,7 @@
         }
 
         function response(response) {
+            $injector.get('authService').noteSuccessfulResponse();
             return response || $q.when(response);
         }
 
@@ -49,7 +50,11 @@
             var auth = $injector.get('authService');
 
             if (response.status === 401) {
-                if (!auth.isStoredTokenValid() && !loggingOut) {
+                // Response interceptors run in reverse registration order, so this
+                // counts the 401 before unauthInterceptor reads the tally.
+                var absorptionExhausted = auth.noteUnauthorizedResponse();
+
+                if ((!auth.isStoredTokenValid() || absorptionExhausted) && !loggingOut) {
                     loggingOut = true;
                     auth.logOut();
                 }

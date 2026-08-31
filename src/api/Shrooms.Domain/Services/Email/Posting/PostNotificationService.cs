@@ -15,6 +15,7 @@ using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
+using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Emails;
 using Shrooms.Resources.Models.Walls.Posts;
@@ -29,6 +30,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
+        private readonly IMentionLinkExpander _mentionLinkExpander;
 
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
@@ -42,7 +44,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter)
+            IMarkdownConverter markdownConverter,
+            IMentionLinkExpander mentionLinkExpander)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -51,6 +54,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _postService = postService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
+            _mentionLinkExpander = mentionLinkExpander;
 
             _wallsDbSet = uow.GetDbSet<MultiwallWall>();
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -81,11 +85,24 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        public async Task NotifyMentionedUsersAsync(EditPostDto editPostDto)
+        public async Task NotifyMentionedUsersAsync(EditPostDto editPostDto, IEnumerable<string> mentionedUserIds)
         {
+            var ids = mentionedUserIds?.Distinct().ToList();
+
+            if (ids == null || !ids.Any())
+            {
+                return;
+            }
+
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(ids);
+
+            if (!mentionedUsers.Any())
+            {
+                return;
+            }
+
             var organization = await _organizationService.GetOrganizationByIdAsync(editPostDto.OrganizationId);
             var postAuthor = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds.Distinct());
 
             await SendMentionerUserEmailsAsync(editPostDto.Id, postAuthor.FullName, mentionedUsers, organization.ShortName);
         }
@@ -93,7 +110,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private async Task SendMentionerUserEmailsAsync(int postId, string postAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
             var postBody = await _postService.GetPostBodyAsync(postId);
-            var convertedPostBody = _markdownConverter.ConvertToHtml(postBody);
+            var convertedPostBody = ConvertBodyToHtml(postBody, organizationShortName);
 
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
@@ -117,6 +134,12 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
+        private string ConvertBodyToHtml(string messageBody, string organizationShortName)
+        {
+            return _markdownConverter.ConvertToHtml(
+                _mentionLinkExpander.ExpandToMarkdown(messageBody, organizationShortName));
+        }
+
         private async Task SendWallSubscriberEmailsAsync(
             NewlyCreatedPostDto post,
             IEnumerable<string> destinationEmails,
@@ -128,7 +151,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var subject = CreateSubject(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
-            var body = _markdownConverter.ConvertToHtml(post.MessageBody);
+            var body = ConvertBodyToHtml(post.MessageBody, organization.ShortName);
 
             var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(GetWallTitle(wall),
                 authorPictureUrl,

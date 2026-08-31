@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
@@ -49,7 +50,15 @@ namespace Shrooms.Tests.DomainService
 
             var commentService = Substitute.For<ICommentService>();
 
-            _postService = new PostService(uow, commentService, _wallService);
+            var mentionResolver = Substitute.For<IMentionResolver>();
+            mentionResolver
+                .ResolveAsync(Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(Enumerable.Empty<string>());
+            mentionResolver
+                .ResolveAddedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(Enumerable.Empty<string>());
+
+            _postService = new PostService(uow, commentService, _wallService, mentionResolver);
         }
 
         [Test]

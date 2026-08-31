@@ -15,6 +15,11 @@ namespace Shrooms.DataLayer.EntityModels.Models.Kudos
         public string EmployeeId { get; set; }
 
         public virtual ApplicationUser Employee { get; set; }
+        
+        [ForeignKey("SentTo")]
+        public string SentToId { get; set; }
+
+        public virtual ApplicationUser SentTo { get; set; }
 
         public string KudosTypeName { get; set; }
 

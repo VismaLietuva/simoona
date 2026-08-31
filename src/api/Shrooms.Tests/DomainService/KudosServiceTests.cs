@@ -157,6 +157,24 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Name_The_User_A_Log_Sent_Points_To()
+        {
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+
+            var withRecipient = result.KudosLogs.First(log => log.Id == 3);
+            var withoutRecipient = result.KudosLogs.First(log => log.Id == 1);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(withRecipient.SentTo.Id, Is.EqualTo("testUserId2"));
+                Assert.That(withRecipient.SentTo.FullName, Is.EqualTo("second user"));
+                Assert.That(withRecipient.SentTo.PictureId, Is.EqualTo("second.jpg"));
+                Assert.That(withoutRecipient.SentTo.Id, Is.Empty);
+                Assert.That(withoutRecipient.SentTo.FullName, Is.Empty);
+            });
+        }
+
+        [Test]
         public async Task Should_Return_Only_Matching_Type_When_User_Kudos_Logs_Are_Filtered()
         {
             var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1" });
@@ -434,6 +452,96 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Exclude_Refund_Logs_From_Pie_Chart()
+        {
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>
+            {
+                PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 10),
+                PieChartLog(2, "Refund", KudosTypeEnum.Refund, 9)
+            }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result.Single().TypeName, Is.EqualTo("Other"));
+                Assert.That(result.Sum(slice => slice.Value), Is.EqualTo(10));
+            });
+        }
+
+        [Test]
+        public async Task Should_Exclude_Basket_Donation_Logs_From_Pie_Chart()
+        {
+            var donation = PieChartLog(2, "Other", KudosTypeEnum.Ordinary, 5);
+            donation.KudosBasketId = 1;
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>
+            {
+                PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 10),
+                donation
+            }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
+
+            Assert.That(result.Single().Value, Is.EqualTo(10));
+        }
+
+        [Test]
+        public async Task Should_Exclude_Pie_Chart_Logs_Created_Before_The_Employment_Date()
+        {
+            var employmentDate = DateTime.UtcNow.AddMonths(-1);
+            _usersDbSet.FindAsync("PieUserId").Returns(new ApplicationUser
+            {
+                Id = "PieUserId",
+                OrganizationId = 2,
+                CultureCode = "en-US",
+                EmploymentDate = employmentDate
+            });
+
+            var before = PieChartLog(1, "Before", KudosTypeEnum.Ordinary, 7);
+            before.EmployeeId = "PieUserId";
+            before.Created = employmentDate.AddDays(-1);
+
+            var after = PieChartLog(2, "After", KudosTypeEnum.Ordinary, 3);
+            after.EmployeeId = "PieUserId";
+            after.Created = employmentDate.AddDays(1);
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { before, after }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "PieUserId")).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result.Single().TypeName, Is.EqualTo("After"));
+                Assert.That(result.Single().Value, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public async Task Should_Not_Blank_The_Pie_Chart_When_The_Employment_Date_Is_Missing()
+        {
+            _usersDbSet.FindAsync("NoDateUserId").Returns(new ApplicationUser
+            {
+                Id = "NoDateUserId",
+                OrganizationId = 2,
+                CultureCode = "en-US",
+                EmploymentDate = null
+            });
+
+            var log = PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 4);
+            log.EmployeeId = "NoDateUserId";
+            log.Created = DateTime.UtcNow.AddYears(-5);
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "NoDateUserId")).ToList();
+
+            Assert.That(result.Single().Value, Is.EqualTo(4));
+        }
+
+        [Test]
         public async Task Should_Return_Pie_Chart_Slices_In_A_Deterministic_Order()
         {
             MockKudosLogsForPieChart();
@@ -689,6 +797,36 @@ namespace Shrooms.Tests.DomainService
             await _kudosService.AddKudosLogAsync(kudosLog);
             _kudosLogsDbSet.Received(4).Add(Arg.Any<KudosLog>());
             await _uow.Received(1).SaveChangesAsync(false);
+        }
+
+        [Test]
+        public async Task Should_Record_The_Receiver_On_The_Deduction_Mirroring_A_Send()
+        {
+            var kudosLog = new AddKudosLogDto
+            {
+                OrganizationId = 2,
+                PointsTypeId = 2,
+                UserId = "testUserId2",
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
+                MultiplyBy = 2,
+                Comment = "Comment",
+                IsActive = true
+            };
+
+            await _kudosService.AddKudosLogAsync(kudosLog);
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Minus &&
+                log.EmployeeId == "testUserId2" &&
+                log.SentToId == "testUserId3"));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Minus &&
+                log.EmployeeId == "testUserId2" &&
+                log.SentToId == "testUserId4"));
+
+            _kudosLogsDbSet.Received(2).Add(Arg.Is<KudosLog>(log =>
+                log.KudosSystemType == KudosTypeEnum.Send && log.SentToId == null));
         }
 
         //Checks if available kudos validation for send kudos operation works properly.
@@ -1026,6 +1164,9 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     Id = "testUserId2",
+                    FirstName = "second",
+                    LastName = "user",
+                    PictureId = "second.jpg",
                     TotalKudos = 4,
                     SpentKudos = 0,
                     RemainingKudos = 4,
@@ -1163,7 +1304,8 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     CreatedBy = "testUserId",
                     Points = 0,
-                    Comments = "Hello"
+                    Comments = "Hello",
+                    SentToId = "testUserId2"
                 },
                 new()
                 {

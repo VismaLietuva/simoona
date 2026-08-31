@@ -12,6 +12,15 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IVacationService, VacationService>();
             services.AddHttpClient<IVacationBotService, VacationBotService>();
             services.AddScoped<IVacationDomainService, VacationDomainService>();
+
+            services.AddScoped<IVacationRequestService, VacationRequestService>();
+            services.AddScoped<IVacationRequestListService, VacationRequestListService>();
+            services.AddScoped<IVacationLogService, VacationLogService>();
+            services.AddScoped<IVacationStatisticsService, VacationStatisticsService>();
+            services.AddScoped<IVacationSettingsService, VacationSettingsService>();
+            services.AddScoped<IVacationReportService, VacationReportService>();
+            services.AddScoped<IVacationOrderService, VacationOrderService>();
+
             return services;
         }
     }

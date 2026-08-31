@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
+using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Models.Walls.Comments;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -32,6 +33,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IOrganizationService _organizationService;
         private readonly IPostService _postService;
         private readonly IMarkdownConverter _markdownConverter;
+        private readonly IMentionLinkExpander _mentionLinkExpander;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Project> _projectsDbSet;
@@ -46,7 +48,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
             IMarkdownConverter markdownConverter,
-            IPostService postService)
+            IPostService postService,
+            IMentionLinkExpander mentionLinkExpander)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -56,6 +59,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
             _postService = postService;
+            _mentionLinkExpander = mentionLinkExpander;
 
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
@@ -89,11 +93,24 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        public async Task NotifyMentionedUsersAsync(EditCommentDto editCommentDto)
+        public async Task NotifyMentionedUsersAsync(EditCommentDto editCommentDto, IEnumerable<string> mentionedUserIds)
         {
+            var ids = mentionedUserIds?.Distinct().ToList();
+
+            if (ids == null || !ids.Any())
+            {
+                return;
+            }
+
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(ids);
+
+            if (!mentionedUsers.Any())
+            {
+                return;
+            }
+
             var mentionCommentDto = await _commentService.GetMentionCommentByIdAsync(editCommentDto.Id);
             var organization = await _organizationService.GetOrganizationByIdAsync(editCommentDto.OrganizationId);
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editCommentDto.MentionedUserIds.Distinct());
 
             await SendMentionedUserEmailsAsync(
                 editCommentDto.Id,
@@ -109,7 +126,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
 
-            var messageBody = _markdownConverter.ConvertToHtml(comment);
+            var messageBody = ConvertBodyToHtml(comment, organizationShortName);
 
             foreach (var mentionedUser in mentionedUsers)
             {
@@ -130,6 +147,12 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
+        private string ConvertBodyToHtml(string messageBody, string organizationShortName)
+        {
+            return _markdownConverter.ConvertToHtml(
+                _mentionLinkExpander.ExpandToMarkdown(messageBody, organizationShortName));
+        }
+
         private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentAuthor, Organization organization)
         {
             var comment = await LoadCommentAsync(commentDto.CommentId);
@@ -139,7 +162,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
 
             var subject = CreateSubject(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentAuthor.FullName);
-            var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
+            var body = ConvertBodyToHtml(comment.MessageBody, organization.ShortName);
 
             var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                 authorPictureUrl,

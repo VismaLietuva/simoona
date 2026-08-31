@@ -38,17 +38,21 @@ namespace Shrooms.Domain.Helpers
             {
                 Comment = log.Comments,
                 Created = log.Created,
-                Sender = new KudosLogUserDto
-                {
-                    Id = log.CreatedBy,
-                    FullName = users.Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? string.Empty
-                },
+                Sender = users
+                    .Select(u => new KudosLogUserDto
+                    {
+                        Id = log.CreatedBy,
+                        FullName = u.FirstName + " " + u.LastName,
+                        PictureId = u.PictureId
+                    })
+                    .FirstOrDefault() ?? new KudosLogUserDto { Id = log.CreatedBy, FullName = string.Empty },
                 Id = log.Id,
                 Points = log.Points,
                 Receiver = new KudosLogUserDto
                 {
                     Id = log.Employee == null ? null : log.Employee.Id,
-                    FullName = log.Employee == null ? string.Empty : log.Employee.FirstName + " " + log.Employee.LastName
+                    FullName = log.Employee == null ? string.Empty : log.Employee.FirstName + " " + log.Employee.LastName,
+                    PictureId = log.Employee == null ? null : log.Employee.PictureId
                 },
                 Type = new KudosLogTypeDto
                 {

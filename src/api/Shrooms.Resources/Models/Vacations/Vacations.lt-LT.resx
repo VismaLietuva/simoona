@@ -141,6 +141,9 @@
   <data name="vacationInProgress" xml:space="preserve">
     <value>Negalite atšaukti atostogų kurios jau vyksta</value>
   </data>
+  <data name="vacationMonthClosed" xml:space="preserve">
+    <value>Praėjusių mėnesių prašymų keisti nebegalima</value>
+  </data>
   <data name="wrongVacationPeriod" xml:space="preserve">
     <value>Blogai nurodytas atostogų periodas</value>
   </data>
@@ -167,5 +170,44 @@
   </data>
   <data name="tooManyDeputiesAtTheSameTime" xml:space="preserve">
     <value>Vienu metu gali būti tik vienas aktyvus pavaduotojas</value>
+  </data>
+  <data name="startInPast" xml:space="preserve">
+    <value>Negalima prašyti atostogų praeityje</value>
+  </data>
+  <data name="tooFarAhead" xml:space="preserve">
+    <value>Galima prašyti ne daugiau kaip {0} mėn. į priekį</value>
+  </data>
+  <data name="noWorkingDays" xml:space="preserve">
+    <value>Pasirinktame laikotarpyje nėra darbo dienų</value>
+  </data>
+  <data name="noteTooLong" xml:space="preserve">
+    <value>Komentaras negali viršyti {0} simbolių</value>
+  </data>
+  <data name="cannotEditVacation" xml:space="preserve">
+    <value>Šio prašymo keisti nebegalima</value>
+  </data>
+  <data name="cannotReviewVacation" xml:space="preserve">
+    <value>Šis prašymas nelaukia sprendimo</value>
+  </data>
+  <data name="reasonTooShort" xml:space="preserve">
+    <value>Nurodykite atmetimo priežastį</value>
+  </data>
+  <data name="orderHasNoRequests" xml:space="preserve">
+    <value>Šiam laikotarpiui įsakymų nėra</value>
+  </data>
+  <data name="orderNotFound" xml:space="preserve">
+    <value>Tokio įsakymo nėra</value>
+  </data>
+  <data name="importDateRequired" xml:space="preserve">
+    <value>Nurodykite datą, kuriai apskaičiuoti likučiai</value>
+  </data>
+  <data name="importUnreadable" xml:space="preserve">
+    <value>Failo nepavyko perskaityti kaip buhalterijos ataskaitos</value>
+  </data>
+  <data name="orderRaceLost" xml:space="preserve">
+    <value>Šiuos įsakymus ką tik sugeneravo kitas administratorius. Atnaujinkite puslapį ir pabandykite dar kartą</value>
+  </data>
+  <data name="archiveTooLarge" xml:space="preserve">
+    <value>Šiame laikotarpyje yra daugiau nei {0} įsakymai. Susiaukite laikotarpį ir atsisiųskite dar kartą</value>
   </data>
 </root>

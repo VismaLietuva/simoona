@@ -46,15 +46,19 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var supportDto = _mapper.Map<SupportPostViewModel, SupportDto>(support);
 
-            if (support.Image != null && support.Image.Length > 0)
-            {
-                var imageValidationResult = ValidateImage(support.Image);
-                if (imageValidationResult != null)
-                {
-                    return imageValidationResult;
-                }
+            var images = support.Images?.Where(image => image != null && image.Length > 0).ToList() ?? new List<IFormFile>();
 
-                supportDto.Attachment = await ReadAttachmentAsync(support.Image);
+            var imagesValidationResult = ValidateImages(images);
+            if (imagesValidationResult != null)
+            {
+                return imagesValidationResult;
+            }
+
+            var usedFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var image in images)
+            {
+                supportDto.Attachments.Add(await ReadAttachmentAsync(image, usedFileNames));
             }
 
             await _supportService.SubmitTicketAsync(GetUserAndOrganization(), supportDto);
@@ -62,16 +66,29 @@ namespace Shrooms.Presentation.Api.Controllers
             return StatusCode(201);
         }
 
-        private static IActionResult ValidateImage(IFormFile image)
+        private static IActionResult ValidateImages(IReadOnlyCollection<IFormFile> images)
         {
-            if (image.Length >= WebApiConstants.MaximumPictureSizeInBytes)
+            if (images.Count > WebApiConstants.MaximumSupportImageCount)
             {
-                return new BadRequestObjectResult("Image is too large");
+                return new BadRequestObjectResult("Too many images");
             }
 
-            if (!Array.Exists(AllowedImageMimeTypes, type => type.Equals(image.ContentType, StringComparison.OrdinalIgnoreCase)))
+            foreach (var image in images)
             {
-                return new ObjectResult("Unsupported media type") { StatusCode = StatusCodes.Status415UnsupportedMediaType };
+                if (image.Length >= WebApiConstants.MaximumPictureSizeInBytes)
+                {
+                    return new BadRequestObjectResult("Image is too large");
+                }
+
+                if (!Array.Exists(AllowedImageMimeTypes, type => type.Equals(image.ContentType, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new ObjectResult("Unsupported media type") { StatusCode = StatusCodes.Status415UnsupportedMediaType };
+                }
+            }
+
+            if (images.Sum(image => image.Length) >= WebApiConstants.MaximumSupportImagesTotalSizeInBytes)
+            {
+                return new BadRequestObjectResult("Images are too large");
             }
 
             return null;
@@ -79,7 +96,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         // Buffered rather than streamed: the mail attachment is built after this
         // action returns, by which point ASP.NET Core has disposed the form file.
-        private static async Task<SupportAttachmentDto> ReadAttachmentAsync(IFormFile image)
+        private static async Task<SupportAttachmentDto> ReadAttachmentAsync(IFormFile image, HashSet<string> usedFileNames)
         {
             using var buffer = new MemoryStream();
             await image.CopyToAsync(buffer);
@@ -87,9 +104,29 @@ namespace Shrooms.Presentation.Api.Controllers
             return new SupportAttachmentDto
             {
                 Content = buffer.ToArray(),
-                FileName = Path.GetFileName(image.FileName),
+                FileName = MakeFileNameUnique(Path.GetFileName(image.FileName), usedFileNames),
                 ContentType = image.ContentType
             };
+        }
+
+        private static string MakeFileNameUnique(string fileName, HashSet<string> usedFileNames)
+        {
+            if (usedFileNames.Add(fileName))
+            {
+                return fileName;
+            }
+
+            var stem = Path.GetFileNameWithoutExtension(fileName);
+            var extension = Path.GetExtension(fileName);
+
+            for (var suffix = 2; ; suffix++)
+            {
+                var candidate = $"{stem}-{suffix}{extension}";
+                if (usedFileNames.Add(candidate))
+                {
+                    return candidate;
+                }
+            }
         }
 
         [HttpGet]

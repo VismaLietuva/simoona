@@ -52,12 +52,14 @@
 
   <!-- Documents, images and content -->
   <ItemGroup>
+    <PackageVersion Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageVersion Include="EPPlus" Version="7.5.3" />
     <PackageVersion Include="ExcelDataReader" Version="3.9.0" />
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.9.0" />
     <PackageVersion Include="HtmlSanitizer" Version="9.2.995" />
     <PackageVersion Include="Ical.Net" Version="4.3.0" />
     <PackageVersion Include="Markdig" Version="1.3.2" />
+    <PackageVersion Include="PDFsharp" Version="6.2.4" />
     <PackageVersion Include="RazorLight" Version="2.3.1" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.10" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="2.0.2" />

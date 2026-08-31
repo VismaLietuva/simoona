@@ -47,6 +47,8 @@ namespace Shrooms.Contracts.Infrastructure
 
         string UserProfileUrl(string tenant, string id);
 
+        string GroupUrl(string tenant, int groupId);
+
         string BookUrl(string tenant, int bookOfficeId, int officeId);
 
         string KudosProfileUrl(string tenant, string userId);
