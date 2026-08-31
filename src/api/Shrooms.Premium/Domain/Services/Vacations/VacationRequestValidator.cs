@@ -34,6 +34,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             string note,
             DateTime today,
             IEnumerable<VacationRequest> ownRequests,
+            HolidayCalendar holidays,
             DateTime? originalDateFrom = null)
         {
             if (dateTo < dateFrom)
@@ -63,7 +64,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             // Before the overlap check, which would silently pass a zero-day period.
-            if (VacationCalculator.CountWorkingDays(dateFrom, dateTo) == 0)
+            // A period that is nothing but holidays is rejected here for the same
+            // reason a period that is nothing but weekend always was.
+            if (VacationCalculator.CountWorkingDays(dateFrom, dateTo, holidays) == 0)
             {
                 throw Fail(ErrorCodes.VacationNoWorkingDays, "noWorkingDays", Resx.GetResourceString("noWorkingDays"));
             }

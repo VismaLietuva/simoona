@@ -15,14 +15,16 @@ namespace Shrooms.Premium.Domain.Services.Vacations
     public class VacationRequestService : IVacationRequestService
     {
         private readonly IUnitOfWork2 _uow;
+        private readonly IHolidayService _holidayService;
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
 
-        public VacationRequestService(IUnitOfWork2 uow)
+        public VacationRequestService(IUnitOfWork2 uow, IHolidayService holidayService)
         {
             _uow = uow;
+            _holidayService = holidayService;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
@@ -60,7 +62,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                                       || request.Status == VacationRequestStatus.Approved))
                 .ToListAsync();
 
-            var booked = VacationCalculator.CommittedAnnualDays(chargeable, balanceAsOf);
+            var holidays = await _holidayService.GetCalendarAsync();
+            var booked = VacationCalculator.CommittedAnnualDays(chargeable, balanceAsOf, holidays);
             var annualRate = VacationCalculator.AnnualAccrual(user.YearsEmployed);
             var accruedNow = VacationCalculator.ApproxAccruedNow(entitlement, balanceAsOf, today, annualRate);
 
@@ -82,6 +85,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             var parsed = VacationRequestValidator.ParseDraft(draft.Type, draft.DateFrom, draft.DateTo, draft.Note);
 
             var ownRequests = await OwnActiveRequestsAsync(userOrg.OrganizationId, userOrg.UserId, null);
+            var holidays = await _holidayService.GetCalendarAsync();
 
             VacationRequestValidator.ValidateDraft(
                 parsed.Type,
@@ -89,7 +93,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 parsed.DateTo,
                 parsed.Note,
                 today,
-                ownRequests);
+                ownRequests,
+                holidays);
 
             var now = DateTime.UtcNow;
             var request = new VacationRequest
@@ -101,7 +106,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 DateFrom = parsed.DateFrom,
                 DateTo = parsed.DateTo,
                 // Never the client's figure: it decides what the leave costs.
-                WorkingDays = VacationCalculator.CountWorkingDays(parsed.DateFrom, parsed.DateTo),
+                WorkingDays = VacationCalculator.CountWorkingDays(parsed.DateFrom, parsed.DateTo, holidays),
                 Note = parsed.Note,
                 Created = now,
                 Modified = now
@@ -127,6 +132,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             var parsed = VacationRequestValidator.ParseDraft(draft.Type, draft.DateFrom, draft.DateTo, draft.Note);
 
             var ownRequests = await OwnActiveRequestsAsync(userOrg.OrganizationId, userOrg.UserId, id);
+            var holidays = await _holidayService.GetCalendarAsync();
 
             VacationRequestValidator.ValidateDraft(
                 parsed.Type,
@@ -135,6 +141,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 parsed.Note,
                 today,
                 ownRequests,
+                holidays,
                 request.DateFrom);
 
             var before = Snapshot(request);
@@ -142,7 +149,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             request.Type = parsed.Type;
             request.DateFrom = parsed.DateFrom;
             request.DateTo = parsed.DateTo;
-            request.WorkingDays = VacationCalculator.CountWorkingDays(parsed.DateFrom, parsed.DateTo);
+            request.WorkingDays = VacationCalculator.CountWorkingDays(parsed.DateFrom, parsed.DateTo, holidays);
             request.Note = parsed.Note;
 
             // Back to pending: the approved period is not the one being asked for
@@ -228,7 +235,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             request.Status = status;
             request.DateFrom = dateFrom;
             request.DateTo = dateTo;
-            request.WorkingDays = VacationCalculator.CountWorkingDays(dateFrom, dateTo);
+            request.WorkingDays = VacationCalculator.CountWorkingDays(dateFrom, dateTo, await _holidayService.GetCalendarAsync());
             // Null means "leave it", as with the fields above; the dialog sends
             // an empty string to clear one.
             if (patch.Note != null)

@@ -24,14 +24,16 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private const char Separator = ';';
 
         private readonly IUnitOfWork2 _uow;
+        private readonly IHolidayService _holidayService;
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
 
-        public VacationReportService(IUnitOfWork2 uow)
+        public VacationReportService(IUnitOfWork2 uow, IHolidayService holidayService)
         {
             _uow = uow;
+            _holidayService = holidayService;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
@@ -132,6 +134,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 .GroupBy(request => request.EmployeeId)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
+            var holidays = await _holidayService.GetCalendarAsync();
+
             var now = DateTime.UtcNow;
 
             foreach (var row in parsed.Rows)
@@ -158,7 +162,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                     continue;
                 }
 
-                var workingDays = VacationCalculator.CountWorkingDays(from.Value, to.Value);
+                var workingDays = VacationCalculator.CountWorkingDays(from.Value, to.Value, holidays);
                 if (workingDays == 0)
                 {
                     report.Errors.Add(Error(row, "noWorkingDays"));

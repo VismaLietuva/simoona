@@ -20,9 +20,11 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
+        private readonly IHolidayService _holidayService;
 
-        public VacationRequestListService(IUnitOfWork2 uow)
+        public VacationRequestListService(IUnitOfWork2 uow, IHolidayService holidayService)
         {
+            _holidayService = holidayService;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
@@ -181,7 +183,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             if (enrichment != Enrichment.None && rows.Count > 0)
             {
-                await EnrichAsync(page.ToList(), rows, args.OrganizationId, enrichment);
+                await EnrichAsync(page.ToList(), rows, args.OrganizationId, today, enrichment);
             }
 
             return new StaticPagedList<VacationRequestDto>(rows, page.PageNumber, page.PageSize, page.TotalItemCount);
@@ -195,9 +197,11 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             IReadOnlyList<VacationRequest> entities,
             IReadOnlyList<VacationRequestDto> rows,
             int organizationId,
+            DateTime today,
             Enrichment enrichment)
         {
             var employeeIds = entities.Select(request => request.EmployeeId).Distinct().ToList();
+            var holidays = await _holidayService.GetCalendarAsync();
 
             var entitlements = await _userDbSet
                 .AsNoTracking()
@@ -207,7 +211,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 {
                     user.Id,
                     Unused = user.VacationUnusedTime,
-                    AsOf = user.VacationLastTimeUpdated
+                    AsOf = user.VacationLastTimeUpdated,
+                    user.EmploymentDate
                 })
                 .ToListAsync();
 
@@ -248,6 +253,13 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 var accrued = entitlement.Unused ?? 0;
                 row.Entitlement = accrued;
 
+                row.AccruedNow = VacationCalculator.ApproxAccruedNow(
+                    accrued,
+                    entitlement.AsOf?.Date,
+                    today,
+                    VacationCalculator.AnnualAccrual(
+                        VacationCalculator.YearsEmployedOn(entitlement.EmploymentDate, today)));
+
                 var own = annualByEmployee.TryGetValue(entity.EmployeeId, out var list)
                     ? list
                     : new List<VacationRequest>();
@@ -260,6 +272,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 var remaining = accrued - VacationCalculator.CommittedAnnualDays(
                     own,
                     entitlement.AsOf?.Date,
+                    holidays,
                     deducts ? entity.Id : null);
 
                 row.RemainingDays = remaining;

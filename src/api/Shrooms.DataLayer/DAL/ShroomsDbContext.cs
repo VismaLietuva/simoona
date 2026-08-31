@@ -185,6 +185,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VacationOrderItem> VacationOrderItems { get; set; }
 
+        public virtual DbSet<Holiday> Holidays { get; set; }
+
         public virtual DbSet<Seat> Seats { get; set; }
 
         public virtual DbSet<SeatReservation> SeatReservations { get; set; }
@@ -289,6 +291,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new VacationRequestEventEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new HolidayEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReservationEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());

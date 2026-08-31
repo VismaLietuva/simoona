@@ -3657,6 +3657,21 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("VacationPages");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.Holiday", b =>
+                {
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Date");
+
+                    b.ToTable("Holidays", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
                 {
                     b.Property<int>("Id")
