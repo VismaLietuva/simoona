@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using Shrooms.Domain.Services.Picture;
+using X.PagedList;
 
 namespace Shrooms.Domain.Services.VideoLibrary
 {
@@ -29,13 +30,46 @@ namespace Shrooms.Domain.Services.VideoLibrary
             _videoTypesDbSet = uow.GetDbSet<VideoType>();
         }
 
-        public async Task<IEnumerable<VideoLibraryItemDto>> GetVideosAsync(UserAndOrganizationDto userOrg)
+        public async Task<IPagedList<VideoLibraryItemDto>> GetVideosAsync(VideoLibraryListArgsDto args)
         {
-            return await _videosDbSet
-                .Where(v => v.OrganizationId == userOrg.OrganizationId)
+            var query = _videosDbSet
+                .Where(v => v.OrganizationId == args.OrganizationId)
+                .Where(BuildTypeFilter(args))
+                .Where(BuildSearchFilter(args))
                 .OrderByDescending(v => v.Created)
-                .Select(MapVideoToDto())
+                .Select(MapVideoToDto());
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((args.Page - 1) * args.PageSize)
+                .Take(args.PageSize)
                 .ToListAsync();
+
+            return new StaticPagedList<VideoLibraryItemDto>(items, args.Page, args.PageSize, totalCount);
+        }
+
+        public async Task<VideoLibraryFiltersDto> GetFiltersAsync(UserAndOrganizationDto userOrg)
+        {
+            var videos = _videosDbSet.Where(v => v.OrganizationId == userOrg.OrganizationId);
+
+            var types = await _videoTypesDbSet
+                .Where(t => t.OrganizationId == userOrg.OrganizationId)
+                .Select(t => new VideoTypeDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    VideoCount = t.Videos.Count(v => !v.IsDeleted)
+                })
+                .Where(t => t.VideoCount > 0)
+                .OrderBy(t => t.Title)
+                .ToListAsync();
+
+            return new VideoLibraryFiltersDto
+            {
+                Types = types,
+                UncategorisedCount = await videos.CountAsync(v => v.VideoTypeId == null),
+                TotalCount = await videos.CountAsync()
+            };
         }
 
         public async Task CreateVideoAsync(VideoLibraryItemDto video)
@@ -93,6 +127,35 @@ namespace Shrooms.Domain.Services.VideoLibrary
             }
 
             await _pictureService.RemoveImageAsync(previousPictureId, organizationId);
+        }
+
+        private static Expression<Func<VideoLibraryItem, bool>> BuildTypeFilter(VideoLibraryListArgsDto args)
+        {
+            if (args.Uncategorised)
+            {
+                return video => video.VideoTypeId == null;
+            }
+
+            if (args.VideoTypeId == null)
+            {
+                return video => true;
+            }
+
+            return video => video.VideoTypeId == args.VideoTypeId;
+        }
+
+        private static Expression<Func<VideoLibraryItem, bool>> BuildSearchFilter(VideoLibraryListArgsDto args)
+        {
+            var search = args.Search?.Trim();
+
+            if (string.IsNullOrEmpty(search))
+            {
+                return video => true;
+            }
+
+            return video => video.Title.Contains(search) ||
+                            (video.Description != null && video.Description.Contains(search)) ||
+                            (video.VideoType != null && video.VideoType.Title.Contains(search));
         }
 
         private async Task<VideoLibraryItem> FindAsync(int id, int organizationId)

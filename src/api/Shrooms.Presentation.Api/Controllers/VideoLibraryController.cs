@@ -2,6 +2,8 @@ using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.ViewModels;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Common.Controllers;
@@ -30,13 +32,35 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("List")]
         [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
-        [ProducesResponseType(typeof(IEnumerable<VideoLibraryItemViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> List()
+        [ProducesResponseType(typeof(PagedViewModel<VideoLibraryItemViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> List([FromQuery] VideoLibraryListArgsViewModel argsViewModel)
         {
-            var videoDtos = await _videoLibraryService.GetVideosAsync(GetUserAndOrganization());
-            var viewModels = _mapper.Map<IEnumerable<VideoLibraryItemDto>, IEnumerable<VideoLibraryItemViewModel>>(videoDtos);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(viewModels);
+            argsViewModel ??= new VideoLibraryListArgsViewModel();
+
+            var argsDto = _mapper.Map<VideoLibraryListArgsViewModel, VideoLibraryListArgsDto>(argsViewModel);
+            SetOrganizationAndUser(argsDto);
+
+            var pagedVideoDtos = await _videoLibraryService.GetVideosAsync(argsDto);
+            var viewModels = _mapper.Map<IEnumerable<VideoLibraryItemDto>, IEnumerable<VideoLibraryItemViewModel>>(pagedVideoDtos);
+
+            return Ok(pagedVideoDtos.ToPagedViewModel(viewModels, argsViewModel));
+        }
+
+        [HttpGet]
+        [Route("Filters")]
+        [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
+        [ProducesResponseType(typeof(VideoLibraryFiltersViewModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Filters()
+        {
+            var filtersDto = await _videoLibraryService.GetFiltersAsync(GetUserAndOrganization());
+            var viewModel = _mapper.Map<VideoLibraryFiltersDto, VideoLibraryFiltersViewModel>(filtersDto);
+
+            return Ok(viewModel);
         }
 
         [HttpPost]

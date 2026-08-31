@@ -13,7 +13,9 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Presentation.Common.Filters;
+using X.PagedList;
 using Shrooms.Presentation.WebViewModels.Models.VideoLibrary;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
@@ -36,31 +38,120 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public async Task List_Should_Return_Mapped_Videos()
+        public async Task List_Should_Return_A_Page_Of_Mapped_Videos()
         {
-            _videoLibraryService.GetVideosAsync(Arg.Any<UserAndOrganizationDto>())
-                .Returns(new List<VideoLibraryItemDto>
-                {
-                    new()
-                    {
-                        Id = 1,
-                        Title = "All-Hands April",
-                        Url = "https://drive.google.com/file/d/abc/view",
-                        VideoTypeId = 3,
-                        VideoTypeTitle = "All-Hands meetings",
-                        Created = new DateTime(2026, 4, 1)
-                    }
-                });
+            StubPage(totalItemCount: 30, pageSize: 24);
 
-            var result = await _videoLibraryController.List();
+            var result = await _videoLibraryController.List(new VideoLibraryListArgsViewModel());
 
             Assert.That(result, Is.InstanceOf<OkObjectResult>());
 
-            var videos = ((OkObjectResult)result).Value as IEnumerable<VideoLibraryItemViewModel>;
+            var paged = ((OkObjectResult)result).Value as PagedViewModel<VideoLibraryItemViewModel>;
 
-            Assert.That(videos, Is.Not.Null);
-            Assert.That(videos.Single().Title, Is.EqualTo("All-Hands April"));
-            Assert.That(videos.Single().VideoTypeTitle, Is.EqualTo("All-Hands meetings"));
+            Assert.That(paged, Is.Not.Null);
+            Assert.That(paged.PagedList.Single().Title, Is.EqualTo("All-Hands April"));
+            Assert.That(paged.PagedList.Single().VideoTypeTitle, Is.EqualTo("All-Hands meetings"));
+        }
+
+        [Test]
+        public async Task List_Should_Report_The_Whole_Library_Size_So_The_Caller_Can_Page()
+        {
+            StubPage(totalItemCount: 30, pageSize: 24);
+
+            var result = await _videoLibraryController.List(new VideoLibraryListArgsViewModel());
+            var paged = ((OkObjectResult)result).Value as PagedViewModel<VideoLibraryItemViewModel>;
+
+            Assert.That(paged.ItemCount, Is.EqualTo(30));
+            Assert.That(paged.PageCount, Is.EqualTo(2));
+            Assert.That(paged.PageSize, Is.EqualTo(24));
+        }
+
+        [Test]
+        public async Task List_Should_Pass_The_Query_Arguments_Through_To_The_Service()
+        {
+            StubPage(totalItemCount: 1, pageSize: 5);
+
+            await _videoLibraryController.List(new VideoLibraryListArgsViewModel
+            {
+                Search = "all-hands",
+                VideoTypeId = 3,
+                Page = 2,
+                PageSize = 5
+            });
+
+            await _videoLibraryService.Received(1).GetVideosAsync(Arg.Is<VideoLibraryListArgsDto>(args =>
+                args.Search == "all-hands" &&
+                args.VideoTypeId == 3 &&
+                args.Page == 2 &&
+                args.PageSize == 5 &&
+                args.UserId == "1" &&
+                args.OrganizationId == TestConstants.DefaultOrganizationId));
+        }
+
+        [TestCase(0)]
+        [TestCase(-1)]
+        public async Task List_Should_Reject_A_Page_That_Cannot_Exist(int page)
+        {
+            var argsViewModel = new VideoLibraryListArgsViewModel { Page = page };
+            _videoLibraryController.Validate(argsViewModel);
+
+            var result = await _videoLibraryController.List(argsViewModel);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _videoLibraryService.DidNotReceive().GetVideosAsync(Arg.Any<VideoLibraryListArgsDto>());
+        }
+
+        [Test]
+        public async Task List_Should_Refuse_To_Serve_An_Unbounded_Page_Size()
+        {
+            var argsViewModel = new VideoLibraryListArgsViewModel
+            {
+                PageSize = VideoLibraryListArgsViewModel.MaxPageSize + 1
+            };
+            _videoLibraryController.Validate(argsViewModel);
+
+            var result = await _videoLibraryController.List(argsViewModel);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _videoLibraryService.DidNotReceive().GetVideosAsync(Arg.Any<VideoLibraryListArgsDto>());
+        }
+
+        [Test]
+        public async Task Filters_Should_Return_Whole_Library_Counts()
+        {
+            _videoLibraryService.GetFiltersAsync(Arg.Any<UserAndOrganizationDto>())
+                .Returns(new VideoLibraryFiltersDto
+                {
+                    Types = new[] { new VideoTypeDto { Id = 3, Title = "All-Hands meetings", VideoCount = 7 } },
+                    UncategorisedCount = 2,
+                    TotalCount = 9
+                });
+
+            var result = await _videoLibraryController.Filters();
+
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+
+            var filters = ((OkObjectResult)result).Value as VideoLibraryFiltersViewModel;
+
+            Assert.That(filters.TotalCount, Is.EqualTo(9));
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(2));
+            Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(7));
+        }
+
+        private void StubPage(int totalItemCount, int pageSize)
+        {
+            var video = new VideoLibraryItemDto
+            {
+                Id = 1,
+                Title = "All-Hands April",
+                Url = "https://drive.google.com/file/d/abc/view",
+                VideoTypeId = 3,
+                VideoTypeTitle = "All-Hands meetings",
+                Created = new DateTime(2026, 4, 1)
+            };
+
+            _videoLibraryService.GetVideosAsync(Arg.Any<VideoLibraryListArgsDto>())
+                .Returns(new StaticPagedList<VideoLibraryItemDto>(new[] { video }, 1, pageSize, totalItemCount));
         }
 
         [Test]

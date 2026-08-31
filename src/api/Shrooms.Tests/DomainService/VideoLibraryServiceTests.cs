@@ -78,6 +78,9 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
+            allHands.Videos = _videos.Where(v => v.VideoTypeId == allHands.Id).ToList();
+            foreignType.Videos = _videos.Where(v => v.VideoTypeId == foreignType.Id).ToList();
+
             _uow = Substitute.For<IUnitOfWork2>();
             _videosDbSet = _uow.MockDbSetForAsync(_videos);
             _uow.MockDbSetForAsync(new List<VideoType> { allHands, foreignType });
@@ -90,7 +93,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Only_Videos_Of_The_Requesting_Organization()
         {
-            var result = (await _videoLibraryService.GetVideosAsync(UserOrg())).ToList();
+            var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result.Select(v => v.Id), Is.EquivalentTo(new[] { 1, 2 }));
@@ -99,7 +102,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Newest_Videos_First()
         {
-            var result = (await _videoLibraryService.GetVideosAsync(UserOrg())).ToList();
+            var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
             Assert.That(result.First().Id, Is.EqualTo(2));
             Assert.That(result.Last().Id, Is.EqualTo(1));
@@ -108,7 +111,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Map_Video_Type_Title_And_Leave_It_Null_When_Untyped()
         {
-            var result = (await _videoLibraryService.GetVideosAsync(UserOrg())).ToList();
+            var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
             var typed = result.First(v => v.Id == 1);
             var untyped = result.First(v => v.Id == 2);
@@ -116,6 +119,107 @@ namespace Shrooms.Tests.DomainService
             Assert.That(typed.VideoTypeTitle, Is.EqualTo("All-Hands meetings"));
             Assert.That(untyped.VideoTypeId, Is.Null);
             Assert.That(untyped.VideoTypeTitle, Is.Null);
+        }
+
+        [Test]
+        public async Task Should_Return_Only_The_Requested_Page()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(pageSize: 1));
+
+            Assert.That(page.Count, Is.EqualTo(1));
+            Assert.That(page.First().Id, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Report_The_Whole_Library_Size_Alongside_A_Page()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(pageSize: 1));
+
+            Assert.That(page.TotalItemCount, Is.EqualTo(2));
+            Assert.That(page.PageCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Walk_Through_Pages_Without_Repeating_A_Video()
+        {
+            var first = await _videoLibraryService.GetVideosAsync(ListArgs(page: 1, pageSize: 1));
+            var second = await _videoLibraryService.GetVideosAsync(ListArgs(page: 2, pageSize: 1));
+
+            Assert.That(first.Single().Id, Is.EqualTo(2));
+            Assert.That(second.Single().Id, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Return_Nothing_Past_The_Last_Page()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(page: 99));
+
+            Assert.That(page, Is.Empty);
+            Assert.That(page.TotalItemCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Filter_The_Page_By_Video_Type()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(videoTypeId: 1));
+
+            Assert.That(page.Single().Id, Is.EqualTo(1));
+            Assert.That(page.TotalItemCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Filter_The_Page_Down_To_Uncategorised_Videos()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(uncategorised: true));
+
+            Assert.That(page.Single().Id, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Search_Across_Title_Description_And_Type()
+        {
+            var byTitle = await _videoLibraryService.GetVideosAsync(ListArgs(search: "Older"));
+            var byDescription = await _videoLibraryService.GetVideosAsync(ListArgs(search: "Description"));
+            var byType = await _videoLibraryService.GetVideosAsync(ListArgs(search: "All-Hands"));
+
+            Assert.That(byTitle.Single().Id, Is.EqualTo(1));
+            Assert.That(byDescription.Single().Id, Is.EqualTo(2));
+            Assert.That(byType.Single().Id, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Ignore_A_Blank_Search()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(search: "   "));
+
+            Assert.That(page.TotalItemCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Not_Leak_Another_Organizations_Videos_Through_Search()
+        {
+            var page = await _videoLibraryService.GetVideosAsync(ListArgs(search: "another organization"));
+
+            Assert.That(page, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Count_Filters_Across_The_Whole_Library_Not_One_Page()
+        {
+            var filters = await _videoLibraryService.GetFiltersAsync(UserOrg());
+
+            Assert.That(filters.TotalCount, Is.EqualTo(2));
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(1));
+            Assert.That(filters.Types.Single().Title, Is.EqualTo("All-Hands meetings"));
+            Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Not_Offer_A_Filter_For_Another_Organizations_Type()
+        {
+            var filters = await _videoLibraryService.GetFiltersAsync(UserOrg());
+
+            Assert.That(filters.Types.Select(t => t.Title), Does.Not.Contain("Foreign type"));
         }
 
         [Test]
@@ -328,6 +432,25 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
             Assert.That(_videos.First(v => v.Id == 3).IsDeleted, Is.False);
+        }
+
+        private static VideoLibraryListArgsDto ListArgs(
+            string search = null,
+            int? videoTypeId = null,
+            bool uncategorised = false,
+            int page = 1,
+            int pageSize = 24)
+        {
+            return new VideoLibraryListArgsDto
+            {
+                Search = search,
+                VideoTypeId = videoTypeId,
+                Uncategorised = uncategorised,
+                Page = page,
+                PageSize = pageSize,
+                UserId = "testUser",
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
         }
 
         private static UserAndOrganizationDto UserOrg()
