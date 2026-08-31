@@ -3917,6 +3917,107 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("VacationRequestEvents", (string)null);
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PictureId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int?>("VideoTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VideoTypeId");
+
+                    b.HasIndex("OrganizationId", "Created")
+                        .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_Created");
+
+                    b.HasIndex("OrganizationId", "VideoTypeId")
+                        .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_VideoTypeId");
+
+                    b.ToTable("VideoLibraryItems", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Title")
+                        .IsUnique()
+                        .HasDatabaseName("IX_VideoTypes_OrganizationId_Title")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("VideoTypes", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.WorkingHours", b =>
                 {
                     b.Property<int>("Id")
@@ -5509,6 +5610,35 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("VacationRequest");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryItem", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", "VideoType")
+                        .WithMany("Videos")
+                        .HasForeignKey("VideoTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("VideoType");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.WorkingHours", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "ApplicationUser")
@@ -5680,6 +5810,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>
+                {
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }

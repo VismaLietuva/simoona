@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -57,6 +57,7 @@ namespace Shrooms.IoC
             services.AddSupport();
             services.AddAdministrationUsers();
             services.AddJobs();
+            services.AddVideoLibrary();
             services.AddFilterPresets();
             services.AddBlacklistUsers();
             services.AddCustomEmoji();
