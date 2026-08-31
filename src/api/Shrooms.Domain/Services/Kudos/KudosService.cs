@@ -190,7 +190,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(KudosServiceHelper.StatusFilter(options.Status))
                 .Where(KudosServiceHelper.UserFilter(options.SearchUserId))
                 .Where(KudosServiceHelper.TypeFilter(options.FilteringType))
-                .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto());
+                .SelectMany(log => _usersDbSet.Where(user => user.Id == log.CreatedBy).DefaultIfEmpty(), KudosServiceHelper.MapKudosLogsToDto());
 
             var kudosLogsQuery = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
                 kudosLogsQueryBeforeSort.AsQueryable(), 
