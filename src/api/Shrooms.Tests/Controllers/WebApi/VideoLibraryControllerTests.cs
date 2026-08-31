@@ -301,10 +301,18 @@ namespace Shrooms.Tests.Controllers.WebApi
             Assert.That(list.GetCustomAttribute<PermissionAuthorizeAttribute>(), Is.Null);
         }
 
-        [TestCase(nameof(VideoLibraryController.Create))]
+        [Test]
+        public void Create_Should_Not_Be_Restricted_To_Administrators()
+        {
+            var create = typeof(VideoLibraryController).GetMethod(nameof(VideoLibraryController.Create));
+
+            Assert.That(create.GetCustomAttribute<PermissionAnyOfAuthorizeAttribute>(), Is.Not.Null);
+            Assert.That(create.GetCustomAttribute<PermissionAuthorizeAttribute>(), Is.Null);
+        }
+
         [TestCase(nameof(VideoLibraryController.Update))]
         [TestCase(nameof(VideoLibraryController.Delete))]
-        public void Mutating_Actions_Should_Require_The_Administration_Permission(string actionName)
+        public void Editing_Actions_Should_Require_The_Administration_Permission(string actionName)
         {
             var action = typeof(VideoLibraryController).GetMethod(actionName);
             var attribute = action.GetCustomAttribute<PermissionAuthorizeAttribute>();

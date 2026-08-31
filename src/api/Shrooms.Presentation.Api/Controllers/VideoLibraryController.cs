@@ -65,7 +65,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.VideoLibrary)]
+        [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(NewVideoLibraryItemViewModel videoViewModel)
         {

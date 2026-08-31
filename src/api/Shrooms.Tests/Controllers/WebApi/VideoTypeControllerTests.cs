@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.WebViewModels.Models.VideoLibrary;
 using Shrooms.Tests.Extensions;
@@ -164,11 +165,19 @@ namespace Shrooms.Tests.Controllers.WebApi
             AssertBadRequestWithErrorCode(result, ErrorCodes.DuplicatesIntolerable);
         }
 
-        [TestCase(nameof(VideoTypeController.GetVideoTypes))]
+        [Test]
+        public void Listing_The_Types_Should_Not_Be_Restricted_To_Administrators()
+        {
+            var list = typeof(VideoTypeController).GetMethod(nameof(VideoTypeController.GetVideoTypes));
+
+            Assert.That(list.GetCustomAttribute<PermissionAnyOfAuthorizeAttribute>(), Is.Not.Null);
+            Assert.That(list.GetCustomAttribute<PermissionAuthorizeAttribute>(), Is.Null);
+        }
+
         [TestCase(nameof(VideoTypeController.Create))]
         [TestCase(nameof(VideoTypeController.Update))]
         [TestCase(nameof(VideoTypeController.Delete))]
-        public void Every_Action_Should_Require_The_Administration_Permission(string actionName)
+        public void Managing_The_Types_Should_Require_The_Administration_Permission(string actionName)
         {
             var action = typeof(VideoTypeController).GetMethod(actionName);
             var attribute = action.GetCustomAttribute<PermissionAuthorizeAttribute>();
