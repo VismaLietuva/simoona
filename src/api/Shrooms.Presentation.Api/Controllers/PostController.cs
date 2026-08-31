@@ -53,7 +53,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 var userAndOrg = GetUserAndOrganization();
                 var wallPost = await _wallService.GetWallPostAsync(userAndOrg, postId);
 
-                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events && wallPost.WallType != WallType.Polls)
                 {
                     return Forbidden();
                 }
@@ -84,7 +84,7 @@ namespace Shrooms.Presentation.Api.Controllers
             if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post))
             {
                 var wall = await _wallService.GetWallAsync(postModel.WallId, userAndOrg);
-                if (wall.Type != WallType.Events)
+                if (wall.Type != WallType.Events && wall.Type != WallType.Polls)
                 {
                     return Forbidden();
                 }
