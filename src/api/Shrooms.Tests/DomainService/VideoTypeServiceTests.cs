@@ -74,12 +74,20 @@ namespace Shrooms.Tests.DomainService
                     VideoTypeId = aiHubs.Id,
                     IsDeleted = true,
                     OrganizationId = TestConstants.DefaultOrganizationId
+                },
+                new()
+                {
+                    Id = 3,
+                    Title = "Deleted video of an archived type",
+                    VideoTypeId = unused.Id,
+                    IsDeleted = true,
+                    OrganizationId = TestConstants.DefaultOrganizationId
                 }
             };
 
-            aiHubs.Videos = _videos;
+            aiHubs.Videos = _videos.Where(v => v.VideoTypeId == aiHubs.Id).ToList();
             allHands.Videos = new List<VideoLibraryItem>();
-            unused.Videos = new List<VideoLibraryItem>();
+            unused.Videos = _videos.Where(v => v.VideoTypeId == unused.Id).ToList();
             foreignType.Videos = new List<VideoLibraryItem>();
 
             _videoTypes = new List<VideoType> { allHands, aiHubs, unused, foreignType };
@@ -221,6 +229,22 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
             Assert.That(_videoTypes.First(t => t.Id == 1).IsDeleted, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Delete_Video_Type_Used_Only_By_Deleted_Videos()
+        {
+            await _videoTypeService.RemoveVideoTypeAsync(3, UserOrg());
+
+            Assert.That(_videoTypes.First(t => t.Id == 3).IsDeleted, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Clear_The_Type_From_Deleted_Videos_That_Still_Point_At_It()
+        {
+            await _videoTypeService.RemoveVideoTypeAsync(3, UserOrg());
+
+            Assert.That(_videos.First(v => v.Id == 3).VideoTypeId, Is.Null);
         }
 
         [Test]

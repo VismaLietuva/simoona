@@ -67,13 +67,23 @@ namespace Shrooms.Domain.Services.VideoLibrary
         {
             var type = await FindAsync(id, userOrg.OrganizationId);
             var videosUsingType = await _videosDbSet
-                .CountAsync(v => v.OrganizationId == userOrg.OrganizationId && v.VideoTypeId == id);
+                .CountAsync(v => v.OrganizationId == userOrg.OrganizationId && v.VideoTypeId == id && !v.IsDeleted);
 
             if (videosUsingType > 0)
             {
                 throw new ValidationException(
                     ErrorCodes.DuplicatesIntolerable,
                     $"Video type is still used by {videosUsingType} video(s)");
+            }
+
+            var deletedVideosUsingType = await _videosDbSet
+                .IgnoreQueryFilters()
+                .Where(v => v.OrganizationId == userOrg.OrganizationId && v.VideoTypeId == id)
+                .ToListAsync();
+
+            foreach (var video in deletedVideosUsingType)
+            {
+                video.VideoTypeId = null;
             }
 
             type.IsDeleted = true;
