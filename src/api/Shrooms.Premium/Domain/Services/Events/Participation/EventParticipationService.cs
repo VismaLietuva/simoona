@@ -131,6 +131,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var @event = await _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.EventOptions)
+                .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
                 .Where(x => x.Id == updateAttendStatusDto.EventId
                             && x.OrganizationId == updateAttendStatusDto.OrganizationId)
@@ -142,7 +143,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDto.AttendStatus);
             _eventValidationService.CheckIfAttendOptionIsAllowed(updateAttendStatusDto.AttendStatus, @event);
 
-            await AddParticipantWithStatusAsync(updateAttendStatusDto.UserId, updateAttendStatusDto.AttendStatus, updateAttendStatusDto.AttendComment, @event);
+            var chosenOptionsToSave = ValidateAnswersForStatusChange(updateAttendStatusDto, @event);
+
+            await AddParticipantWithStatusAsync(updateAttendStatusDto.UserId, updateAttendStatusDto.AttendStatus, updateAttendStatusDto.AttendComment, @event, chosenOptionsToSave);
 
             await _uow.SaveChangesAsync(false);
         }
@@ -347,6 +350,46 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             participant.EventOptions = eventEntity.SelectedOptions;
 
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
+        }
+
+        /// <summary>
+        /// Validates the answers a status change carries and returns the options to persist, or
+        /// null when the caller's selection must be left alone. Going is the only status required
+        /// questions apply to, and the only one that can carry answers.
+        /// </summary>
+        private ICollection<EventOption> ValidateAnswersForStatusChange(UpdateAttendStatusDto updateAttendStatusDto, EventJoinValidationDto eventDto)
+        {
+            var isGoing = updateAttendStatusDto.AttendStatus == AttendingStatus.Attending ||
+                          updateAttendStatusDto.AttendStatus == AttendingStatus.AttendingVirtually;
+
+            if (!isGoing)
+            {
+                return null;
+            }
+
+            var chosenOptions = (updateAttendStatusDto.ChosenOptions ?? Enumerable.Empty<int>()).ToList();
+            var selectedOptions = eventDto.Options.Where(option => chosenOptions.Contains(option.Id)).ToList();
+            var legacyOptionIds = LegacyOptionIds(eventDto.Options);
+
+            _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, selectedOptions);
+
+            // Only the upper bound is checked. CheckIfJoiningNotEnoughChoicesProvided is
+            // deliberately left out: a Going switch on a legacy food event has never had to carry
+            // a food pick, and requiring one here would reject every such status change.
+            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, chosenOptions.Count(legacyOptionIds.Contains));
+
+            // Only legacy options participate in the single-choice-with-rule check; question
+            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
+                selectedOptions.Where(option => option.QuestionId == null).ToList(),
+                OptionRules.IgnoreSingleJoin);
+
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
+
+            // An empty write would wipe a food pick made at join time, so replace the selection
+            // only when there is something to write or the event actually has questions whose
+            // answers the caller may be clearing on purpose. Mirrors the frontend's own rule.
+            return chosenOptions.Count > 0 || eventDto.Questions.Count > 0 ? selectedOptions : null;
         }
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
@@ -716,10 +759,16 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private async Task AddParticipantWithStatusAsync(string userId, AttendingStatus status, string attendComment, EventJoinValidationDto eventDto)
+        /// <summary>
+        /// <paramref name="chosenOptions"/> null means "leave the participant's current selection
+        /// untouched"; a collection replaces it wholesale, the way UpdateSelectedOptionsAsync does.
+        /// </summary>
+        private async Task AddParticipantWithStatusAsync(string userId, AttendingStatus status, string attendComment, EventJoinValidationDto eventDto, ICollection<EventOption> chosenOptions = null)
         {
             var timeStamp = _systemClock.UtcNow;
-            var participant = await _eventParticipantsDbSet.FirstOrDefaultAsync(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
+            var participant = await _eventParticipantsDbSet
+                .Include(p => p.EventOptions)
+                .FirstOrDefaultAsync(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
 
             if (participant != null)
             {
@@ -727,6 +776,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 participant.AttendComment = attendComment;
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
+
+                if (chosenOptions != null)
+                {
+                    participant.EventOptions?.Clear();
+                    participant.EventOptions = chosenOptions;
+                }
             }
             else
             {
@@ -739,7 +794,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     Modified = timeStamp,
                     ModifiedBy = userId,
                     AttendComment = attendComment,
-                    AttendStatus = (int)status
+                    AttendStatus = (int)status,
+                    EventOptions = chosenOptions ?? new List<EventOption>()
                 };
 
                 _eventParticipantsDbSet.Add(newParticipant);

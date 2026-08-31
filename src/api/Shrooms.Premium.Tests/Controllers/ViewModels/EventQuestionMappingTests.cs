@@ -7,6 +7,7 @@ using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Presentation.ModelMappings.Profiles;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
@@ -262,6 +263,24 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
 
             Assert.That(json, Does.Contain("\"selectType\":\"Single\""));
             Assert.That(json, Does.Contain("\"showIfOptionId\":null"));
+        }
+
+        // The viewmodel -> DTO map is convention-based (MemberList.None), so nothing would fail
+        // loudly if ChosenOptions stopped mapping: the answers would silently never reach the
+        // service and every status change into Going on a question event would 400.
+        [Test]
+        public void Should_Carry_The_Chosen_Options_Of_A_Status_Change_Onto_The_Dto()
+        {
+            var viewModel = new UpdateAttendStatusViewModel
+            {
+                EventId = Guid.NewGuid(),
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int> { 135, 136 }
+            };
+
+            var dto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(viewModel);
+
+            Assert.That(dto.ChosenOptions, Is.EquivalentTo(new[] { 135, 136 }));
         }
     }
 }

@@ -285,5 +285,29 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             Assert.That(json, Does.Contain("\"reason\":\"RequiredAnswerMissing\""));
             Assert.That(json, Does.Contain("\"questionId\":12"));
         }
+
+        // UpdateAttendStatus now validates answers, so it needs the same derived catch as Join:
+        // without it the generic EventException handler answers with the bare string
+        // "EventAnswersInvalid" and the client cannot tell which questions failed.
+        [Test]
+        public async Task UpdateAttendStatus_Should_Return_The_Offending_Questions_When_Answers_Are_Invalid()
+        {
+            _eventParticipationService
+                .UpdateAttendStatusAsync(Arg.Any<UpdateAttendStatusDto>())
+                .Returns(Task.FromException(new EventAnswersInvalidException(new List<EventAnswerErrorDto>
+                {
+                    new EventAnswerErrorDto { QuestionId = 12, Reason = EventAnswerErrorReason.RequiredAnswerMissing }
+                })));
+
+            var result = await _eventController.UpdateAttendStatus(new UpdateAttendStatusViewModel { EventId = Guid.NewGuid() });
+
+            Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
+            var body = result.GetContent<EventAnswersInvalidViewModel>();
+            Assert.That(body.Code, Is.EqualTo("EventAnswersInvalid"));
+            Assert.That(body.Errors, Has.Count.EqualTo(1));
+            Assert.That(body.Errors[0].QuestionId, Is.EqualTo(12));
+            Assert.That(body.Errors[0].Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));
+        }
+
     }
 }
