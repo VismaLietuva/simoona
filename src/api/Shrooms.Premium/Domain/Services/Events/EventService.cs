@@ -709,24 +709,30 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                Options = e.EventOptions.Select(o => new EventDetailsOptionDto
-                {
-                    Id = o.Id,
-                    Name = o.Option,
-                    Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId &&
-                              (x.AttendStatus == (int)AttendingStatus.Attending ||
-                               x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
-                        .Select(p => new EventDetailsParticipantDto
-                        {
-                            Id = p.Id,
-                            UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
-                            FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
-                            ImageName = p.ApplicationUser.PictureId,
-                            AttendStatus = p.AttendStatus,
-                            AttendComment = p.AttendComment
-                        })
-                }),
+                // Legacy flat options only. Question-owned options belong to the question tree,
+                // not to this list — serving them here presents them to the client as ordinary
+                // food options. Mirrors MapToEventEditDetailsDto() and
+                // EventListingService.MapOptionsToDto().
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventDetailsOptionDto
+                    {
+                        Id = o.Id,
+                        Name = o.Option,
+                        Participants = o.EventParticipants
+                            .Where(x => x.EventId == eventId &&
+                                  (x.AttendStatus == (int)AttendingStatus.Attending ||
+                                   x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
+                            .Select(p => new EventDetailsParticipantDto
+                            {
+                                Id = p.Id,
+                                UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
+                                FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
+                                ImageName = p.ApplicationUser.PictureId,
+                                AttendStatus = p.AttendStatus,
+                                AttendComment = p.AttendComment
+                            })
+                    }),
                 Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDto
                 {
                     Id = p.Id,

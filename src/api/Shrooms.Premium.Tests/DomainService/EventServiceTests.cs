@@ -169,6 +169,62 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(questions[0].Options.Select(o => o.Id), Is.EquivalentTo(new int?[] { 90, 91 }));
         }
 
+        // Regression test: MapToEventDetailsDto projected every EventOption into the flat Options
+        // list, so GET /Events/Details served question-owned options as if they were legacy food
+        // options. Only legacy (QuestionId == null) options belong there — question-owned options
+        // reach the client through the question tree.
+        [Test]
+        public async Task Should_Only_Return_Legacy_Options_In_Flat_Options_List_In_Details()
+        {
+            var eventId = MockEventDetailsWithLegacyAndQuestionOptions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            var flatOptions = result.Options.ToList();
+            Assert.That(flatOptions, Has.Count.EqualTo(1));
+            Assert.That(flatOptions[0].Id, Is.EqualTo(80));
+            Assert.That(flatOptions[0].Name, Is.EqualTo("Legacy option"));
+        }
+
+        private Guid MockEventDetailsWithLegacyAndQuestionOptions()
+        {
+            var eventId = Guid.NewGuid();
+            var responsibleUser = new ApplicationUser
+            {
+                Id = "responsibleUser1",
+                FirstName = "user1f",
+                LastName = "user1l"
+            };
+
+            var options = new List<EventOption>
+            {
+                new EventOption { Id = 80, EventId = eventId, Option = "Legacy option", QuestionId = null, Order = 0, EventParticipants = new List<EventParticipant>() },
+                new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0, EventParticipants = new List<EventParticipant>() },
+                new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1, EventParticipants = new List<EventParticipant>() }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Offices = "[\"1\"]",
+                    MaxChoices = 1,
+                    ResponsibleUser = responsibleUser,
+                    ResponsibleUserId = responsibleUser.Id,
+                    EventOptions = options,
+                    EventParticipants = new List<EventParticipant>()
+                }
+            };
+
+            _officeDbSet.SetDbSetDataForAsync(new List<Office> { new Office { Id = 1, Name = "Office", OrganizationId = 2 } });
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+
+            return eventId;
+        }
+
         private Guid MockEventForEditingWithLegacyAndQuestionOptions()
         {
             var eventId = Guid.NewGuid();
