@@ -712,6 +712,57 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual("Kitchen", result.JoinedEvent.Place);
         }
 
+        [Test]
+        public async Task Should_Return_The_Option_This_User_Selected()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            ClassicAssert.AreEqual("Pepperoni", result.JoinedEvent.SelectedOption);
+        }
+
+        [Test]
+        public async Task Should_Return_No_Selected_Option_When_User_Picked_None()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserWithoutOption"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+        }
+
+        [Test]
+        public async Task Should_Return_No_Selected_Option_When_The_Food_Team_Has_No_Options()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserJoinedSecondFoodType"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+        }
+
         // This week's food day is over, so the widget rolls over to next week's team even though
         // it starts a little more than seven days out.
         [Test]
@@ -879,8 +930,33 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 10,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 1, ApplicationUserId = "testUser1", AttendStatus = (int)AttendingStatus.Attending },
-                        new EventParticipant { Id = 2, ApplicationUserId = "testUserNotAttending", AttendStatus = (int)AttendingStatus.NotAttending }
+                        new EventParticipant
+                        {
+                            Id = 1,
+                            ApplicationUserId = "testUser1",
+                            AttendStatus = (int)AttendingStatus.Attending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Id = 1, Option = "Pepperoni" }
+                            }
+                        },
+                        new EventParticipant
+                        {
+                            Id = 2,
+                            ApplicationUserId = "testUserNotAttending",
+                            AttendStatus = (int)AttendingStatus.NotAttending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Id = 3, Option = "Hawaiian" }
+                            }
+                        },
+                        new EventParticipant
+                        {
+                            Id = 9,
+                            ApplicationUserId = "testUserWithoutOption",
+                            AttendStatus = (int)AttendingStatus.Attending,
+                            EventOptions = new List<EventOption>()
+                        }
                     }
                 },
                 new Event
@@ -894,7 +970,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 10,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 3, ApplicationUserId = "testUserJoinedFarFuture", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 3, ApplicationUserId = "testUserJoinedFarFuture", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 },
 
@@ -910,7 +986,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 10,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 7, ApplicationUserId = "testUserJoinedNextWeek", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 7, ApplicationUserId = "testUserJoinedNextWeek", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 },
                 new Event
@@ -924,7 +1000,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 11,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 4, ApplicationUserId = "testUserJoinedOtherType", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 4, ApplicationUserId = "testUserJoinedOtherType", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 },
 
@@ -940,7 +1016,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 10,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 5, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 5, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 },
                 new Event
@@ -954,7 +1030,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 10,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 6, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 6, ApplicationUserId = "testUserTwoTeamsSameDay", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 },
                 new Event
@@ -968,7 +1044,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventTypeId = 13,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { Id = 8, ApplicationUserId = "testUserJoinedSecondFoodType", AttendStatus = (int)AttendingStatus.Attending }
+                        new EventParticipant { Id = 8, ApplicationUserId = "testUserJoinedSecondFoodType", AttendStatus = (int)AttendingStatus.Attending, EventOptions = new List<EventOption>() }
                     }
                 }
             };

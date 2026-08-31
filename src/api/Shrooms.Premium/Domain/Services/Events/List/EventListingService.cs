@@ -152,7 +152,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         Place = e.Place,
                         ImageName = e.ImageName,
                         StartDate = e.StartDate,
-                        EndDate = e.EndDate
+                        EndDate = e.EndDate,
+                        SelectedOption = e.EventParticipants
+                            .Where(p => p.ApplicationUserId == userOrg.UserId)
+                            .SelectMany(p => p.EventOptions)
+                            .OrderBy(o => o.Id)
+                            .Select(o => o.Option)
+                            .FirstOrDefault()
                     }
                 })
                 .FirstOrDefaultAsync();
