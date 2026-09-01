@@ -8,10 +8,12 @@ namespace Shrooms.Premium.Domain.Services.Events
     public interface IEventQuestionWriter
     {
         /// <summary>
-        /// Validates an event's desired question tree without touching the database, so a caller
-        /// can reject a bad payload before it commits anything of its own.
+        /// Validates an event's desired question tree without writing anything, so a caller can
+        /// reject a bad payload before it commits work of its own. Pass a null
+        /// <paramref name="eventId"/> when the event does not exist yet, which also asserts that
+        /// the payload references nothing by id.
         /// </summary>
-        Task ValidateAsync(Guid eventId, IList<EventQuestionStructureDto> questions);
+        Task ValidateAsync(Guid? eventId, IList<EventQuestionStructureDto> questions);
 
         /// <summary>
         /// Stages the full desired state of an event's question tree. Rows present in the

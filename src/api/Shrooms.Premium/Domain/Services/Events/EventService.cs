@@ -184,7 +184,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             // Before the event row is committed: an invalid question tree returned 400 while the
             // event was already persisted, leaving an orphan the caller could not find or retry.
-            await _eventQuestionWriter.ValidateAsync(Guid.Empty, newEventDto.Questions);
+            await _eventQuestionWriter.ValidateAsync(null, newEventDto.Questions);
 
             var newEvent = await MapNewEventAsync(newEventDto);
 

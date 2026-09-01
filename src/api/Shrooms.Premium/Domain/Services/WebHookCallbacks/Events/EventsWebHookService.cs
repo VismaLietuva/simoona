@@ -174,9 +174,9 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                         Question = clone
                     };
 
+                    // Reached through clone.Options, so adding the question is enough to insert it.
                     clone.Options.Add(optionClone);
                     clonedOptionByOldId[option.Id] = optionClone;
-                    _eventOptionsDbSet.Add(optionClone);
                 }
 
                 _questionsDbSet.Add(clone);

@@ -798,13 +798,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var chosenOptionIds = new List<int> { -9999 };
             var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
-            // The answer validator now runs ahead of CheckIfProvidedOptionsAreValid, so an unknown
-            // option comes back as the structured payload naming it rather than a bare code.
-            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
-                async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto));
+            _eventValidationServiceMock
+                .When(x => x.CheckIfProvidedOptionsAreValid(Arg.Is<IEnumerable<int>>(a => a.SequenceEqual(chosenOptionIds)), Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
-            Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.UnknownOption));
-            Assert.That(ex.Errors.Single().OptionId, Is.EqualTo(-9999));
+            // CheckIfProvidedOptionsAreValid still owns the unknown-option rejection, ahead of the
+            // answer validator: it answers with code 215, which the web client has a message for.
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
         }
 
         [Test]

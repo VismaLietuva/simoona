@@ -321,11 +321,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventEntity.RegistrationDeadline);
 
-            // Ahead of CheckIfProvidedOptionsAreValid, which also rejects an unknown option but
-            // with a bare code. Running it first means the client gets the structured payload
-            // naming the offending option instead.
-            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions, legacyOptionIds);
-
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventEntity.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
@@ -337,6 +332,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 OptionRules.IgnoreSingleJoin);
 
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
+
+            // After the capacity and membership rules, so those keep reporting their own codes.
+            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions, legacyOptionIds);
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
@@ -358,10 +356,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventDto.RegistrationDeadline);
 
-            // Ahead of CheckIfProvidedOptionsAreValid, so an unknown option reaches the client as
-            // the structured payload naming it rather than a bare code.
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
-
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventDto.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
@@ -374,6 +368,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
             _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
+
+            // Last, so "event is full" and the option-count codes are not masked by an answer
+            // error. CheckIfProvidedOptionsAreValid above already rejects an unknown option with
+            // code 215, which the web client has a message for, so UnknownOption here is a
+            // backstop for callers that skip that check.
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
         }
 
         private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)

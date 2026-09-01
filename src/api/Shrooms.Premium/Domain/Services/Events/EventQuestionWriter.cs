@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -33,13 +33,17 @@ namespace Shrooms.Premium.Domain.Services.Events
             _systemClock = systemClock;
         }
 
-        public async Task ValidateAsync(Guid eventId, IList<EventQuestionStructureDto> questions)
+        public async Task ValidateAsync(Guid? eventId, IList<EventQuestionStructureDto> questions)
         {
             var desired = questions ?? new List<EventQuestionStructureDto>();
 
             _structureValidator.ValidatePayload(desired);
 
-            var existing = await LoadExistingAsync(eventId);
+            // No event yet, so nothing can be referenced by id. Skipping the load also keeps
+            // create from querying for rows that cannot exist.
+            var existing = eventId == null
+                ? new List<EventQuestion>()
+                : await LoadExistingAsync(eventId.Value);
 
             CheckSuppliedIdsBelongToEvent(existing, desired);
 
@@ -321,15 +325,11 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private void SoftDelete(ISoftDelete entity, string userId)
+        private void SoftDelete(SoftDeletableModel entity, string userId)
         {
             entity.IsDeleted = true;
-
-            if (entity is ITrackable trackable)
-            {
-                trackable.Modified = _systemClock.UtcNow;
-                trackable.ModifiedBy = userId;
-            }
+            entity.Modified = _systemClock.UtcNow;
+            entity.ModifiedBy = userId;
         }
     }
 }
