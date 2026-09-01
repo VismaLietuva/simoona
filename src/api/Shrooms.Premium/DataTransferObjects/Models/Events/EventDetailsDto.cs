@@ -31,6 +31,9 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public IEnumerable<EventDetailsOptionDto> Options { get; set; }
         public IEnumerable<EventDetailsParticipantDto> Participants { get; set; }
 
+        /// <summary>Sign-up questions with the answers behind each option. Host-facing.</summary>
+        public IEnumerable<EventDetailsQuestionDto> Questions { get; set; }
+
         public int GoingCount { get; set; }
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }

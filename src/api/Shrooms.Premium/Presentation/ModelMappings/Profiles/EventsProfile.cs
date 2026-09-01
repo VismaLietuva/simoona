@@ -41,6 +41,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>(MemberList.None);
             CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>(MemberList.None);
+            CreateMap<EventDetailsQuestionDto, EventDetailsQuestionViewModel>(MemberList.None);
+            CreateMap<EventDetailsQuestionOptionDto, EventDetailsQuestionOptionViewModel>(MemberList.None);
             CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>(MemberList.None);
             CreateMap<EventProjectReportDto, EventProjectReportViewModel>(MemberList.None);
             CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>(MemberList.None);

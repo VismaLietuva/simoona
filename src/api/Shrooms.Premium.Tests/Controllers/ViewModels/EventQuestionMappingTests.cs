@@ -282,5 +282,73 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
 
             Assert.That(dto.ChosenOptions, Is.EquivalentTo(new[] { 135, 136 }));
         }
+
+        // The details payload is the only one carrying answers, so the nesting has to survive the
+        // map: the top-level map is MemberList.None, which would not complain if it did not.
+        [Test]
+        public void Should_Carry_The_Answers_Behind_Each_Question_Option_To_The_Client()
+        {
+            var viewModel = _mapper.Map<EventDetailsDto, EventDetailsViewModel>(DetailsWithAnAnsweredQuestion());
+
+            var question = viewModel.Questions.Single();
+            Assert.That(question.Id, Is.EqualTo(5));
+            Assert.That(question.ShowIfOptionId, Is.EqualTo(91));
+            var option = question.Options.Single();
+            Assert.That(option.Id, Is.EqualTo(90));
+            Assert.That(option.Name, Is.EqualTo("Pasta"));
+            Assert.That(option.Participants.Single().FullName, Is.EqualTo("Test User"));
+        }
+
+        // Same reason EventSignUpQuestionViewModel needs its converter: no global string-enum
+        // converter is configured, so without the attribute the client receives 0/1.
+        [Test]
+        public void Should_Serialize_The_Details_Question_Select_Type_As_A_String()
+        {
+            var viewModel = _mapper.Map<EventDetailsDto, EventDetailsViewModel>(DetailsWithAnAnsweredQuestion());
+
+            var json = JsonConvert.SerializeObject(viewModel, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+
+            Assert.That(json, Does.Contain("\"selectType\":\"Multi\""));
+        }
+
+        private static EventDetailsDto DetailsWithAnAnsweredQuestion()
+        {
+            return new EventDetailsDto
+            {
+                Id = Guid.NewGuid(),
+                Name = "Autumnfest",
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "Office" } },
+                Options = new List<EventDetailsOptionDto>(),
+                Participants = new List<EventDetailsParticipantDto>(),
+                Questions = new List<EventDetailsQuestionDto>
+                {
+                    new EventDetailsQuestionDto
+                    {
+                        Id = 5,
+                        Title = "Pick your dish",
+                        Order = 0,
+                        SelectType = EventQuestionSelectType.Multi,
+                        IsRequired = true,
+                        ShowIfOptionId = 91,
+                        Options = new List<EventDetailsQuestionOptionDto>
+                        {
+                            new EventDetailsQuestionOptionDto
+                            {
+                                Id = 90,
+                                Name = "Pasta",
+                                Order = 0,
+                                Participants = new List<EventDetailsParticipantDto>
+                                {
+                                    new EventDetailsParticipantDto { Id = 1, UserId = "testUser1", FullName = "Test User" }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
     }
 }
