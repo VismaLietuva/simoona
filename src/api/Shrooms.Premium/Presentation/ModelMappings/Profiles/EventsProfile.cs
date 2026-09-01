@@ -49,6 +49,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>(MemberList.None);
 
+            // Read side. Id is non-null on anything that came out of the database, so the
+            // nullable write-side Id is flattened here rather than leaking a null to the client.
+            CreateMap<EventQuestionStructureDto, EventSignUpQuestionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
+            CreateMap<EventQuestionOptionStructureDto, EventSignUpOptionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
             CreateMap<EventQuestionStructureDto, EventQuestionViewModel>()
                 .ForMember(dest => dest.ShowIf, opt => opt.MapFrom(src =>
                     src.ShowIfOptionId == null && src.ShowIfOptionClientId == null
@@ -60,7 +68,11 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                         }))
                 .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src => src.ShowIfOptionId));
 
+            // Answers is assigned by the controller: AutoMapper maps a null source collection to an
+            // empty destination one, which would erase the difference between "omitted" (keep the
+            // stored answers) and an empty array (clear them).
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
+                .Ignore(x => x.Answers)
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
 
@@ -83,10 +95,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>(MemberList.None);
             CreateMap<EventSearchOptionsViewModel, EventSearchOptionsDto>(MemberList.None);
+            // Answers is assigned by the controller for the same reason as on
+            // EventChangeOptionViewModel: a null collection must not arrive as an empty one.
             CreateMap<EventJoinViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinMultipleViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDto>(MemberList.None);

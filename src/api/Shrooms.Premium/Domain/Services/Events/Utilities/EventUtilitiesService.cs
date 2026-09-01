@@ -197,6 +197,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .Include(e => e.EventParticipants)
                 .Include(e => e.Event)
                 .Where(e => e.EventId == eventId
+                    && e.QuestionId == null
                     && e.Event.OrganizationId == userAndOrg.OrganizationId
                     && e.EventParticipants.Any(x => x.EventId == eventId))
                 .Select(e => new EventOptionCountDto

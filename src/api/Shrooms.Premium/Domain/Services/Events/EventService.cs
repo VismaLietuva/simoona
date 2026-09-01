@@ -39,6 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
+        private readonly IEventQuestionWriter _eventQuestionWriter;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -55,7 +56,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IWallService wallService,
             IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService,
-            ISystemClock systemClock)
+            ISystemClock systemClock,
+            IEventQuestionWriter eventQuestionWriter)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -73,6 +75,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
             _systemClock = systemClock;
+            _eventQuestionWriter = eventQuestionWriter;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -98,6 +101,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
             await RemoveEventRemindersAsync(@event.Reminders, userOrg.UserId);
 
+            // DeleteEventOptionsAsync takes the question-owned options with it, so leaving the
+            // questions behind would strand live rows with every option deleted.
+            await _eventQuestionWriter.WriteAsync(id, null, userOrg.UserId);
+
             _eventsDbSet.Remove(@event);
 
             await _uow.SaveChangesAsync(false);
@@ -109,6 +116,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
+                .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
@@ -174,11 +182,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
+            // Before the event row is committed: an invalid question tree returned 400 while the
+            // event was already persisted, leaving an orphan the caller could not find or retry.
+            await _eventQuestionWriter.ValidateAsync(null, newEventDto.Questions);
+
             var newEvent = await MapNewEventAsync(newEventDto);
 
             _eventsDbSet.Add(newEvent);
 
             MapNewOptions(newEventDto, newEvent);
+            await _uow.SaveChangesAsync(newEventDto.UserId);
+
+            await _eventQuestionWriter.WriteAsync(newEvent.Id, newEventDto.Questions, newEventDto.UserId);
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
             newEventDto.Id = newEvent.Id.ToString();
@@ -225,10 +240,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
+
+            // With the other rules, before anything mutates: ResetEventAttendessAsync commits the
+            // expulsions and sends their emails, so a question tree rejected afterwards would
+            // return 400 with the attendee list already wiped.
+            await _eventQuestionWriter.ValidateAsync(eventToUpdate.Id, eventDto.Questions);
+
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
             await UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
+
+            await _eventQuestionWriter.WriteAsync(eventToUpdate.Id, eventDto.Questions, eventDto.UserId);
 
             await _uow.SaveChangesAsync(false);
 
@@ -336,12 +359,40 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Type = reminder.Type,
                     RemindedCount = reminder.RemindedCount
                 }),
-                Options = e.EventOptions.Select(o => new EventOptionDto
-                {
-                    Id = o.Id,
-                    Option = o.Option,
-                    Rule = o.Rule
-                })
+                // Legacy flat options only. Question-owned options are returned under Questions;
+                // leaving them here also leaks them into the edit payload's editedOptions, which
+                // inflates totalOptionsProvided and trips CheckIfCreatingEventHasNoChoices on any
+                // question-bearing event. Mirrors EventListingService.MapOptionsToDto().
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventOptionDto
+                    {
+                        Id = o.Id,
+                        Option = o.Option,
+                        Rule = o.Rule
+                    }),
+                Questions = e.EventQuestions
+                    .OrderBy(q => q.Order)
+                    .Select(q => new EventQuestionStructureDto
+                    {
+                        Id = q.Id,
+                        Title = q.Title,
+                        Order = q.Order,
+                        SelectType = q.SelectType,
+                        IsRequired = q.IsRequired,
+                        ShowIfOptionId = q.ShowIfOptionId,
+                        Options = q.Options
+                            .OrderBy(o => o.Order)
+                            .Select(o => new EventQuestionOptionStructureDto
+                            {
+                                Id = o.Id,
+                                Name = o.Option,
+                                Order = o.Order,
+                                Rule = o.Rule
+                            })
+                            .ToList()
+                    })
+                    .ToList()
             };
         }
 
@@ -398,13 +449,20 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void UpdateEventOptions(EditEventDto editedEvent, Event @event)
         {
+            // @event.EventOptions also holds question-owned options (QuestionId != null), which
+            // belong solely to EventQuestionWriter. EditedOptions only ever carries legacy
+            // options (see MapToEventEditDetailsDto), so scoping both the edit loop and the
+            // removal sweep to QuestionId == null keeps this method from treating every absent
+            // question option as "removed" and hard-deleting it.
+            var legacyOptions = @event.EventOptions.Where(o => o.QuestionId == null).ToList();
+
             foreach (var editedOption in editedEvent.EditedOptions)
             {
-                var option = @event.EventOptions.Single(o => o.Id == editedOption.Id);
+                var option = legacyOptions.Single(o => o.Id == editedOption.Id);
                 option.Option = editedOption.Option;
             }
 
-            var removedOptions = @event.EventOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
+            var removedOptions = legacyOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
 
             foreach (var option in removedOptions)
             {
