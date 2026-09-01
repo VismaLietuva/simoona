@@ -2,7 +2,6 @@
 {
     public enum EventAnswerErrorReason
     {
-        UnknownOption,
         TooManyAnswers,
         RequiredAnswerMissing,
         AnswerForHiddenQuestion

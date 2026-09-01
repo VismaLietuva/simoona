@@ -49,32 +49,21 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Accept_A_Complete_Branch()
         {
-            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 10, 20 }, Array.Empty<int>()));
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 10, 20 }));
         }
 
         [Test]
         public void Should_Accept_A_Branch_That_Skips_The_Conditional_Question()
         {
             // Pasta chosen, so "Which pizza?" is not reachable and needs no answer.
-            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11 }, Array.Empty<int>()));
-        }
-
-        [Test]
-        public void Should_Reject_An_Option_That_Does_Not_Belong_To_The_Event()
-        {
-            var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(FoodTree(), new[] { 10, 20, 999 }, Array.Empty<int>()));
-
-            Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.UnknownOption));
-            Assert.That(ex.Errors.Single().OptionId, Is.EqualTo(999));
-            Assert.That(ex.Errors.Single().QuestionId, Is.Null);
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11 }));
         }
 
         [Test]
         public void Should_Reject_Two_Answers_To_A_Single_Select_Question()
         {
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(FoodTree(), new[] { 10, 11, 20 }, Array.Empty<int>()));
+                () => _validator.Validate(FoodTree(), new[] { 10, 11, 20 }));
 
             Assert.That(ex.Errors.Any(e => e.QuestionId == 1 && e.Reason == EventAnswerErrorReason.TooManyAnswers), Is.True);
         }
@@ -82,7 +71,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Accept_Two_Answers_To_A_Multi_Select_Question()
         {
-            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 30, 31 }, Array.Empty<int>()));
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 30, 31 }));
         }
 
         [Test]
@@ -90,7 +79,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             // Pizza chosen but "Which pizza?" left unanswered.
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(FoodTree(), new[] { 10 }, Array.Empty<int>()));
+                () => _validator.Validate(FoodTree(), new[] { 10 }));
 
             Assert.That(ex.Errors.Single().QuestionId, Is.EqualTo(2));
             Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));
@@ -101,7 +90,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             // Pasta chosen, yet a pizza sub-option was answered.
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(FoodTree(), new[] { 11, 20 }, Array.Empty<int>()));
+                () => _validator.Validate(FoodTree(), new[] { 11, 20 }));
 
             Assert.That(ex.Errors.Single().QuestionId, Is.EqualTo(2));
             Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.AnswerForHiddenQuestion));
@@ -125,7 +114,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(questions, Array.Empty<int>(), Array.Empty<int>()));
+                () => _validator.Validate(questions, Array.Empty<int>()));
 
             Assert.That(ex.Errors.Count, Is.EqualTo(2));
         }
@@ -147,7 +136,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             });
 
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(questions, new[] { 11, 40 }, Array.Empty<int>()));
+                () => _validator.Validate(questions, new[] { 11, 40 }));
 
             Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
         }
@@ -167,22 +156,25 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             });
 
             var ex = Assert.Throws<EventAnswersInvalidException>(
-                () => _validator.Validate(questions, new[] { 11, 20, 40 }, Array.Empty<int>()));
+                () => _validator.Validate(questions, new[] { 11, 20, 40 }));
 
             Assert.That(ex.Errors.Any(e => e.QuestionId == 2 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
             Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
         }
 
+        // Ids outside every question — legacy flat options — must pass straight through. Rejecting
+        // an id the event does not own belongs to CheckIfProvidedOptionsAreValid, which runs first
+        // and answers with a code the web client has a message for.
         [Test]
-        public void Should_Accept_Legacy_Flat_Options_Alongside_Questions()
+        public void Should_Ignore_Legacy_Flat_Options_Alongside_Questions()
         {
-            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 500 }, new[] { 500, 501 }));
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 500 }));
         }
 
         [Test]
-        public void Should_Accept_Legacy_Only_Events_With_No_Questions()
+        public void Should_Ignore_Chosen_Options_On_An_Event_With_No_Questions()
         {
-            Assert.DoesNotThrow(() => _validator.Validate(new List<ResolvedEventQuestionDto>(), new[] { 500 }, new[] { 500 }));
+            Assert.DoesNotThrow(() => _validator.Validate(new List<ResolvedEventQuestionDto>(), new[] { 500 }));
         }
     }
 }

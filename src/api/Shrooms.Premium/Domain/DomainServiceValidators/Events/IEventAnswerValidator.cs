@@ -5,9 +5,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 {
     public interface IEventAnswerValidator
     {
-        void Validate(
-            IReadOnlyList<ResolvedEventQuestionDto> questions,
-            IReadOnlyCollection<int> chosenOptionIds,
-            IReadOnlyCollection<int> legacyOptionIds);
+        void Validate(IReadOnlyList<ResolvedEventQuestionDto> questions, IReadOnlyCollection<int> chosenOptionIds);
     }
 }

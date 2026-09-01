@@ -15,25 +15,15 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
     {
         public void Validate(
             IReadOnlyList<ResolvedEventQuestionDto> questions,
-            IReadOnlyCollection<int> chosenOptionIds,
-            IReadOnlyCollection<int> legacyOptionIds)
+            IReadOnlyCollection<int> chosenOptionIds)
         {
             var chosen = (chosenOptionIds ?? Array.Empty<int>()).ToHashSet();
-            var legacy = (legacyOptionIds ?? Array.Empty<int>()).ToHashSet();
             var ordered = (questions ?? new List<ResolvedEventQuestionDto>()).OrderBy(q => q.Order).ToList();
 
             var errors = new List<EventAnswerErrorDto>();
 
-            var knownOptionIds = ordered.SelectMany(q => q.OptionIds).Concat(legacy).ToHashSet();
-
-            foreach (var unknownOptionId in chosen.Where(id => !knownOptionIds.Contains(id)))
-            {
-                errors.Add(new EventAnswerErrorDto
-                {
-                    OptionId = unknownOptionId,
-                    Reason = EventAnswerErrorReason.UnknownOption
-                });
-            }
+            // Options that belong to no question are not this validator's business:
+            // CheckIfProvidedOptionsAreValid already rejects an id the event does not own.
 
             // Triggers always live at a lower order, so a single forward pass resolves
             // reachability: by the time a question is visited, its trigger's owner is settled.
