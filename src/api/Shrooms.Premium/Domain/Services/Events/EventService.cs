@@ -117,7 +117,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
                 .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
-                .AsSplitQuery()
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
@@ -131,7 +130,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
-                .AsSplitQuery()
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
@@ -264,10 +262,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
-
-            // An absent image means "leave it alone". Assigning it unconditionally cleared the
-            // cover image and the wall logo for any client that omits the field.
-            eventDto.ImageName ??= eventToUpdate.ImageName;
 
             await ValidateEvent(eventDto);
 

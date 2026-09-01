@@ -133,7 +133,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
-                .AsSplitQuery()
                 .Where(x => x.Id == updateAttendStatusDto.EventId
                             && x.OrganizationId == updateAttendStatusDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
@@ -312,7 +311,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventParticipants)
-                .AsSplitQuery()
                 .Where(x => x.Id == changeOptionsDto.EventId && x.OrganizationId == changeOptionsDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
                 .FirstOrDefaultAsync();
@@ -426,7 +424,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 selectedOptions.Where(option => option.QuestionId == null).ToList(),
                 OptionRules.IgnoreSingleJoin);
 
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions);
 
             return replaceSelection ? selectedOptions : null;
         }
@@ -857,7 +855,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
-                .AsSplitQuery()
                 .Where(x => x.Id == joinDto.EventId && x.OrganizationId == joinDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
                 .FirstOrDefaultAsync();

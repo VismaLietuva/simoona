@@ -22,10 +22,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [StringLength(EventsConstants.EventNameMaxLength)]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Optional, as on create. Omitting it keeps the stored image; send an empty string to
-        /// clear one.
-        /// </summary>
+        [Required]
         public string ImageName { get; set; }
 
         [Required]
