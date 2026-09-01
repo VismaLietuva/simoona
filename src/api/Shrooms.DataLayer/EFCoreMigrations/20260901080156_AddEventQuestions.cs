@@ -70,13 +70,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 column: "ShowIfOptionId");
 
             // Leads with EventId, so it also serves the FK lookup that would otherwise need a
-            // separate IX_EventQuestions_EventId.
+            // separate IX_EventQuestions_EventId. Not unique: see EventQuestionEntityConfig.
             migrationBuilder.CreateIndex(
                 name: "IX_EventQuestions_EventId_Order",
                 table: "EventQuestions",
-                columns: new[] { "EventId", "Order" },
-                unique: true,
-                filter: "[IsDeleted] = 0");
+                columns: new[] { "EventId", "Order" });
 
             migrationBuilder.AddForeignKey(
                 name: "FK_EventOptions_EventQuestions_QuestionId",

@@ -143,7 +143,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             var clonedOptionByOldId = new Dictionary<int, EventOption>();
             var clones = new List<(EventQuestion Old, EventQuestion New)>();
 
-            foreach (var question in expiredQuestions.OrderBy(question => question.Order))
+            foreach (var question in expiredQuestions.OrderBy(question => question.Order).ThenBy(question => question.Id))
             {
                 var clone = new EventQuestion
                 {

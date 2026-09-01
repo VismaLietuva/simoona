@@ -72,7 +72,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 return;
             }
 
-            var ordered = questions.OrderBy(q => q.Order).ToList();
+            var ordered = questions.OrderBy(q => q.Order).ThenBy(q => q.QuestionId).ToList();
 
             var ownerByOptionId = new Dictionary<int, ResolvedEventQuestionDto>();
             foreach (var question in ordered)

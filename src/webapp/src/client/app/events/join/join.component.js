@@ -75,7 +75,14 @@
             eventRepository.getEventOptions(eventId).then(function (responseEvent) {
                 vm.event.maxChoices = responseEvent.maxOptions;
                 vm.event.availableOptions = responseEvent.options;
-                if (!vm.event.availableOptions.length && !vm.isAddColleague) {
+
+                vm.event.signUpQuestions = responseEvent.questions || [];
+
+                vm.event.myChosenOptions = responseEvent.myChosenOptions || [];
+
+                // A question-only event has no flat options but still has something to ask,
+                // and joining without answers is rejected outright by a required question.
+                if (!vm.event.availableOptions.length && !vm.event.signUpQuestions.length && !vm.isAddColleague) {
                     var selectedOptions = [];
 
                     var comment = "";

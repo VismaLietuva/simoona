@@ -389,11 +389,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var updateAttendStatusDto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(updateStatusViewModel);
             SetOrganizationAndUser(updateAttendStatusDto);
+            updateAttendStatusDto.ChosenOptions = updateStatusViewModel.ChosenOptions;
+            updateAttendStatusDto.Answers = updateStatusViewModel.Answers;
 
             try
             {
                 await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -722,6 +728,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return BadRequest(new EventAnswersInvalidViewModel
             {
                 Code = PremiumErrorCodes.EventAnswersInvalid,
+                Message = PremiumErrorCodes.EventAnswersInvalid,
                 Errors = exception.Errors
                     .Select(error => new EventAnswerErrorViewModel
                     {

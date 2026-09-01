@@ -33,6 +33,7 @@
     "messageEventTypeNameExists": "Event type name already exists",
     "messageEventAttendTypeIsNotAllowed": "Such attending status is not allowed for this event",
     "messageEventAttendTypeCannotBeChangedIfParticipantsJoined": "Cannot change allowed attend types if there are joined participants",
+    "messageEventAnswersInvalid": "Please answer all required sign-up questions",
     "messageNameAlreadyExists": "Name already exists",
     "messageShopItemAlreadyExists": "This item already exists",
     "messageServiceRequestTypeInUse": "This type cannot be deleted because it is used by service requests that are still open or in progress",
