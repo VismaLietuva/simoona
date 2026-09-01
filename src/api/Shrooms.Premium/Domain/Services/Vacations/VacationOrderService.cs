@@ -26,14 +26,16 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private const int MaxArchiveOrders = 200;
 
         private readonly IUnitOfWork2 _uow;
+        private readonly IHolidayService _holidayService;
         private readonly DbSet<VacationOrder> _orderDbSet;
         private readonly DbSet<VacationOrderItem> _itemDbSet;
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
 
-        public VacationOrderService(IUnitOfWork2 uow)
+        public VacationOrderService(IUnitOfWork2 uow, IHolidayService holidayService)
         {
             _uow = uow;
+            _holidayService = holidayService;
             _orderDbSet = uow.GetDbSet<VacationOrder>();
             _itemDbSet = uow.GetDbSet<VacationOrderItem>();
             _requestDbSet = uow.GetDbSet<VacationRequest>();
@@ -88,6 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 .ToListAsync();
 
             var number = await VacationSettingsService.NextOrderNumberAsync(_orderDbSet, userOrg.OrganizationId, settings);
+            var holidays = await _holidayService.GetCalendarAsync();
             var now = DateTime.UtcNow;
 
             var report = new VacationOrderGenerationDto
@@ -124,7 +127,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                         Type = group.Key.Type,
                         PeriodStart = group.Key.Day,
                         // The document has to be signed before the leave starts.
-                        IssuedOn = VacationCalculator.PreviousWorkingDay(group.Key.Day),
+                        IssuedOn = VacationCalculator.PreviousWorkingDay(group.Key.Day, holidays),
                         IssuedById = userOrg.UserId,
                         Created = now,
                         Modified = now,

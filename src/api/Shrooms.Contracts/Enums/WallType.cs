@@ -5,6 +5,7 @@
         Main,
         UserCreated,
         Events,
-        Project
+        Project,
+        Polls
     }
 }

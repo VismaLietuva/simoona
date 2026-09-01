@@ -44,6 +44,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
         private IAsyncRunner _asyncRunner;
 
+        private IEventAnswerValidator _eventAnswerValidator;
+
         [SetUp]
         public void TestInitializer()
         {
@@ -69,6 +71,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
+            _eventAnswerValidator = new EventAnswerValidator();
 
             _eventParticipationService =
                 new EventParticipationService(
@@ -78,7 +81,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     permissionService,
                     _eventValidationServiceMock,
                     _wallService,
-                    _asyncRunner);
+                    _asyncRunner,
+                    _eventAnswerValidator);
         }
 
         [Test]
@@ -169,6 +173,189 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             // Assert
             _eventParticipantsDbSet.Received(1).Add(Arg.Is<EventParticipant>(x => x.EventOptions.Count == 1));
+        }
+
+        [Test]
+        public void Should_Let_A_Question_Only_Event_Be_Joined_With_Answers()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+
+            // Use the real EventValidationService here (not the substitute) so the choice checks
+            // actually run instead of being no-ops.
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner,
+                _eventAnswerValidator);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                // Answers q5 with Pasta. q6 is conditional on Pizza, so it stays hidden and
+                // unanswered — a valid submission that today trips the MaxChoices check.
+                ChosenOptions = new List<int> { 90 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Let_A_Mixed_Event_Be_Joined_With_A_Legacy_IgnoreSingleJoin_Option_And_A_Question_Answer()
+        {
+            var eventId = MockEventWithLegacyIgnoreSingleJoinOptionAndQuestion();
+
+            // Use the real EventValidationService here (not the substitute) so the choice checks
+            // actually run instead of being no-ops.
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner,
+                _eventAnswerValidator);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                // Option 10 is the legacy IgnoreSingleJoin option; 90 is the question answer.
+                // Picking both must not trip CheckIfSingleChoiceSelectedWithRule.
+                ChosenOptions = new List<int> { 10, 90 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Reject_A_Join_That_Skips_A_Required_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.RequiredAnswerMissing }));
+        }
+
+        [Test]
+        public void Should_Reject_An_Answer_For_A_Hidden_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            // 92 belongs to the conditional question, whose trigger (91) was not chosen.
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 90, 92 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.AnswerForHiddenQuestion }));
+        }
+
+        [Test]
+        public void Should_Accept_A_Join_That_Answers_Every_Reachable_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 91, 92 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Validate_Answers_When_A_Host_Adds_Colleagues()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1", "user2" },
+                UserId = "host1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.AddColleagueAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Reject_Edited_Choices_That_Skip_A_Required_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion();
+
+            var changeOptionsDto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                ChosenOptions = new List<int>(),
+
+                // An empty Answers array is the caller saying "my answers are: none", which is what
+                // puts the answer rules in play. Omitting it means "leave my answers alone".
+                Answers = new List<int>(),
+                UserId = "user1",
+                OrganizationId = 2
+            };
+
+            Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto));
+        }
+
+        [Test]
+        public void Should_Not_Enforce_Answers_When_A_Legacy_Payload_Carries_None()
+        {
+            // The shipped AngularJS client posts flat options only. Enforcing answers against what
+            // is already stored would leave a participant unable to change options at all once a
+            // host adds a required question to a live event.
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true);
+
+            var changeOptionsDto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                ChosenOptions = new List<int>(),
+                UserId = "user1",
+                OrganizationId = 2
+            };
+
+            Assert.DoesNotThrowAsync(
+                async () => await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto));
         }
 
         [Test]
@@ -636,9 +823,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
-                .When(x => x.CheckIfProvidedOptionsAreValid(chosenOptionIds, Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
+                .When(x => x.CheckIfProvidedOptionsAreValid(Arg.Is<IEnumerable<int>>(a => a.SequenceEqual(chosenOptionIds)), Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
+            // CheckIfProvidedOptionsAreValid still owns the unknown-option rejection, ahead of the
+            // answer validator: it answers with code 215, which the web client has a message for.
             Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
         }
 
@@ -1403,6 +1592,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EndDate = DateTime.Parse("2016-04-06"),
                     RegistrationDeadline = DateTime.Parse("2016-04-05"),
                     EventOptions = new List<EventOption>(),
+                    EventQuestions = new List<EventQuestion>(),
                     Id = guid,
                     MaxChoices = 0,
                     MaxParticipants = 20,
@@ -1488,6 +1678,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                             Rule = OptionRules.IgnoreSingleJoin
                         }
                     },
+                    EventQuestions = new List<EventQuestion>(),
                     Id = guid,
                     MaxChoices = 1,
                     MaxParticipants = 20,
@@ -1548,6 +1739,331 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _eventParticipantsDbSet.SetDbSetDataForAsync(participants.AsQueryable());
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return guid;
+        }
+
+        /// <summary>
+        /// q5 "Pick your dish" (required, single, always shown): 90 Pasta, 91 Pizza.
+        /// q6 "Which pizza?"   (required, single, shown if 91):   92 Margherita.
+        /// MaxChoices is 0 — every option belongs to a question, so nothing counts as a legacy choice.
+        /// </summary>
+        [Test]
+        public async Task Should_Keep_Stored_Answers_When_Changing_Options_Without_Any()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1AnswerIds: new[] { 90 });
+
+            // /Events/Options serves only legacy options, so a client echoing it back sends no
+            // answers. Replacing the whole selection with that would delete them.
+            var dto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                OrganizationId = 2,
+                UserId = "user1",
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateSelectedOptionsAsync(dto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
+        public async Task Should_Keep_Stored_Answers_When_A_Status_Change_Carries_Only_Flat_Options()
+        {
+            // What the shipped client posts: attendStatus and nothing else. Replacing the whole
+            // selection with that would delete answers the client never knew about.
+            var eventId = MockEventWithRequiredQuestion(
+                withAttendingUser1: true,
+                user1Status: AttendingStatus.MaybeAttending,
+                user1AnswerIds: new[] { 90 });
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
+        public void Should_Not_Block_Going_When_A_Required_Question_Was_Added_After_The_Participant_Answered()
+        {
+            // A host can add a required question to a live event. The shipped client cannot supply
+            // an answer on a status change, so enforcing the stored ones would strand the
+            // participant on Maybe with no way forward.
+            var eventId = MockEventWithRequiredQuestion(
+                withAttendingUser1: true,
+                user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(
+                async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+        }
+
+        [Test]
+        public void Should_Reject_A_Status_Change_To_Going_That_Skips_A_Required_Question()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>(),
+
+                // Present but empty: the caller is submitting "no answers", which is what puts the
+                // answer rules in play. Omitting it would mean "keep my stored answers".
+                Answers = new List<int>()
+            };
+
+            var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+
+            Assert.That(ex.Errors.Select(e => e.Reason),
+                Is.EquivalentTo(new[] { EventAnswerErrorReason.RequiredAnswerMissing }));
+        }
+
+        [Test]
+        public async Task Should_Save_The_Answers_Carried_By_A_Status_Change_To_Going()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int> { 90 }
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
+        public void Should_Not_Validate_Answers_When_The_New_Status_Is_Not_Going()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.Attending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.MaybeAttending,
+                ChosenOptions = new List<int>()
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+        }
+
+        [Test]
+        public async Task Should_Keep_Stored_Answers_When_A_Status_Change_Carries_None()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending, user1AnswerIds: new[] { 90 });
+
+            // The shipped client posts updateAttendStatus(attendStatus, attendComment, eventId), so
+            // ChosenOptions arrives empty. Falling back to the stored answer is what lets a user
+            // switch Maybe back to Going without re-answering.
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }),
+                "an omitted ChosenOptions must not wipe the stored answer");
+        }
+
+        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false, AttendingStatus user1Status = AttendingStatus.Attending, int[] user1AnswerIds = null)
+        {
+            var eventId = Guid.NewGuid();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
+
+            var dishOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0 },
+                new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1 }
+            };
+
+            var pizzaOptions = new List<EventOption>
+            {
+                new EventOption { Id = 92, EventId = eventId, Option = "Margherita", QuestionId = 6, Order = 0 }
+            };
+
+            var participants = withAttendingUser1
+                ? new List<EventParticipant>
+                {
+                    new EventParticipant
+                    {
+                        Id = 1,
+                        EventId = eventId,
+                        ApplicationUserId = "user1",
+                        AttendStatus = (int)user1Status,
+                        EventOptions = dishOptions.Concat(pizzaOptions)
+                            .Where(option => (user1AnswerIds ?? Array.Empty<int>()).Contains(option.Id))
+                            .ToList()
+                    }
+                }
+                : new List<EventParticipant>();
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Name = "Question event",
+                    MaxChoices = 0,
+                    MaxParticipants = 20,
+                    MaxVirtualParticipants = 0,
+                    StartDate = DateTime.Parse("2026-06-01"),
+                    EndDate = DateTime.Parse("2026-06-02"),
+                    RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    ResponsibleUserId = "host1",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "test type", IsSingleJoin = false },
+                    EventParticipants = participants,
+                    EventOptions = dishOptions.Concat(pizzaOptions).ToList(),
+                    EventQuestions = new List<EventQuestion>
+                    {
+                        new EventQuestion
+                        {
+                            Id = 5,
+                            EventId = eventId,
+                            Title = "Pick your dish",
+                            Order = 0,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = null,
+                            Options = dishOptions
+                        },
+                        new EventQuestion
+                        {
+                            Id = 6,
+                            EventId = eventId,
+                            Title = "Which pizza?",
+                            Order = 1,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = 91,
+                            Options = pizzaOptions
+                        }
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(participants.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2 },
+                new ApplicationUser { Id = "user2", OrganizationId = 2 },
+                new ApplicationUser { Id = "host1", OrganizationId = 2 }
+            });
+
+            return eventId;
+        }
+
+        /// <summary>
+        /// Mixed event: one legacy option (10, no QuestionId) carrying <see cref="OptionRules.IgnoreSingleJoin"/>,
+        /// plus a required question (5) with its own option (90). MaxChoices is 1, counting the legacy
+        /// option only. Exercises FIX 1: question answers must not be counted by
+        /// CheckIfSingleChoiceSelectedWithRule alongside the legacy IgnoreSingleJoin option.
+        /// </summary>
+        private Guid MockEventWithLegacyIgnoreSingleJoinOptionAndQuestion()
+        {
+            var eventId = Guid.NewGuid();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
+
+            var legacyOptions = new List<EventOption>
+            {
+                new EventOption { Id = 10, EventId = eventId, Option = "Legacy", QuestionId = null, Rule = OptionRules.IgnoreSingleJoin, Order = 0 }
+            };
+
+            var questionOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "QOption", QuestionId = 5, Order = 0 }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Name = "Mixed event",
+                    MaxChoices = 1,
+                    MaxParticipants = 20,
+                    MaxVirtualParticipants = 0,
+                    StartDate = DateTime.Parse("2026-06-01"),
+                    EndDate = DateTime.Parse("2026-06-02"),
+                    RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    ResponsibleUserId = "host1",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "test type", IsSingleJoin = false },
+                    EventParticipants = new List<EventParticipant>(),
+                    EventOptions = legacyOptions.Concat(questionOptions).ToList(),
+                    EventQuestions = new List<EventQuestion>
+                    {
+                        new EventQuestion
+                        {
+                            Id = 5,
+                            EventId = eventId,
+                            Title = "Pick one",
+                            Order = 0,
+                            SelectType = EventQuestionSelectType.Single,
+                            IsRequired = true,
+                            ShowIfOptionId = null,
+                            Options = questionOptions
+                        }
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>().AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2 }
+            });
+
+            return eventId;
         }
 
         private void MockUsers()

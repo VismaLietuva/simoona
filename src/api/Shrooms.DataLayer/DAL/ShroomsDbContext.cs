@@ -12,6 +12,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Polls;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.VideoLibrary;
@@ -27,6 +28,7 @@ using Shrooms.DataLayer.EntityModels.Models.Monitors;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
+using Shrooms.DataLayer.EntityModels.Models.Polls;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
@@ -96,6 +98,8 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<EventParticipant> EventParticipants { get; set; }
 
         public virtual DbSet<EventOption> EventOptions { get; set; }
+
+        public virtual DbSet<EventQuestion> EventQuestions { get; set; }
 
         public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
 
@@ -185,6 +189,18 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VacationOrderItem> VacationOrderItems { get; set; }
 
+        public virtual DbSet<Holiday> Holidays { get; set; }
+
+        public virtual DbSet<Poll> Polls { get; set; }
+
+        public virtual DbSet<PollQuestion> PollQuestions { get; set; }
+
+        public virtual DbSet<PollOption> PollOptions { get; set; }
+
+        public virtual DbSet<PollAnswer> PollAnswers { get; set; }
+
+        public virtual DbSet<PollParticipant> PollParticipants { get; set; }
+
         public virtual DbSet<Seat> Seats { get; set; }
 
         public virtual DbSet<SeatReservation> SeatReservations { get; set; }
@@ -255,6 +271,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new EventTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
             modelBuilder.ApplyConfiguration(new EventOptionEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventQuestionEntityConfig());
             modelBuilder.ApplyConfiguration(new CommitteeEntityConfig());
             modelBuilder.ApplyConfiguration(new GroupTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new GroupEntityConfig());
@@ -289,6 +306,12 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new VacationRequestEventEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new HolidayEntityConfig());
+            modelBuilder.ApplyConfiguration(new PollEntityConfig());
+            modelBuilder.ApplyConfiguration(new PollQuestionEntityConfig());
+            modelBuilder.ApplyConfiguration(new PollOptionEntityConfig());
+            modelBuilder.ApplyConfiguration(new PollAnswerEntityConfig());
+            modelBuilder.ApplyConfiguration(new PollParticipantEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReservationEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());

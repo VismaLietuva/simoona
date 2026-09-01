@@ -16,6 +16,14 @@
         public const int EventsMaxDateFilterRangeInDays = 100;
 
         public const int EventOptionsMinimumCount = 2;
+
+        public const int EventQuestionsMaxCount = 20;
+        public const int EventQuestionOptionsMaxCount = 30;
+        public const int EventQuestionOptionsMinCount = 1;
+        public const int EventQuestionTitleMaxLength = 100;
+        public const int EventQuestionOptionNameMaxLength = 100;
+        public const int EventQuestionMaxConditionalDepth = 5;
+
         public const string EventParticipantsExcelTableName = "Event Participants";
         public const string EventOptionsExcelTableName = "Event Options";
 

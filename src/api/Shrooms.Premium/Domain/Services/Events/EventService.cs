@@ -39,6 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
+        private readonly IEventQuestionWriter _eventQuestionWriter;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -55,7 +56,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IWallService wallService,
             IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService,
-            ISystemClock systemClock)
+            ISystemClock systemClock,
+            IEventQuestionWriter eventQuestionWriter)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -73,6 +75,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
             _systemClock = systemClock;
+            _eventQuestionWriter = eventQuestionWriter;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -98,6 +101,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
             await RemoveEventRemindersAsync(@event.Reminders, userOrg.UserId);
 
+            // DeleteEventOptionsAsync takes the question-owned options with it, so leaving the
+            // questions behind would strand live rows with every option deleted.
+            await _eventQuestionWriter.WriteAsync(id, null, userOrg.UserId);
+
             _eventsDbSet.Remove(@event);
 
             await _uow.SaveChangesAsync(false);
@@ -109,6 +116,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
+                .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
@@ -123,7 +131,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
-                .Select(MapToEventDetailsDto(id))
+                .Select(MapToEventDetailsDto(id, userOrg.UserId))
+                .AsSplitQuery()
                 .SingleOrDefaultAsync();
             _eventValidationService.CheckIfEventExists(@event);
 
@@ -152,11 +161,35 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             @event.Participants = @event.Participants.Where(p => p.UserId == userOrg.UserId).ToList();
 
-            var userEventOptions = @event.Options.Where(o => o.Participants.Any(p => p.UserId == userOrg.UserId));
-            foreach (var userEventOption in userEventOptions)
+            // Every option, not only the ones the caller picked. Rewriting just the caller's own
+            // picks left every other option carrying the full participant list — names, pictures
+            // and attend comments — for a caller without EventUsers.
+            var options = @event.Options.ToList();
+            foreach (var option in options)
             {
-                userEventOption.Participants = @event.Participants;
+                option.Participants = option.Participants
+                    .Where(p => p.UserId == userOrg.UserId)
+                    .ToList();
             }
+
+            @event.Options = options;
+
+            // Each level is materialised: mutating a lazy projection is discarded on re-enumeration.
+            var trimmedQuestions = @event.Questions.ToList();
+            foreach (var question in trimmedQuestions)
+            {
+                var questionOptions = question.Options.ToList();
+                foreach (var option in questionOptions)
+                {
+                    option.Participants = option.Participants
+                        .Where(p => p.UserId == userOrg.UserId)
+                        .ToList();
+                }
+
+                question.Options = questionOptions;
+            }
+
+            @event.Questions = trimmedQuestions;
 
             return @event;
         }
@@ -174,11 +207,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
+            // Before MapNewEventAsync, which creates the event's wall and commits it: a tree
+            // rejected after that point leaves an orphan wall behind.
+            await _eventQuestionWriter.ValidateAsync(null, newEventDto.Questions);
+
             var newEvent = await MapNewEventAsync(newEventDto);
 
             _eventsDbSet.Add(newEvent);
 
             MapNewOptions(newEventDto, newEvent);
+
+            await _eventQuestionWriter.WriteForNewEventAsync(newEvent, newEventDto.Questions, newEventDto.UserId);
+
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
             newEventDto.Id = newEvent.Id.ToString();
@@ -225,10 +265,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
+
+            // With the other rules, before anything mutates: ResetEventAttendessAsync commits the
+            // expulsions and sends their emails, so a question tree rejected afterwards would
+            // return 400 with the attendee list already wiped.
+            await _eventQuestionWriter.ValidateAsync(eventToUpdate.Id, eventDto.Questions);
+
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
             await UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
+
+            await _eventQuestionWriter.WriteAsync(eventToUpdate.Id, eventDto.Questions, eventDto.UserId);
 
             await _uow.SaveChangesAsync(false);
 
@@ -336,12 +384,42 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Type = reminder.Type,
                     RemindedCount = reminder.RemindedCount
                 }),
-                Options = e.EventOptions.Select(o => new EventOptionDto
-                {
-                    Id = o.Id,
-                    Option = o.Option,
-                    Rule = o.Rule
-                })
+                // Legacy flat options only. Question-owned options are returned under Questions;
+                // leaving them here also leaks them into the edit payload's editedOptions, which
+                // inflates totalOptionsProvided and trips CheckIfCreatingEventHasNoChoices on any
+                // question-bearing event. Mirrors EventListingService.MapOptionsToDto().
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventOptionDto
+                    {
+                        Id = o.Id,
+                        Option = o.Option,
+                        Rule = o.Rule
+                    }),
+                Questions = e.EventQuestions
+                    .OrderBy(q => q.Order)
+                    .ThenBy(q => q.Id)
+                    .Select(q => new EventQuestionStructureDto
+                    {
+                        Id = q.Id,
+                        Title = q.Title,
+                        Order = q.Order,
+                        SelectType = q.SelectType,
+                        IsRequired = q.IsRequired,
+                        ShowIfOptionId = q.ShowIfOptionId,
+                        Options = q.Options
+                            .OrderBy(o => o.Order)
+                            .ThenBy(o => o.Id)
+                            .Select(o => new EventQuestionOptionStructureDto
+                            {
+                                Id = o.Id,
+                                Name = o.Option,
+                                Order = o.Order,
+                                Rule = o.Rule
+                            })
+                            .ToList()
+                    })
+                    .ToList()
             };
         }
 
@@ -398,13 +476,20 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void UpdateEventOptions(EditEventDto editedEvent, Event @event)
         {
+            // @event.EventOptions also holds question-owned options (QuestionId != null), which
+            // belong solely to EventQuestionWriter. EditedOptions only ever carries legacy
+            // options (see MapToEventEditDetailsDto), so scoping both the edit loop and the
+            // removal sweep to QuestionId == null keeps this method from treating every absent
+            // question option as "removed" and hard-deleting it.
+            var legacyOptions = @event.EventOptions.Where(o => o.QuestionId == null).ToList();
+
             foreach (var editedOption in editedEvent.EditedOptions)
             {
-                var option = @event.EventOptions.Single(o => o.Id == editedOption.Id);
+                var option = legacyOptions.Single(o => o.Id == editedOption.Id);
                 option.Option = editedOption.Option;
             }
 
-            var removedOptions = @event.EventOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
+            var removedOptions = legacyOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
 
             foreach (var option in removedOptions)
             {
@@ -644,7 +729,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return eventArgsDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventArgsDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
         }
 
-        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId)
+        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId, string userId)
         {
             return e => new EventDetailsDto
             {
@@ -666,24 +751,63 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                Options = e.EventOptions.Select(o => new EventDetailsOptionDto
-                {
-                    Id = o.Id,
-                    Name = o.Option,
-                    Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId &&
-                              (x.AttendStatus == (int)AttendingStatus.Attending ||
-                               x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
-                        .Select(p => new EventDetailsParticipantDto
-                        {
-                            Id = p.Id,
-                            UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
-                            FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
-                            ImageName = p.ApplicationUser.PictureId,
-                            AttendStatus = p.AttendStatus,
-                            AttendComment = p.AttendComment
-                        })
-                }),
+                // Legacy flat options only; question-owned options reach the client under Questions.
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventDetailsOptionDto
+                    {
+                        Id = o.Id,
+                        Name = o.Option,
+                        Participants = o.EventParticipants
+                            .Where(x => x.EventId == eventId &&
+                                  (x.AttendStatus == (int)AttendingStatus.Attending ||
+                                   x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
+                            .Select(p => new EventDetailsParticipantDto
+                            {
+                                Id = p.Id,
+                                UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
+                                FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
+                                ImageName = p.ApplicationUser.PictureId,
+                                AttendStatus = p.AttendStatus,
+                                AttendComment = p.AttendComment
+                            })
+                    }),
+                // The only read endpoint carrying participants: /Events/Options feeds a client
+                // component, so its copy of this tree must stay participant-free.
+                Questions = e.EventQuestions
+                    .OrderBy(question => question.Order)
+                    .ThenBy(question => question.Id)
+                    .Select(question => new EventDetailsQuestionDto
+                    {
+                        Id = question.Id,
+                        Title = question.Title,
+                        Order = question.Order,
+                        SelectType = question.SelectType,
+                        IsRequired = question.IsRequired,
+                        ShowIfOptionId = question.ShowIfOptionId,
+                        Options = question.Options
+                            .OrderBy(option => option.Order)
+                                .ThenBy(option => option.Id)
+                            .Select(option => new EventDetailsQuestionOptionDto
+                            {
+                                Id = option.Id,
+                                Name = option.Option,
+                                Order = option.Order,
+                                Participants = option.EventParticipants
+                                    .Where(x => x.EventId == eventId &&
+                                          (x.AttendStatus == (int)AttendingStatus.Attending ||
+                                           x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
+                                    .Select(p => new EventDetailsParticipantDto
+                                    {
+                                        Id = p.Id,
+                                        UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
+                                        FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
+                                        ImageName = p.ApplicationUser.PictureId,
+                                        AttendStatus = p.AttendStatus,
+                                        AttendComment = p.AttendComment
+                                    })
+                            })
+                    }),
                 Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDto
                 {
                     Id = p.Id,
@@ -692,7 +816,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                     ImageName = p.ApplicationUser.PictureId,
                     AttendStatus = p.AttendStatus,
                     AttendComment = p.AttendComment
-                })
+                }),
+
+                // Not derivable from the option-level Participants lists above: those are scoped to
+                // people who are Going, so a Maybe participant would see none of their own answers.
+                MyChosenOptions = e.EventParticipants
+                    .Where(p => p.ApplicationUserId == userId)
+                    .SelectMany(p => p.EventOptions.Select(option => option.Id))
             };
         }
     }

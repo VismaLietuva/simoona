@@ -16,9 +16,11 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
+        private readonly IHolidayService _holidayService;
 
-        public VacationStatisticsService(IUnitOfWork2 uow)
+        public VacationStatisticsService(IUnitOfWork2 uow, IHolidayService holidayService)
         {
+            _holidayService = holidayService;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationDbSet = uow.GetDbSet<Organization>();
@@ -57,8 +59,10 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 .GroupBy(request => request.EmployeeId)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
+            var holidays = await _holidayService.GetCalendarAsync();
+
             var rows = users
-                .Select(user => BuildRow(user, byEmployee, today))
+                .Select(user => BuildRow(user, byEmployee, today, holidays))
                 .ToList();
 
             rows = ApplySort(rows, args).ToList();
@@ -88,12 +92,13 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private static VacationStatsDto BuildRow(
             ApplicationUser user,
             IReadOnlyDictionary<string, List<VacationRequest>> byEmployee,
-            DateTime today)
+            DateTime today,
+            HolidayCalendar holidays)
         {
             var own = byEmployee.TryGetValue(user.Id, out var list) ? list : new List<VacationRequest>();
 
             var accrued = user.VacationUnusedTime ?? 0;
-            var booked = VacationCalculator.CommittedAnnualDays(own, user.VacationLastTimeUpdated?.Date);
+            var booked = VacationCalculator.CommittedAnnualDays(own, user.VacationLastTimeUpdated?.Date, holidays);
 
             // taken + upcoming deliberately does not equal booked: booked also
             // carries pending requests and starts at the payslip cutoff, whereas

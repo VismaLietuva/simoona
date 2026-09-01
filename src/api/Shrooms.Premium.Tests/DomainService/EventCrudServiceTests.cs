@@ -68,6 +68,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventValidationService = new EventValidationService(_systemClockMock);
             var officeMapService = Substitute.For<IOfficeMapService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
+            var eventQuestionWriter = Substitute.For<IEventQuestionWriter>();
 
             _eventService = new EventService(
                 _uow,
@@ -78,7 +79,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 _wallService,
                 markdownConverter,
                 officeMapService,
-                _systemClock);
+                _systemClock,
+                eventQuestionWriter);
         }
 
         [Test]
@@ -614,6 +616,173 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventOptionsDbSet.Received(0).Remove(Arg.Any<EventOption>());
             _eventOptionsDbSet.Received(2).Add(Arg.Any<EventOption>());
             await _uow.Received(1).SaveChangesAsync(false);
+        }
+
+        // Regression test for the reported bug: MapToEventEditDetailsDto used to leak
+        // question-owned options into the flat Options list, the client echoed them back as
+        // EditedOptions, and UpdateEventAsync's totalOptionsProvided count made
+        // CheckIfCreatingEventHasNoChoices throw even though MaxChoices == 0 is correct for a
+        // question-only event. This chains GetEventForEditingAsync into UpdateEventAsync, the
+        // same way the real host-edit flow does, so it fails before the fix and passes after.
+        [Test]
+        public async Task Should_Not_Throw_MaxChoice_Exception_When_Updating_Question_Only_Event()
+        {
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var questionOptions = new List<EventOption>
+            {
+                new EventOption { Id = 101, Option = "Pizza", QuestionId = 5, EventId = eventId },
+                new EventOption { Id = 102, Option = "Pasta", QuestionId = 5, EventId = eventId }
+            };
+
+            var question = new EventQuestion
+            {
+                Id = 5,
+                EventId = eventId,
+                Title = "Pick your dish",
+                Order = 0,
+                SelectType = EventQuestionSelectType.Single,
+                IsRequired = true,
+                Options = questionOptions
+            };
+
+            var @event = new Event
+            {
+                Id = eventId,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                EndDate = DateTime.UtcNow.AddDays(4),
+                Created = DateTime.UtcNow,
+                ResponsibleUserId = users.First().Id,
+                ResponsibleUser = users.First(),
+                EventRecurring = EventRecurrenceOptions.None,
+                ImageName = "imageUrl",
+                Name = "Question-only event",
+                Place = "City",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                EventOptions = questionOptions,
+                EventQuestions = new List<EventQuestion> { question },
+                EventParticipants = new List<EventParticipant>(),
+                Offices = $"[\"{office.Id}\"]",
+                RegistrationDeadline = DateTime.UtcNow,
+                MaxChoices = 0,
+                EventType = eventTypes.Last(),
+                EventTypeId = eventTypes.Last().Id,
+                Reminders = new List<EventReminder>()
+            };
+            _eventsDbSet.SetDbSetDataForAsync(new[] { @event });
+
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = users.First().Id };
+            var editDetails = await _eventService.GetEventForEditingAsync(eventId, userOrg);
+
+            var editDto = new EditEventDto
+            {
+                Id = eventId.ToString(),
+                UserId = users.First().Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Question-only event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto { OfficeNames = new List<string> { office.Name } },
+                RegistrationDeadlineDate = @event.RegistrationDeadline,
+                MaxOptions = editDetails.MaxOptions,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = editDetails.Options.Select(o => new EventOptionDto { Id = o.Id, Option = o.Option, Rule = o.Rule }),
+                Reminders = new List<EventReminderDto>()
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventService.UpdateEventAsync(editDto));
+        }
+
+        // Question-owned options must never be hard-deleted through the legacy option edit path:
+        // once MapToEventEditDetailsDto stops leaking them into EditedOptions, a naive
+        // "anything not in EditedOptions gets removed" sweep would delete every question's
+        // options on the host's very next save. Only legacy (QuestionId == null) options may be
+        // removed here; question-owned rows belong solely to EventQuestionWriter.
+        [Test]
+        public async Task Should_Not_Remove_Question_Owned_Options_When_Editing_Event()
+        {
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var legacyOptionKept1 = new EventOption { Id = 1, Option = "Legacy kept 1", QuestionId = null };
+            var legacyOptionKept2 = new EventOption { Id = 2, Option = "Legacy kept 2", QuestionId = null };
+            var legacyOptionRemoved = new EventOption { Id = 3, Option = "Legacy removed", QuestionId = null };
+            var questionOption1 = new EventOption { Id = 101, Option = "Pizza", QuestionId = 5 };
+            var questionOption2 = new EventOption { Id = 102, Option = "Pasta", QuestionId = 5 };
+
+            var @event = new Event
+            {
+                Id = eventId,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                EndDate = DateTime.UtcNow.AddDays(4),
+                Created = DateTime.UtcNow,
+                ResponsibleUserId = users.First().Id,
+                ResponsibleUser = users.First(),
+                EventRecurring = EventRecurrenceOptions.None,
+                ImageName = "imageUrl",
+                Name = "Dinner event",
+                Place = "City",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                EventOptions = new List<EventOption> { legacyOptionKept1, legacyOptionKept2, legacyOptionRemoved, questionOption1, questionOption2 },
+                EventParticipants = new List<EventParticipant>(),
+                Offices = $"[\"{office.Id}\"]",
+                RegistrationDeadline = DateTime.UtcNow,
+                MaxChoices = 1,
+                EventType = eventTypes.Last(),
+                EventTypeId = eventTypes.Last().Id,
+                Reminders = new List<EventReminder>()
+            };
+            _eventsDbSet.SetDbSetDataForAsync(new[] { @event });
+
+            var editDto = new EditEventDto
+            {
+                Id = eventId.ToString(),
+                UserId = users.First().Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Dinner event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto { OfficeNames = new List<string> { office.Name } },
+                RegistrationDeadlineDate = @event.RegistrationDeadline,
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>
+                {
+                    new EventOptionDto { Id = legacyOptionKept1.Id, Option = "Legacy kept 1 edited" },
+                    new EventOptionDto { Id = legacyOptionKept2.Id, Option = "Legacy kept 2 edited" }
+                },
+                Reminders = new List<EventReminderDto>()
+            };
+
+            await _eventService.UpdateEventAsync(editDto);
+
+            _eventOptionsDbSet.Received(1).Remove(legacyOptionRemoved);
+            _eventOptionsDbSet.DidNotReceive().Remove(questionOption1);
+            _eventOptionsDbSet.DidNotReceive().Remove(questionOption2);
+            _eventOptionsDbSet.DidNotReceive().Remove(legacyOptionKept1);
+            _eventOptionsDbSet.DidNotReceive().Remove(legacyOptionKept2);
         }
 
         private List<EventType> MockEventTypes()
@@ -1193,6 +1362,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Description = "desc",
                     EventOptions = eventOptions,
                     EventParticipants = eventParticipants,
+                    EventQuestions = new List<EventQuestion>(),
                     Offices = "[\"1\"]",
                     StartDate = DateTime.UtcNow,
                     EndDate = DateTime.UtcNow,

@@ -28,6 +28,10 @@
             eventRepository.getEventOptions(vm.event.id).then(function (responseEvent) {
                 vm.event.maxChoices = responseEvent.maxOptions;
                 vm.event.availableOptions = responseEvent.options;
+
+                vm.event.signUpQuestions = responseEvent.questions || [];
+
+                vm.event.myChosenOptions = responseEvent.myChosenOptions || [];
                 openOptionsModal();
             });
         }

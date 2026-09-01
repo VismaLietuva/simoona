@@ -33,6 +33,7 @@
     "messageEventTypeNameExists": "Toks renginio tipo pavadinimas jau egzistuoja",
     "messageEventAttendTypeIsNotAllowed": "Toks dalyvavimo tipas šitam renginiui yra neleidžiamas",
     "messageEventAttendTypeCannotBeChangedIfParticipantsJoined": "Keisti dalyvavimo pasirinkimus negalima, kai jau yra dalyvių",
+    "messageEventAnswersInvalid": "Prašome atsakyti į visus privalomus registracijos klausimus",
     "messageNameAlreadyExists": "Toks pavadinimas jau egzistuoja",
     "messageShopItemAlreadyExists": "Tokia prekė jau egzistuoja",
     "messageServiceRequestTypeInUse": "Šio tipo negalima ištrinti, nes jis naudojamas neužbaigtose užklausose",

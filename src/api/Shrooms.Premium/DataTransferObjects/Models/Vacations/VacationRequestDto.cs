@@ -54,6 +54,14 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Vacations
         public double? Entitlement { get; set; }
 
         /// <summary>
+        /// The entitlement plus accrual since the payslip date, which is what the
+        /// employee sees as "Accrued now". Approximate by construction, so it is
+        /// shown but never charged against: RemainingDays and BalanceShortfall
+        /// stay on the exact payslip figure.
+        /// </summary>
+        public double? AccruedNow { get; set; }
+
+        /// <summary>
         /// The employee's days left, with this request excluded from the total
         /// when it is one of the types that charges the balance — an approver
         /// wants the balance as it stood *before* the decision in front of them.

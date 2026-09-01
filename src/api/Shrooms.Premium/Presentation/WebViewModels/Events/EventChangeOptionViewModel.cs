@@ -11,5 +11,11 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         [Required]
         public IEnumerable<int> ChosenOptions { get; set; }
+
+        /// <summary>
+        /// Question answers. Omit the property to keep the stored answers, send an empty array to
+        /// clear them. Deliberately not [Required]: null and empty mean different things here.
+        /// </summary>
+        public IEnumerable<int> Answers { get; set; }
     }
 }
