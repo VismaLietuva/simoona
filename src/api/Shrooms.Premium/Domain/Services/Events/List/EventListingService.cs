@@ -61,6 +61,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var eventOptionsDto = await _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
+                .AsSplitQuery()
                 .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapOptionsToDto())
                 .SingleOrDefaultAsync();

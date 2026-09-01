@@ -222,6 +222,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 "an answer picked by someone else must not name them");
         }
 
+        [Test]
+        public async Task Should_Hide_Participants_On_A_Legacy_Option_The_Caller_Did_Not_Pick()
+        {
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            var soup = result.Options.Single(option => option.Name == "Soup");
+            Assert.That(soup.Participants, Is.Empty,
+                "only the caller's own picks used to be rewritten, so every other option leaked its participants");
+        }
+
         private Guid MockEventDetailsWithAnsweredQuestion(bool canSeeParticipants)
         {
             _permissionService
@@ -255,6 +268,9 @@ namespace Shrooms.Premium.Tests.DomainService
             var pizza = new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1, EventParticipants = new List<EventParticipant>() };
             var margherita = new EventOption { Id = 92, EventId = eventId, Option = "Margherita", QuestionId = 6, Order = 0, EventParticipants = new List<EventParticipant>() };
 
+            // A legacy option the colleague picked and the caller did not.
+            var soup = new EventOption { Id = 80, EventId = eventId, Option = "Soup", QuestionId = null, Order = 0, EventParticipants = new List<EventParticipant> { colleague } };
+
             var events = new List<Event>
             {
                 new Event
@@ -265,7 +281,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     MaxChoices = 0,
                     ResponsibleUser = responsibleUser,
                     ResponsibleUserId = responsibleUser.Id,
-                    EventOptions = new List<EventOption> { pasta, pizza, margherita },
+                    EventOptions = new List<EventOption> { soup, pasta, pizza, margherita },
                     EventParticipants = new List<EventParticipant> { me, colleague },
                     EventQuestions = new List<EventQuestion>
                     {

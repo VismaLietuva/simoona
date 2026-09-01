@@ -133,6 +133,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
+                .AsSplitQuery()
                 .Where(x => x.Id == updateAttendStatusDto.EventId
                             && x.OrganizationId == updateAttendStatusDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
@@ -143,7 +144,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDto.AttendStatus);
             _eventValidationService.CheckIfAttendOptionIsAllowed(updateAttendStatusDto.AttendStatus, @event);
 
-            var chosenOptionsToSave = ValidateAnswersForStatusChange(updateAttendStatusDto, @event);
+            var participant = await _eventParticipantsDbSet
+                .Include(p => p.EventOptions)
+                .FirstOrDefaultAsync(p => p.EventId == @event.Id && p.ApplicationUserId == updateAttendStatusDto.UserId);
+
+            var chosenOptionsToSave = ValidateAnswersForStatusChange(updateAttendStatusDto, @event, participant?.EventOptions);
 
             await AddParticipantWithStatusAsync(updateAttendStatusDto.UserId, updateAttendStatusDto.AttendStatus, updateAttendStatusDto.AttendComment, @event, chosenOptionsToSave);
 
@@ -307,6 +312,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventParticipants)
+                .AsSplitQuery()
                 .Where(x => x.Id == changeOptionsDto.EventId && x.OrganizationId == changeOptionsDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
                 .FirstOrDefaultAsync();
@@ -378,8 +384,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
         }
 
-        /// <summary>Returns the options to persist, or null to leave the selection untouched.</summary>
-        private ICollection<EventOption> ValidateAnswersForStatusChange(UpdateAttendStatusDto updateAttendStatusDto, EventJoinValidationDto eventDto)
+        /// <summary>
+        /// Returns the options to persist, or null to leave the participant's selection untouched.
+        /// A request that carries no choices is validated against what the participant already
+        /// answered: AutoMapper's AllowNullCollections is off, so an omitted array arrives as an
+        /// empty one and "omitted" cannot be told from "clear my answers". Treating it as "keep"
+        /// is the only safe reading — clearing answers is what UpdateSelectedOptions is for.
+        /// </summary>
+        private ICollection<EventOption> ValidateAnswersForStatusChange(
+            UpdateAttendStatusDto updateAttendStatusDto,
+            EventJoinValidationDto eventDto,
+            ICollection<EventOption> storedOptions)
         {
             var isGoing = updateAttendStatusDto.AttendStatus == AttendingStatus.Attending ||
                           updateAttendStatusDto.AttendStatus == AttendingStatus.AttendingVirtually;
@@ -389,9 +404,20 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return null;
             }
 
-            var chosenOptions = (updateAttendStatusDto.ChosenOptions ?? Enumerable.Empty<int>()).ToList();
+            var requested = (updateAttendStatusDto.ChosenOptions ?? Enumerable.Empty<int>()).ToList();
+            var stored = (storedOptions ?? new List<EventOption>()).Select(option => option.Id).ToList();
+
+            // Nothing requested: re-assert the stored answers so switching Maybe back to Going
+            // does not have to re-send an answer the database already holds.
+            var replaceSelection = requested.Count > 0;
+            var chosenOptions = replaceSelection ? requested : stored;
+
             var selectedOptions = eventDto.Options.Where(option => chosenOptions.Contains(option.Id)).ToList();
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
+
+            // Ahead of CheckIfProvidedOptionsAreValid, so an unknown option reaches the client as
+            // the structured payload naming it rather than a bare code.
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
 
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, selectedOptions);
 
@@ -404,11 +430,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 selectedOptions.Where(option => option.QuestionId == null).ToList(),
                 OptionRules.IgnoreSingleJoin);
 
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
-
-            // Sending nothing must not wipe a food pick made at join time, so only replace the
-            // selection when there is something to write or the event actually has questions.
-            return chosenOptions.Count > 0 || eventDto.Questions.Count > 0 ? selectedOptions : null;
+            return replaceSelection ? selectedOptions : null;
         }
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
@@ -837,6 +859,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(x => x.EventOptions)
                 .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
                 .Include(x => x.EventType)
+                .AsSplitQuery()
                 .Where(x => x.Id == joinDto.EventId && x.OrganizationId == joinDto.OrganizationId)
                 .Select(MapEventToJoinValidationDto)
                 .FirstOrDefaultAsync();

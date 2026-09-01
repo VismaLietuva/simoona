@@ -1747,6 +1747,28 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         /// MaxChoices is 0 — every option belongs to a question, so nothing counts as a legacy choice.
         /// </summary>
         [Test]
+        public async Task Should_Keep_Stored_Answers_When_Changing_Options_Without_Any()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1AnswerIds: new[] { 90 });
+
+            // /Events/Options serves only legacy options, so a client echoing it back sends no
+            // answers. Replacing the whole selection with that would delete them.
+            var dto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                OrganizationId = 2,
+                UserId = "user1",
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateSelectedOptionsAsync(dto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
         public void Should_Reject_A_Status_Change_To_Going_That_Skips_A_Required_Question()
         {
             var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
@@ -1806,7 +1828,33 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.DoesNotThrowAsync(async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
         }
 
-        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false, AttendingStatus user1Status = AttendingStatus.Attending)
+        [Test]
+        public async Task Should_Keep_Stored_Answers_When_A_Status_Change_Carries_None()
+        {
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending, user1AnswerIds: new[] { 90 });
+
+            // The shipped client posts updateAttendStatus(attendStatus, attendComment, eventId), so
+            // ChosenOptions arrives empty. Falling back to the stored answer is what lets a user
+            // switch Maybe back to Going without re-answering.
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }),
+                "an omitted ChosenOptions must not wipe the stored answer");
+        }
+
+        private Guid MockEventWithRequiredQuestion(bool withAttendingUser1 = false, AttendingStatus user1Status = AttendingStatus.Attending, int[] user1AnswerIds = null)
         {
             var eventId = Guid.NewGuid();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
@@ -1831,7 +1879,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         EventId = eventId,
                         ApplicationUserId = "user1",
                         AttendStatus = (int)user1Status,
-                        EventOptions = new List<EventOption>()
+                        EventOptions = dishOptions.Concat(pizzaOptions)
+                            .Where(option => (user1AnswerIds ?? Array.Empty<int>()).Contains(option.Id))
+                            .ToList()
                     }
                 }
                 : new List<EventParticipant>();

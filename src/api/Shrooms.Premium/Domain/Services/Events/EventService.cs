@@ -117,6 +117,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
                 .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
+                .AsSplitQuery()
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
@@ -130,6 +131,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
+                .AsSplitQuery()
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
@@ -160,26 +162,32 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             @event.Participants = @event.Participants.Where(p => p.UserId == userOrg.UserId).ToList();
 
-            var userEventOptions = @event.Options.Where(o => o.Participants.Any(p => p.UserId == userOrg.UserId));
-            foreach (var userEventOption in userEventOptions)
+            // Every option, not only the ones the caller picked. Rewriting just the caller's own
+            // picks left every other option carrying the full participant list — names, pictures
+            // and attend comments — for a caller without EventUsers.
+            var options = @event.Options.ToList();
+            foreach (var option in options)
             {
-                userEventOption.Participants = @event.Participants;
+                option.Participants = option.Participants
+                    .Where(p => p.UserId == userOrg.UserId)
+                    .ToList();
             }
 
-            // Every question option, not just the caller's own picks as in the loop above. Each
-            // level is materialised: mutating a lazy projection is discarded on re-enumeration.
+            @event.Options = options;
+
+            // Each level is materialised: mutating a lazy projection is discarded on re-enumeration.
             var trimmedQuestions = @event.Questions.ToList();
             foreach (var question in trimmedQuestions)
             {
-                var options = question.Options.ToList();
-                foreach (var option in options)
+                var questionOptions = question.Options.ToList();
+                foreach (var option in questionOptions)
                 {
                     option.Participants = option.Participants
                         .Where(p => p.UserId == userOrg.UserId)
                         .ToList();
                 }
 
-                question.Options = options;
+                question.Options = questionOptions;
             }
 
             @event.Questions = trimmedQuestions;
@@ -256,6 +264,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
+
+            // An absent image means "leave it alone". Assigning it unconditionally cleared the
+            // cover image and the wall logo for any client that omits the field.
+            eventDto.ImageName ??= eventToUpdate.ImageName;
 
             await ValidateEvent(eventDto);
 
