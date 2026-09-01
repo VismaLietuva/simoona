@@ -29,10 +29,14 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Polls
                 .HasForeignKey(x => x.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ClientNoAction, not Restrict: the database keeps NO ACTION either way, but Restrict makes
+            // EF enforce the required relationship on the client. Because polls and walls are soft deleted,
+            // the poll stays tracked with a non-nullable WallId when the wall is removed, and EF's cascade
+            // pass throws "the association ... has been severed" before SaveChanges is reached.
             builder.HasOne(x => x.Wall)
                 .WithMany()
                 .HasForeignKey(x => x.WallId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.ClientNoAction);
 
             builder.HasOne(x => x.ReviewedBy)
                 .WithMany()

@@ -5409,7 +5409,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall", "Wall")
                         .WithMany()
                         .HasForeignKey("WallId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.Navigation("Organization");

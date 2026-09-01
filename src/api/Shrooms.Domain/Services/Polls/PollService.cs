@@ -20,6 +20,9 @@ namespace Shrooms.Domain.Services.Polls
         private const int MaxOptionsPerQuestion = 10;
         private const int MaxQuestionsPerPoll = 10;
 
+        private const string BallotLockedMessage =
+            "Voting has started, so the questions and answers can no longer be changed.";
+
         private readonly IUnitOfWork2 _uow;
         private readonly IWallService _wallService;
         private readonly DbSet<Poll> _pollDbSet;
@@ -184,6 +187,12 @@ namespace Shrooms.Domain.Services.Polls
                 throw new InvalidOperationException("Poll not found.");
             }
 
+            var hasVotes = await _participantDbSet.AnyAsync(entity => entity.PollId == poll.Id);
+            if (hasVotes)
+            {
+                ValidateBallotUnchanged(poll, dto);
+            }
+
             var now = DateTime.UtcNow;
             poll.Title = dto.Title.Trim();
             poll.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
@@ -201,7 +210,6 @@ namespace Shrooms.Domain.Services.Polls
                 poll.ReviewedAt = null;
             }
 
-            var hasVotes = await _participantDbSet.AnyAsync(entity => entity.PollId == poll.Id);
             if (!hasVotes)
             {
                 poll.IsAnonymous = dto.IsAnonymous;
@@ -238,16 +246,16 @@ namespace Shrooms.Domain.Services.Polls
             var reason = args.Reason?.Trim();
             var now = DateTime.UtcNow;
 
+            if (poll.Deadline <= now)
+            {
+                throw new ArgumentException("The deadline has already passed. Give the poll a new deadline before publishing it.");
+            }
+
             poll.State = PollState.Published;
             poll.ClosedAt = null;
             poll.ReviewReason = string.IsNullOrEmpty(reason) ? null : reason;
             poll.ReviewedById = string.IsNullOrEmpty(reason) ? null : args.UserId;
             poll.ReviewedAt = string.IsNullOrEmpty(reason) ? null : now;
-
-            if (poll.Deadline <= now)
-            {
-                poll.Deadline = now.AddDays(1);
-            }
 
             poll.Modified = now;
             poll.ModifiedBy = args.UserId;
@@ -555,6 +563,47 @@ namespace Shrooms.Domain.Services.Polls
                         ModifiedBy = userId
                     }).ToList()
             }).ToList();
+        }
+
+        private static void ValidateBallotUnchanged(Poll poll, UpdatePollDto dto)
+        {
+            if (dto.IsAnonymous != poll.IsAnonymous)
+            {
+                throw new ArgumentException("Voting has started, so the anonymity setting can no longer be changed.");
+            }
+
+            var existing = poll.Questions.OrderBy(question => question.Order).ToList();
+
+            if (existing.Count != dto.Questions.Count)
+            {
+                throw new ArgumentException(BallotLockedMessage);
+            }
+
+            for (var index = 0; index < existing.Count; index++)
+            {
+                var current = existing[index];
+                var submitted = dto.Questions[index];
+
+                if (current.Text != submitted.Text.Trim() || current.AllowMultiple != submitted.AllowMultiple)
+                {
+                    throw new ArgumentException(BallotLockedMessage);
+                }
+
+                var currentOptions = current.Options
+                    .OrderBy(option => option.Order)
+                    .Select(option => option.Text)
+                    .ToList();
+
+                var submittedOptions = submitted.Options
+                    .Where(option => !string.IsNullOrWhiteSpace(option.Text))
+                    .Select(option => option.Text.Trim())
+                    .ToList();
+
+                if (!currentOptions.SequenceEqual(submittedOptions, StringComparer.Ordinal))
+                {
+                    throw new ArgumentException(BallotLockedMessage);
+                }
+            }
         }
 
         private static void ValidateContent(string title, string description, IList<CreatePollQuestionDto> questions)
