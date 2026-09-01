@@ -104,7 +104,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventQuestionViewModel, EventQuestionStructureDto>()
                 .ForMember(dest => dest.ShowIfOptionId,
-                    opt => opt.MapFrom(src => src.ShowIf == null ? (int?)null : src.ShowIf.OptionId))
+                    opt => opt.MapFrom(src => src.ShowIf == null ? src.ShowIfOptionId : src.ShowIf.OptionId))
                 .ForMember(dest => dest.ShowIfOptionClientId,
                     opt => opt.MapFrom(src => src.ShowIf == null ? null : src.ShowIf.OptionClientId));
 
