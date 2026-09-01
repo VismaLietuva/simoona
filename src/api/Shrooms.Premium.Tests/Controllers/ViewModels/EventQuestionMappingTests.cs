@@ -265,20 +265,25 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             Assert.That(json, Does.Contain("\"showIfOptionId\":null"));
         }
 
-        // MemberList.None would not complain if ChosenOptions stopped mapping.
+        // The controller assigns both id collections after mapping, because AutoMapper maps a null
+        // source collection to an empty destination one, and this endpoint needs "omitted" (keep
+        // what is stored) to stay distinguishable from an empty array (clear it). Mapping them here
+        // would quietly reintroduce that coercion, and MemberList.None would not complain.
         [Test]
-        public void Should_Carry_The_Chosen_Options_Of_A_Status_Change_Onto_The_Dto()
+        public void Should_Leave_The_Status_Change_Id_Collections_For_The_Controller_To_Assign()
         {
             var viewModel = new UpdateAttendStatusViewModel
             {
                 EventId = Guid.NewGuid(),
                 AttendStatus = AttendingStatus.Attending,
-                ChosenOptions = new List<int> { 135, 136 }
+                ChosenOptions = new List<int> { 135, 136 },
+                Answers = new List<int> { 90 }
             };
 
             var dto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(viewModel);
 
-            Assert.That(dto.ChosenOptions, Is.EquivalentTo(new[] { 135, 136 }));
+            Assert.That(dto.ChosenOptions, Is.Null);
+            Assert.That(dto.Answers, Is.Null);
         }
 
         // MemberList.None would not complain if the nesting stopped mapping.

@@ -55,6 +55,12 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<EventDetailsQuestionViewModel> Questions { get; set; }
 
+        /// <summary>
+        /// The caller's own selection, so the sign-up wizard can pre-fill the answers it is about
+        /// to re-assert. The per-option participant lists only carry people who are Going.
+        /// </summary>
+        public IEnumerable<int> MyChosenOptions { get; set; }
+
         public int GoingCount { get; set; }
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }

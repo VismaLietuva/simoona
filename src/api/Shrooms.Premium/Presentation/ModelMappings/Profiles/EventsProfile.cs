@@ -122,7 +122,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.ShowIfOptionClientId,
                     opt => opt.MapFrom(src => src.ShowIf == null ? null : src.ShowIf.OptionClientId));
 
+            // Both id collections are assigned by the controller: on this endpoint an omitted array
+            // means "keep what is stored", which AutoMapper's null-to-empty collection mapping
+            // would turn into "clear it".
             CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(MemberList.None)
+                .Ignore(d => d.ChosenOptions)
+                .Ignore(d => d.Answers)
                 .IgnoreUserOrgDto();
 
             CreateMap<EventDetailsOptionViewModel, EventDetailsOptionDto>(MemberList.None);

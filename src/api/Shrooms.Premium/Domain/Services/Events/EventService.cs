@@ -131,7 +131,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
-                .Select(MapToEventDetailsDto(id))
+                .Select(MapToEventDetailsDto(id, userOrg.UserId))
                 .SingleOrDefaultAsync();
             _eventValidationService.CheckIfEventExists(@event);
 
@@ -726,7 +726,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return eventArgsDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventArgsDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
         }
 
-        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId)
+        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId, string userId)
         {
             return e => new EventDetailsDto
             {
@@ -811,7 +811,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                     ImageName = p.ApplicationUser.PictureId,
                     AttendStatus = p.AttendStatus,
                     AttendComment = p.AttendComment
-                })
+                }),
+
+                // Not derivable from the option-level Participants lists above: those are scoped to
+                // people who are Going, so a Maybe participant would see none of their own answers.
+                MyChosenOptions = e.EventParticipants
+                    .Where(p => p.ApplicationUserId == userId)
+                    .SelectMany(p => p.EventOptions.Select(option => option.Id))
             };
         }
     }

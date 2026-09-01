@@ -389,6 +389,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var updateAttendStatusDto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(updateStatusViewModel);
             SetOrganizationAndUser(updateAttendStatusDto);
+            updateAttendStatusDto.ChosenOptions = updateStatusViewModel.ChosenOptions;
+            updateAttendStatusDto.Answers = updateStatusViewModel.Answers;
 
             try
             {

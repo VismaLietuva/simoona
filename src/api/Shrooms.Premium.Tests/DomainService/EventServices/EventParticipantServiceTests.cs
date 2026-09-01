@@ -1769,6 +1769,54 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public async Task Should_Keep_Stored_Answers_When_A_Status_Change_Carries_Only_Flat_Options()
+        {
+            // What the shipped client posts: attendStatus and nothing else. Replacing the whole
+            // selection with that would delete answers the client never knew about.
+            var eventId = MockEventWithRequiredQuestion(
+                withAttendingUser1: true,
+                user1Status: AttendingStatus.MaybeAttending,
+                user1AnswerIds: new[] { 90 });
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending,
+                ChosenOptions = new List<int>()
+            };
+
+            await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
+
+            var participant = ((IQueryable<EventParticipant>)_eventParticipantsDbSet)
+                .Single(p => p.ApplicationUserId == "user1");
+            Assert.That(participant.EventOptions.Select(option => option.Id), Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
+        public void Should_Not_Block_Going_When_A_Required_Question_Was_Added_After_The_Participant_Answered()
+        {
+            // A host can add a required question to a live event. The shipped client cannot supply
+            // an answer on a status change, so enforcing the stored ones would strand the
+            // participant on Maybe with no way forward.
+            var eventId = MockEventWithRequiredQuestion(
+                withAttendingUser1: true,
+                user1Status: AttendingStatus.MaybeAttending);
+
+            var updateAttendStatusDto = new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(
+                async () => await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto));
+        }
+
+        [Test]
         public void Should_Reject_A_Status_Change_To_Going_That_Skips_A_Required_Question()
         {
             var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true, user1Status: AttendingStatus.MaybeAttending);
@@ -1779,7 +1827,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "user1",
                 OrganizationId = 2,
                 AttendStatus = AttendingStatus.Attending,
-                ChosenOptions = new List<int>()
+                ChosenOptions = new List<int>(),
+
+                // Present but empty: the caller is submitting "no answers", which is what puts the
+                // answer rules in play. Omitting it would mean "keep my stored answers".
+                Answers = new List<int>()
             };
 
             var ex = Assert.ThrowsAsync<EventAnswersInvalidException>(

@@ -384,10 +384,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         /// <summary>
         /// Returns the options to persist, or null to leave the participant's selection untouched.
-        /// A request that carries no choices is validated against what the participant already
-        /// answered: AutoMapper's AllowNullCollections is off, so an omitted array arrives as an
-        /// empty one and "omitted" cannot be told from "clear my answers". Treating it as "keep"
-        /// is the only safe reading — clearing answers is what UpdateSelectedOptions is for.
+        /// The flat picks and the answers are replaced independently: each is kept as stored unless
+        /// the request carries that half. A status change is not the place to judge answers the
+        /// caller did not send, so the answer rules only run against a submitted set.
         /// </summary>
         private ICollection<EventOption> ValidateAnswersForStatusChange(
             UpdateAttendStatusDto updateAttendStatusDto,
@@ -402,13 +401,34 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return null;
             }
 
-            var requested = (updateAttendStatusDto.ChosenOptions ?? Enumerable.Empty<int>()).ToList();
-            var stored = (storedOptions ?? new List<EventOption>()).Select(option => option.Id).ToList();
+            var submitted = SubmittedOptionIds(updateAttendStatusDto.ChosenOptions, updateAttendStatusDto.Answers);
+            var stored = (storedOptions ?? new List<EventOption>()).ToList();
 
-            // Nothing requested: re-assert the stored answers so switching Maybe back to Going
-            // does not have to re-send an answer the database already holds.
-            var replaceSelection = requested.Count > 0;
-            var chosenOptions = replaceSelection ? requested : stored;
+            var questionOwnedIds = eventDto.Options
+                .Where(option => option.QuestionId != null)
+                .Select(option => option.Id)
+                .ToHashSet();
+
+            // Each half of the selection is replaced only if the request carries that half, so a
+            // caller sending just answers keeps the participant's flat picks and vice versa.
+            // Which half an id belongs to comes from the event, not from the field it arrived in.
+            var legacySupplied = updateAttendStatusDto.ChosenOptions != null;
+            var answersSupplied = updateAttendStatusDto.Answers != null || submitted.Any(questionOwnedIds.Contains);
+
+            if (!legacySupplied && !answersSupplied)
+            {
+                return null;
+            }
+
+            var legacy = legacySupplied
+                ? submitted.Where(id => !questionOwnedIds.Contains(id)).ToList()
+                : stored.Where(option => option.QuestionId == null).Select(option => option.Id).ToList();
+
+            var answers = answersSupplied
+                ? submitted.Where(questionOwnedIds.Contains).ToList()
+                : stored.Where(option => option.QuestionId != null).Select(option => option.Id).ToList();
+
+            var chosenOptions = legacy.Concat(answers).Distinct().ToList();
 
             var selectedOptions = eventDto.Options.Where(option => chosenOptions.Contains(option.Id)).ToList();
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
@@ -424,9 +444,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 selectedOptions.Where(option => option.QuestionId == null).ToList(),
                 OptionRules.IgnoreSingleJoin);
 
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions);
+            // Only what the caller actually submitted is judged. Validating stored answers would
+            // make a required question added to a live event a permanent block on going: the
+            // shipped client sends no answers here and offers no way to supply the missing one.
+            if (answersSupplied)
+            {
+                _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions);
+            }
 
-            return replaceSelection ? selectedOptions : null;
+            return selectedOptions;
         }
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)

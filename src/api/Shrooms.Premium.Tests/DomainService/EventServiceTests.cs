@@ -210,6 +210,20 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_The_Callers_Own_Selection_In_Details()
+        {
+            // The per-option Participants lists only name people who are Going, so this is the only
+            // place a Maybe participant can learn what they already answered — which is exactly
+            // what a status change back to Going re-asserts.
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.MyChosenOptions, Is.EquivalentTo(new[] { 90 }));
+        }
+
+        [Test]
         public async Task Should_Hide_Other_Peoples_Answers_From_A_Caller_Who_Cannot_See_Participants()
         {
             var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
@@ -270,6 +284,11 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // A legacy option the colleague picked and the caller did not.
             var soup = new EventOption { Id = 80, EventId = eventId, Option = "Soup", QuestionId = null, Order = 0, EventParticipants = new List<EventParticipant> { colleague } };
+
+            // The inverse navigation the details projection reads for the caller's own selection.
+            // EF fills it from the ThenInclude; a mocked DbSet does no relationship fixup.
+            me.EventOptions = new List<EventOption> { pasta };
+            colleague.EventOptions = new List<EventOption> { soup, pasta };
 
             var events = new List<Event>
             {

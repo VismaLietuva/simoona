@@ -33,6 +33,13 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<EventDetailsQuestionDto> Questions { get; set; }
 
+        /// <summary>
+        /// The caller's own selection, flat options and answers alike. The per-option Participants
+        /// lists only carry people who are Going, so a Maybe or Not going participant would
+        /// otherwise have no way to see what they had already answered.
+        /// </summary>
+        public IEnumerable<int> MyChosenOptions { get; set; }
+
         public int GoingCount { get; set; }
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
