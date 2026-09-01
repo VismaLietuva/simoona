@@ -326,11 +326,35 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             {
                 EventId = eventId,
                 ChosenOptions = new List<int>(),
+
+                // An empty Answers array is the caller saying "my answers are: none", which is what
+                // puts the answer rules in play. Omitting it means "leave my answers alone".
+                Answers = new List<int>(),
                 UserId = "user1",
                 OrganizationId = 2
             };
 
             Assert.ThrowsAsync<EventAnswersInvalidException>(
+                async () => await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto));
+        }
+
+        [Test]
+        public void Should_Not_Enforce_Answers_When_A_Legacy_Payload_Carries_None()
+        {
+            // The shipped AngularJS client posts flat options only. Enforcing answers against what
+            // is already stored would leave a participant unable to change options at all once a
+            // host adds a required question to a live event.
+            var eventId = MockEventWithRequiredQuestion(withAttendingUser1: true);
+
+            var changeOptionsDto = new EventChangeOptionsDto
+            {
+                EventId = eventId,
+                ChosenOptions = new List<int>(),
+                UserId = "user1",
+                OrganizationId = 2
+            };
+
+            Assert.DoesNotThrowAsync(
                 async () => await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto));
         }
 

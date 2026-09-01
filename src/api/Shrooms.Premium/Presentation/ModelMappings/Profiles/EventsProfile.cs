@@ -68,7 +68,11 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                         }))
                 .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src => src.ShowIfOptionId));
 
+            // Answers is assigned by the controller: AutoMapper maps a null source collection to an
+            // empty destination one, which would erase the difference between "omitted" (keep the
+            // stored answers) and an empty array (clear them).
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
+                .Ignore(x => x.Answers)
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
 
@@ -91,10 +95,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>(MemberList.None);
             CreateMap<EventSearchOptionsViewModel, EventSearchOptionsDto>(MemberList.None);
+            // Answers is assigned by the controller for the same reason as on
+            // EventChangeOptionViewModel: a null collection must not arrive as an empty one.
             CreateMap<EventJoinViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinMultipleViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDto>(MemberList.None);

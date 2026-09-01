@@ -16,5 +16,10 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public ICollection<string> ParticipantIds { get; set; }
 
         public ICollection<int> ChosenOptions { get; set; }
+
+        /// <summary>
+        /// Question answers, applied to every participant being added.
+        /// </summary>
+        public ICollection<int> Answers { get; set; }
     }
 }

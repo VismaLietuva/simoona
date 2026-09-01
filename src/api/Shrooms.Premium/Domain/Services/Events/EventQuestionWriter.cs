@@ -72,8 +72,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             foreach (var dto in desired)
             {
                 var entity = dto.Id == null
-                    ? InsertQuestion(eventId, dto)
-                    : UpdateQuestion(existing, dto);
+                    ? InsertQuestion(eventId, dto, userId)
+                    : UpdateQuestion(existing, dto, userId);
 
                 entities.Add((dto, entity));
             }
@@ -218,7 +218,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             entity.ShowIfOption = optionByClientId[dto.ShowIfOptionClientId];
         }
 
-        private EventQuestion InsertQuestion(Guid eventId, EventQuestionStructureDto dto)
+        private EventQuestion InsertQuestion(Guid eventId, EventQuestionStructureDto dto, string userId)
         {
             var entity = new EventQuestion
             {
@@ -230,11 +230,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                 Options = new List<EventOption>()
             };
 
+            StampCreated(entity, userId);
+
             _questionsDbSet.Add(entity);
             return entity;
         }
 
-        private static EventQuestion UpdateQuestion(List<EventQuestion> existing, EventQuestionStructureDto dto)
+        private EventQuestion UpdateQuestion(List<EventQuestion> existing, EventQuestionStructureDto dto, string userId)
         {
             var entity = existing.Single(q => q.Id == dto.Id);
 
@@ -242,6 +244,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             entity.Order = dto.Order;
             entity.SelectType = dto.SelectType;
             entity.IsRequired = dto.IsRequired;
+
+            StampModified(entity, userId);
 
             return entity;
         }
@@ -279,6 +283,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                         Question = entity
                     };
 
+                    StampCreated(option, userId);
+
                     _optionsDbSet.Add(option);
 
                     if (!string.IsNullOrWhiteSpace(optionDto.ClientId))
@@ -298,6 +304,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                     {
                         option.Rule = optionDto.Rule.Value;
                     }
+
+                    StampModified(option, userId);
 
                     if (!string.IsNullOrWhiteSpace(optionDto.ClientId))
                     {
@@ -328,6 +336,22 @@ namespace Shrooms.Premium.Domain.Services.Events
         private void SoftDelete(SoftDeletableModel entity, string userId)
         {
             entity.IsDeleted = true;
+            StampModified(entity, userId);
+        }
+
+        // Both callers of this writer finish with SaveChangesAsync(false), which skips
+        // ShroomsDbContext.UpdateEntityMetadata, so nothing else fills these in. Without the stamp
+        // an inserted row lands with Created = 0001-01-01 and CreatedBy = NULL. The legacy option
+        // path in EventService.UpdateEventOptions sets them by hand for the same reason.
+        private void StampCreated(BaseModel entity, string userId)
+        {
+            entity.Created = _systemClock.UtcNow;
+            entity.CreatedBy = userId;
+            StampModified(entity, userId);
+        }
+
+        private void StampModified(BaseModel entity, string userId)
+        {
             entity.Modified = _systemClock.UtcNow;
             entity.ModifiedBy = userId;
         }

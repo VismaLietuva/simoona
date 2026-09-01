@@ -311,11 +311,33 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfEventExists(eventEntity);
 
             // ReSharper disable once PossibleNullReferenceException
+            var submitted = SubmittedOptionIds(changeOptionsDto.ChosenOptions, changeOptionsDto.Answers);
+
+            // Whether the request touches answers is decided by the event's own data, not by which
+            // field the ids arrived in: a caller that puts answers in ChosenOptions is still
+            // answering, and must face the answer rules.
+            var questionOwnedIds = eventEntity.Options
+                .Where(option => option.QuestionId != null)
+                .Select(option => option.Id)
+                .ToHashSet();
+
+            var answersSupplied = changeOptionsDto.Answers != null || submitted.Any(questionOwnedIds.Contains);
+
+            // A flat-options-only payload leaves the stored answers alone. The legacy web client
+            // posts exactly that, so replacing the whole selection with it would delete answers it
+            // never knew about, and enforcing the stored ones would block a food-choice change the
+            // moment a host adds a required question.
+            var chosenOptions = answersSupplied
+                ? submitted
+                : submitted
+                    .Concat(await StoredAnswerIdsAsync(changeOptionsDto.EventId, changeOptionsDto.UserId))
+                    .Distinct()
+                    .ToList();
+
             eventEntity.SelectedOptions = eventEntity.Options
-                .Where(option => changeOptionsDto.ChosenOptions.Contains(option.Id))
+                .Where(option => chosenOptions.Contains(option.Id))
                 .ToList();
 
-            var chosenOptions = changeOptionsDto.ChosenOptions.ToList();
             var legacyOptionIds = LegacyOptionIds(eventEntity.Options);
             var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
@@ -334,7 +356,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
             // After the capacity and membership rules, so those keep reporting their own codes.
-            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions);
+            // Only when the caller actually submitted answers: re-validating stored ones would turn
+            // a later tree change into a permanent block on changing options.
+            if (answersSupplied)
+            {
+                _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions);
+            }
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
@@ -350,7 +377,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
         {
-            var chosenOptions = joinDto.ChosenOptions.ToList();
+            var chosenOptions = SubmittedOptionIds(joinDto.ChosenOptions, joinDto.Answers);
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
             var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
@@ -783,9 +810,32 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserHasPermission(joinDto.UserId, eventDto.ResponsibleUserId, hasPermission);
         }
 
-        private List<EventOption> GetSelectedOptions(EventJoinValidationDto validationDto, EventJoinDto joinDto) =>
-            validationDto.Options.Where(option => joinDto.ChosenOptions.Contains(option.Id))
+        private List<EventOption> GetSelectedOptions(EventJoinValidationDto validationDto, EventJoinDto joinDto)
+        {
+            var submitted = SubmittedOptionIds(joinDto.ChosenOptions, joinDto.Answers);
+
+            return validationDto.Options.Where(option => submitted.Contains(option.Id)).ToList();
+        }
+
+        // The two id kinds travel in separate fields, but every rule downstream partitions them by
+        // the event's own QuestionId, so a caller that lumps them together still behaves.
+        private static List<int> SubmittedOptionIds(IEnumerable<int> chosenOptions, IEnumerable<int> answers)
+        {
+            return (chosenOptions ?? Enumerable.Empty<int>())
+                .Concat(answers ?? Enumerable.Empty<int>())
+                .Distinct()
                 .ToList();
+        }
+
+        private async Task<List<int>> StoredAnswerIdsAsync(Guid eventId, string userId)
+        {
+            return await _eventParticipantsDbSet
+                .Where(participant => participant.EventId == eventId && participant.ApplicationUserId == userId)
+                .SelectMany(participant => participant.EventOptions
+                    .Where(option => option.QuestionId != null)
+                    .Select(option => option.Id))
+                .ToListAsync();
+        }
 
         // MaxChoices is derived from flat options only (see EventService.FindOutMaxChoices), so a
         // question-only event has MaxChoices == 0. Counting answers against it rejects every valid

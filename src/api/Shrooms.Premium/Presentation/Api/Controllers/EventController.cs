@@ -328,6 +328,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var eventJoinDto = _mapper.Map<EventJoinMultipleViewModel, EventJoinDto>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDto);
+            eventJoinDto.Answers = eventJoinModel.Answers;
 
             try
             {
@@ -357,6 +358,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var optionsDto = _mapper.Map<EventJoinViewModel, EventJoinDto>(joinOptions);
             SetOrganizationAndUser(optionsDto);
+            optionsDto.Answers = joinOptions.Answers;
             optionsDto.ParticipantIds = new List<string> { optionsDto.UserId };
 
             try
@@ -654,6 +656,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var changeOptionsDto = _mapper.Map<EventChangeOptionViewModel, EventChangeOptionsDto>(viewModel);
             SetOrganizationAndUser(changeOptionsDto);
+            changeOptionsDto.Answers = viewModel.Answers;
 
             try
             {
