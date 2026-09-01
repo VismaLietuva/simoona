@@ -334,7 +334,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
             // After the capacity and membership rules, so those keep reporting their own codes.
-            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions, legacyOptionIds);
+            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions);
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
@@ -373,7 +373,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             // error. CheckIfProvidedOptionsAreValid above already rejects an unknown option with
             // code 215, which the web client has a message for, so UnknownOption here is a
             // backstop for callers that skip that check.
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions);
         }
 
         private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)

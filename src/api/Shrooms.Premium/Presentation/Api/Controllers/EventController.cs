@@ -723,7 +723,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     .Select(error => new EventAnswerErrorViewModel
                     {
                         QuestionId = error.QuestionId,
-                        OptionId = error.OptionId,
                         Reason = error.Reason
                     })
                     .ToList()
