@@ -336,7 +336,7 @@ namespace Shrooms.Domain.Services.Wall
             {
                 var wallTypeFilter = isEventWall
                     ? (Expression<Func<DataLayer.EntityModels.Models.Multiwall.Wall, bool>>)(w => w.Type == WallType.Events)
-                    : (w => w.Type != WallType.Events);
+                    : (w => w.Type != WallType.Events && w.Type != WallType.Polls);
 
                 var wall = await _wallsDbSet
                     .Include(w => w.Members)
@@ -641,9 +641,18 @@ namespace Shrooms.Domain.Services.Wall
                 AdministrationPermissions.Event :
                 BasicPermissions.Event;
 
-            var hasRequiredPermission = wall.Type != WallType.Events ?
-                await _permissionService.UserHasPermissionAsync(userOrg, permission) :
-                await _permissionService.UserHasPermissionAsync(userOrg, eventPermission);
+            var pollPermission = checkForAdministrationEventPermission ?
+                AdministrationPermissions.Poll :
+                BasicPermissions.Poll;
+
+            var requiredPermission = wall.Type switch
+            {
+                WallType.Events => eventPermission,
+                WallType.Polls => pollPermission,
+                _ => permission
+            };
+
+            var hasRequiredPermission = await _permissionService.UserHasPermissionAsync(userOrg, requiredPermission);
 
             if (!hasRequiredPermission)
             {
