@@ -166,6 +166,26 @@ namespace Shrooms.Premium.Domain.Services.Events
                 userEventOption.Participants = @event.Participants;
             }
 
+            // Every question option, not only the ones the caller picked: a colleague's name behind
+            // an answer the caller did not choose is precisely what this permission gates.
+            // Each level is materialised before being written back — the projection can still be
+            // lazy here, and mutating objects from a lazy sequence is thrown away on re-enumeration.
+            var trimmedQuestions = @event.Questions.ToList();
+            foreach (var question in trimmedQuestions)
+            {
+                var options = question.Options.ToList();
+                foreach (var option in options)
+                {
+                    option.Participants = option.Participants
+                        .Where(p => p.UserId == userOrg.UserId)
+                        .ToList();
+                }
+
+                question.Options = options;
+            }
+
+            @event.Questions = trimmedQuestions;
+
             return @event;
         }
 
@@ -746,6 +766,41 @@ namespace Shrooms.Premium.Domain.Services.Events
                                 ImageName = p.ApplicationUser.PictureId,
                                 AttendStatus = p.AttendStatus,
                                 AttendComment = p.AttendComment
+                            })
+                    }),
+                // The answers. This is the only read endpoint that carries them: /Events/Options
+                // serves the same tree to the attendee wizard without participants, because that
+                // payload is serialised into a client component.
+                Questions = e.EventQuestions
+                    .OrderBy(question => question.Order)
+                    .Select(question => new EventDetailsQuestionDto
+                    {
+                        Id = question.Id,
+                        Title = question.Title,
+                        Order = question.Order,
+                        SelectType = question.SelectType,
+                        IsRequired = question.IsRequired,
+                        ShowIfOptionId = question.ShowIfOptionId,
+                        Options = question.Options
+                            .OrderBy(option => option.Order)
+                            .Select(option => new EventDetailsQuestionOptionDto
+                            {
+                                Id = option.Id,
+                                Name = option.Option,
+                                Order = option.Order,
+                                Participants = option.EventParticipants
+                                    .Where(x => x.EventId == eventId &&
+                                          (x.AttendStatus == (int)AttendingStatus.Attending ||
+                                           x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
+                                    .Select(p => new EventDetailsParticipantDto
+                                    {
+                                        Id = p.Id,
+                                        UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
+                                        FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
+                                        ImageName = p.ApplicationUser.PictureId,
+                                        AttendStatus = p.AttendStatus,
+                                        AttendComment = p.AttendComment
+                                    })
                             })
                     }),
                 Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDto
