@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -11,6 +12,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Polls;
 using Shrooms.Domain.Services.Wall;
+using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Polls
 {
@@ -31,6 +33,7 @@ namespace Shrooms.Domain.Services.Polls
         private readonly DbSet<PollAnswer> _answerDbSet;
         private readonly DbSet<PollParticipant> _participantDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
+        private readonly DbSet<MultiwallWall> _wallDbSet;
 
         public PollService(IUnitOfWork2 uow, IWallService wallService)
         {
@@ -42,6 +45,7 @@ namespace Shrooms.Domain.Services.Polls
             _answerDbSet = uow.GetDbSet<PollAnswer>();
             _participantDbSet = uow.GetDbSet<PollParticipant>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
+            _wallDbSet = uow.GetDbSet<MultiwallWall>();
         }
 
         public async Task<IEnumerable<PollListItemDto>> GetVisiblePollsAsync(UserAndOrganizationDto userOrg)
@@ -208,6 +212,14 @@ namespace Shrooms.Domain.Services.Polls
                 poll.ReviewReason = null;
                 poll.ReviewedById = null;
                 poll.ReviewedAt = null;
+            }
+
+            // The wall carries the poll's name into comment notifications and emails, so keep it in step.
+            var wall = await _wallDbSet.FirstOrDefaultAsync(entity => entity.Id == poll.WallId);
+            if (wall != null)
+            {
+                wall.Name = poll.Title;
+                wall.Description = poll.Description;
             }
 
             if (!hasVotes)
@@ -385,16 +397,19 @@ namespace Shrooms.Domain.Services.Polls
                 _answerDbSet.Add(pick);
             }
 
+            if (!poll.IsAnonymous)
+            {
+                await _wallService.AddMemberToWallsAsync(dto.UserId, new List<int> { poll.WallId });
+            }
+
             try
             {
-                await _uow.SaveChangesAsync(false);
+                await _uow.SaveChangesAsync(dto.UserId);
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException e) when (IsUniqueViolation(e))
             {
                 throw new ArgumentException("You have already voted in this poll.");
             }
-
-            await _wallService.AddMemberToWallsAsync(dto.UserId, new List<int> { poll.WallId });
         }
 
         private IQueryable<Poll> BaseQuery(UserAndOrganizationDto userOrg)
@@ -670,6 +685,12 @@ namespace Shrooms.Domain.Services.Polls
                     throw new ArgumentException("Answers must be different from one another.");
                 }
             }
+        }
+
+        private static bool IsUniqueViolation(DbUpdateException e)
+        {
+            return e.InnerException is SqlException sql
+                   && (sql.Number == 2601 || sql.Number == 2627);
         }
 
         private static bool IsClosed(Poll poll)
