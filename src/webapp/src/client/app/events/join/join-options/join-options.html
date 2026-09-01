@@ -30,6 +30,38 @@
                 </label>
             </div>
         </div>
+        <div class="event-sign-up-questions" ng-if="vm.questions.length">
+            <h4 ng-if="!!vm.options.length" translate="events.eventQuestionsTitle"></h4>
+
+            <div class="event-sign-up-question" ng-repeat="question in vm.visibleQuestions()"
+                data-test-id="sign-up-question">
+                <div class="event-sign-up-question-title">
+                    {{question.title}}
+                    <span ng-if="question.isRequired" class="text-error"
+                        uib-tooltip="{{'events.eventQuestionRequired' | translate}}">*</span>
+                </div>
+                <p class="event-sign-up-question-hint">
+                    <span ng-if="question.selectType !== 'Multi'" translate="events.eventQuestionPickOne"></span>
+                    <span ng-if="question.selectType === 'Multi'" translate="events.eventQuestionPickMany"></span>
+                </p>
+
+                <div class="row row-options">
+                    <div ng-repeat="option in question.options | orderBy:['order','id']"
+                        class="col-xs-6 {{question.selectType === 'Multi' ? 'checkbox' : 'radio'}}">
+                        <label for="answer{{option.id}}" uib-tooltip="{{option.name}}" tooltip-placement="bottom"
+                            tooltip-append-to-body="true" data-test-id="answer-to-select">
+                            <input id="answer{{option.id}}"
+                                type="{{question.selectType === 'Multi' ? 'checkbox' : 'radio'}}"
+                                name="question{{question.id}}" data-test-id="answer-check-box"
+                                ng-click="vm.selectAnswer(question, option)"
+                                ng-checked="vm.isAnswerSelected(question.id, option.id)" />
+                            {{option.name}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <tags-input ng-if="vm.isAddColleague" id="participants" name="participants" ng-model="vm.participants"
             add-from-autocomplete-only="true" display-property="fullName" key-property="id"
@@ -61,7 +93,8 @@
             <span ng-if="vm.isAddColleague" translate="events.eventAdd"></span>
         </button>
         <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save"
-            ng-click="vm.updateOptions()"></button>
+            ng-click="vm.updateOptions()"
+            ng-disabled="vm.hasUnansweredQuestion() || vm.isActionDisabled"></button>
         <button class="btn btn-default" ng-click="vm.closeModal()" data-test-id="close-event-modal-button">
             <span translate="common.cancel"></span>
         </button>

@@ -27,7 +27,8 @@
         'attendStatus',
         'optionRules',
         'selectedAttendStatus',
-        'eventService'
+        'eventService',
+        'eventSignUpSteps'
     ];
 
     function eventJoinOptionsController(
@@ -48,7 +49,8 @@
         attendStatus,
         optionRules,
         selectedAttendStatus,
-        eventService) {
+        eventService,
+        eventSignUpSteps) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -64,6 +66,10 @@
         });
         vm.isActionDisabled = false;
 
+        vm.questions = event.signUpQuestions || [];
+
+        vm.answers = eventSignUpSteps.prefill(vm.questions, event.myChosenOptions);
+
         vm.joinEvent = joinEvent;
         vm.updateOptions = updateOptions;
         vm.closeModal = closeModal;
@@ -72,6 +78,14 @@
         vm.getUserForAutoComplete = getUserForAutoComplete;
         vm.isTooManyOptionsSelected = isTooManyOptionsSelected;
         vm.isOptionSelected = isOptionSelected;
+
+        vm.visibleQuestions = visibleQuestions;
+
+        vm.selectAnswer = selectAnswer;
+
+        vm.isAnswerSelected = isAnswerSelected;
+
+        vm.hasUnansweredQuestion = hasUnansweredQuestion;
 
         init();
 
@@ -133,6 +147,54 @@
             }
         }
 
+        // undefined rather than [] when the event has no questions: the API reads an
+
+        // empty array as "clear my answers" and a missing one as "leave them alone".
+
+        function submittedAnswers() {
+
+            return vm.questions.length
+
+                ? eventSignUpSteps.answerIds(vm.questions, vm.answers)
+
+                : undefined;
+
+        }
+
+
+
+        function visibleQuestions() {
+
+            return eventSignUpSteps.visibleQuestions(vm.questions, vm.answers);
+
+        }
+
+
+
+        function selectAnswer(question, option) {
+
+            vm.answers = eventSignUpSteps.toggleAnswer(vm.questions, vm.answers, question, option.id);
+
+        }
+
+
+
+        function isAnswerSelected(questionId, optionId) {
+
+            return eventSignUpSteps.isAnswerSelected(vm.answers, questionId, optionId);
+
+        }
+
+
+
+        function hasUnansweredQuestion() {
+
+            return !!eventSignUpSteps.missingRequired(vm.questions, vm.answers);
+
+        }
+
+
+
         function isOptionSelected(optionId) {
             return vm.selectedOptions.findIndex(op => op.id === optionId) > -1;
         }
@@ -164,7 +226,7 @@
 
             if (vm.selectedOptions.length > event.maxChoices) {
                 handleErrorMessage($translate.instant('events.maxOptionsError') + ' ' + event.maxChoices);
-            } else if (!vm.selectedOptions.length && event.options.length) {
+            } else if (!vm.selectedOptions.length && vm.options.length) {
                 handleErrorMessage('errorCodeMessages.messageNotEnoughOptions');
             } else if (vm.isAddColleague && !vm.participants.length) {
                 handleErrorMessage('events.noParticipantsError');
@@ -178,12 +240,21 @@
                 $uibModalInstance.close();
             } else {
                 var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
+
+                // An array once the event has questions — Join reads a missing `answers` as
+
+                // "none supplied", which a required question rejects — and undefined when it
+
+                // has none, so a legacy event keeps the exact payload it always sent.
+
+                var answerIds = submittedAnswers();
+
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, vm.colleagueStatusOption.attendStatus)
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, vm.colleagueStatusOption.attendStatus, answerIds)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
-                    eventRepository.joinEvent(event.id, selectedOptionsId, selectedAttendStatus)
+                    eventRepository.joinEvent(event.id, selectedOptionsId, selectedAttendStatus, '', answerIds)
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
@@ -202,7 +273,7 @@
 
             var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
 
-            eventRepository.updateEventOptions(event.id, selectedOptionsId)
+            eventRepository.updateEventOptions(event.id, selectedOptionsId, submittedAnswers())
                 .then(handleSuccessPromise, handleErrorPromise);
         }
 
@@ -258,8 +329,10 @@
 
         function isOptionsJoinAvailable() {
             var selectedOptionsCount = vm.selectedOptions.length;
+            var missingFlatPick = !!event.maxChoices &&
+                (!selectedOptionsCount || selectedOptionsCount > event.maxChoices);
 
-            return !!event.maxChoices && (!selectedOptionsCount || selectedOptionsCount > event.maxChoices);
+            return missingFlatPick || hasUnansweredQuestion();
         }
 
         function isTooManyOptionsSelected() {

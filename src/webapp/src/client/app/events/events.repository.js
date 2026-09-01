@@ -116,10 +116,11 @@
             }).get().$promise;
         }
 
-        function updateEventOptions(eventId, chosenOptions) {
+        function updateEventOptions(eventId, chosenOptions, answers) {
             return $resource(eventUrl + 'Options').save({
                 eventId: eventId,
-                chosenOptions: chosenOptions
+                chosenOptions: chosenOptions,
+                answers: answers
             }).$promise;
         }
 
@@ -142,21 +143,23 @@
             }).$promise;
         }
 
-        function addColleagues(eventId, chosenOptions, participantIds, attendStatus) {
+        function addColleagues(eventId, chosenOptions, participantIds, attendStatus, answers) {
             return $resource(eventUrl + 'AddColleague').save({
                 eventId: eventId,
                 chosenOptions: chosenOptions,
                 participantIds: participantIds,
-                attendStatus: attendStatus
+                attendStatus: attendStatus,
+                answers: answers
             }).$promise;
         }
 
-        function joinEvent(eventId, chosenOptions, attendStatus, attendComment) {
+        function joinEvent(eventId, chosenOptions, attendStatus, attendComment, answers) {
             return $resource(eventUrl + 'Join').save({
                 eventId: eventId,
                 chosenOptions: chosenOptions,
                 attendStatus: attendStatus,
-                attendComment: attendComment
+                attendComment: attendComment,
+                answers: answers
             }).$promise;
         }
 
