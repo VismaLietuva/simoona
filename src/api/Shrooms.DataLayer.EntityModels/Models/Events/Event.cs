@@ -59,6 +59,9 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public virtual Wall Wall { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
+
+        public virtual ICollection<EventQuestion> EventQuestions { get; set; }
+
         public bool IsPinned { get; set; }
         public bool IsShownInUpcomingEventsWidget { get; set; }
         public bool IsDeleted { get; set; }

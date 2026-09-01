@@ -15,7 +15,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasMaxLength(100);
 
             builder.HasOne(e => e.Event)
-                .WithMany()
+                .WithMany(e => e.EventQuestions)
                 .HasForeignKey(e => e.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
 

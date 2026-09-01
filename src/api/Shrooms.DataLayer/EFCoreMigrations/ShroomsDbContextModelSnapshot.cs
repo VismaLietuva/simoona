@@ -4989,7 +4989,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventQuestion", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Events.Event", "Event")
-                        .WithMany()
+                        .WithMany("EventQuestions")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -6144,6 +6144,8 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("EventOptions");
 
                     b.Navigation("EventParticipants");
+
+                    b.Navigation("EventQuestions");
 
                     b.Navigation("Reminders");
                 });
