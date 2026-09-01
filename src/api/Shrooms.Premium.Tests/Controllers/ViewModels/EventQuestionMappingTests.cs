@@ -346,5 +346,51 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
         }
+
+        [Test]
+        public void Should_Keep_A_Condition_Sent_In_The_Read_Shape()
+        {
+            var viewModel = new EventQuestionViewModel
+            {
+                Id = 2,
+                Title = "Choose pizza",
+                Order = 1,
+                SelectType = EventQuestionSelectType.Single,
+                IsRequired = true,
+                ShowIf = null,
+                ShowIfOptionId = 135
+            };
+
+            var dto = _mapper.Map<EventQuestionViewModel, EventQuestionStructureDto>(viewModel);
+
+            Assert.That(dto.ShowIfOptionId, Is.EqualTo(135),
+                "the old UI echoes the read payload back, where the condition is a scalar");
+        }
+
+        [Test]
+        public void Should_Let_The_Nested_Condition_Win_Over_The_Scalar()
+        {
+            var viewModel = new EventQuestionViewModel
+            {
+                Id = 2,
+                Title = "Choose pizza",
+                ShowIf = new EventQuestionConditionViewModel { OptionId = 991 },
+                ShowIfOptionId = 135
+            };
+
+            var dto = _mapper.Map<EventQuestionViewModel, EventQuestionStructureDto>(viewModel);
+
+            Assert.That(dto.ShowIfOptionId, Is.EqualTo(991));
+        }
+
+        [Test]
+        public void Should_Clear_A_Condition_When_Neither_Form_Is_Sent()
+        {
+            var viewModel = new EventQuestionViewModel { Id = 2, Title = "Choose pizza", ShowIf = null };
+
+            var dto = _mapper.Map<EventQuestionViewModel, EventQuestionStructureDto>(viewModel);
+
+            Assert.That(dto.ShowIfOptionId, Is.Null);
+        }
     }
 }
