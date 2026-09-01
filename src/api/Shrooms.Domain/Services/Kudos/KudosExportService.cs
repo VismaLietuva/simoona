@@ -47,7 +47,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             var sortedLogs = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
                 logsQuery.AsQueryable(),
-                string.Concat(filter.SortBy, " ", filter.SortOrder));
+                string.Concat(filter.SortBy, " ", filter.SortOrder, ", Id ", filter.SortOrder));
 
             var kudos = await sortedLogs.ToListAsync();
 

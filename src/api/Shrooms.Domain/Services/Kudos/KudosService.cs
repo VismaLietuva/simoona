@@ -194,7 +194,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             var kudosLogsQuery = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
                 kudosLogsQueryBeforeSort.AsQueryable(), 
-                string.Concat(options.SortBy, " ", options.SortOrder));
+                string.Concat(options.SortBy, " ", options.SortOrder, ", Id ", options.SortOrder));
 
             var logsTotalCount = await kudosLogsQuery.CountAsync();
 
