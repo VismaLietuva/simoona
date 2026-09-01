@@ -22,7 +22,10 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [StringLength(EventsConstants.EventNameMaxLength)]
         public string Name { get; set; }
 
-        [Required]
+        /// <summary>
+        /// Optional, as on create. Assigned unconditionally, which is what makes removing a cover
+        /// image possible.
+        /// </summary>
         public string ImageName { get; set; }
 
         [Required]
