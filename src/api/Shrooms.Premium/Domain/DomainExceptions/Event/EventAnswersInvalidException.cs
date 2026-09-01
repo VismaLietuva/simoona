@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.DomainExceptions.Event
@@ -11,10 +12,8 @@ namespace Shrooms.Premium.Domain.DomainExceptions.Event
     /// </summary>
     public class EventAnswersInvalidException : EventException
     {
-        public const string ErrorCode = "EventAnswersInvalid";
-
         public EventAnswersInvalidException(IReadOnlyList<EventAnswerErrorDto> errors)
-            : base(ErrorCode)
+            : base(PremiumErrorCodes.EventAnswersInvalid)
         {
             Errors = errors;
         }

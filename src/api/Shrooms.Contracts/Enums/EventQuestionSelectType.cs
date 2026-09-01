@@ -1,4 +1,4 @@
-namespace Shrooms.Contracts.Enums
+﻿namespace Shrooms.Contracts.Enums
 {
     public enum EventQuestionSelectType
     {

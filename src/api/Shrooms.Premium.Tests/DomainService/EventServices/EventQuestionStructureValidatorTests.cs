@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Shrooms.Contracts.Enums;
@@ -149,10 +149,112 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Not_Throw_When_Options_Is_Null()
+        public void Should_Reject_A_Question_Whose_Options_Are_Null()
         {
             var question = Question("q1", 0);
             question.Options = null;
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionOptionsMissing));
+        }
+
+        [Test]
+        public void Should_Reject_A_Question_With_No_Options()
+        {
+            var question = Question("q1", 0);
+            question.Options = new List<EventQuestionOptionStructureDto>();
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionOptionsMissing));
+        }
+
+        [Test]
+        public void Should_Reject_A_Null_Question_In_The_Payload()
+        {
+            var questions = new List<EventQuestionStructureDto> { Question("q1", 0), null };
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(questions));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionPayloadInvalid));
+        }
+
+        [Test]
+        public void Should_Reject_A_Null_Option_In_The_Payload()
+        {
+            var question = Question("q1", 0);
+            question.Options.Add(null);
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionPayloadInvalid));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Questions_Sharing_An_Id()
+        {
+            var first = Question("q1", 0);
+            var second = Question("q2", 1);
+            first.Id = 5;
+            second.Id = 5;
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { first, second }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionDuplicateId));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Options_Sharing_An_Id_Across_Questions()
+        {
+            var first = Question("q1", 0);
+            var second = Question("q2", 1);
+            first.Options[0].Id = 100;
+            second.Options[0].Id = 100;
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { first, second }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionDuplicateId));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Options_Sharing_A_ClientId()
+        {
+            var first = Question("q1", 0);
+            var second = Question("q2", 1);
+            second.Options[0].ClientId = first.Options[0].ClientId;
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { first, second }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionDuplicateClientId));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Questions_Sharing_An_Order()
+        {
+            var questions = new List<EventQuestionStructureDto> { Question("q1", 0), Question("q2", 0) };
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(questions));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionDuplicateOrder));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Options_In_One_Question_Sharing_An_Order()
+        {
+            var question = Question("q1", 0);
+            question.Options.Add(new EventQuestionOptionStructureDto { ClientId = "q1-o2", Name = "Pasta", Order = 0 });
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionDuplicateOrder));
+        }
+
+        [Test]
+        public void Should_Treat_A_Whitespace_Only_Trigger_ClientId_As_No_Condition()
+        {
+            var question = Question("q1", 0);
+            question.ShowIfOptionClientId = "   ";
 
             Assert.DoesNotThrow(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
         }

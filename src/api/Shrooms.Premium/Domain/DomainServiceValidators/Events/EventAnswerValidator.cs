@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Contracts.Enums;
@@ -17,19 +18,19 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             IReadOnlyCollection<int> chosenOptionIds,
             IReadOnlyCollection<int> legacyOptionIds)
         {
-            var chosen = (chosenOptionIds ?? new int[0]).ToHashSet();
-            var legacy = (legacyOptionIds ?? new int[0]).ToHashSet();
+            var chosen = (chosenOptionIds ?? Array.Empty<int>()).ToHashSet();
+            var legacy = (legacyOptionIds ?? Array.Empty<int>()).ToHashSet();
             var ordered = (questions ?? new List<ResolvedEventQuestionDto>()).OrderBy(q => q.Order).ToList();
 
             var errors = new List<EventAnswerErrorDto>();
 
             var knownOptionIds = ordered.SelectMany(q => q.OptionIds).Concat(legacy).ToHashSet();
 
-            foreach (var unknown in chosen.Where(id => !knownOptionIds.Contains(id)))
+            foreach (var unknownOptionId in chosen.Where(id => !knownOptionIds.Contains(id)))
             {
                 errors.Add(new EventAnswerErrorDto
                 {
-                    QuestionId = null,
+                    OptionId = unknownOptionId,
                     Reason = EventAnswerErrorReason.UnknownOption
                 });
             }

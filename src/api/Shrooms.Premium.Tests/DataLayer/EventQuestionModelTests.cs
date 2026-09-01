@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models.Events;

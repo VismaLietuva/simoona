@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events

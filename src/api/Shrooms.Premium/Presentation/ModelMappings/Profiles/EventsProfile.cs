@@ -57,7 +57,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                         {
                             OptionId = src.ShowIfOptionId,
                             OptionClientId = src.ShowIfOptionClientId
-                        }));
+                        }))
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src => src.ShowIfOptionId));
 
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
                 .Ignore(x => x.OrganizationId)
@@ -92,9 +93,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventQuestionOptionViewModel, EventQuestionOptionStructureDto>().ReverseMap();
 
+            // A present but empty ShowIf must not read as "no condition": that would silently
+            // clear a stored condition and turn a hidden question into an always-visible one.
+            // Fall back to the scalar the read shape emits whenever ShowIf names nothing.
             CreateMap<EventQuestionViewModel, EventQuestionStructureDto>()
-                .ForMember(dest => dest.ShowIfOptionId,
-                    opt => opt.MapFrom(src => src.ShowIf == null ? (int?)null : src.ShowIf.OptionId))
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src =>
+                    src.ShowIf == null || (src.ShowIf.OptionId == null && src.ShowIf.OptionClientId == null)
+                        ? src.ShowIfOptionId
+                        : src.ShowIf.OptionId))
                 .ForMember(dest => dest.ShowIfOptionClientId,
                     opt => opt.MapFrom(src => src.ShowIf == null ? null : src.ShowIf.OptionClientId));
 

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -12,16 +12,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
     /// </summary>
     public class EventQuestionStructureValidator : IEventQuestionStructureValidator
     {
-        public const int MaxQuestionsPerEvent = 20;
-        public const int MaxOptionsPerQuestion = 30;
-        public const int MaxTitleLength = 100;
-        public const int MaxOptionNameLength = 100;
-        public const int MaxConditionalDepth = 5;
-
-        /// <summary>
-        /// Checks everything decidable before rows are inserted: limits, lengths, and that every
-        /// condition names exactly one trigger that exists somewhere in this payload.
-        /// </summary>
         public void ValidatePayload(IList<EventQuestionStructureDto> questions)
         {
             if (questions == null || questions.Count == 0)
@@ -29,7 +19,12 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 return;
             }
 
-            if (questions.Count > MaxQuestionsPerEvent)
+            if (questions.Any(question => question == null))
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionPayloadInvalid);
+            }
+
+            if (questions.Count > EventsConstants.EventQuestionsMaxCount)
             {
                 throw new EventException(PremiumErrorCodes.EventQuestionLimitExceeded);
             }
@@ -41,13 +36,20 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 // SelectMany below — has to guard against a null Options list.
                 question.Options ??= new List<EventQuestionOptionStructureDto>();
 
+                if (question.Options.Any(option => option == null))
+                {
+                    throw new EventException(PremiumErrorCodes.EventQuestionPayloadInvalid);
+                }
+
                 ValidateQuestionShape(question);
             }
 
+            ValidateUniqueness(questions);
+
             var optionClientIds = questions
                 .SelectMany(q => q.Options)
-                .Where(o => o.ClientId != null)
                 .Select(o => o.ClientId)
+                .Where(clientId => !string.IsNullOrWhiteSpace(clientId))
                 .ToHashSet();
 
             foreach (var question in questions)
@@ -59,7 +61,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         /// <summary>
         /// Checks the rules that need real IDs: a condition must point at an option owned by a
         /// question with a strictly lower order, and the conditional chain must not exceed
-        /// <see cref="MaxConditionalDepth"/>.
+        /// <see cref="EventsConstants.EventQuestionMaxConditionalDepth"/>.
         /// </summary>
         public void ValidateResolved(IReadOnlyList<ResolvedEventQuestionDto> questions)
         {
@@ -98,7 +100,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 // The owner sits at a lower order, so it has already been assigned a depth.
                 var depth = depthByQuestionId[owner.QuestionId] + 1;
 
-                if (depth > MaxConditionalDepth)
+                if (depth > EventsConstants.EventQuestionMaxConditionalDepth)
                 {
                     throw new EventException(PremiumErrorCodes.EventQuestionDepthExceeded);
                 }
@@ -114,25 +116,71 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventQuestionClientIdMissing);
             }
 
-            if (string.IsNullOrWhiteSpace(question.Title) || question.Title.Length > MaxTitleLength)
+            if (string.IsNullOrWhiteSpace(question.Title) ||
+                question.Title.Length > EventsConstants.EventQuestionTitleMaxLength)
             {
                 throw new EventException(PremiumErrorCodes.EventQuestionTitleInvalid);
             }
 
-            // Normalised to a non-null list in ValidatePayload before this is called.
             var options = question.Options;
 
-            if (options.Count > MaxOptionsPerQuestion)
+            // A question with no options can never be answered, so a required one would reject
+            // every join for good.
+            if (options.Count < EventsConstants.EventQuestionOptionsMinCount)
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionOptionsMissing);
+            }
+
+            if (options.Count > EventsConstants.EventQuestionOptionsMaxCount)
             {
                 throw new EventException(PremiumErrorCodes.EventQuestionOptionLimitExceeded);
             }
 
             foreach (var option in options)
             {
-                if (string.IsNullOrWhiteSpace(option.Name) || option.Name.Length > MaxOptionNameLength)
+                if (string.IsNullOrWhiteSpace(option.Name) ||
+                    option.Name.Length > EventsConstants.EventQuestionOptionNameMaxLength)
                 {
                     throw new EventException(PremiumErrorCodes.EventQuestionOptionNameInvalid);
                 }
+            }
+
+            if (HasDuplicates(options.Select(option => option.Order)))
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionDuplicateOrder);
+            }
+        }
+
+        /// <summary>
+        /// Identities have to be unique across the whole payload, not just within one question.
+        /// A repeated question id collapses two payload entries onto one row, and a repeated
+        /// clientId makes a condition bind to an arbitrary one of the options claiming it.
+        /// </summary>
+        private static void ValidateUniqueness(IList<EventQuestionStructureDto> questions)
+        {
+            var options = questions.SelectMany(question => question.Options).ToList();
+
+            if (HasDuplicates(questions.Where(q => q.Id != null).Select(q => q.Id.Value)) ||
+                HasDuplicates(options.Where(o => o.Id != null).Select(o => o.Id.Value)))
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionDuplicateId);
+            }
+
+            var clientIds = questions
+                .Select(question => question.ClientId)
+                .Concat(options.Select(option => option.ClientId))
+                .Where(clientId => !string.IsNullOrWhiteSpace(clientId));
+
+            if (HasDuplicates(clientIds))
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionDuplicateClientId);
+            }
+
+            // Every read projection sorts on Order with no secondary key, so ties would reorder
+            // the wizard's steps between requests.
+            if (HasDuplicates(questions.Select(question => question.Order)))
+            {
+                throw new EventException(PremiumErrorCodes.EventQuestionDuplicateOrder);
             }
         }
 
@@ -150,6 +198,12 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             {
                 throw new EventException(PremiumErrorCodes.EventQuestionConditionInvalid);
             }
+        }
+
+        private static bool HasDuplicates<T>(IEnumerable<T> values)
+        {
+            var seen = new HashSet<T>();
+            return values.Any(value => !seen.Add(value));
         }
     }
 }

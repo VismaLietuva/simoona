@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events

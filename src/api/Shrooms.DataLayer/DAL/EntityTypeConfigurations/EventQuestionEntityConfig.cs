@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 
@@ -19,8 +19,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .HasForeignKey(e => e.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Restrict, not Cascade: deleting a trigger option must not silently rewrite the
-            // question tree by nulling conditions. The structure validator rejects that state.
+            // Restrict rather than Cascade to state the intent that a trigger option is not a
+            // disposable row. Note it can never fire in practice: SoftDeleteHandler rewrites every
+            // delete into an IsDeleted update, so no DELETE reaches the database.
             builder.HasOne(e => e.ShowIfOption)
                 .WithMany()
                 .HasForeignKey(e => e.ShowIfOptionId)
