@@ -132,6 +132,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id, userOrg.UserId))
+                .AsSplitQuery()
                 .SingleOrDefaultAsync();
             _eventValidationService.CheckIfEventExists(@event);
 
@@ -206,8 +207,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
-            // Before the event row is committed: an invalid question tree returned 400 while the
-            // event was already persisted, leaving an orphan the caller could not find or retry.
+            // Before MapNewEventAsync, which creates the event's wall and commits it: a tree
+            // rejected after that point leaves an orphan wall behind.
             await _eventQuestionWriter.ValidateAsync(null, newEventDto.Questions);
 
             var newEvent = await MapNewEventAsync(newEventDto);
@@ -215,9 +216,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventsDbSet.Add(newEvent);
 
             MapNewOptions(newEventDto, newEvent);
-            await _uow.SaveChangesAsync(newEventDto.UserId);
 
-            await _eventQuestionWriter.WriteAsync(newEvent.Id, newEventDto.Questions, newEventDto.UserId);
+            await _eventQuestionWriter.WriteForNewEventAsync(newEvent, newEventDto.Questions, newEventDto.UserId);
+
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
             newEventDto.Id = newEvent.Id.ToString();
@@ -397,6 +398,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     }),
                 Questions = e.EventQuestions
                     .OrderBy(q => q.Order)
+                    .ThenBy(q => q.Id)
                     .Select(q => new EventQuestionStructureDto
                     {
                         Id = q.Id,
@@ -407,6 +409,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                         ShowIfOptionId = q.ShowIfOptionId,
                         Options = q.Options
                             .OrderBy(o => o.Order)
+                            .ThenBy(o => o.Id)
                             .Select(o => new EventQuestionOptionStructureDto
                             {
                                 Id = o.Id,
@@ -773,6 +776,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 // component, so its copy of this tree must stay participant-free.
                 Questions = e.EventQuestions
                     .OrderBy(question => question.Order)
+                    .ThenBy(question => question.Id)
                     .Select(question => new EventDetailsQuestionDto
                     {
                         Id = question.Id,
@@ -783,6 +787,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                         ShowIfOptionId = question.ShowIfOptionId,
                         Options = question.Options
                             .OrderBy(option => option.Order)
+                                .ThenBy(option => option.Id)
                             .Select(option => new EventDetailsQuestionOptionDto
                             {
                                 Id = option.Id,

@@ -18,7 +18,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             IReadOnlyCollection<int> chosenOptionIds)
         {
             var chosen = (chosenOptionIds ?? Array.Empty<int>()).ToHashSet();
-            var ordered = (questions ?? new List<ResolvedEventQuestionDto>()).OrderBy(q => q.Order).ToList();
+            var ordered = (questions ?? new List<ResolvedEventQuestionDto>()).OrderBy(q => q.Order).ThenBy(q => q.QuestionId).ToList();
 
             var errors = new List<EventAnswerErrorDto>();
 

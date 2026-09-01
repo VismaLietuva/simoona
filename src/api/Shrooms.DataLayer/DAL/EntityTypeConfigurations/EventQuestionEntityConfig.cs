@@ -14,13 +14,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            // Both validators treat a question's Order as its identity in the tree: uniqueness is
-            // only checked per request, so two hosts saving the same event concurrently could
-            // otherwise persist a tie, and every read projection sorts on Order with no secondary
-            // key. Filtered on IsDeleted so reusing the order of a soft-deleted question still works.
-            builder.HasIndex(e => new { e.EventId, e.Order })
-                .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
+            builder.HasIndex(e => new { e.EventId, e.Order });
 
             builder.HasOne(e => e.Event)
                 .WithMany(e => e.EventQuestions)

@@ -50,13 +50,25 @@ namespace Shrooms.Premium.Domain.Services.Events
             _structureValidator.ValidateResolved(BuildResolvedFromPayload(desired));
         }
 
-        public async Task WriteAsync(Guid eventId, IList<EventQuestionStructureDto> questions, string userId)
+        public Task WriteAsync(Guid eventId, IList<EventQuestionStructureDto> questions, string userId)
+        {
+            return WriteAsync(eventId, null, questions, userId);
+        }
+
+        public Task WriteForNewEventAsync(Event @event, IList<EventQuestionStructureDto> questions, string userId)
+        {
+            return WriteAsync(@event.Id, @event, questions, userId);
+        }
+
+        private async Task WriteAsync(Guid eventId, Event eventEntity, IList<EventQuestionStructureDto> questions, string userId)
         {
             var desired = questions ?? new List<EventQuestionStructureDto>();
 
             _structureValidator.ValidatePayload(desired);
 
-            var existing = await LoadExistingAsync(eventId);
+            var existing = eventEntity == null
+                ? await LoadExistingAsync(eventId)
+                : new List<EventQuestion>();
 
             CheckSuppliedIdsBelongToEvent(existing, desired);
 
@@ -72,7 +84,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             foreach (var dto in desired)
             {
                 var entity = dto.Id == null
-                    ? InsertQuestion(eventId, dto, userId)
+                    ? InsertQuestion(eventId, eventEntity, dto, userId)
                     : UpdateQuestion(existing, dto, userId);
 
                 entities.Add((dto, entity));
@@ -82,7 +94,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             foreach (var (dto, entity) in entities)
             {
-                WriteOptions(eventId, dto, entity, existing, optionByClientId, userId);
+                WriteOptions(eventId, eventEntity, dto, entity, existing, optionByClientId, userId);
             }
 
             foreach (var (dto, entity) in entities)
@@ -95,6 +107,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             return await _questionsDbSet
                 .Include(q => q.Options)
+                .ThenInclude(o => o.EventParticipants)
                 .Where(q => q.EventId == eventId)
                 .ToListAsync();
         }
@@ -218,11 +231,12 @@ namespace Shrooms.Premium.Domain.Services.Events
             entity.ShowIfOption = optionByClientId[dto.ShowIfOptionClientId];
         }
 
-        private EventQuestion InsertQuestion(Guid eventId, EventQuestionStructureDto dto, string userId)
+        private EventQuestion InsertQuestion(Guid eventId, Event eventEntity, EventQuestionStructureDto dto, string userId)
         {
             var entity = new EventQuestion
             {
                 EventId = eventId,
+                Event = eventEntity,
                 Title = dto.Title,
                 Order = dto.Order,
                 SelectType = dto.SelectType,
@@ -252,6 +266,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void WriteOptions(
             Guid eventId,
+            Event eventEntity,
             EventQuestionStructureDto dto,
             EventQuestion entity,
             List<EventQuestion> existing,
@@ -267,7 +282,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             foreach (var removed in existingOptions.Where(o => !keptIds.Contains(o.Id)))
             {
-                SoftDelete(removed, userId);
+                SoftDeleteOption(removed, userId);
             }
 
             foreach (var optionDto in dto.Options)
@@ -277,6 +292,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     var option = new EventOption
                     {
                         EventId = eventId,
+                        Event = eventEntity,
                         Option = optionDto.Name,
                         Order = optionDto.Order,
                         Rule = optionDto.Rule ?? OptionRules.Default,
@@ -328,7 +344,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
                 foreach (var option in question.Options ?? new List<EventOption>())
                 {
-                    SoftDelete(option, userId);
+                    SoftDeleteOption(option, userId);
                 }
             }
         }
@@ -337,6 +353,12 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             entity.IsDeleted = true;
             StampModified(entity, userId);
+        }
+
+        private void SoftDeleteOption(EventOption option, string userId)
+        {
+            option.EventParticipants?.Clear();
+            SoftDelete(option, userId);
         }
 
         // Both callers of this writer finish with SaveChangesAsync(false), which skips

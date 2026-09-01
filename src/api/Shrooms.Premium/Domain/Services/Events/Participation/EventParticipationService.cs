@@ -412,7 +412,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             // Each half of the selection is replaced only if the request carries that half, so a
             // caller sending just answers keeps the participant's flat picks and vice versa.
             // Which half an id belongs to comes from the event, not from the field it arrived in.
-            var legacySupplied = updateAttendStatusDto.ChosenOptions != null;
+            var legacySupplied = updateAttendStatusDto.ChosenOptions?.Any() == true;
             var answersSupplied = updateAttendStatusDto.Answers != null || submitted.Any(questionOwnedIds.Contains);
 
             if (!legacySupplied && !answersSupplied)
@@ -732,6 +732,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 Options = e.EventOptions,
                 Questions = e.EventQuestions
                     .OrderBy(q => q.Order)
+                    .ThenBy(q => q.Id)
                     .Select(q => new ResolvedEventQuestionDto
                     {
                         QuestionId = q.Id,

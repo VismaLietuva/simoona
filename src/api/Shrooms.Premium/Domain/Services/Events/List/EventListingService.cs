@@ -440,6 +440,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
                 Questions = e.EventQuestions
                     .OrderBy(q => q.Order)
+                    .ThenBy(q => q.Id)
                     .Select(q => new EventQuestionStructureDto
                     {
                         Id = q.Id,
@@ -450,6 +451,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         ShowIfOptionId = q.ShowIfOptionId,
                         Options = q.Options
                             .OrderBy(o => o.Order)
+                            .ThenBy(o => o.Id)
                             .Select(o => new EventQuestionOptionStructureDto
                             {
                                 Id = o.Id,
