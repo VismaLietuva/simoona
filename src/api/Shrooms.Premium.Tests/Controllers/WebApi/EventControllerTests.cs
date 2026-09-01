@@ -288,9 +288,6 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             Assert.That(json, Does.Contain("\"questionId\":12"));
         }
 
-        // UpdateAttendStatus now validates answers, so it needs the same derived catch as Join:
-        // without it the generic EventException handler answers with the bare string
-        // "EventAnswersInvalid" and the client cannot tell which questions failed.
         [Test]
         public async Task UpdateAttendStatus_Should_Return_The_Offending_Questions_When_Answers_Are_Invalid()
         {

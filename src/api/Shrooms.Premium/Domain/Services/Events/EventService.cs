@@ -166,10 +166,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 userEventOption.Participants = @event.Participants;
             }
 
-            // Every question option, not only the ones the caller picked: a colleague's name behind
-            // an answer the caller did not choose is precisely what this permission gates.
-            // Each level is materialised before being written back — the projection can still be
-            // lazy here, and mutating objects from a lazy sequence is thrown away on re-enumeration.
+            // Every question option, not just the caller's own picks as in the loop above. Each
+            // level is materialised: mutating a lazy projection is discarded on re-enumeration.
             var trimmedQuestions = @event.Questions.ToList();
             foreach (var question in trimmedQuestions)
             {
@@ -744,10 +742,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                // Legacy flat options only. Question-owned options belong to the question tree,
-                // not to this list — serving them here presents them to the client as ordinary
-                // food options. Mirrors MapToEventEditDetailsDto() and
-                // EventListingService.MapOptionsToDto().
+                // Legacy flat options only; question-owned options reach the client under Questions.
                 Options = e.EventOptions
                     .Where(o => o.QuestionId == null)
                     .Select(o => new EventDetailsOptionDto
@@ -768,9 +763,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                                 AttendComment = p.AttendComment
                             })
                     }),
-                // The answers. This is the only read endpoint that carries them: /Events/Options
-                // serves the same tree to the attendee wizard without participants, because that
-                // payload is serialised into a client component.
+                // The only read endpoint carrying participants: /Events/Options feeds a client
+                // component, so its copy of this tree must stay participant-free.
                 Questions = e.EventQuestions
                     .OrderBy(question => question.Order)
                     .Select(question => new EventDetailsQuestionDto

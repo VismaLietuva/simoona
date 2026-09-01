@@ -171,10 +171,6 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(questions[0].Options.Select(o => o.Id), Is.EquivalentTo(new int?[] { 90, 91 }));
         }
 
-        // Regression test: MapToEventDetailsDto projected every EventOption into the flat Options
-        // list, so GET /Events/Details served question-owned options as if they were legacy food
-        // options. Only legacy (QuestionId == null) options belong there — question-owned options
-        // reach the client through the question tree.
         [Test]
         public async Task Should_Only_Return_Legacy_Options_In_Flat_Options_List_In_Details()
         {
@@ -189,9 +185,6 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(flatOptions[0].Name, Is.EqualTo("Legacy option"));
         }
 
-        // The host's responses panel is the only place anyone sees who answered what, and
-        // /Events/Details is the only read endpoint allowed to carry that: the wizard's payload
-        // (/Events/Options) is serialised into a client component and must stay participant-free.
         [Test]
         public async Task Should_Return_The_Question_Tree_With_Its_Answers_In_Details()
         {
@@ -216,8 +209,6 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(dish[1].Participants, Is.Empty);
         }
 
-        // Without EventUsers permission the caller already only sees themselves in Participants;
-        // the answers must not become a second way to read every colleague's name off the page.
         [Test]
         public async Task Should_Hide_Other_Peoples_Answers_From_A_Caller_Who_Cannot_See_Participants()
         {
