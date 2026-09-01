@@ -6,10 +6,8 @@ using Shrooms.Contracts.Enums;
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
     /// <summary>
-    /// Read shape for the host's responses panel. Mirrors <see cref="EventSignUpQuestionViewModel"/>
-    /// field for field, adding the participants behind each option — which is exactly why it is a
-    /// separate model: the wizard's payload is serialised into a client component and must never
-    /// carry names. SelectType needs the same explicit string converter; no global one is configured.
+    /// Separate from <see cref="EventSignUpQuestionViewModel"/> because that one feeds a client
+    /// component and must never carry participants.
     /// </summary>
     public class EventDetailsQuestionViewModel
     {

@@ -265,9 +265,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             Assert.That(json, Does.Contain("\"showIfOptionId\":null"));
         }
 
-        // The viewmodel -> DTO map is convention-based (MemberList.None), so nothing would fail
-        // loudly if ChosenOptions stopped mapping: the answers would silently never reach the
-        // service and every status change into Going on a question event would 400.
+        // MemberList.None would not complain if ChosenOptions stopped mapping.
         [Test]
         public void Should_Carry_The_Chosen_Options_Of_A_Status_Change_Onto_The_Dto()
         {
@@ -283,8 +281,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             Assert.That(dto.ChosenOptions, Is.EquivalentTo(new[] { 135, 136 }));
         }
 
-        // The details payload is the only one carrying answers, so the nesting has to survive the
-        // map: the top-level map is MemberList.None, which would not complain if it did not.
+        // MemberList.None would not complain if the nesting stopped mapping.
         [Test]
         public void Should_Carry_The_Answers_Behind_Each_Question_Option_To_The_Client()
         {
@@ -299,8 +296,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             Assert.That(option.Participants.Single().FullName, Is.EqualTo("Test User"));
         }
 
-        // Same reason EventSignUpQuestionViewModel needs its converter: no global string-enum
-        // converter is configured, so without the attribute the client receives 0/1.
+        // No global string-enum converter is configured, so the attribute is load-bearing.
         [Test]
         public void Should_Serialize_The_Details_Question_Select_Type_As_A_String()
         {

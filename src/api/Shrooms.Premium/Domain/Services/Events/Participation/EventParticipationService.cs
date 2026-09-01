@@ -352,11 +352,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
         }
 
-        /// <summary>
-        /// Validates the answers a status change carries and returns the options to persist, or
-        /// null when the caller's selection must be left alone. Going is the only status required
-        /// questions apply to, and the only one that can carry answers.
-        /// </summary>
+        /// <summary>Returns the options to persist, or null to leave the selection untouched.</summary>
         private ICollection<EventOption> ValidateAnswersForStatusChange(UpdateAttendStatusDto updateAttendStatusDto, EventJoinValidationDto eventDto)
         {
             var isGoing = updateAttendStatusDto.AttendStatus == AttendingStatus.Attending ||
@@ -373,22 +369,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, selectedOptions);
 
-            // Only the upper bound is checked. CheckIfJoiningNotEnoughChoicesProvided is
-            // deliberately left out: a Going switch on a legacy food event has never had to carry
-            // a food pick, and requiring one here would reject every such status change.
+            // Upper bound only: CheckIfJoiningNotEnoughChoicesProvided is deliberately not applied,
+            // since a Going switch on a legacy food event has never had to carry a food pick.
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, chosenOptions.Count(legacyOptionIds.Contains));
 
-            // Only legacy options participate in the single-choice-with-rule check; question
-            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            // Question answers are excluded for the same reason they are excluded from MaxChoices.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
                 selectedOptions.Where(option => option.QuestionId == null).ToList(),
                 OptionRules.IgnoreSingleJoin);
 
             _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
 
-            // An empty write would wipe a food pick made at join time, so replace the selection
-            // only when there is something to write or the event actually has questions whose
-            // answers the caller may be clearing on purpose. Mirrors the frontend's own rule.
+            // Sending nothing must not wipe a food pick made at join time, so only replace the
+            // selection when there is something to write or the event actually has questions.
             return chosenOptions.Count > 0 || eventDto.Questions.Count > 0 ? selectedOptions : null;
         }
 
@@ -759,10 +752,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        /// <summary>
-        /// <paramref name="chosenOptions"/> null means "leave the participant's current selection
-        /// untouched"; a collection replaces it wholesale, the way UpdateSelectedOptionsAsync does.
-        /// </summary>
+        /// <summary>Null <paramref name="chosenOptions"/> leaves the participant's selection untouched.</summary>
         private async Task AddParticipantWithStatusAsync(string userId, AttendingStatus status, string attendComment, EventJoinValidationDto eventDto, ICollection<EventOption> chosenOptions = null)
         {
             var timeStamp = _systemClock.UtcNow;

@@ -22,11 +22,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [StringLength(EventsConstants.EventNameMaxLength)]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Optional, exactly as on create: null means the event has no cover image. Requiring it
-        /// here made every event created without one impossible to update at all. Note that the
-        /// value is assigned unconditionally on save, so omitting it clears an existing image.
-        /// </summary>
+        /// <summary>Optional, as on create. Assigned unconditionally, so omitting it clears an existing image.</summary>
         public string ImageName { get; set; }
 
         [Required]

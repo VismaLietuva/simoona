@@ -11,10 +11,6 @@ namespace Shrooms.Premium.Tests.WebViewModels
     [TestFixture]
     public class UpdateEventViewModelTests
     {
-        // ImageName was [Required] on update but optional on create, so an event created without
-        // a cover image (ImageName NULL in the database) could not be updated through the API at
-        // all — every PUT for it failed model validation before reaching the service. A host
-        // editing such an event, e.g. to add sign-up questions, was blocked outright.
         [Test]
         public void Should_Not_Require_ImageName_When_Updating_An_Event()
         {
