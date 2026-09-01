@@ -415,10 +415,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var selectedOptions = eventDto.Options.Where(option => chosenOptions.Contains(option.Id)).ToList();
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
 
-            // Ahead of CheckIfProvidedOptionsAreValid, so an unknown option reaches the client as
-            // the structured payload naming it rather than a bare code.
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
-
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, selectedOptions);
 
             // Upper bound only: CheckIfJoiningNotEnoughChoicesProvided is deliberately not applied,
@@ -429,6 +425,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
                 selectedOptions.Where(option => option.QuestionId == null).ToList(),
                 OptionRules.IgnoreSingleJoin);
+
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
 
             return replaceSelection ? selectedOptions : null;
         }
