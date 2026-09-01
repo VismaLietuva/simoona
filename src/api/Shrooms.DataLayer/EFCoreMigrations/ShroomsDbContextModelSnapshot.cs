@@ -1334,12 +1334,20 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuestionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rule")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("EventOptions");
                 });
@@ -1387,6 +1395,60 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("EventId");
 
                     b.ToTable("EventParticipants");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SelectType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ShowIfOptionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShowIfOptionId");
+
+                    b.HasIndex("EventId", "Order")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("EventQuestions");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventReminder", b =>
@@ -4898,7 +4960,14 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Events.EventQuestion", "Question")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Event");
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventParticipant", b =>
@@ -4917,6 +4986,24 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventQuestion", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Events.Event", "Event")
+                        .WithMany("EventQuestions")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Events.EventOption", "ShowIfOption")
+                        .WithMany()
+                        .HasForeignKey("ShowIfOptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Event");
+
+                    b.Navigation("ShowIfOption");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventReminder", b =>
@@ -6060,7 +6147,14 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Navigation("EventParticipants");
 
+                    b.Navigation("EventQuestions");
+
                     b.Navigation("Reminders");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventQuestion", b =>
+                {
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventType", b =>

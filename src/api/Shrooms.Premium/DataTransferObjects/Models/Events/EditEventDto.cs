@@ -54,6 +54,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<NewEventOptionDto> NewOptions { get; set; }
 
+        public IList<EventQuestionStructureDto> Questions { get; set; } = new List<EventQuestionStructureDto>();
+
         public IEnumerable<EventReminderDto> Reminders { get; set; }
     }
 }

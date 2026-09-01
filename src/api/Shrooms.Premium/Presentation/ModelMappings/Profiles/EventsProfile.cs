@@ -49,6 +49,17 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>(MemberList.None);
 
+            CreateMap<EventQuestionStructureDto, EventQuestionViewModel>()
+                .ForMember(dest => dest.ShowIf, opt => opt.MapFrom(src =>
+                    src.ShowIfOptionId == null && src.ShowIfOptionClientId == null
+                        ? null
+                        : new EventQuestionConditionViewModel
+                        {
+                            OptionId = src.ShowIfOptionId,
+                            OptionClientId = src.ShowIfOptionClientId
+                        }))
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src => src.ShowIfOptionId));
+
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
@@ -79,6 +90,19 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDto>(MemberList.None);
+
+            CreateMap<EventQuestionOptionViewModel, EventQuestionOptionStructureDto>().ReverseMap();
+
+            // A present but empty ShowIf must not read as "no condition": that would silently
+            // clear a stored condition and turn a hidden question into an always-visible one.
+            // Fall back to the scalar the read shape emits whenever ShowIf names nothing.
+            CreateMap<EventQuestionViewModel, EventQuestionStructureDto>()
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src =>
+                    src.ShowIf == null || (src.ShowIf.OptionId == null && src.ShowIf.OptionClientId == null)
+                        ? src.ShowIfOptionId
+                        : src.ShowIf.OptionId))
+                .ForMember(dest => dest.ShowIfOptionClientId,
+                    opt => opt.MapFrom(src => src.ShowIf == null ? null : src.ShowIf.OptionClientId));
 
             CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(MemberList.None)
                 .IgnoreUserOrgDto();

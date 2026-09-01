@@ -99,6 +99,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<EventOption> EventOptions { get; set; }
 
+        public virtual DbSet<EventQuestion> EventQuestions { get; set; }
+
         public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
 
         public virtual DbSet<ServiceRequestCategory> ServiceRequestCategories { get; set; }
@@ -269,6 +271,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new EventTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new EventParticipantEntityConfig());
             modelBuilder.ApplyConfiguration(new EventOptionEntityConfig());
+            modelBuilder.ApplyConfiguration(new EventQuestionEntityConfig());
             modelBuilder.ApplyConfiguration(new CommitteeEntityConfig());
             modelBuilder.ApplyConfiguration(new GroupTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new GroupEntityConfig());
