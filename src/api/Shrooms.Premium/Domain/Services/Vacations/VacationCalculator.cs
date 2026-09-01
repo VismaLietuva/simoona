@@ -26,11 +26,14 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private const double DaysPerYear = 365.25;
 
         /// <summary>
-        /// Inclusive of both ends, weekends excluded. Public holidays deliberately
-        /// are not: payroll reconciles them afterwards, so subtracting them here
-        /// would only make the in-app figure disagree with the payslip.
+        /// Inclusive of both ends, weekends and public holidays excluded.
+        ///
+        /// <paramref name="holidays"/> is required rather than defaulted to
+        /// <see cref="HolidayCalendar.Empty"/> on purpose: a default would let a
+        /// new call site keep the old weekends-only behaviour without anyone
+        /// noticing, which is the one failure this signature exists to prevent.
         /// </summary>
-        public static double CountWorkingDays(DateTime from, DateTime to)
+        public static double CountWorkingDays(DateTime from, DateTime to, HolidayCalendar holidays)
         {
             var start = from.Date;
             var end = to.Date;
@@ -54,17 +57,21 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 cursor = cursor.AddDays(1);
             }
 
-            return workingDays;
+            return workingDays - holidays.CountWorkdayHolidaysBetween(start, end);
         }
 
         /// <summary>
         /// The last working day before <paramref name="day"/>: an order is signed
-        /// at the office before the leave starts, so Monday's is granted on Friday.
+        /// at the office before the leave starts, so Monday's is granted on Friday
+        /// — or on the Thursday, when that Friday is a holiday and nobody is there
+        /// to sign it.
         /// </summary>
-        public static DateTime PreviousWorkingDay(DateTime day)
+        public static DateTime PreviousWorkingDay(DateTime day, HolidayCalendar holidays)
         {
             var cursor = day.Date.AddDays(-1);
-            while (cursor.DayOfWeek == DayOfWeek.Saturday || cursor.DayOfWeek == DayOfWeek.Sunday)
+            while (cursor.DayOfWeek == DayOfWeek.Saturday
+                   || cursor.DayOfWeek == DayOfWeek.Sunday
+                   || holidays.IsHoliday(cursor))
             {
                 cursor = cursor.AddDays(-1);
             }
@@ -105,6 +112,28 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             return SeniorityBaseBonus + ((yearsEmployed - SeniorityYears) / SeniorityStepYears);
+        }
+
+        /// <summary>
+        /// Mirrors ApplicationUser.YearsEmployed, which is [NotMapped] and so cannot
+        /// be projected in a query, and takes today explicitly rather than reading
+        /// UtcNow — every other figure here is in the organisation's zone.
+        /// </summary>
+        public static int YearsEmployedOn(DateTime? employmentDate, DateTime today)
+        {
+            if (employmentDate == null)
+            {
+                return 0;
+            }
+
+            var years = today.Year - employmentDate.Value.Year;
+
+            if (today < employmentDate.Value.AddYears(years))
+            {
+                years = years >= 1 ? years - 1 : years;
+            }
+
+            return years < 0 ? 0 : years;
         }
 
         public static double AnnualAccrual(int yearsEmployed)
@@ -149,6 +178,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         public static double CommittedAnnualDays(
             IEnumerable<VacationRequest> requests,
             DateTime? balanceAsOf,
+            HolidayCalendar holidays,
             int? excludeRequestId = null)
         {
             // No payslip on file: nothing is netted out, so every active day counts.
@@ -166,7 +196,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                     }
 
                     var from = request.DateFrom.Date > firstChargeableDay ? request.DateFrom.Date : firstChargeableDay;
-                    return CountWorkingDays(from, request.DateTo);
+                    return CountWorkingDays(from, request.DateTo, holidays);
                 });
         }
 

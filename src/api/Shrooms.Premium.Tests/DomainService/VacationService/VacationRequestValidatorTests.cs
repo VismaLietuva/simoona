@@ -58,6 +58,7 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
                     null,
                     Today,
                     NoOtherRequests,
+                    HolidayCalendar.Empty,
                     originalDateFrom: Today.AddDays(-3)));
 
             Assert.That(error.Code, Is.EqualTo("startInPast"));
@@ -75,6 +76,7 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
                     null,
                     Today,
                     NoOtherRequests,
+                    HolidayCalendar.Empty,
                     originalDateFrom: Today.AddDays(-3)));
         }
 
@@ -88,7 +90,8 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
                     Today.AddDays(2),
                     null,
                     Today,
-                    NoOtherRequests));
+                    NoOtherRequests,
+                    HolidayCalendar.Empty));
 
             Assert.That(error.Code, Is.EqualTo("startInPast"));
         }

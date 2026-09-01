@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -14,6 +14,7 @@ using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.VideoLibrary;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -28,6 +29,7 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
+using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 
 namespace Shrooms.DataLayer.DAL
@@ -183,11 +185,17 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VacationOrderItem> VacationOrderItems { get; set; }
 
+        public virtual DbSet<Holiday> Holidays { get; set; }
+
         public virtual DbSet<Seat> Seats { get; set; }
 
         public virtual DbSet<SeatReservation> SeatReservations { get; set; }
 
         public virtual DbSet<SeatRelease> SeatReleases { get; set; }
+
+        public virtual DbSet<VideoType> VideoTypes { get; set; }
+
+        public virtual DbSet<VideoLibraryItem> VideoLibraryItems { get; set; }
 
         public int SaveChanges(string userId)
         {
@@ -283,9 +291,12 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new VacationRequestEventEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new HolidayEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReservationEntityConfig());
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());
+            modelBuilder.ApplyConfiguration(new VideoTypeEntityConfig());
+            modelBuilder.ApplyConfiguration(new VideoLibraryItemEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 

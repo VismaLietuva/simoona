@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,13 +27,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
     {
         private readonly IVacationRequestService _requestService;
         private readonly IVacationRequestListService _listService;
+        private readonly IHolidayService _holidayService;
 
         public VacationRequestsController(
             IVacationRequestService requestService,
-            IVacationRequestListService listService)
+            IVacationRequestListService listService,
+            IHolidayService holidayService)
         {
             _requestService = requestService;
             _listService = listService;
+            _holidayService = holidayService;
         }
 
         [HttpGet]
@@ -130,6 +135,31 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
         public Task<IActionResult> Reject(int id, [FromBody] VacationRejectViewModel model)
         {
             return GuardedAsync(() => _requestService.RejectAsync(id, model?.Reason, GetUserAndOrganization()));
+        }
+
+        /// <summary>
+        /// The public holidays, so the client can grey them out in its date
+        /// pickers. Weekends are not sent: the client already knows what a
+        /// Saturday is, and sending them would be ten times the payload to say so.
+        ///
+        /// Both bounds are optional and inclusive. Unparseable values are ignored
+        /// rather than rejected — the whole calendar is a few hundred rows, so the
+        /// worst case of a bad parameter is a slightly larger response.
+        /// </summary>
+        [HttpGet]
+        [Route("Holidays")]
+        [ProducesResponseType(typeof(IEnumerable<HolidayViewModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Holidays([FromQuery] string from, [FromQuery] string to)
+        {
+            var holidays = await _holidayService.GetAsync(
+                VacationWireFormat.ParseDay(from),
+                VacationWireFormat.ParseDay(to));
+
+            return Ok(holidays.Select(holiday => new HolidayViewModel
+            {
+                Date = VacationWireFormat.ToDay(holiday.Date),
+                Name = holiday.Name
+            }));
         }
     }
 }
