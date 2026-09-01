@@ -46,15 +46,17 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
             ValidateUniqueness(questions);
 
-            var optionClientIds = questions
-                .SelectMany(q => q.Options)
-                .Select(o => o.ClientId)
-                .Where(clientId => !string.IsNullOrWhiteSpace(clientId))
-                .ToHashSet();
+            // ValidateUniqueness has rejected duplicate clientIds by now, so one owner per
+            // clientId holds and the order is enough to place the trigger in the tree.
+            var ownerOrderByOptionClientId = questions
+                .SelectMany(question => question.Options
+                    .Select(option => new { option.ClientId, OwnerOrder = question.Order }))
+                .Where(entry => !string.IsNullOrWhiteSpace(entry.ClientId))
+                .ToDictionary(entry => entry.ClientId, entry => entry.OwnerOrder);
 
             foreach (var question in questions)
             {
-                ValidateCondition(question, optionClientIds);
+                ValidateCondition(question, ownerOrderByOptionClientId);
             }
         }
 
@@ -184,7 +186,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        private static void ValidateCondition(EventQuestionStructureDto question, HashSet<string> optionClientIds)
+        private static void ValidateCondition(
+            EventQuestionStructureDto question,
+            IReadOnlyDictionary<string, int> ownerOrderByOptionClientId)
         {
             var hasId = question.ShowIfOptionId != null;
             var hasClientId = !string.IsNullOrWhiteSpace(question.ShowIfOptionClientId);
@@ -194,7 +198,17 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventQuestionConditionAmbiguous);
             }
 
-            if (hasClientId && !optionClientIds.Contains(question.ShowIfOptionClientId))
+            if (!hasClientId)
+            {
+                return;
+            }
+
+            // Same rule as ValidateResolved, applied before the insert: a trigger has to belong to
+            // a question at a strictly lower order. Without the order check a self- or
+            // forward-reference only fails in ValidateResolved, which by definition runs once the
+            // rows already carry ids.
+            if (!ownerOrderByOptionClientId.TryGetValue(question.ShowIfOptionClientId, out var ownerOrder) ||
+                ownerOrder >= question.Order)
             {
                 throw new EventException(PremiumErrorCodes.EventQuestionConditionInvalid);
             }

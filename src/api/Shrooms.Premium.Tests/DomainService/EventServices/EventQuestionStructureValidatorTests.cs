@@ -138,6 +138,41 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public void Should_Reject_A_Condition_Pointing_At_The_Questions_Own_Option()
+        {
+            var question = Question("q1", 0);
+            question.ShowIfOptionClientId = "q1-o1";
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(new List<EventQuestionStructureDto> { question }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionConditionInvalid));
+        }
+
+        [Test]
+        public void Should_Reject_A_Condition_Pointing_At_A_Later_Questions_Option()
+        {
+            var first = Question("q1", 0);
+            first.ShowIfOptionClientId = "q2-o1";
+
+            var questions = new List<EventQuestionStructureDto> { first, Question("q2", 1) };
+
+            var ex = Assert.Throws<EventException>(() => _validator.ValidatePayload(questions));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionConditionInvalid));
+        }
+
+        [Test]
+        public void Should_Accept_A_Condition_Pointing_At_An_Earlier_Questions_Option()
+        {
+            var second = Question("q2", 1);
+            second.ShowIfOptionClientId = "q1-o1";
+
+            var questions = new List<EventQuestionStructureDto> { Question("q1", 0), second };
+
+            Assert.DoesNotThrow(() => _validator.ValidatePayload(questions));
+        }
+
+        [Test]
         public void Should_Require_A_ClientId_When_Id_Is_Null()
         {
             var question = Question("q1", 0);

@@ -1442,9 +1442,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
-
                     b.HasIndex("ShowIfOptionId");
+
+                    b.HasIndex("EventId", "Order")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("EventQuestions");
                 });
