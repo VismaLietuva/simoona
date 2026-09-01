@@ -718,11 +718,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             return BadRequest(new EventAnswersInvalidViewModel
             {
-                Code = EventAnswersInvalidException.ErrorCode,
+                Code = PremiumErrorCodes.EventAnswersInvalid,
                 Errors = exception.Errors
                     .Select(error => new EventAnswerErrorViewModel
                     {
                         QuestionId = error.QuestionId,
+                        OptionId = error.OptionId,
                         Reason = error.Reason
                     })
                     .ToList()

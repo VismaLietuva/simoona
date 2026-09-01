@@ -4,9 +4,11 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Services.Wall.Posts;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.Services.Events;
@@ -255,7 +257,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.BadRequest));
             var body = result.GetContent<EventAnswersInvalidViewModel>();
-            Assert.That(body.Code, Is.EqualTo("EventAnswersInvalid"));
+            Assert.That(body.Code, Is.EqualTo(PremiumErrorCodes.EventAnswersInvalid));
             Assert.That(body.Errors, Has.Count.EqualTo(1));
             Assert.That(body.Errors[0].QuestionId, Is.EqualTo(12));
             Assert.That(body.Errors[0].Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));

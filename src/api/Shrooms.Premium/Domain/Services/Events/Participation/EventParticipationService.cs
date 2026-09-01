@@ -320,6 +320,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventEntity.RegistrationDeadline);
+
+            // Ahead of CheckIfProvidedOptionsAreValid, which also rejects an unknown option but
+            // with a bare code. Running it first means the client gets the structured payload
+            // naming the offending option instead.
+            _eventAnswerValidator.Validate(eventEntity.Questions, chosenOptions, legacyOptionIds);
+
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventEntity.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
@@ -331,11 +337,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 OptionRules.IgnoreSingleJoin);
 
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
-
-            _eventAnswerValidator.Validate(
-                eventEntity.Questions,
-                chosenOptions,
-                legacyOptionIds);
 
             await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
@@ -356,6 +357,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var legacyChosenCount = chosenOptions.Count(legacyOptionIds.Contains);
 
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventDto.RegistrationDeadline);
+
+            // Ahead of CheckIfProvidedOptionsAreValid, so an unknown option reaches the client as
+            // the structured payload naming it rather than a bare code.
+            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
+
             _eventValidationService.CheckIfProvidedOptionsAreValid(chosenOptions, eventDto.SelectedOptions);
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
@@ -368,8 +374,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
             _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
-
-            _eventAnswerValidator.Validate(eventDto.Questions, chosenOptions, legacyOptionIds);
         }
 
         private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)
@@ -648,8 +652,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
-            if (validationDto.SelectedOptions.All(x => x.Rule == OptionRules.IgnoreSingleJoin) &&
-                validationDto.SelectedOptions.Count != 0 ||
+            // Legacy options only, as everywhere else this rule is applied. Question answers carry
+            // Rule = Default, so counting them here would make All(...) false and silently revoke
+            // the multi-join exemption for anyone who answered a question.
+            var legacySelectedOptions = validationDto.SelectedOptions
+                .Where(option => option.QuestionId == null)
+                .ToList();
+
+            if (legacySelectedOptions.All(x => x.Rule == OptionRules.IgnoreSingleJoin) &&
+                legacySelectedOptions.Count != 0 ||
                 !validationDto.IsSingleJoin)
             {
                 return;
@@ -677,8 +688,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             var anyEventsAlreadyJoined = await query.AnyAsync(x => !x.EventParticipants.Any(y =>
                 y.ApplicationUserId == userId &&
-                y.EventOptions.All(z => z.Rule == OptionRules.IgnoreSingleJoin) &&
-                y.EventOptions.Count > 0));
+                y.EventOptions.Where(z => z.QuestionId == null).All(z => z.Rule == OptionRules.IgnoreSingleJoin) &&
+                y.EventOptions.Count(z => z.QuestionId == null) > 0));
 
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }

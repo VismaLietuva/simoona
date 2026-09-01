@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +7,9 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
@@ -22,17 +24,19 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private IEventQuestionWriter _writer;
         private DbSet<EventQuestion> _questionsDbSet;
         private DbSet<EventOption> _optionsDbSet;
+        private ISystemClock _systemClock;
 
         private readonly Guid _eventId = Guid.NewGuid();
 
         [SetUp]
         public void TestInitializer()
         {
+            _systemClock ??= Substitute.For<ISystemClock>();
             _uow = Substitute.For<IUnitOfWork2>();
             _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion>());
             _optionsDbSet = _uow.MockDbSetForAsync(new List<EventOption>());
 
-            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator());
+            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator(), _systemClock);
         }
 
         private static EventQuestionStructureDto Question(
@@ -77,7 +81,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             _questionsDbSet.Received(1).Add(Arg.Is<EventQuestion>(q => q.Title == "Pick your dish" && q.EventId == _eventId));
             _optionsDbSet.Received(2).Add(Arg.Any<EventOption>());
-            await _uow.Received(1).SaveChangesAsync("user-1");
+            await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<string>());
         }
 
         [Test]
@@ -161,10 +165,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Options = new List<EventOption>()
             };
 
+            _systemClock ??= Substitute.For<ISystemClock>();
             _uow = Substitute.For<IUnitOfWork2>();
             _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion> { existing });
             _optionsDbSet = _uow.MockDbSetForAsync(new List<EventOption>());
-            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator());
+            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator(), _systemClock);
 
             await _writer.WriteAsync(_eventId, new List<EventQuestionStructureDto>(), "user-1");
 
@@ -173,7 +178,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task Should_Save_Exactly_Once_On_A_Successful_Write()
+        public async Task Should_Leave_Saving_To_The_Caller()
         {
             var questions = new List<EventQuestionStructureDto>
             {
@@ -182,7 +187,96 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             await _writer.WriteAsync(_eventId, questions, "user-1");
 
-            await _uow.Received(1).SaveChangesAsync(Arg.Any<string>());
+            await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<string>());
+            await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<bool>());
+        }
+
+        [Test]
+        public void Should_Reject_A_Question_Id_That_Is_Not_This_Events()
+        {
+            var question = Question("q1", 0, "Pick your dish", Option("o1", "Pizza", 0));
+            question.Id = 999;
+
+            var ex = Assert.ThrowsAsync<EventException>(
+                () => _writer.WriteAsync(_eventId, new List<EventQuestionStructureDto> { question }, "user-1"));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionNotFound));
+        }
+
+        [Test]
+        public async Task Should_Reject_An_Option_Id_Owned_By_Another_Question()
+        {
+            var existing = new EventQuestion
+            {
+                Id = 7,
+                EventId = _eventId,
+                Title = "Old question",
+                Order = 0,
+                Options = new List<EventOption> { new EventOption { Id = 100, EventId = _eventId, Option = "Pizza" } }
+            };
+
+            var other = new EventQuestion
+            {
+                Id = 8,
+                EventId = _eventId,
+                Title = "Other question",
+                Order = 1,
+                Options = new List<EventOption>()
+            };
+
+            _systemClock ??= Substitute.For<ISystemClock>();
+            _uow = Substitute.For<IUnitOfWork2>();
+            _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion> { existing, other });
+            _optionsDbSet = _uow.MockDbSetForAsync(new List<EventOption>());
+            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator(), _systemClock);
+
+            // Option 100 belongs to question 7; sending it under question 8 is the "dragged
+            // between questions" case that used to throw InvalidOperationException.
+            var moved = Question("q8", 1, "Other question", Option(null, "Pizza", 0));
+            moved.Id = 8;
+            moved.Options[0].Id = 100;
+
+            var ex = Assert.ThrowsAsync<EventException>(
+                () => _writer.WriteAsync(_eventId, new List<EventQuestionStructureDto> { moved }, "user-1"));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionOptionNotFound));
+            await Task.CompletedTask;
+        }
+
+        [Test]
+        public async Task Should_Keep_A_Stored_Rule_When_The_Payload_Omits_It()
+        {
+            var storedOption = new EventOption
+            {
+                Id = 100,
+                EventId = _eventId,
+                Option = "Pizza",
+                Rule = OptionRules.IgnoreSingleJoin
+            };
+
+            var existing = new EventQuestion
+            {
+                Id = 7,
+                EventId = _eventId,
+                Title = "Pick your dish",
+                Order = 0,
+                Options = new List<EventOption> { storedOption }
+            };
+
+            _systemClock ??= Substitute.For<ISystemClock>();
+            _uow = Substitute.For<IUnitOfWork2>();
+            _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion> { existing });
+            _optionsDbSet = _uow.MockDbSetForAsync(new List<EventOption>());
+            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator(), _systemClock);
+
+            var echoed = Question("q7", 0, "Pick your dish", Option(null, "Pizza", 0));
+            echoed.Id = 7;
+            echoed.Options[0].Id = 100;
+            echoed.Options[0].Rule = null;
+
+            await _writer.WriteAsync(_eventId, new List<EventQuestionStructureDto> { echoed }, "user-1");
+
+            Assert.That(storedOption.Rule, Is.EqualTo(OptionRules.IgnoreSingleJoin));
         }
     }
 }

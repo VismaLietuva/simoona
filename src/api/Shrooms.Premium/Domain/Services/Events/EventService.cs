@@ -101,6 +101,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
             await RemoveEventRemindersAsync(@event.Reminders, userOrg.UserId);
 
+            // DeleteEventOptionsAsync takes the question-owned options with it, so leaving the
+            // questions behind would strand live rows with every option deleted.
+            await _eventQuestionWriter.WriteAsync(id, null, userOrg.UserId);
+
             _eventsDbSet.Remove(@event);
 
             await _uow.SaveChangesAsync(false);
@@ -178,6 +182,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
+            // Before the event row is committed: an invalid question tree returned 400 while the
+            // event was already persisted, leaving an orphan the caller could not find or retry.
+            await _eventQuestionWriter.ValidateAsync(Guid.Empty, newEventDto.Questions);
+
             var newEvent = await MapNewEventAsync(newEventDto);
 
             _eventsDbSet.Add(newEvent);
@@ -186,6 +194,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
             await _eventQuestionWriter.WriteAsync(newEvent.Id, newEventDto.Questions, newEventDto.UserId);
+            await _uow.SaveChangesAsync(newEventDto.UserId);
 
             newEventDto.Id = newEvent.Id.ToString();
 
@@ -231,6 +240,12 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
+
+            // With the other rules, before anything mutates: ResetEventAttendessAsync commits the
+            // expulsions and sends their emails, so a question tree rejected afterwards would
+            // return 400 with the attendee list already wiped.
+            await _eventQuestionWriter.ValidateAsync(eventToUpdate.Id, eventDto.Questions);
+
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
             await UpdateEventInfoAsync(eventDto, eventToUpdate);

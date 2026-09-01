@@ -1,28 +1,49 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 
 namespace Shrooms.Premium.Domain.Services.Events
 {
     public class EventQuestionWriter : IEventQuestionWriter
     {
-        private readonly IUnitOfWork2 _uow;
         private readonly DbSet<EventQuestion> _questionsDbSet;
         private readonly DbSet<EventOption> _optionsDbSet;
         private readonly IEventQuestionStructureValidator _structureValidator;
+        private readonly ISystemClock _systemClock;
 
-        public EventQuestionWriter(IUnitOfWork2 uow, IEventQuestionStructureValidator structureValidator)
+        public EventQuestionWriter(
+            IUnitOfWork2 uow,
+            IEventQuestionStructureValidator structureValidator,
+            ISystemClock systemClock)
         {
-            _uow = uow;
             _questionsDbSet = uow.GetDbSet<EventQuestion>();
             _optionsDbSet = uow.GetDbSet<EventOption>();
             _structureValidator = structureValidator;
+            _systemClock = systemClock;
+        }
+
+        public async Task ValidateAsync(Guid eventId, IList<EventQuestionStructureDto> questions)
+        {
+            var desired = questions ?? new List<EventQuestionStructureDto>();
+
+            _structureValidator.ValidatePayload(desired);
+
+            var existing = await LoadExistingAsync(eventId);
+
+            CheckSuppliedIdsBelongToEvent(existing, desired);
+
+            _structureValidator.ValidateResolved(BuildResolvedFromPayload(desired));
         }
 
         public async Task WriteAsync(Guid eventId, IList<EventQuestionStructureDto> questions, string userId)
@@ -31,10 +52,9 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _structureValidator.ValidatePayload(desired);
 
-            var existing = await _questionsDbSet
-                .Include(q => q.Options)
-                .Where(q => q.EventId == eventId)
-                .ToListAsync();
+            var existing = await LoadExistingAsync(eventId);
+
+            CheckSuppliedIdsBelongToEvent(existing, desired);
 
             // Validate the entire tree before touching the database. A payload that fails here must
             // leave no trace: persisting questions whose conditions were silently dropped would turn
@@ -65,8 +85,47 @@ namespace Shrooms.Premium.Domain.Services.Events
             {
                 ApplyCondition(dto, entity, optionByClientId);
             }
+        }
 
-            await _uow.SaveChangesAsync(userId);
+        private async Task<List<EventQuestion>> LoadExistingAsync(Guid eventId)
+        {
+            return await _questionsDbSet
+                .Include(q => q.Options)
+                .Where(q => q.EventId == eventId)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Every id the client supplies has to name a live row of this event, and an option id has
+        /// to sit under the question that claims it. Without this the lookups below throw
+        /// InvalidOperationException, which the controllers do not catch — a 500 for a stale form,
+        /// an option dragged between questions, or an id borrowed from another event.
+        /// </summary>
+        private static void CheckSuppliedIdsBelongToEvent(
+            List<EventQuestion> existing,
+            IList<EventQuestionStructureDto> desired)
+        {
+            var existingById = existing.ToDictionary(question => question.Id);
+
+            foreach (var dto in desired.Where(question => question.Id != null))
+            {
+                if (!existingById.ContainsKey(dto.Id.Value))
+                {
+                    throw new EventException(PremiumErrorCodes.EventQuestionNotFound);
+                }
+            }
+
+            foreach (var dto in desired)
+            {
+                var ownedOptionIds = dto.Id != null
+                    ? existingById[dto.Id.Value].Options?.Select(option => option.Id).ToHashSet() ?? new HashSet<int>()
+                    : new HashSet<int>();
+
+                if (dto.Options.Any(option => option.Id != null && !ownedOptionIds.Contains(option.Id.Value)))
+                {
+                    throw new EventException(PremiumErrorCodes.EventQuestionOptionNotFound);
+                }
+            }
         }
 
         /// <summary>
@@ -92,7 +151,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     var id = option.Id ?? next--;
                     syntheticOptionId[option] = id;
 
-                    if (option.ClientId != null)
+                    if (!string.IsNullOrWhiteSpace(option.ClientId))
                     {
                         syntheticOptionIdByClientId[option.ClientId] = id;
                     }
@@ -119,7 +178,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 return dto.ShowIfOptionId;
             }
 
-            if (dto.ShowIfOptionClientId == null)
+            if (string.IsNullOrWhiteSpace(dto.ShowIfOptionClientId))
             {
                 return null;
             }
@@ -143,7 +202,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 return;
             }
 
-            if (dto.ShowIfOptionClientId == null)
+            if (string.IsNullOrWhiteSpace(dto.ShowIfOptionClientId))
             {
                 entity.ShowIfOptionId = null;
                 entity.ShowIfOption = null;
@@ -200,9 +259,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             foreach (var removed in existingOptions.Where(o => !keptIds.Contains(o.Id)))
             {
-                removed.IsDeleted = true;
-                removed.Modified = DateTime.UtcNow;
-                removed.ModifiedBy = userId;
+                SoftDelete(removed, userId);
             }
 
             foreach (var optionDto in dto.Options)
@@ -214,13 +271,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                         EventId = eventId,
                         Option = optionDto.Name,
                         Order = optionDto.Order,
-                        Rule = optionDto.Rule,
+                        Rule = optionDto.Rule ?? OptionRules.Default,
                         Question = entity
                     };
 
                     _optionsDbSet.Add(option);
 
-                    if (optionDto.ClientId != null)
+                    if (!string.IsNullOrWhiteSpace(optionDto.ClientId))
                     {
                         optionByClientId[optionDto.ClientId] = option;
                     }
@@ -230,9 +287,15 @@ namespace Shrooms.Premium.Domain.Services.Events
                     var option = existingOptions.Single(o => o.Id == optionDto.Id.Value);
                     option.Option = optionDto.Name;
                     option.Order = optionDto.Order;
-                    option.Rule = optionDto.Rule;
 
-                    if (optionDto.ClientId != null)
+                    // A client that omits the rule keeps the stored one: the read shapes did not
+                    // always carry it, so treating "absent" as Default silently cleared it.
+                    if (optionDto.Rule != null)
+                    {
+                        option.Rule = optionDto.Rule.Value;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(optionDto.ClientId))
                     {
                         optionByClientId[optionDto.ClientId] = option;
                     }
@@ -240,7 +303,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private static void SoftDeleteAbsent(
+        private void SoftDeleteAbsent(
             List<EventQuestion> existing,
             IList<EventQuestionStructureDto> desired,
             string userId)
@@ -249,16 +312,23 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             foreach (var question in existing.Where(q => !keptIds.Contains(q.Id)))
             {
-                question.IsDeleted = true;
-                question.Modified = DateTime.UtcNow;
-                question.ModifiedBy = userId;
+                SoftDelete(question, userId);
 
                 foreach (var option in question.Options ?? new List<EventOption>())
                 {
-                    option.IsDeleted = true;
-                    option.Modified = DateTime.UtcNow;
-                    option.ModifiedBy = userId;
+                    SoftDelete(option, userId);
                 }
+            }
+        }
+
+        private void SoftDelete(ISoftDelete entity, string userId)
+        {
+            entity.IsDeleted = true;
+
+            if (entity is ITrackable trackable)
+            {
+                trackable.Modified = _systemClock.UtcNow;
+                trackable.ModifiedBy = userId;
             }
         }
     }

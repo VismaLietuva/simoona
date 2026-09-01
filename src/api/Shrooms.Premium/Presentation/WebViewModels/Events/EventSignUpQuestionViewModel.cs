@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Shrooms.Contracts.Enums;
@@ -29,14 +29,5 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int? ShowIfOptionId { get; set; }
 
         public IList<EventSignUpOptionViewModel> Options { get; set; } = new List<EventSignUpOptionViewModel>();
-    }
-
-    public class EventSignUpOptionViewModel
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public int Order { get; set; }
     }
 }

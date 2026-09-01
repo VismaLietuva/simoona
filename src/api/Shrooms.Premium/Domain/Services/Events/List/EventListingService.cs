@@ -165,6 +165,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         SelectedOption = e.EventParticipants
                             .Where(p => p.ApplicationUserId == userOrg.UserId)
                             .SelectMany(p => p.EventOptions)
+                            .Where(o => o.QuestionId == null)
                             .OrderBy(o => o.Id)
                             .Select(o => o.Option)
                             .FirstOrDefault()

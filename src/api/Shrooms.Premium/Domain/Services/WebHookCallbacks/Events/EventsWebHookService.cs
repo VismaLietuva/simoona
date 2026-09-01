@@ -27,6 +27,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly DbSet<EventOption> _eventOptionsDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
+        private readonly DbSet<EventQuestion> _questionsDbSet;
         private readonly IWallService _wallService;
         private readonly IApplicationSettings _appSettings;
 
@@ -35,6 +36,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
+            _questionsDbSet = uow.GetDbSet<EventQuestion>();
 
             _systemClock = systemClock;
             _wallService = wallService;
@@ -45,6 +47,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         {
             var eventsToUpdate = await _eventsDbSet
                     .Include(e => e.EventOptions)
+                    .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                     .Include(u => u.ResponsibleUser)
                     .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow && e.ResponsibleUser != null)
                     .ToListAsync();
@@ -56,6 +59,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 _eventsDbSet.Add(newEvent);
                 @event.EventRecurring = EventRecurrenceOptions.None;
                 CreateNewOptions(@event.EventOptions, newEvent);
+                CreateNewQuestions(@event.EventQuestions, newEvent);
             }
 
             await _uow.SaveChangesAsync(false);
@@ -110,7 +114,10 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private void CreateNewOptions(IEnumerable<EventOption> expiredEventOptions, Event newEvent)
         {
             var timestamp = _systemClock.UtcNow;
-            foreach (var option in expiredEventOptions)
+
+            // Legacy flat options only. A question-owned option cloned loose would surface on the
+            // next occurrence as a top-level food choice, and MaxChoices does not account for it.
+            foreach (var option in expiredEventOptions.Where(option => option.QuestionId == null))
             {
                 _eventOptionsDbSet.Add(new EventOption
                 {
@@ -119,8 +126,70 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                     CreatedBy = option.CreatedBy,
                     ModifiedBy = option.ModifiedBy,
                     Option = option.Option,
+                    Rule = option.Rule,
+                    Order = option.Order,
                     Event = newEvent
                 });
+            }
+        }
+
+        /// <summary>
+        /// Clones the question tree onto the next occurrence. Conditions are rewired through the
+        /// navigation property, since the cloned options have no identity until SaveChanges.
+        /// </summary>
+        private void CreateNewQuestions(IEnumerable<EventQuestion> expiredQuestions, Event newEvent)
+        {
+            var timestamp = _systemClock.UtcNow;
+            var clonedOptionByOldId = new Dictionary<int, EventOption>();
+            var clones = new List<(EventQuestion Old, EventQuestion New)>();
+
+            foreach (var question in expiredQuestions.OrderBy(question => question.Order))
+            {
+                var clone = new EventQuestion
+                {
+                    Created = timestamp,
+                    Modified = timestamp,
+                    CreatedBy = question.CreatedBy,
+                    ModifiedBy = question.ModifiedBy,
+                    Title = question.Title,
+                    Order = question.Order,
+                    SelectType = question.SelectType,
+                    IsRequired = question.IsRequired,
+                    Event = newEvent,
+                    Options = new List<EventOption>()
+                };
+
+                foreach (var option in question.Options ?? new List<EventOption>())
+                {
+                    var optionClone = new EventOption
+                    {
+                        Created = timestamp,
+                        Modified = timestamp,
+                        CreatedBy = option.CreatedBy,
+                        ModifiedBy = option.ModifiedBy,
+                        Option = option.Option,
+                        Rule = option.Rule,
+                        Order = option.Order,
+                        Event = newEvent,
+                        Question = clone
+                    };
+
+                    clone.Options.Add(optionClone);
+                    clonedOptionByOldId[option.Id] = optionClone;
+                    _eventOptionsDbSet.Add(optionClone);
+                }
+
+                _questionsDbSet.Add(clone);
+                clones.Add((question, clone));
+            }
+
+            foreach (var (old, clone) in clones)
+            {
+                if (old.ShowIfOptionId != null &&
+                    clonedOptionByOldId.TryGetValue(old.ShowIfOptionId.Value, out var trigger))
+                {
+                    clone.ShowIfOption = trigger;
+                }
             }
         }
     }
