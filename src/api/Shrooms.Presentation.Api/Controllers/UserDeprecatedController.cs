@@ -758,10 +758,13 @@ namespace Shrooms.Presentation.Api.Controllers
                 return StatusCode(403);
             }
 
-            var room = await _roomRepository.GetByIdAsync(model.RoomId);
-            if (room == null)
+            if (model.RoomId.HasValue)
             {
-                return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist + " Id: " + model.RoomId, Resources.Models.Room.Room.EntityName) });
+                var room = await _roomRepository.GetByIdAsync(model.RoomId.Value);
+                if (room == null)
+                {
+                    return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist + " Id: " + model.RoomId, Resources.Models.Room.Room.EntityName) });
+                }
             }
 
             var user = await _applicationUserRepository.GetByIdAsync(model.Id);

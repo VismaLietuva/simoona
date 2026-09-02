@@ -15,6 +15,12 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<int> ChosenOptions { get; set; }
 
+        /// <summary>
+        /// Question-owned option ids. Join replaces the participant's whole selection, so null here
+        /// reads as "no answers supplied" and the answer rules are enforced against that.
+        /// </summary>
+        public IEnumerable<int> Answers { get; set; }
+
         public ICollection<string> ParticipantIds { get; set; }
     }
 }

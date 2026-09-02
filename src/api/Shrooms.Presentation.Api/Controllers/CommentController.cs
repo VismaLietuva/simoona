@@ -51,7 +51,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var wallPost = await _wallService.GetWallPostAsync(userAndOrg, comment.PostId);
 
-            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
+            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events && wallPost.WallType != WallType.Polls)
             {
                 return Forbidden();
             }

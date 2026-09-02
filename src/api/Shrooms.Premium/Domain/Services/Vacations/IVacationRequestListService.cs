@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 using X.PagedList;
 
@@ -20,5 +22,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         Task<int> GetPendingTeamCountAsync(UserAndOrganizationDto userOrg);
 
         Task<bool> HasDirectReportsAsync(UserAndOrganizationDto userOrg);
+
+        Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg);
     }
 }

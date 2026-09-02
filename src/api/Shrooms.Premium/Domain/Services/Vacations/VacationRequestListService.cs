@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
@@ -16,6 +17,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 {
     public class VacationRequestListService : IVacationRequestListService
     {
+        private const int AutocompleteLimit = 10;
+
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
@@ -68,6 +71,40 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 .AsNoTracking()
                 .AnyAsync(user => user.OrganizationId == userOrg.OrganizationId
                                   && user.ManagerId == userOrg.UserId);
+        }
+
+        public async Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
+        {
+            var query = _userDbSet
+                .AsNoTracking()
+                .Where(user => user.OrganizationId == userOrg.OrganizationId
+                               && user.ManagerId == userOrg.UserId);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+                query = query.Where(user =>
+                    ((user.FirstName ?? "") + " " + (user.LastName ?? "")).Contains(term)
+                    || ((user.LastName ?? "") + " " + (user.FirstName ?? "")).Contains(term)
+                    || user.UserName.Contains(term)
+                    || user.Email.Contains(term));
+            }
+
+            return await query
+                .OrderBy(user => user.FirstName)
+                .ThenBy(user => user.LastName)
+                .Take(AutocompleteLimit)
+                .Select(user => new UserAutoCompleteDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    FullName = user.FirstName + " " + user.LastName,
+                    UserName = user.UserName,
+                    PictureId = user.PictureId,
+                    Email = user.Email
+                })
+                .ToListAsync();
         }
 
         [Flags]

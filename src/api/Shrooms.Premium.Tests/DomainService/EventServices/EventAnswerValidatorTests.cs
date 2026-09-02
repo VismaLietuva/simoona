@@ -1,0 +1,180 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using Shrooms.Contracts.Enums;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainExceptions.Event;
+using Shrooms.Premium.Domain.DomainServiceValidators.Events;
+
+namespace Shrooms.Premium.Tests.DomainService.EventServices
+{
+    public class EventAnswerValidatorTests
+    {
+        private EventAnswerValidator _validator;
+
+        [SetUp]
+        public void TestInitializer()
+        {
+            _validator = new EventAnswerValidator();
+        }
+
+        /// <summary>
+        /// q1 "Pick your dish" (required, single): options 10 Pizza, 11 Pasta.
+        /// q2 "Which pizza?"   (required, single, shown if 10): options 20, 21.
+        /// q3 "Anything else?" (optional, multi, always shown): options 30, 31.
+        /// </summary>
+        private static List<ResolvedEventQuestionDto> FoodTree()
+        {
+            return new List<ResolvedEventQuestionDto>
+            {
+                new ResolvedEventQuestionDto
+                {
+                    QuestionId = 1, Order = 0, SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true, ShowIfOptionId = null, OptionIds = new[] { 10, 11 }
+                },
+                new ResolvedEventQuestionDto
+                {
+                    QuestionId = 2, Order = 1, SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true, ShowIfOptionId = 10, OptionIds = new[] { 20, 21 }
+                },
+                new ResolvedEventQuestionDto
+                {
+                    QuestionId = 3, Order = 2, SelectType = EventQuestionSelectType.Multi,
+                    IsRequired = false, ShowIfOptionId = null, OptionIds = new[] { 30, 31 }
+                }
+            };
+        }
+
+        [Test]
+        public void Should_Accept_A_Complete_Branch()
+        {
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 10, 20 }));
+        }
+
+        [Test]
+        public void Should_Accept_A_Branch_That_Skips_The_Conditional_Question()
+        {
+            // Pasta chosen, so "Which pizza?" is not reachable and needs no answer.
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11 }));
+        }
+
+        [Test]
+        public void Should_Reject_Two_Answers_To_A_Single_Select_Question()
+        {
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(FoodTree(), new[] { 10, 11, 20 }));
+
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 1 && e.Reason == EventAnswerErrorReason.TooManyAnswers), Is.True);
+        }
+
+        [Test]
+        public void Should_Accept_Two_Answers_To_A_Multi_Select_Question()
+        {
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 30, 31 }));
+        }
+
+        [Test]
+        public void Should_Reject_A_Missing_Answer_To_A_Reachable_Required_Question()
+        {
+            // Pizza chosen but "Which pizza?" left unanswered.
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(FoodTree(), new[] { 10 }));
+
+            Assert.That(ex.Errors.Single().QuestionId, Is.EqualTo(2));
+            Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.RequiredAnswerMissing));
+        }
+
+        [Test]
+        public void Should_Reject_An_Answer_To_A_Hidden_Question()
+        {
+            // Pasta chosen, yet a pizza sub-option was answered.
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(FoodTree(), new[] { 11, 20 }));
+
+            Assert.That(ex.Errors.Single().QuestionId, Is.EqualTo(2));
+            Assert.That(ex.Errors.Single().Reason, Is.EqualTo(EventAnswerErrorReason.AnswerForHiddenQuestion));
+        }
+
+        [Test]
+        public void Should_Report_Every_Failing_Question_Not_Just_The_First()
+        {
+            var questions = new List<ResolvedEventQuestionDto>
+            {
+                new ResolvedEventQuestionDto
+                {
+                    QuestionId = 1, Order = 0, SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true, ShowIfOptionId = null, OptionIds = new[] { 10 }
+                },
+                new ResolvedEventQuestionDto
+                {
+                    QuestionId = 2, Order = 1, SelectType = EventQuestionSelectType.Single,
+                    IsRequired = true, ShowIfOptionId = null, OptionIds = new[] { 20 }
+                }
+            };
+
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(questions, Array.Empty<int>()));
+
+            Assert.That(ex.Errors.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Should_Treat_A_Question_As_Hidden_When_Its_Trigger_Question_Is_Itself_Hidden()
+        {
+            // q4's trigger option (20) is not chosen here, so this only covers the shallow
+            // "trigger not chosen" path (stage 1). It does not exercise the owner-reachability
+            // propagation check (stage 2) — see
+            // Should_Hide_A_Question_Whose_Trigger_Was_Chosen_But_Whose_Trigger_Question_Was_Hidden
+            // for that.
+            // q4 is triggered by an option of q2, but q2 is hidden because q1 chose 11.
+            var questions = FoodTree();
+            questions.Add(new ResolvedEventQuestionDto
+            {
+                QuestionId = 4, Order = 3, SelectType = EventQuestionSelectType.Single,
+                IsRequired = true, ShowIfOptionId = 20, OptionIds = new[] { 40 }
+            });
+
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(questions, new[] { 11, 40 }));
+
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
+        }
+
+        [Test]
+        public void Should_Hide_A_Question_Whose_Trigger_Was_Chosen_But_Whose_Trigger_Question_Was_Hidden()
+        {
+            // q4's trigger option (20) IS chosen this time, so reachability for q4 must pass
+            // stage 1 (trigger chosen) and fall through to stage 2 (owner-reachability
+            // propagation): q2 owns option 20 but q2 itself is hidden (its trigger, 10, was not
+            // chosen), so q4 must also be treated as hidden.
+            var questions = FoodTree();
+            questions.Add(new ResolvedEventQuestionDto
+            {
+                QuestionId = 4, Order = 3, SelectType = EventQuestionSelectType.Single,
+                IsRequired = true, ShowIfOptionId = 20, OptionIds = new[] { 40 }
+            });
+
+            var ex = Assert.Throws<EventAnswersInvalidException>(
+                () => _validator.Validate(questions, new[] { 11, 20, 40 }));
+
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 2 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
+            Assert.That(ex.Errors.Any(e => e.QuestionId == 4 && e.Reason == EventAnswerErrorReason.AnswerForHiddenQuestion), Is.True);
+        }
+
+        // Ids outside every question — legacy flat options — must pass straight through. Rejecting
+        // an id the event does not own belongs to CheckIfProvidedOptionsAreValid, which runs first
+        // and answers with a code the web client has a message for.
+        [Test]
+        public void Should_Ignore_Legacy_Flat_Options_Alongside_Questions()
+        {
+            Assert.DoesNotThrow(() => _validator.Validate(FoodTree(), new[] { 11, 500 }));
+        }
+
+        [Test]
+        public void Should_Ignore_Chosen_Options_On_An_Event_With_No_Questions()
+        {
+            Assert.DoesNotThrow(() => _validator.Validate(new List<ResolvedEventQuestionDto>(), new[] { 500 }));
+        }
+    }
+}

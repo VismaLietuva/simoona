@@ -50,6 +50,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<EventOptionViewModel> Options { get; set; }
 
+        public IEnumerable<EventSignUpQuestionViewModel> Questions { get; set; } = new List<EventSignUpQuestionViewModel>();
+
         public IEnumerable<EventReminderDetailsViewModel> Reminders { get; set; }
     }
 }

@@ -28,6 +28,7 @@
             222: 'messageEventTypeNameExists',
             227: 'messageEventAttendTypeIsNotAllowed',
             228: 'messageEventAttendTypeCannotBeChangedIfParticipantsJoined',
+            241: 'messageEventAnswersInvalid',
             302: 'messageCannotSendKudosPointsToThisUser',
             303: 'messageKudosTypeNotFound',
             304: 'messageInsufficientKudos',

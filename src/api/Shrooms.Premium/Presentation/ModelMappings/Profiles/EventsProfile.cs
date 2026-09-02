@@ -41,6 +41,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>(MemberList.None);
             CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>(MemberList.None);
+            CreateMap<EventDetailsQuestionDto, EventDetailsQuestionViewModel>(MemberList.None);
+            CreateMap<EventDetailsQuestionOptionDto, EventDetailsQuestionOptionViewModel>(MemberList.None);
             CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>(MemberList.None);
             CreateMap<EventProjectReportDto, EventProjectReportViewModel>(MemberList.None);
             CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>(MemberList.None);
@@ -49,7 +51,30 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>(MemberList.None);
 
+            // Read side. Id is non-null on anything that came out of the database, so the
+            // nullable write-side Id is flattened here rather than leaking a null to the client.
+            CreateMap<EventQuestionStructureDto, EventSignUpQuestionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
+            CreateMap<EventQuestionOptionStructureDto, EventSignUpOptionViewModel>(MemberList.None)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? 0));
+
+            CreateMap<EventQuestionStructureDto, EventQuestionViewModel>()
+                .ForMember(dest => dest.ShowIf, opt => opt.MapFrom(src =>
+                    src.ShowIfOptionId == null && src.ShowIfOptionClientId == null
+                        ? null
+                        : new EventQuestionConditionViewModel
+                        {
+                            OptionId = src.ShowIfOptionId,
+                            OptionClientId = src.ShowIfOptionClientId
+                        }))
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src => src.ShowIfOptionId));
+
+            // Answers is assigned by the controller: AutoMapper maps a null source collection to an
+            // empty destination one, which would erase the difference between "omitted" (keep the
+            // stored answers) and an empty array (clear them).
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>(MemberList.None)
+                .Ignore(x => x.Answers)
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
 
@@ -72,15 +97,37 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>(MemberList.None);
             CreateMap<EventSearchOptionsViewModel, EventSearchOptionsDto>(MemberList.None);
+            // Answers is assigned by the controller for the same reason as on
+            // EventChangeOptionViewModel: a null collection must not arrive as an empty one.
             CreateMap<EventJoinViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinMultipleViewModel, EventJoinDto>(MemberList.None)
+                .Ignore(d => d.Answers)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDto>(MemberList.None);
 
+            CreateMap<EventQuestionOptionViewModel, EventQuestionOptionStructureDto>().ReverseMap();
+
+            // A present but empty ShowIf must not read as "no condition": that would silently
+            // clear a stored condition and turn a hidden question into an always-visible one.
+            // Fall back to the scalar the read shape emits whenever ShowIf names nothing.
+            CreateMap<EventQuestionViewModel, EventQuestionStructureDto>()
+                .ForMember(dest => dest.ShowIfOptionId, opt => opt.MapFrom(src =>
+                    src.ShowIf == null || (src.ShowIf.OptionId == null && src.ShowIf.OptionClientId == null)
+                        ? src.ShowIfOptionId
+                        : src.ShowIf.OptionId))
+                .ForMember(dest => dest.ShowIfOptionClientId,
+                    opt => opt.MapFrom(src => src.ShowIf == null ? null : src.ShowIf.OptionClientId));
+
+            // Both id collections are assigned by the controller: on this endpoint an omitted array
+            // means "keep what is stored", which AutoMapper's null-to-empty collection mapping
+            // would turn into "clear it".
             CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(MemberList.None)
+                .Ignore(d => d.ChosenOptions)
+                .Ignore(d => d.Answers)
                 .IgnoreUserOrgDto();
 
             CreateMap<EventDetailsOptionViewModel, EventDetailsOptionDto>(MemberList.None);

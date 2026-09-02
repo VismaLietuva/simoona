@@ -328,11 +328,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var eventJoinDto = _mapper.Map<EventJoinMultipleViewModel, EventJoinDto>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDto);
+            eventJoinDto.Answers = eventJoinModel.Answers;
 
             try
             {
                 await _eventParticipationService.AddColleagueAsync(eventJoinDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -353,12 +358,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var optionsDto = _mapper.Map<EventJoinViewModel, EventJoinDto>(joinOptions);
             SetOrganizationAndUser(optionsDto);
+            optionsDto.Answers = joinOptions.Answers;
             optionsDto.ParticipantIds = new List<string> { optionsDto.UserId };
 
             try
             {
                 await _eventParticipationService.JoinAsync(optionsDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -379,11 +389,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var updateAttendStatusDto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(updateStatusViewModel);
             SetOrganizationAndUser(updateAttendStatusDto);
+            updateAttendStatusDto.ChosenOptions = updateStatusViewModel.ChosenOptions;
+            updateAttendStatusDto.Answers = updateStatusViewModel.Answers;
 
             try
             {
                 await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -646,11 +662,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var changeOptionsDto = _mapper.Map<EventChangeOptionViewModel, EventChangeOptionsDto>(viewModel);
             SetOrganizationAndUser(changeOptionsDto);
+            changeOptionsDto.Answers = viewModel.Answers;
 
             try
             {
                 await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto);
                 return Ok();
+            }
+            catch (EventAnswersInvalidException e)
+            {
+                return AnswersInvalid(e);
             }
             catch (EventException e)
             {
@@ -700,6 +721,22 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        private BadRequestObjectResult AnswersInvalid(EventAnswersInvalidException exception)
+        {
+            return BadRequest(new EventAnswersInvalidViewModel
+            {
+                Code = PremiumErrorCodes.EventAnswersInvalid,
+                Message = PremiumErrorCodes.EventAnswersInvalid,
+                Errors = exception.Errors
+                    .Select(error => new EventAnswerErrorViewModel
+                    {
+                        QuestionId = error.QuestionId,
+                        Reason = error.Reason
+                    })
+                    .ToList()
+            });
         }
     }
 }
