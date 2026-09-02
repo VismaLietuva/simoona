@@ -135,7 +135,7 @@
   <data name="CoacheeJoinedEventEmailSubject" xml:space="preserve">
     <value>Coachee {0} prisijungė prie {1} renginio</value>
   </data>
-  <data name="CoacheLeftEventEmailSubject" xml:space="preserve">
+  <data name="CoacheeLeftEventEmailSubject" xml:space="preserve">
     <value>Coachee {0} paliko {1} renginį</value>
   </data>
   <data name="RemindEventDeadlineEmailSubject" xml:space="preserve">
@@ -148,6 +148,6 @@
     <value>Renginys {0} pasidalintas {1} sienoje</value>
   </data>
   <data name="NewEventEmailSubject" xml:space="preserve">
-    <value>Sukurtas naujas reginys: {0}</value>
+    <value>Sukurtas naujas renginys: {0}</value>
   </data>
 </root>
