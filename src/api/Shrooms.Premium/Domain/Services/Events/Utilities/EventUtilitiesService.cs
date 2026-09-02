@@ -197,9 +197,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .Include(e => e.EventParticipants)
                 .Include(e => e.Event)
                 .Include(e => e.Question)
+                // The attend-status predicate is repeated below rather than extracted: EF Core
+                // cannot translate a method call inside an expression tree. Both halves must count
+                // the same set the participants sheet lists, or the two sheets disagree — a dropout
+                // keeps their picks, so counting them inflates every total.
                 .Where(e => e.EventId == eventId
                     && e.Event.OrganizationId == userAndOrg.OrganizationId
-                    && e.EventParticipants.Any(x => x.EventId == eventId))
+                    && e.EventParticipants.Any(x => x.EventId == eventId
+                        && (x.AttendStatus == (int)AttendingStatus.Attending
+                            || x.AttendStatus == (int)AttendingStatus.AttendingVirtually)))
                 .OrderBy(e => e.QuestionId == null ? 0 : 1)
                 .ThenBy(e => e.Question == null ? 0 : e.Question.Order)
                 .ThenBy(e => e.QuestionId)
@@ -211,7 +217,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .Select(e => new EventOptionCountDto
                 {
                     Option = e.Option,
-                    Count = e.EventParticipants.Count(x => x.EventId == eventId),
+                    Count = e.EventParticipants.Count(x => x.EventId == eventId
+                        && (x.AttendStatus == (int)AttendingStatus.Attending
+                            || x.AttendStatus == (int)AttendingStatus.AttendingVirtually)),
                     QuestionId = e.QuestionId,
                     Question = e.Question == null ? null : e.Question.Title
                 })

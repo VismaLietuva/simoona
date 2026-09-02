@@ -91,14 +91,15 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 var optionsTable = excelData.Tables[1];
                 var excelRows = optionsTable.Rows;
 
+                // No questions on this event, so the sheet keeps its original two columns.
                 ClassicAssert.AreEqual(2, excelData.Tables.Count);
-                ClassicAssert.AreEqual("Question", optionsTable.Columns[0].ColumnName);
-                ClassicAssert.AreEqual("Option", optionsTable.Columns[1].ColumnName);
-                ClassicAssert.AreEqual("Count", optionsTable.Columns[2].ColumnName);
-                ClassicAssert.AreEqual("Option1", excelRows[0].ItemArray[1]);
-                ClassicAssert.AreEqual("2", excelRows[0].ItemArray[2]);
-                ClassicAssert.AreEqual("Option2", excelRows[1].ItemArray[1]);
-                ClassicAssert.AreEqual("1", excelRows[1].ItemArray[2]);
+                ClassicAssert.AreEqual(2, optionsTable.Columns.Count);
+                ClassicAssert.AreEqual("Option", optionsTable.Columns[0].ColumnName);
+                ClassicAssert.AreEqual("Count", optionsTable.Columns[1].ColumnName);
+                ClassicAssert.AreEqual("Option1", excelRows[0].ItemArray[0]);
+                ClassicAssert.AreEqual("2", excelRows[0].ItemArray[1]);
+                ClassicAssert.AreEqual("Option2", excelRows[1].ItemArray[0]);
+                ClassicAssert.AreEqual("1", excelRows[1].ItemArray[1]);
                 ClassicAssert.AreEqual(2, excelRows.Count);
             }
         }

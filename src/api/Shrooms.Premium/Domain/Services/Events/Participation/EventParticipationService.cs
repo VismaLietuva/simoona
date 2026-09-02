@@ -652,23 +652,29 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private static Expression<Func<Event, IEnumerable<EventParticipantDto>>> MapEventToParticipantDto()
         {
-            return e => e.EventParticipants.Select(p => new EventParticipantDto
-            {
-                FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
-                    ? BusinessLayerConstants.DeletedUserFirstName
-                    : p.ApplicationUser.FirstName,
-
-                LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
-                    ? BusinessLayerConstants.DeletedUserLastName
-                    : p.ApplicationUser.LastName,
-
-                Choices = p.EventOptions.Select(o => new EventParticipantChoiceDto
+            // Declining does not clear a participant's picks (ValidateAnswersForStatusChange returns
+            // null for any non-going status, which means "leave the selection alone"), so without
+            // this filter the sheet caters for people who dropped out.
+            return e => e.EventParticipants
+                .Where(p => p.AttendStatus == (int)AttendingStatus.Attending ||
+                            p.AttendStatus == (int)AttendingStatus.AttendingVirtually)
+                .Select(p => new EventParticipantDto
                 {
-                    QuestionId = o.QuestionId,
-                    Option = o.Option,
-                    Order = o.Order
-                })
-            });
+                    FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
+                        ? BusinessLayerConstants.DeletedUserFirstName
+                        : p.ApplicationUser.FirstName,
+
+                    LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
+                        ? BusinessLayerConstants.DeletedUserLastName
+                        : p.ApplicationUser.LastName,
+
+                    Choices = p.EventOptions.Select(o => new EventParticipantChoiceDto
+                    {
+                        QuestionId = o.QuestionId,
+                        Option = o.Option,
+                        Order = o.Order
+                    })
+                });
         }
 
         private static UserEventAttendStatusChangeEmailDto MapToUserEventAttendStatusChangeEmailDto(

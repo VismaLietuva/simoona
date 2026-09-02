@@ -51,13 +51,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
 
             if (options.Any())
             {
+                // An event with no questions keeps the pre-sign-up-steps two-column sheet rather
+                // than gaining a column that would be blank the whole way down.
+                var hasQuestions = options.Any(option => option.QuestionId != null);
+
                 excelBuilder
                     .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
-                    .AddHeader(
-                        Resources.Models.Events.Events.Question,
-                        Resources.Models.Events.Events.Option,
-                        Resources.Models.Events.Events.Count)
-                    .AddRows(MapOptionsToExcelRows(options))
+                    .AddHeader(GetOptionsHeader(hasQuestions))
+                    .AddRows(MapOptionsToExcelRows(options, hasQuestions))
                     .AutoFitColumns();
             }
 
@@ -129,18 +130,38 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             return string.Join(AnswerSeparator, answers);
         }
 
-        private static IExcelRowCollection MapOptionsToExcelRows(IEnumerable<EventOptionCountDto> options)
+        private static IEnumerable<string> GetOptionsHeader(bool hasQuestions)
+        {
+            var header = new List<string>();
+
+            if (hasQuestions)
+            {
+                header.Add(Resources.Models.Events.Events.Question);
+            }
+
+            header.Add(Resources.Models.Events.Events.Option);
+            header.Add(Resources.Models.Events.Events.Count);
+
+            return header;
+        }
+
+        private static IExcelRowCollection MapOptionsToExcelRows(IEnumerable<EventOptionCountDto> options, bool hasQuestions)
         {
             var rows = new ExcelRowCollection();
 
             foreach (var option in options)
             {
-                rows.Add(new ExcelRow
+                var row = new ExcelRow();
+
+                if (hasQuestions)
                 {
-                    new ExcelColumn { Value = option.Question ?? string.Empty },
-                    new ExcelColumn { Value = option.Option },
-                    new ExcelColumn { Value = option.Count.ToString() }
-                });
+                    row.Add(new ExcelColumn { Value = option.Question ?? string.Empty });
+                }
+
+                row.Add(new ExcelColumn { Value = option.Option });
+                row.Add(new ExcelColumn { Value = option.Count.ToString() });
+
+                rows.Add(row);
             }
 
             return rows;

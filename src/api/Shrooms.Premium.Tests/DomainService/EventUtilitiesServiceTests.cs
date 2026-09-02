@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Services.FilterPresets;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Tests.Extensions;
 
@@ -18,6 +19,9 @@ namespace Shrooms.Premium.Tests.DomainService
 {
     public class EventUtilitiesServiceTests
     {
+        // Only going participants are counted, so every mocked one has to carry a going status.
+        private const int Attending = (int)AttendingStatus.Attending;
+
         private IEventUtilitiesService _eventUtilitiesService;
 
         private IFilterPresetService _filterPresetService;
@@ -215,15 +219,18 @@ namespace Shrooms.Premium.Tests.DomainService
                     {
                         new EventParticipant
                         {
-                            EventId = eventId
+                            EventId = eventId,
+                            AttendStatus = Attending
                         },
                         new EventParticipant
                         {
-                            EventId = eventId
+                            EventId = eventId,
+                            AttendStatus = Attending
                         },
                         new EventParticipant
                         {
-                            EventId = default
+                            EventId = default,
+                            AttendStatus = Attending
                         }
                     }
                 },
@@ -236,11 +243,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     {
                         new EventParticipant
                         {
-                            EventId = eventId
+                            EventId = eventId,
+                            AttendStatus = Attending
                         },
                         new EventParticipant
                         {
-                            EventId = default
+                            EventId = default,
+                            AttendStatus = Attending
                         }
                     }
                 },
@@ -299,7 +308,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Question = tShirtSize,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { EventId = eventId }
+                        new EventParticipant { EventId = eventId, AttendStatus = Attending }
                     }
                 },
                 new EventOption
@@ -312,7 +321,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Question = dietaryNeeds,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { EventId = eventId }
+                        new EventParticipant { EventId = eventId, AttendStatus = Attending }
                     }
                 },
                 new EventOption
@@ -323,8 +332,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     Order = 0,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { EventId = eventId },
-                        new EventParticipant { EventId = eventId }
+                        new EventParticipant { EventId = eventId, AttendStatus = Attending },
+                        new EventParticipant { EventId = eventId, AttendStatus = Attending }
                     }
                 },
                 new EventOption
@@ -367,7 +376,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Order = 0,
                     EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant { EventId = eventId }
+                        new EventParticipant { EventId = eventId, AttendStatus = Attending }
                     }
                 })
                 .ToList();

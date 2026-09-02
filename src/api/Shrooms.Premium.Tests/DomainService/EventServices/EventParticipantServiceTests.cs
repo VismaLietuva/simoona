@@ -425,7 +425,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
+
+            // The third mocked participant is Not attending, so they stay out of the list.
             ClassicAssert.AreEqual(2, result.Count);
+            CollectionAssert.DoesNotContain(result.Select(participant => participant.FirstName), "Gone");
             ClassicAssert.AreEqual("Name", result.First().FirstName);
 
             var choices = result.First().Choices.ToList();
@@ -1217,6 +1220,21 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                             },
                             AttendStatus = 1,
                             EventOptions = new List<EventOption>()
+                        },
+
+                        // Dropped out but kept the pick, which is what declining does.
+                        new EventParticipant
+                        {
+                            ApplicationUser = new ApplicationUser
+                            {
+                                FirstName = "Gone",
+                                LastName = "Away"
+                            },
+                            AttendStatus = (int)AttendingStatus.NotAttending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Option = "Vegan", Order = 0, QuestionId = 7 }
+                            }
                         }
                     }
                 }
