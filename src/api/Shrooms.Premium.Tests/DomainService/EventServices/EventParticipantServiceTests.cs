@@ -426,9 +426,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
 
-            // The third mocked participant is Not attending, so they stay out of the list.
-            ClassicAssert.AreEqual(2, result.Count);
-            CollectionAssert.DoesNotContain(result.Select(participant => participant.FirstName), "Gone");
+            // Only the person who declined is left out; the undecided one stays.
+            var names = result.Select(participant => participant.FirstName).ToList();
+            ClassicAssert.AreEqual(3, result.Count);
+            CollectionAssert.DoesNotContain(names, "Gone");
+            CollectionAssert.Contains(names, "Undecided");
             ClassicAssert.AreEqual("Name", result.First().FirstName);
 
             var choices = result.First().Choices.ToList();
@@ -1220,6 +1222,18 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 LastName = "Surname1"
                             },
                             AttendStatus = 1,
+                            EventOptions = new List<EventOption>()
+                        },
+
+                        // Still deciding — belongs on the roster.
+                        new EventParticipant
+                        {
+                            ApplicationUser = new ApplicationUser
+                            {
+                                FirstName = "Undecided",
+                                LastName = "Person"
+                            },
+                            AttendStatus = (int)AttendingStatus.MaybeAttending,
                             EventOptions = new List<EventOption>()
                         },
 
