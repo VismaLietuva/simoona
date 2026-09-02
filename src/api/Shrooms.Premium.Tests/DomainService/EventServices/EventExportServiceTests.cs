@@ -67,8 +67,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             ClassicAssert.AreEqual("Count", options.Columns[1].ColumnName);
             ClassicAssert.AreEqual("People", options.Columns[2].ColumnName);
 
-            // Ada and Grace picked exactly the same things, so they share one order line, and the
-            // answers inside it read in question then option order rather than as they were stored.
             ClassicAssert.AreEqual(2, options.Rows.Count);
 
             ClassicAssert.AreEqual("Pizza + Vegan + M", options.Rows[0].ItemArray[0]);
@@ -153,7 +151,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             ClassicAssert.LessOrEqual(cell.Length, 32767);
             StringAssert.Contains("more)", cell);
-            // The count column still reports everyone, and no name is cut mid-word.
             ClassicAssert.AreEqual("2600", tables[1].Rows[0].ItemArray[1]);
             StringAssert.DoesNotContain("Person1000,", cell.Substring(cell.Length - 20));
         }
@@ -196,7 +193,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var tables = await ExportTablesAsync(eventId, userAndOrg);
 
-            // Both people are participants, but only one placed an order.
             ClassicAssert.AreEqual(2, tables[0].Rows.Count);
             ClassicAssert.AreEqual(1, tables[1].Rows.Count);
             ClassicAssert.AreEqual("Ada Lovelace", tables[1].Rows[0].ItemArray[2]);

@@ -426,7 +426,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
 
-            // Only the person who declined is left out; the undecided one stays.
             var names = result.Select(participant => participant.FirstName).ToList();
             ClassicAssert.AreEqual(3, result.Count);
             CollectionAssert.DoesNotContain(names, "Gone");
@@ -1225,7 +1224,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                             EventOptions = new List<EventOption>()
                         },
 
-                        // Still deciding — belongs on the roster.
                         new EventParticipant
                         {
                             ApplicationUser = new ApplicationUser

@@ -120,9 +120,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         }
 
         /// <summary>
-        /// Where one pick sorts, both inside a row and between rows: flat options first, then by
-        /// question, then by option. Id settles the rest, because every legacy flat option is
-        /// written with Order 0 and would otherwise tie.
+        /// Id settles the rest because every legacy flat option is written with Order 0, so
+        /// without it they all tie and SQL Server's unstable sort can reshuffle the sheet.
         /// </summary>
         private static IReadOnlyList<int> Rank(EventParticipantChoiceDto choice)
         {
