@@ -191,25 +191,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return recurrenceOptions;
         }
 
-        public async Task<IEnumerable<EventOptionCountDto>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
-        {
-            var eventOptions = await _eventOptionsDbSet
-                .Include(e => e.EventParticipants)
-                .Include(e => e.Event)
-                .Where(e => e.EventId == eventId
-                    && e.QuestionId == null
-                    && e.Event.OrganizationId == userAndOrg.OrganizationId
-                    && e.EventParticipants.Any(x => x.EventId == eventId))
-                .Select(e => new EventOptionCountDto
-                {
-                    Option = e.Option,
-                    Count = e.EventParticipants.Count(x => x.EventId == eventId)
-                })
-                .ToListAsync();
-
-            return eventOptions;
-        }
-
         public async Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds)
         {
             var now = DateTime.UtcNow;

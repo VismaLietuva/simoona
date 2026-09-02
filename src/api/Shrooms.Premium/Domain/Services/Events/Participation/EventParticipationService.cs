@@ -652,16 +652,30 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private static Expression<Func<Event, IEnumerable<EventParticipantDto>>> MapEventToParticipantDto()
         {
-            return e => e.EventParticipants.Select(p => new EventParticipantDto
-            {
-                FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
-                    ? BusinessLayerConstants.DeletedUserFirstName
-                    : p.ApplicationUser.FirstName,
+            // Declining does not clear a participant's picks (ValidateAnswersForStatusChange returns
+            // null for any non-going status, which means "leave the selection alone"), so without
+            // this the sheet caters for people who dropped out. Only they are excluded: someone
+            // still deciding belongs on the roster, and over-ordering for them beats missing them.
+            return e => e.EventParticipants
+                .Where(p => p.AttendStatus != (int)AttendingStatus.NotAttending)
+                .Select(p => new EventParticipantDto
+                {
+                    FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
+                        ? BusinessLayerConstants.DeletedUserFirstName
+                        : p.ApplicationUser.FirstName,
 
-                LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
-                    ? BusinessLayerConstants.DeletedUserLastName
-                    : p.ApplicationUser.LastName
-            });
+                    LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
+                        ? BusinessLayerConstants.DeletedUserLastName
+                        : p.ApplicationUser.LastName,
+
+                    Choices = p.EventOptions.Select(o => new EventParticipantChoiceDto
+                    {
+                        OptionId = o.Id,
+                        QuestionOrder = o.Question == null ? null : (int?)o.Question.Order,
+                        Option = o.Option,
+                        Order = o.Order
+                    })
+                });
         }
 
         private static UserEventAttendStatusChangeEmailDto MapToUserEventAttendStatusChangeEmailDto(

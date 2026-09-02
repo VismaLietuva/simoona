@@ -425,8 +425,20 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
-            ClassicAssert.AreEqual(2, result.Count);
+
+            var names = result.Select(participant => participant.FirstName).ToList();
+            ClassicAssert.AreEqual(3, result.Count);
+            CollectionAssert.DoesNotContain(names, "Gone");
+            CollectionAssert.Contains(names, "Undecided");
             ClassicAssert.AreEqual("Name", result.First().FirstName);
+
+            var choices = result.First().Choices.ToList();
+            ClassicAssert.AreEqual(2, choices.Count);
+            ClassicAssert.AreEqual("Vegan", choices[0].Option);
+            ClassicAssert.AreEqual(3, choices[0].QuestionOrder);
+            ClassicAssert.AreEqual("Pizza", choices[1].Option);
+            ClassicAssert.AreEqual(null, choices[1].QuestionOrder);
+            ClassicAssert.IsEmpty(result.Last().Choices);
         }
 
         [Test]
@@ -1184,7 +1196,22 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 FirstName = "Name",
                                 LastName = "Surname"
                             },
-                            AttendStatus = 1
+                            AttendStatus = 1,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption
+                                {
+                                    Option = "Vegan",
+                                    Order = 0,
+                                    QuestionId = 7,
+                                    Question = new EventQuestion { Id = 7, Title = "Dietary needs", Order = 3 }
+                                },
+                                new EventOption
+                                {
+                                    Option = "Pizza",
+                                    Order = 1
+                                }
+                            }
                         },
                         new EventParticipant
                         {
@@ -1193,7 +1220,34 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 FirstName = "Name1",
                                 LastName = "Surname1"
                             },
-                            AttendStatus = 1
+                            AttendStatus = 1,
+                            EventOptions = new List<EventOption>()
+                        },
+
+                        new EventParticipant
+                        {
+                            ApplicationUser = new ApplicationUser
+                            {
+                                FirstName = "Undecided",
+                                LastName = "Person"
+                            },
+                            AttendStatus = (int)AttendingStatus.MaybeAttending,
+                            EventOptions = new List<EventOption>()
+                        },
+
+                        // Dropped out but kept the pick, which is what declining does.
+                        new EventParticipant
+                        {
+                            ApplicationUser = new ApplicationUser
+                            {
+                                FirstName = "Gone",
+                                LastName = "Away"
+                            },
+                            AttendStatus = (int)AttendingStatus.NotAttending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Option = "Vegan", Order = 0, QuestionId = 7 }
+                            }
                         }
                     }
                 }
