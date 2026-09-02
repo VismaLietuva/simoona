@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -15,7 +16,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
 {
     public class EventExportService : IEventExportService
     {
-        private const string AnswerSeparator = ", ";
+        private const string LabelSeparator = " + ";
+        private const string PersonSeparator = ", ";
 
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
@@ -35,30 +37,27 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         {
             var eventName = await _eventUtilitiesService.GetEventNameAsync(eventId);
             var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg)).ToList();
-            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg)).ToList();
-
-            // Both sheets take their column order from this one list, which the query already sorts
-            // flat options first, then by question order.
-            var choiceColumns = GetChoiceColumns(options);
+            var combinations = BuildCombinations(participants);
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
 
             excelBuilder
                 .AddWorksheet(EventsConstants.EventParticipantsExcelTableName)
-                .AddHeader(GetParticipantsHeader(choiceColumns))
-                .AddRows(MapParticipantsToExcelRows(participants, choiceColumns))
+                .AddHeader(
+                    Resources.Models.ApplicationUser.ApplicationUser.FirstName,
+                    Resources.Models.ApplicationUser.ApplicationUser.LastName)
+                .AddRows(participants.AsQueryable(), MapEventParticipantToExcelRow())
                 .AutoFitColumns();
 
-            if (options.Any())
+            if (combinations.Any())
             {
-                // An event with no questions keeps the pre-sign-up-steps two-column sheet rather
-                // than gaining a column that would be blank the whole way down.
-                var hasQuestions = options.Any(option => option.QuestionId != null);
-
                 excelBuilder
                     .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
-                    .AddHeader(GetOptionsHeader(hasQuestions))
-                    .AddRows(MapOptionsToExcelRows(options, hasQuestions))
+                    .AddHeader(
+                        Resources.Models.Events.Events.Combination,
+                        Resources.Models.Events.Events.Count,
+                        Resources.Models.Events.Events.People)
+                    .AddRows(MapCombinationsToExcelRows(combinations))
                     .AutoFitColumns();
             }
 
@@ -66,105 +65,134 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
-        private static List<EventOptionCountDto> GetChoiceColumns(IEnumerable<EventOptionCountDto> options)
+        /// <summary>
+        /// One row per distinct set of picks, which is what an organizer places an order from:
+        /// "Deep dish + Margerita + Cheese, 2". Counting each option on its own loses which picks
+        /// belonged together, so it cannot say whether the deep dish wanted margerita or marinara.
+        /// </summary>
+        private static List<EventCombination> BuildCombinations(IEnumerable<EventParticipantDto> participants)
         {
-            return options
-                .GroupBy(option => option.QuestionId)
-                .Select(group => group.First())
-                .ToList();
-        }
-
-        private static IEnumerable<string> GetParticipantsHeader(IEnumerable<EventOptionCountDto> choiceColumns)
-        {
-            var header = new List<string>
-            {
-                Resources.Models.ApplicationUser.ApplicationUser.FirstName,
-                Resources.Models.ApplicationUser.ApplicationUser.LastName
-            };
-
-            header.AddRange(choiceColumns.Select(column => column.Question ?? Resources.Models.Events.Events.Option));
-
-            return header;
-        }
-
-        private static IExcelRowCollection MapParticipantsToExcelRows(
-            IEnumerable<EventParticipantDto> participants,
-            IReadOnlyCollection<EventOptionCountDto> choiceColumns)
-        {
-            var rows = new ExcelRowCollection();
+            var combinations = new Dictionary<string, EventCombination>();
 
             foreach (var participant in participants)
             {
-                var row = new ExcelRow
-                {
-                    new ExcelColumn { Value = participant.FirstName },
-                    new ExcelColumn { Value = participant.LastName }
-                };
+                var choices = Ordered(participant.Choices);
 
-                foreach (var column in choiceColumns)
+                if (choices.Count == 0)
                 {
-                    row.Add(new ExcelColumn { Value = GetAnswer(participant, column.QuestionId) });
+                    continue;
                 }
 
-                rows.Add(row);
+                var key = string.Join(">", choices.Select(choice => choice.OptionId));
+
+                if (!combinations.TryGetValue(key, out var combination))
+                {
+                    combination = new EventCombination
+                    {
+                        Labels = string.Join(LabelSeparator, choices.Select(choice => choice.Option)),
+                        Sequence = choices.SelectMany(SortKey).ToList()
+                    };
+
+                    combinations.Add(key, combination);
+                }
+
+                combination.People.Add(FullName(participant));
             }
 
-            return rows;
+            return combinations.Values
+                .OrderBy(combination => combination, Comparer<EventCombination>.Create(
+                    (left, right) => CompareSequences(left.Sequence, right.Sequence)))
+                .ToList();
         }
 
-        private static string GetAnswer(EventParticipantDto participant, int? questionId)
+        private static List<EventParticipantChoiceDto> Ordered(IEnumerable<EventParticipantChoiceDto> choices)
         {
-            if (participant.Choices == null)
+            if (choices == null)
             {
-                return string.Empty;
+                return new List<EventParticipantChoiceDto>();
             }
 
-            // Option breaks the Order tie that every legacy flat choice shares, so the same pair of
-            // picks cannot render in one order on one row and the reverse on the next.
-            var answers = participant.Choices
-                .Where(choice => choice.QuestionId == questionId)
-                .OrderBy(choice => choice.Order)
-                .ThenBy(choice => choice.Option)
-                .Select(choice => choice.Option);
-
-            return string.Join(AnswerSeparator, answers);
+            return choices
+                .OrderBy(choice => choice.QuestionId == null ? 0 : 1)
+                .ThenBy(choice => choice.QuestionOrder ?? 0)
+                .ThenBy(choice => choice.Order)
+                .ThenBy(choice => choice.OptionId)
+                .ToList();
         }
 
-        private static IEnumerable<string> GetOptionsHeader(bool hasQuestions)
+        private static IEnumerable<int> SortKey(EventParticipantChoiceDto choice)
         {
-            var header = new List<string>();
-
-            if (hasQuestions)
-            {
-                header.Add(Resources.Models.Events.Events.Question);
-            }
-
-            header.Add(Resources.Models.Events.Events.Option);
-            header.Add(Resources.Models.Events.Events.Count);
-
-            return header;
+            yield return choice.QuestionId == null ? 0 : 1;
+            yield return choice.QuestionOrder ?? 0;
+            yield return choice.Order;
+            yield return choice.OptionId;
         }
 
-        private static IExcelRowCollection MapOptionsToExcelRows(IEnumerable<EventOptionCountDto> options, bool hasQuestions)
+        // Orders the sheet the way the answers themselves are ordered, so a shorter order that
+        // starts the same way sits directly above the longer one that extends it.
+        private static int CompareSequences(IReadOnlyList<int> left, IReadOnlyList<int> right)
+        {
+            for (var i = 0; i < Math.Min(left.Count, right.Count); i++)
+            {
+                if (left[i] != right[i])
+                {
+                    return left[i].CompareTo(right[i]);
+                }
+            }
+
+            return left.Count.CompareTo(right.Count);
+        }
+
+        private static string FullName(EventParticipantDto participant)
+        {
+            return $"{participant.FirstName} {participant.LastName}".Trim();
+        }
+
+        private static IExcelRowCollection MapCombinationsToExcelRows(IEnumerable<EventCombination> combinations)
         {
             var rows = new ExcelRowCollection();
 
-            foreach (var option in options)
+            foreach (var combination in combinations)
             {
-                var row = new ExcelRow();
-
-                if (hasQuestions)
+                rows.Add(new ExcelRow
                 {
-                    row.Add(new ExcelColumn { Value = option.Question ?? string.Empty });
-                }
-
-                row.Add(new ExcelColumn { Value = option.Option });
-                row.Add(new ExcelColumn { Value = option.Count.ToString() });
-
-                rows.Add(row);
+                    new ExcelColumn { Value = combination.Labels },
+                    new ExcelColumn { Value = combination.People.Count.ToString() },
+                    new ExcelColumn
+                    {
+                        Value = string.Join(
+                            PersonSeparator,
+                            combination.People.OrderBy(name => name, StringComparer.CurrentCulture))
+                    }
+                });
             }
 
             return rows;
+        }
+
+        private static Expression<Func<EventParticipantDto, IExcelRow>> MapEventParticipantToExcelRow()
+        {
+            return participant => new ExcelRow
+            {
+                new ExcelColumn
+                {
+                    Value = participant.FirstName
+                },
+
+                new ExcelColumn
+                {
+                    Value = participant.LastName
+                }
+            };
+        }
+
+        private sealed class EventCombination
+        {
+            public string Labels { get; set; }
+
+            public List<int> Sequence { get; set; }
+
+            public List<string> People { get; } = new List<string>();
         }
     }
 }

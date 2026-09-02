@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
 using NSubstitute;
@@ -35,157 +37,108 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task Should_Return_Excel_File_With_Participants()
+        public async Task Should_Return_Excel_File_With_Participant_Names_Only()
         {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
 
-            var guid = MockParticipantsWithOptionsForExport(userAndOrg);
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+            var participants = tables[0];
 
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            ClassicAssert.AreEqual(2, participants.Columns.Count);
+            ClassicAssert.AreEqual("First name", participants.Columns[0].ColumnName);
+            ClassicAssert.AreEqual("Last name", participants.Columns[1].ColumnName);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                var excelRows = excelData.Tables[0].Rows;
-
-                ClassicAssert.AreEqual("Name", excelRows[0].ItemArray[0]);
-                ClassicAssert.AreEqual("Surname", excelRows[0].ItemArray[1]);
-            }
+            ClassicAssert.AreEqual("Ada", participants.Rows[0].ItemArray[0]);
+            ClassicAssert.AreEqual("Lovelace", participants.Rows[0].ItemArray[1]);
         }
 
         [Test]
-        public async Task Should_Return_Excel_File_With_Participants_And_Without_Options()
+        public async Task Should_Write_One_Row_Per_Distinct_Combination()
         {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
-            var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
 
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+            var options = tables[1];
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                ClassicAssert.AreEqual(1, excelData.Tables.Count);
-            }
+            ClassicAssert.AreEqual(2, tables.Count);
+            ClassicAssert.AreEqual("Combination", options.Columns[0].ColumnName);
+            ClassicAssert.AreEqual("Count", options.Columns[1].ColumnName);
+            ClassicAssert.AreEqual("People", options.Columns[2].ColumnName);
+
+            // Ada and Grace picked exactly the same things, so they share one order line, and the
+            // answers inside it read in question then option order rather than as they were stored.
+            ClassicAssert.AreEqual(2, options.Rows.Count);
+
+            ClassicAssert.AreEqual("Pizza + Vegan + M", options.Rows[0].ItemArray[0]);
+            ClassicAssert.AreEqual("2", options.Rows[0].ItemArray[1]);
+            ClassicAssert.AreEqual("Ada Lovelace, Grace Hopper", options.Rows[0].ItemArray[2]);
+
+            ClassicAssert.AreEqual("Pizza + M + L", options.Rows[1].ItemArray[0]);
+            ClassicAssert.AreEqual("1", options.Rows[1].ItemArray[1]);
+            ClassicAssert.AreEqual("Alan Turing", options.Rows[1].ItemArray[2]);
         }
 
         [Test]
-        public async Task Should_Return_Excel_File_With_Options()
+        public async Task Should_Not_Name_The_Questions_A_Combination_Came_From()
         {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
-            var guid = MockParticipantsWithOptionsForExport(userAndOrg);
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
 
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                var optionsTable = excelData.Tables[1];
-                var excelRows = optionsTable.Rows;
+            var everyCell = tables[1].Rows.Cast<DataRow>()
+                .SelectMany(row => row.ItemArray)
+                .Select(value => value?.ToString() ?? string.Empty);
 
-                // No questions on this event, so the sheet keeps its original two columns.
-                ClassicAssert.AreEqual(2, excelData.Tables.Count);
-                ClassicAssert.AreEqual(2, optionsTable.Columns.Count);
-                ClassicAssert.AreEqual("Option", optionsTable.Columns[0].ColumnName);
-                ClassicAssert.AreEqual("Count", optionsTable.Columns[1].ColumnName);
-                ClassicAssert.AreEqual("Option1", excelRows[0].ItemArray[0]);
-                ClassicAssert.AreEqual("2", excelRows[0].ItemArray[1]);
-                ClassicAssert.AreEqual("Option2", excelRows[1].ItemArray[0]);
-                ClassicAssert.AreEqual("1", excelRows[1].ItemArray[1]);
-                ClassicAssert.AreEqual(2, excelRows.Count);
-            }
+            CollectionAssert.DoesNotContain(everyCell, "Dietary needs");
+            CollectionAssert.DoesNotContain(everyCell, "T-shirt size");
         }
 
         [Test]
-        public async Task Should_Name_The_Question_Each_Option_Belongs_To()
+        public async Task Should_Treat_A_Flat_Only_Event_As_Single_Answer_Combinations()
         {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
-            var guid = MockParticipantsWithQuestionsForExport(userAndOrg);
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockFlatOnlyParticipants(userAndOrg);
 
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+            var options = tables[1];
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                var excelRows = excelData.Tables[1].Rows;
+            ClassicAssert.AreEqual(2, options.Rows.Count);
 
-                ClassicAssert.AreEqual(4, excelRows.Count);
+            ClassicAssert.AreEqual("Pizza", options.Rows[0].ItemArray[0]);
+            ClassicAssert.AreEqual("2", options.Rows[0].ItemArray[1]);
+            ClassicAssert.AreEqual("Ada Lovelace, Grace Hopper", options.Rows[0].ItemArray[2]);
 
-                ClassicAssert.AreEqual(string.Empty, CellText(excelRows[0].ItemArray[0]));
-                ClassicAssert.AreEqual("Pizza", excelRows[0].ItemArray[1]);
-                ClassicAssert.AreEqual("2", excelRows[0].ItemArray[2]);
-
-                ClassicAssert.AreEqual("Dietary needs", excelRows[1].ItemArray[0]);
-                ClassicAssert.AreEqual("Vegan", excelRows[1].ItemArray[1]);
-                ClassicAssert.AreEqual("1", excelRows[1].ItemArray[2]);
-
-                ClassicAssert.AreEqual("T-shirt size", excelRows[2].ItemArray[0]);
-                ClassicAssert.AreEqual("M", excelRows[2].ItemArray[1]);
-                ClassicAssert.AreEqual("1", excelRows[2].ItemArray[2]);
-
-                ClassicAssert.AreEqual("T-shirt size", excelRows[3].ItemArray[0]);
-                ClassicAssert.AreEqual("L", excelRows[3].ItemArray[1]);
-                ClassicAssert.AreEqual("1", excelRows[3].ItemArray[2]);
-            }
+            ClassicAssert.AreEqual("Salad", options.Rows[1].ItemArray[0]);
+            ClassicAssert.AreEqual("1", options.Rows[1].ItemArray[1]);
+            ClassicAssert.AreEqual("Alan Turing", options.Rows[1].ItemArray[2]);
         }
 
         [Test]
-        public async Task Should_Return_Excel_File_With_A_Column_Per_Question_Holding_Each_Participants_Answer()
+        public async Task Should_Omit_The_Options_Sheet_When_Nobody_Picked_Anything()
         {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
-            var guid = MockParticipantsWithQuestionsForExport(userAndOrg);
-
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
-
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                var participantsTable = excelData.Tables[0];
-                var excelRows = participantsTable.Rows;
-
-                ClassicAssert.AreEqual(5, participantsTable.Columns.Count);
-                ClassicAssert.AreEqual("Option", participantsTable.Columns[2].ColumnName);
-                ClassicAssert.AreEqual("Dietary needs", participantsTable.Columns[3].ColumnName);
-                ClassicAssert.AreEqual("T-shirt size", participantsTable.Columns[4].ColumnName);
-
-                ClassicAssert.AreEqual("Ada", excelRows[0].ItemArray[0]);
-                ClassicAssert.AreEqual("Lovelace", excelRows[0].ItemArray[1]);
-                ClassicAssert.AreEqual("Pizza", excelRows[0].ItemArray[2]);
-                ClassicAssert.AreEqual("Vegan", excelRows[0].ItemArray[3]);
-                ClassicAssert.AreEqual("M", excelRows[0].ItemArray[4]);
-
-                ClassicAssert.AreEqual("Grace", excelRows[1].ItemArray[0]);
-                ClassicAssert.AreEqual("Hopper", excelRows[1].ItemArray[1]);
-                ClassicAssert.AreEqual("Pizza", excelRows[1].ItemArray[2]);
-                ClassicAssert.AreEqual(string.Empty, CellText(excelRows[1].ItemArray[3]));
-                ClassicAssert.AreEqual("M, L", excelRows[1].ItemArray[4]);
-            }
-        }
-
-        [Test]
-        public async Task Should_Join_Answers_Alphabetically_When_They_Share_An_Order()
-        {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
             var eventId = Guid.NewGuid();
 
-            var users = new List<EventParticipantDto>
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(new List<EventParticipantDto>
+            {
+                new EventParticipantDto { FirstName = "Ada", LastName = "Lovelace" }
+            });
+
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+
+            ClassicAssert.AreEqual(1, tables.Count);
+        }
+
+        [Test]
+        public async Task Should_Leave_Out_Participants_Who_Picked_Nothing()
+        {
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = Guid.NewGuid();
+
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(new List<EventParticipantDto>
             {
                 new EventParticipantDto
                 {
@@ -193,74 +146,52 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     LastName = "Lovelace",
                     Choices = new List<EventParticipantChoiceDto>
                     {
-                        new EventParticipantChoiceDto { Option = "Salad", Order = 0 },
-                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 }
+                        Choice(1, "Pizza")
                     }
                 },
-                new EventParticipantDto
-                {
-                    FirstName = "Grace",
-                    LastName = "Hopper",
-                    Choices = new List<EventParticipantChoiceDto>
-                    {
-                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 },
-                        new EventParticipantChoiceDto { Option = "Salad", Order = 0 }
-                    }
-                }
-            };
+                new EventParticipantDto { FirstName = "Silent", LastName = "Bob" }
+            });
 
-            var options = new List<EventOptionCountDto>
-            {
-                new EventOptionCountDto { Option = "Pizza", Count = 2 },
-                new EventOptionCountDto { Option = "Salad", Count = 2 }
-            };
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
 
-            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
+            // Both people are participants, but only one placed an order.
+            ClassicAssert.AreEqual(2, tables[0].Rows.Count);
+            ClassicAssert.AreEqual(1, tables[1].Rows.Count);
+            ClassicAssert.AreEqual("Ada Lovelace", tables[1].Rows[0].ItemArray[2]);
+        }
 
+        private async Task<DataTableCollection> ExportTablesAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
+        {
             var export = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, userAndOrg);
 
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                var excelRows = excelData.Tables[0].Rows;
+            using var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content));
 
-                ClassicAssert.AreEqual("Pizza, Salad", excelRows[0].ItemArray[2]);
-                ClassicAssert.AreEqual("Pizza, Salad", excelRows[1].ItemArray[2]);
-            }
+            return excelReader
+                .AsDataSet(new ExcelDataSetConfiguration
+                {
+                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                })
+                .Tables;
         }
 
-        [Test]
-        public async Task Should_Add_Only_The_Flat_Option_Column_When_The_Event_Has_No_Questions()
+        private static EventParticipantChoiceDto Choice(int optionId, string option, int? questionId = null, int? questionOrder = null, int order = 0)
         {
-            var userAndOrg = new UserAndOrganizationDto
+            return new EventParticipantChoiceDto
             {
-                OrganizationId = 2
+                OptionId = optionId,
+                Option = option,
+                QuestionId = questionId,
+                QuestionOrder = questionOrder,
+                Order = order
             };
-            var guid = MockParticipantsWithOptionsForExport(userAndOrg);
-
-            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
-
-            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
-            {
-                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-
-                ClassicAssert.AreEqual(3, excelData.Tables[0].Columns.Count);
-            }
         }
 
-        // A blank cell reads back as DBNull or "" depending on how EPPlus stored it.
-        private static string CellText(object value)
-        {
-            return value == null || value is DBNull ? string.Empty : value.ToString();
-        }
-
-        private Guid MockParticipantsWithQuestionsForExport(UserAndOrganizationDto userAndOrg)
+        private Guid MockParticipantsWithQuestions(UserAndOrganizationDto userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
-            const int dietaryNeedsId = 7;
-            const int tShirtSizeId = 9;
+            const int dietaryNeeds = 7;
+            const int tShirtSize = 9;
 
             var users = new List<EventParticipantDto>
             {
@@ -268,11 +199,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 {
                     FirstName = "Ada",
                     LastName = "Lovelace",
+                    // Stored out of order on purpose: the sheet has to sort them.
                     Choices = new List<EventParticipantChoiceDto>
                     {
-                        new EventParticipantChoiceDto { Option = "M", Order = 0, QuestionId = tShirtSizeId },
-                        new EventParticipantChoiceDto { Option = "Vegan", Order = 0, QuestionId = dietaryNeedsId },
-                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 }
+                        Choice(30, "M", tShirtSize, questionOrder: 1),
+                        Choice(10, "Pizza"),
+                        Choice(20, "Vegan", dietaryNeeds, questionOrder: 0)
                     }
                 },
                 new EventParticipantDto
@@ -281,27 +213,29 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     LastName = "Hopper",
                     Choices = new List<EventParticipantChoiceDto>
                     {
-                        new EventParticipantChoiceDto { Option = "L", Order = 1, QuestionId = tShirtSizeId },
-                        new EventParticipantChoiceDto { Option = "M", Order = 0, QuestionId = tShirtSizeId },
-                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 }
+                        Choice(10, "Pizza"),
+                        Choice(20, "Vegan", dietaryNeeds, questionOrder: 0),
+                        Choice(30, "M", tShirtSize, questionOrder: 1)
+                    }
+                },
+                new EventParticipantDto
+                {
+                    FirstName = "Alan",
+                    LastName = "Turing",
+                    Choices = new List<EventParticipantChoiceDto>
+                    {
+                        Choice(10, "Pizza"),
+                        Choice(30, "M", tShirtSize, questionOrder: 1),
+                        Choice(31, "L", tShirtSize, questionOrder: 1, order: 1)
                     }
                 }
             };
 
-            var options = new List<EventOptionCountDto>
-            {
-                new EventOptionCountDto { Option = "Pizza", Count = 2 },
-                new EventOptionCountDto { Option = "Vegan", Count = 1, QuestionId = dietaryNeedsId, Question = "Dietary needs" },
-                new EventOptionCountDto { Option = "M", Count = 1, QuestionId = tShirtSizeId, Question = "T-shirt size" },
-                new EventOptionCountDto { Option = "L", Count = 1, QuestionId = tShirtSizeId, Question = "T-shirt size" }
-            };
-
             _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
             return eventId;
         }
 
-        private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDto userAndOrg)
+        private Guid MockFlatOnlyParticipants(UserAndOrganizationDto userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
@@ -309,48 +243,25 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             {
                 new EventParticipantDto
                 {
-                    FirstName = "Name",
-                    LastName = "Surname"
-                }
-            };
-
-            var options = new List<EventOptionCountDto>
-            {
-                new EventOptionCountDto
-                {
-                   Option = "Option1",
-                   Count = 2
+                    FirstName = "Ada",
+                    LastName = "Lovelace",
+                    Choices = new List<EventParticipantChoiceDto> { Choice(10, "Pizza") }
                 },
-                new EventOptionCountDto
-                {
-                   Option = "Option2",
-                   Count = 1
-                }
-            };
-
-            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
-            return eventId;
-        }
-
-        private Guid MockParticipantsWithoutOptionsForExport(UserAndOrganizationDto userAndOrg)
-        {
-            var eventId = Guid.NewGuid();
-
-            var users = new List<EventParticipantDto>
-            {
                 new EventParticipantDto
                 {
-                    FirstName = "Name",
-                    LastName = "Surname"
+                    FirstName = "Grace",
+                    LastName = "Hopper",
+                    Choices = new List<EventParticipantChoiceDto> { Choice(10, "Pizza") }
+                },
+                new EventParticipantDto
+                {
+                    FirstName = "Alan",
+                    LastName = "Turing",
+                    Choices = new List<EventParticipantChoiceDto> { Choice(11, "Salad", order: 1) }
                 }
             };
 
-            // ReSharper disable once CollectionNeverUpdated.Local
-            var options = new List<EventOptionCountDto>();
-
             _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
             return eventId;
         }
     }

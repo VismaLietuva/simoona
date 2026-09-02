@@ -670,7 +670,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
                     Choices = p.EventOptions.Select(o => new EventParticipantChoiceDto
                     {
+                        OptionId = o.Id,
                         QuestionId = o.QuestionId,
+                        QuestionOrder = o.Question == null ? null : (int?)o.Question.Order,
                         Option = o.Option,
                         Order = o.Order
                     })
