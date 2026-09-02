@@ -427,6 +427,14 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var result = (await _eventParticipationService.GetEventParticipantsAsync(eventGuid, userAndOrg)).ToList();
             ClassicAssert.AreEqual(2, result.Count);
             ClassicAssert.AreEqual("Name", result.First().FirstName);
+
+            var choices = result.First().Choices.ToList();
+            ClassicAssert.AreEqual(2, choices.Count);
+            ClassicAssert.AreEqual("Vegan", choices[0].Option);
+            ClassicAssert.AreEqual(7, choices[0].QuestionId);
+            ClassicAssert.AreEqual("Pizza", choices[1].Option);
+            ClassicAssert.AreEqual(null, choices[1].QuestionId);
+            ClassicAssert.IsEmpty(result.Last().Choices);
         }
 
         [Test]
@@ -1184,7 +1192,21 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 FirstName = "Name",
                                 LastName = "Surname"
                             },
-                            AttendStatus = 1
+                            AttendStatus = 1,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption
+                                {
+                                    Option = "Vegan",
+                                    Order = 0,
+                                    QuestionId = 7
+                                },
+                                new EventOption
+                                {
+                                    Option = "Pizza",
+                                    Order = 1
+                                }
+                            }
                         },
                         new EventParticipant
                         {
@@ -1193,7 +1215,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 FirstName = "Name1",
                                 LastName = "Surname1"
                             },
-                            AttendStatus = 1
+                            AttendStatus = 1,
+                            EventOptions = new List<EventOption>()
                         }
                     }
                 }

@@ -196,14 +196,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             var eventOptions = await _eventOptionsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.Event)
+                .Include(e => e.Question)
                 .Where(e => e.EventId == eventId
-                    && e.QuestionId == null
                     && e.Event.OrganizationId == userAndOrg.OrganizationId
                     && e.EventParticipants.Any(x => x.EventId == eventId))
+                .OrderBy(e => e.QuestionId == null ? 0 : 1)
+                .ThenBy(e => e.Question == null ? 0 : e.Question.Order)
+                .ThenBy(e => e.Order)
                 .Select(e => new EventOptionCountDto
                 {
                     Option = e.Option,
-                    Count = e.EventParticipants.Count(x => x.EventId == eventId)
+                    Count = e.EventParticipants.Count(x => x.EventId == eventId),
+                    QuestionId = e.QuestionId,
+                    Question = e.Question == null ? null : e.Question.Title
                 })
                 .ToListAsync();
 

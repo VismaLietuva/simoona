@@ -2892,6 +2892,30 @@ namespace Shrooms.Resources.Models.Events {
         ///<summary>
         ///    <list type='bullet'>
         ///        <item>
+        ///            <description>Question</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string Question => GetResourceString(QuestionKey);
+
+        /// <summary>
+        /// Resource key for <see cref="Question"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string QuestionKey = "Question";
+    }
+}
+
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
         ///            <description>I will eat at this event</description>
         ///        </item>
         ///        <item>

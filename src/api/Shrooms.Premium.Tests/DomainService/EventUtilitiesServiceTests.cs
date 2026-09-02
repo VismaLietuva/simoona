@@ -78,6 +78,35 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_Chosen_Options_From_Sign_Up_Questions()
+        {
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+            var guid = MockChosenOptionsWithQuestionsForExport();
+
+            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(guid, userAndOrg)).ToList();
+
+            ClassicAssert.AreEqual(3, options.Count);
+
+            ClassicAssert.AreEqual(null, options[0].Question);
+            ClassicAssert.AreEqual(null, options[0].QuestionId);
+            ClassicAssert.AreEqual("Pizza", options[0].Option);
+            ClassicAssert.AreEqual(2, options[0].Count);
+
+            ClassicAssert.AreEqual("Dietary needs", options[1].Question);
+            ClassicAssert.AreEqual(7, options[1].QuestionId);
+            ClassicAssert.AreEqual("Vegan", options[1].Option);
+            ClassicAssert.AreEqual(1, options[1].Count);
+
+            ClassicAssert.AreEqual("T-shirt size", options[2].Question);
+            ClassicAssert.AreEqual(9, options[2].QuestionId);
+            ClassicAssert.AreEqual("M", options[2].Option);
+            ClassicAssert.AreEqual(1, options[2].Count);
+        }
+
+        [Test]
         public async Task Should_Return_Event_Type_With_Active_Event()
         {
             // Arrange
@@ -209,6 +238,94 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventParticipants = new List<EventParticipant>()
                 }
             };
+            _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
+            return eventId;
+        }
+
+        private Guid MockChosenOptionsWithQuestionsForExport()
+        {
+            var eventId = Guid.NewGuid();
+
+            var @event = new Event
+            {
+                Id = eventId,
+                OrganizationId = 2,
+                ResponsibleUserId = "user"
+            };
+
+            var dietaryNeeds = new EventQuestion
+            {
+                Id = 7,
+                EventId = eventId,
+                Event = @event,
+                Title = "Dietary needs",
+                Order = 0
+            };
+
+            var tShirtSize = new EventQuestion
+            {
+                Id = 9,
+                EventId = eventId,
+                Event = @event,
+                Title = "T-shirt size",
+                Order = 1
+            };
+
+            // Deliberately not in the expected output order: flat options come first, then questions
+            // by their own order, and it is the service that has to put them back in it.
+            var options = new List<EventOption>
+            {
+                new EventOption
+                {
+                    EventId = eventId,
+                    Event = @event,
+                    Option = "M",
+                    Order = 0,
+                    QuestionId = tShirtSize.Id,
+                    Question = tShirtSize,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { EventId = eventId }
+                    }
+                },
+                new EventOption
+                {
+                    EventId = eventId,
+                    Event = @event,
+                    Option = "Vegan",
+                    Order = 0,
+                    QuestionId = dietaryNeeds.Id,
+                    Question = dietaryNeeds,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { EventId = eventId }
+                    }
+                },
+                new EventOption
+                {
+                    EventId = eventId,
+                    Event = @event,
+                    Option = "Pizza",
+                    Order = 0,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { EventId = eventId },
+                        new EventParticipant { EventId = eventId }
+                    }
+                },
+                new EventOption
+                {
+                    EventId = eventId,
+                    Event = @event,
+                    Option = "Vegetarian",
+                    Order = 1,
+                    QuestionId = dietaryNeeds.Id,
+                    Question = dietaryNeeds,
+                    EventParticipants = new List<EventParticipant>()
+                }
+            };
+
             _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
             _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
             return eventId;
