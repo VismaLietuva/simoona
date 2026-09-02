@@ -176,7 +176,61 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task Should_Not_Add_An_Answer_Column_When_The_Event_Has_No_Questions()
+        public async Task Should_Join_Answers_Alphabetically_When_They_Share_An_Order()
+        {
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+            var eventId = Guid.NewGuid();
+
+            var users = new List<EventParticipantDto>
+            {
+                new EventParticipantDto
+                {
+                    FirstName = "Ada",
+                    LastName = "Lovelace",
+                    Choices = new List<EventParticipantChoiceDto>
+                    {
+                        new EventParticipantChoiceDto { Option = "Salad", Order = 0 },
+                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 }
+                    }
+                },
+                new EventParticipantDto
+                {
+                    FirstName = "Grace",
+                    LastName = "Hopper",
+                    Choices = new List<EventParticipantChoiceDto>
+                    {
+                        new EventParticipantChoiceDto { Option = "Pizza", Order = 0 },
+                        new EventParticipantChoiceDto { Option = "Salad", Order = 0 }
+                    }
+                }
+            };
+
+            var options = new List<EventOptionCountDto>
+            {
+                new EventOptionCountDto { Option = "Pizza", Count = 2 },
+                new EventOptionCountDto { Option = "Salad", Count = 2 }
+            };
+
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
+            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
+
+            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, userAndOrg);
+
+            using (var excelReader = ExcelReaderFactory.CreateReader(new MemoryStream(export.Content)))
+            {
+                var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
+                var excelRows = excelData.Tables[0].Rows;
+
+                ClassicAssert.AreEqual("Pizza, Salad", excelRows[0].ItemArray[2]);
+                ClassicAssert.AreEqual("Pizza, Salad", excelRows[1].ItemArray[2]);
+            }
+        }
+
+        [Test]
+        public async Task Should_Add_Only_The_Flat_Option_Column_When_The_Event_Has_No_Questions()
         {
             var userAndOrg = new UserAndOrganizationDto
             {

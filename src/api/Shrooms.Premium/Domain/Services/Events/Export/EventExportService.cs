@@ -118,9 +118,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 return string.Empty;
             }
 
+            // Option breaks the Order tie that every legacy flat choice shares, so the same pair of
+            // picks cannot render in one order on one row and the reverse on the next.
             var answers = participant.Choices
                 .Where(choice => choice.QuestionId == questionId)
                 .OrderBy(choice => choice.Order)
+                .ThenBy(choice => choice.Option)
                 .Select(choice => choice.Option);
 
             return string.Join(AnswerSeparator, answers);

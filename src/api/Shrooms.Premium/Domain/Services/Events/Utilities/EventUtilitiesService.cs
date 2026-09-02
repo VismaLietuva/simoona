@@ -202,7 +202,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     && e.EventParticipants.Any(x => x.EventId == eventId))
                 .OrderBy(e => e.QuestionId == null ? 0 : 1)
                 .ThenBy(e => e.Question == null ? 0 : e.Question.Order)
+                .ThenBy(e => e.QuestionId)
                 .ThenBy(e => e.Order)
+                // Legacy flat options are all written with Order 0, so without Id every one of them
+                // ties on every key above and SQL Server's unstable sort can reshuffle the sheet
+                // between two exports of the same event.
+                .ThenBy(e => e.Id)
                 .Select(e => new EventOptionCountDto
                 {
                     Option = e.Option,

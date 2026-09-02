@@ -107,6 +107,20 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Order_Flat_Options_By_Id_When_They_Share_An_Order()
+        {
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+            var guid = MockFlatOptionsSharingAnOrderForExport();
+
+            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(guid, userAndOrg)).ToList();
+
+            ClassicAssert.AreEqual(new[] { "First", "Second", "Third" }, options.Select(option => option.Option).ToArray());
+        }
+
+        [Test]
         public async Task Should_Return_Event_Type_With_Active_Event()
         {
             // Arrange
@@ -324,6 +338,39 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventParticipants = new List<EventParticipant>()
                 }
             };
+
+            _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
+            return eventId;
+        }
+
+        private Guid MockFlatOptionsSharingAnOrderForExport()
+        {
+            var eventId = Guid.NewGuid();
+
+            var @event = new Event
+            {
+                Id = eventId,
+                OrganizationId = 2,
+                ResponsibleUserId = "user"
+            };
+
+            // Every legacy flat option is written with Order 0, so Id is the only thing separating
+            // them. Seeded newest-first to prove the service does not just echo insertion order.
+            var options = new[] { 30, 20, 10 }
+                .Zip(new[] { "Third", "Second", "First" }, (id, name) => new EventOption
+                {
+                    Id = id,
+                    EventId = eventId,
+                    Event = @event,
+                    Option = name,
+                    Order = 0,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { EventId = eventId }
+                    }
+                })
+                .ToList();
 
             _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
             _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
