@@ -272,8 +272,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Order = 1
             };
 
-            // Deliberately not in the expected output order: flat options come first, then questions
-            // by their own order, and it is the service that has to put them back in it.
+            // Scrambled on purpose — the service is what has to order these.
             var options = new List<EventOption>
             {
                 new EventOption

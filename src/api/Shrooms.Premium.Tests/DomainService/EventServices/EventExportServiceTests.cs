@@ -167,7 +167,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 ClassicAssert.AreEqual("Vegan", excelRows[0].ItemArray[3]);
                 ClassicAssert.AreEqual("M", excelRows[0].ItemArray[4]);
 
-                // Two answers to one question join into a single cell, in option order.
                 ClassicAssert.AreEqual("Grace", excelRows[1].ItemArray[0]);
                 ClassicAssert.AreEqual("Hopper", excelRows[1].ItemArray[1]);
                 ClassicAssert.AreEqual("Pizza", excelRows[1].ItemArray[2]);
@@ -195,8 +194,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             }
         }
 
-        // A cell the builder left blank comes back as either DBNull or an empty string depending on
-        // how EPPlus stored it, and the tests only care that it reads as blank.
+        // A blank cell reads back as DBNull or "" depending on how EPPlus stored it.
         private static string CellText(object value)
         {
             return value == null || value is DBNull ? string.Empty : value.ToString();

@@ -37,8 +37,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg)).ToList();
             var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg)).ToList();
 
-            // The chosen options already carry every question that anyone answered, in the order the
-            // sheets should read, so they are the single source for both sheets' extra columns.
+            // Both sheets take their column order from this one list, which the query already sorts
+            // flat options first, then by question order.
             var choiceColumns = GetChoiceColumns(options);
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
@@ -65,10 +65,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
-        /// <summary>
-        /// One column per thing a participant could have picked: the legacy flat options first,
-        /// when any were picked, then a column per sign-up question that was answered.
-        /// </summary>
         private static List<EventOptionCountDto> GetChoiceColumns(IEnumerable<EventOptionCountDto> options)
         {
             return options
