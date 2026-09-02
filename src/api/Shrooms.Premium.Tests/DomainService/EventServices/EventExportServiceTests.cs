@@ -117,6 +117,48 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public async Task Should_List_Participants_In_A_Stable_Order()
+        {
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
+
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+
+            var names = tables[0].Rows.Cast<DataRow>()
+                .Select(row => row.ItemArray[0]?.ToString())
+                .ToArray();
+
+            // Seeded Ada, Grace, Alan — the sheet cannot inherit the query's arbitrary order.
+            ClassicAssert.AreEqual(new[] { "Ada", "Alan", "Grace" }, names);
+        }
+
+        [Test]
+        public async Task Should_Trim_A_People_Cell_That_Would_Break_The_Workbook()
+        {
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = Guid.NewGuid();
+
+            // Enough identical picks to push the joined names past Excel's per-cell ceiling.
+            var crowd = Enumerable.Range(1000, 2600).Select(i => new EventParticipantDto
+            {
+                FirstName = $"Person{i}",
+                LastName = "Attendee",
+                Choices = new List<EventParticipantChoiceDto> { Choice(10, "Pizza") }
+            }).ToList();
+
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(crowd);
+
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+            var cell = tables[1].Rows[0].ItemArray[2]?.ToString();
+
+            ClassicAssert.LessOrEqual(cell.Length, 32767);
+            StringAssert.Contains("more)", cell);
+            // The count column still reports everyone, and no name is cut mid-word.
+            ClassicAssert.AreEqual("2600", tables[1].Rows[0].ItemArray[1]);
+            StringAssert.DoesNotContain("Person1000,", cell.Substring(cell.Length - 20));
+        }
+
+        [Test]
         public async Task Should_Omit_The_Options_Sheet_When_Nobody_Picked_Anything()
         {
             var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };

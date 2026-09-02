@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -18,6 +19,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
     {
         private const string LabelSeparator = " + ";
         private const string PersonSeparator = ", ";
+        private const int MaxCellLength = 32767;
+        private const int OverflowMarkerBudget = 32;
 
         private static readonly IComparer<IReadOnlyList<int>> BySequence =
             Comparer<IReadOnlyList<int>>.Create(CompareSequences);
@@ -39,7 +42,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         public async Task<FileExportDto> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
             var eventName = await _eventUtilitiesService.GetEventNameAsync(eventId);
-            var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg)).ToList();
+
+            // The query has no ORDER BY, so without this the roster comes back in whatever order
+            // SQL Server happens to return and two exports of one event can disagree.
+            var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg))
+                .OrderBy(participant => participant.FirstName, StringComparer.CurrentCulture)
+                .ThenBy(participant => participant.LastName, StringComparer.CurrentCulture)
+                .ToList();
+
             var combinations = BuildCombinations(participants);
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
@@ -143,6 +153,40 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             return $"{participant.FirstName} {participant.LastName}".Trim();
         }
 
+        /// <summary>
+        /// Excel refuses to open a workbook holding a cell longer than 32,767 characters, and a
+        /// company-wide event can put a few thousand names in one of these, so the tail is dropped
+        /// rather than risking the whole file. Names are never cut mid-word.
+        /// </summary>
+        private static string JoinPeople(IEnumerable<string> people)
+        {
+            var ordered = people.OrderBy(name => name, StringComparer.CurrentCulture).ToList();
+            var joined = string.Join(PersonSeparator, ordered);
+
+            if (joined.Length <= MaxCellLength)
+            {
+                return joined;
+            }
+
+            var kept = new StringBuilder();
+            var written = 0;
+
+            foreach (var name in ordered)
+            {
+                var addition = written == 0 ? name : PersonSeparator + name;
+
+                if (kept.Length + addition.Length > MaxCellLength - OverflowMarkerBudget)
+                {
+                    break;
+                }
+
+                kept.Append(addition);
+                written++;
+            }
+
+            return kept.Append(PersonSeparator).Append($"(+{ordered.Count - written} more)").ToString();
+        }
+
         private static IExcelRowCollection MapCombinationsToExcelRows(IEnumerable<EventCombination> combinations)
         {
             var rows = new ExcelRowCollection();
@@ -153,12 +197,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 {
                     new ExcelColumn { Value = combination.Labels },
                     new ExcelColumn { Value = combination.People.Count.ToString() },
-                    new ExcelColumn
-                    {
-                        Value = string.Join(
-                            PersonSeparator,
-                            combination.People.OrderBy(name => name, StringComparer.CurrentCulture))
-                    }
+                    new ExcelColumn { Value = JoinPeople(combination.People) }
                 });
             }
 
