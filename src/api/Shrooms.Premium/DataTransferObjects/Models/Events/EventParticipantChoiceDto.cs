@@ -4,9 +4,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
     {
         public int OptionId { get; set; }
 
-        /// <summary>Null for a legacy flat option, matching <c>EventOption.QuestionId</c>.</summary>
-        public int? QuestionId { get; set; }
-
+        /// <summary>Null for a legacy flat option, which belongs to no sign-up question.</summary>
         public int? QuestionOrder { get; set; }
 
         public string Option { get; set; }

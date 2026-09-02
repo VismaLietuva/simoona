@@ -19,6 +19,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         private const string LabelSeparator = " + ";
         private const string PersonSeparator = ", ";
 
+        private static readonly IComparer<IReadOnlyList<int>> BySequence =
+            Comparer<IReadOnlyList<int>>.Create(CompareSequences);
+
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
@@ -76,7 +79,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
 
             foreach (var participant in participants)
             {
-                var choices = Ordered(participant.Choices);
+                var choices = (participant.Choices ?? Enumerable.Empty<EventParticipantChoiceDto>())
+                    .OrderBy(Rank, BySequence)
+                    .ToList();
 
                 if (choices.Count == 0)
                 {
@@ -90,7 +95,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                     combination = new EventCombination
                     {
                         Labels = string.Join(LabelSeparator, choices.Select(choice => choice.Option)),
-                        Sequence = choices.SelectMany(SortKey).ToList()
+                        Sequence = choices.SelectMany(Rank).ToList()
                     };
 
                     combinations.Add(key, combination);
@@ -100,36 +105,26 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             }
 
             return combinations.Values
-                .OrderBy(combination => combination, Comparer<EventCombination>.Create(
-                    (left, right) => CompareSequences(left.Sequence, right.Sequence)))
+                .OrderBy(combination => combination.Sequence, BySequence)
                 .ToList();
         }
 
-        private static List<EventParticipantChoiceDto> Ordered(IEnumerable<EventParticipantChoiceDto> choices)
+        /// <summary>
+        /// Where one pick sorts, both inside a row and between rows: flat options first, then by
+        /// question, then by option. Id settles the rest, because every legacy flat option is
+        /// written with Order 0 and would otherwise tie.
+        /// </summary>
+        private static IReadOnlyList<int> Rank(EventParticipantChoiceDto choice)
         {
-            if (choices == null)
+            return new[]
             {
-                return new List<EventParticipantChoiceDto>();
-            }
-
-            return choices
-                .OrderBy(choice => choice.QuestionId == null ? 0 : 1)
-                .ThenBy(choice => choice.QuestionOrder ?? 0)
-                .ThenBy(choice => choice.Order)
-                .ThenBy(choice => choice.OptionId)
-                .ToList();
+                choice.QuestionOrder == null ? 0 : 1,
+                choice.QuestionOrder ?? 0,
+                choice.Order,
+                choice.OptionId
+            };
         }
 
-        private static IEnumerable<int> SortKey(EventParticipantChoiceDto choice)
-        {
-            yield return choice.QuestionId == null ? 0 : 1;
-            yield return choice.QuestionOrder ?? 0;
-            yield return choice.Order;
-            yield return choice.OptionId;
-        }
-
-        // Orders the sheet the way the answers themselves are ordered, so a shorter order that
-        // starts the same way sits directly above the longer one that extends it.
         private static int CompareSequences(IReadOnlyList<int> left, IReadOnlyList<int> right)
         {
             for (var i = 0; i < Math.Min(left.Count, right.Count); i++)

@@ -174,13 +174,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .Tables;
         }
 
-        private static EventParticipantChoiceDto Choice(int optionId, string option, int? questionId = null, int? questionOrder = null, int order = 0)
+        private static EventParticipantChoiceDto Choice(int optionId, string option, int? questionOrder = null, int order = 0)
         {
             return new EventParticipantChoiceDto
             {
                 OptionId = optionId,
                 Option = option,
-                QuestionId = questionId,
                 QuestionOrder = questionOrder,
                 Order = order
             };
@@ -190,8 +189,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = Guid.NewGuid();
 
-            const int dietaryNeeds = 7;
-            const int tShirtSize = 9;
 
             var users = new List<EventParticipantDto>
             {
@@ -202,9 +199,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     // Stored out of order on purpose: the sheet has to sort them.
                     Choices = new List<EventParticipantChoiceDto>
                     {
-                        Choice(30, "M", tShirtSize, questionOrder: 1),
+                        Choice(30, "M", questionOrder: 1),
                         Choice(10, "Pizza"),
-                        Choice(20, "Vegan", dietaryNeeds, questionOrder: 0)
+                        Choice(20, "Vegan", questionOrder: 0)
                     }
                 },
                 new EventParticipantDto
@@ -214,8 +211,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Choices = new List<EventParticipantChoiceDto>
                     {
                         Choice(10, "Pizza"),
-                        Choice(20, "Vegan", dietaryNeeds, questionOrder: 0),
-                        Choice(30, "M", tShirtSize, questionOrder: 1)
+                        Choice(20, "Vegan", questionOrder: 0),
+                        Choice(30, "M", questionOrder: 1)
                     }
                 },
                 new EventParticipantDto
@@ -225,8 +222,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Choices = new List<EventParticipantChoiceDto>
                     {
                         Choice(10, "Pizza"),
-                        Choice(30, "M", tShirtSize, questionOrder: 1),
-                        Choice(31, "L", tShirtSize, questionOrder: 1, order: 1)
+                        Choice(30, "M", questionOrder: 1),
+                        Choice(31, "L", questionOrder: 1, order: 1)
                     }
                 }
             };

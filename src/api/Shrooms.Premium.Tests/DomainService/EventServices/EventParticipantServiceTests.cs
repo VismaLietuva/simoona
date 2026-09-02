@@ -434,9 +434,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var choices = result.First().Choices.ToList();
             ClassicAssert.AreEqual(2, choices.Count);
             ClassicAssert.AreEqual("Vegan", choices[0].Option);
-            ClassicAssert.AreEqual(7, choices[0].QuestionId);
+            ClassicAssert.AreEqual(3, choices[0].QuestionOrder);
             ClassicAssert.AreEqual("Pizza", choices[1].Option);
-            ClassicAssert.AreEqual(null, choices[1].QuestionId);
+            ClassicAssert.AreEqual(null, choices[1].QuestionOrder);
             ClassicAssert.IsEmpty(result.Last().Choices);
         }
 
@@ -1202,7 +1202,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 {
                                     Option = "Vegan",
                                     Order = 0,
-                                    QuestionId = 7
+                                    QuestionId = 7,
+                                    Question = new EventQuestion { Id = 7, Title = "Dietary needs", Order = 3 }
                                 },
                                 new EventOption
                                 {
