@@ -68,9 +68,9 @@ namespace Shrooms.Tests.DomainService
 
                 Assert.That(excelColumns[0].ColumnName, Is.EqualTo(Resources.Models.Kudos.Kudos.ExportColumnSender));
                 Assert.That(excelColumns[1].ColumnName, Is.EqualTo(Resources.Models.Kudos.Kudos.ExportColumnReceiver));
-                Assert.That(excelRows[0].ItemArray[0], Is.EqualTo("name surname"));
-                Assert.That(excelRows[0].ItemArray[1], Is.EqualTo("name surname"));
-                Assert.That(excelRows[1].ItemArray[0], Is.EqualTo("name2 surname2"));
+                Assert.That(excelRows[0].ItemArray[0], Is.EqualTo("name5 surname5"));
+                Assert.That(excelRows[0].ItemArray[1], Is.EqualTo("name3 surname3"));
+                Assert.That(excelRows[1].ItemArray[0], Is.EqualTo("name surname"));
                 Assert.That(excelRows[1].ItemArray[1], Is.EqualTo("name surname"));
                 Assert.That(excelRows.Count, Is.EqualTo(4));
 

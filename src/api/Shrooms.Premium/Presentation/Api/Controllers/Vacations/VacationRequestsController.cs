@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Domain.Extensions;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
@@ -95,6 +96,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
                 IsManager = await _listService.HasDirectReportsAsync(userOrg),
                 PendingCount = await _listService.GetPendingTeamCountAsync(userOrg)
             });
+        }
+
+        [HttpGet]
+        [Route("TeamMembers")]
+        [ProducesResponseType(typeof(IEnumerable<UserAutoCompleteDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> TeamMembers(string s)
+        {
+            return Ok(await _listService.GetTeamMembersForAutocompleteAsync(s, GetUserAndOrganization()));
         }
 
         [HttpPost]

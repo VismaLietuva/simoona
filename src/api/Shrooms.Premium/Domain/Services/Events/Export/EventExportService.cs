@@ -1,6 +1,8 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -15,6 +17,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
 {
     public class EventExportService : IEventExportService
     {
+        private const string LabelSeparator = " + ";
+        private const string PersonSeparator = ", ";
+        private const int MaxCellLength = 32767;
+        private const int OverflowMarkerBudget = 32;
+
+        private static readonly IComparer<IReadOnlyList<int>> BySequence =
+            Comparer<IReadOnlyList<int>>.Create(CompareSequences);
+
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
@@ -32,8 +42,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         public async Task<FileExportDto> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
             var eventName = await _eventUtilitiesService.GetEventNameAsync(eventId);
-            var participants = await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg);
-            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg)).ToList();
+
+            // The query has no ORDER BY, so without this the roster comes back in whatever order
+            // SQL Server happens to return and two exports of one event can disagree.
+            var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg))
+                .OrderBy(participant => participant.FirstName, StringComparer.CurrentCulture)
+                .ThenBy(participant => participant.LastName, StringComparer.CurrentCulture)
+                .ToList();
+
+            var combinations = BuildCombinations(participants);
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
 
@@ -45,14 +62,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 .AddRows(participants.AsQueryable(), MapEventParticipantToExcelRow())
                 .AutoFitColumns();
 
-            if (options.Any())
+            if (combinations.Any())
             {
                 excelBuilder
                     .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
                     .AddHeader(
-                        Resources.Models.Events.Events.Option,
-                        Resources.Models.Events.Events.Count)
-                    .AddRows(options.AsQueryable(), MapEventOptionToExcelRow())
+                        Resources.Models.Events.Events.Combination,
+                        Resources.Models.Events.Events.Count,
+                        Resources.Models.Events.Events.People)
+                    .AddRows(MapCombinationsToExcelRows(combinations))
                     .AutoFitColumns();
             }
 
@@ -60,20 +78,129 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             return new FileExportDto(excelBuilder.Build(), fileName);
         }
 
-        private static Expression<Func<EventOptionCountDto, IExcelRow>> MapEventOptionToExcelRow()
+        /// <summary>
+        /// One row per distinct set of picks, which is what an organizer places an order from:
+        /// "Deep dish + Margerita + Cheese, 2". Counting each option on its own loses which picks
+        /// belonged together, so it cannot say whether the deep dish wanted margerita or marinara.
+        /// </summary>
+        private static List<EventCombination> BuildCombinations(IEnumerable<EventParticipantDto> participants)
         {
-            return option => new ExcelRow
-            {
-                new ExcelColumn
-                {
-                    Value = option.Option
-                },
+            var combinations = new Dictionary<string, EventCombination>();
 
-                new ExcelColumn
+            foreach (var participant in participants)
+            {
+                var choices = (participant.Choices ?? Enumerable.Empty<EventParticipantChoiceDto>())
+                    .OrderBy(Rank, BySequence)
+                    .ToList();
+
+                if (choices.Count == 0)
                 {
-                    Value = option.Count.ToString()
+                    continue;
                 }
+
+                var key = string.Join(">", choices.Select(choice => choice.OptionId));
+
+                if (!combinations.TryGetValue(key, out var combination))
+                {
+                    combination = new EventCombination
+                    {
+                        Labels = string.Join(LabelSeparator, choices.Select(choice => choice.Option)),
+                        Sequence = choices.SelectMany(Rank).ToList()
+                    };
+
+                    combinations.Add(key, combination);
+                }
+
+                combination.People.Add(FullName(participant));
+            }
+
+            return combinations.Values
+                .OrderBy(combination => combination.Sequence, BySequence)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Id settles the rest because every legacy flat option is written with Order 0, so
+        /// without it they all tie and SQL Server's unstable sort can reshuffle the sheet.
+        /// </summary>
+        private static IReadOnlyList<int> Rank(EventParticipantChoiceDto choice)
+        {
+            return new[]
+            {
+                choice.QuestionOrder == null ? 0 : 1,
+                choice.QuestionOrder ?? 0,
+                choice.Order,
+                choice.OptionId
             };
+        }
+
+        private static int CompareSequences(IReadOnlyList<int> left, IReadOnlyList<int> right)
+        {
+            for (var i = 0; i < Math.Min(left.Count, right.Count); i++)
+            {
+                if (left[i] != right[i])
+                {
+                    return left[i].CompareTo(right[i]);
+                }
+            }
+
+            return left.Count.CompareTo(right.Count);
+        }
+
+        private static string FullName(EventParticipantDto participant)
+        {
+            return $"{participant.FirstName} {participant.LastName}".Trim();
+        }
+
+        /// <summary>
+        /// Excel refuses to open a workbook holding a cell longer than 32,767 characters, and a
+        /// company-wide event can put a few thousand names in one of these, so the tail is dropped
+        /// rather than risking the whole file. Names are never cut mid-word.
+        /// </summary>
+        private static string JoinPeople(IEnumerable<string> people)
+        {
+            var ordered = people.OrderBy(name => name, StringComparer.CurrentCulture).ToList();
+            var joined = string.Join(PersonSeparator, ordered);
+
+            if (joined.Length <= MaxCellLength)
+            {
+                return joined;
+            }
+
+            var kept = new StringBuilder();
+            var written = 0;
+
+            foreach (var name in ordered)
+            {
+                var addition = written == 0 ? name : PersonSeparator + name;
+
+                if (kept.Length + addition.Length > MaxCellLength - OverflowMarkerBudget)
+                {
+                    break;
+                }
+
+                kept.Append(addition);
+                written++;
+            }
+
+            return kept.Append(PersonSeparator).Append($"(+{ordered.Count - written} more)").ToString();
+        }
+
+        private static IExcelRowCollection MapCombinationsToExcelRows(IEnumerable<EventCombination> combinations)
+        {
+            var rows = new ExcelRowCollection();
+
+            foreach (var combination in combinations)
+            {
+                rows.Add(new ExcelRow
+                {
+                    new ExcelColumn { Value = combination.Labels },
+                    new ExcelColumn { Value = combination.People.Count.ToString() },
+                    new ExcelColumn { Value = JoinPeople(combination.People) }
+                });
+            }
+
+            return rows;
         }
 
         private static Expression<Func<EventParticipantDto, IExcelRow>> MapEventParticipantToExcelRow()
@@ -90,6 +217,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                     Value = participant.LastName
                 }
             };
+        }
+
+        private sealed class EventCombination
+        {
+            public string Labels { get; set; }
+
+            public List<int> Sequence { get; set; }
+
+            public List<string> People { get; } = new List<string>();
         }
     }
 }

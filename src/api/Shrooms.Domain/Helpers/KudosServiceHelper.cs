@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
@@ -32,20 +30,18 @@ namespace Shrooms.Domain.Helpers
             return log => log.EmployeeId == userId;
         }
 
-        public static Expression<Func<KudosLog, IEnumerable<ApplicationUser>, MainKudosLogDto>> MapKudosLogsToDto()
+        public static Expression<Func<KudosLog, ApplicationUser, MainKudosLogDto>> MapKudosLogsToDto()
         {
-            return (log, users) => new MainKudosLogDto
+            return (log, sender) => new MainKudosLogDto
             {
                 Comment = log.Comments,
                 Created = log.Created,
-                Sender = users
-                    .Select(u => new KudosLogUserDto
-                    {
-                        Id = log.CreatedBy,
-                        FullName = u.FirstName + " " + u.LastName,
-                        PictureId = u.PictureId
-                    })
-                    .FirstOrDefault() ?? new KudosLogUserDto { Id = log.CreatedBy, FullName = string.Empty },
+                Sender = new KudosLogUserDto
+                {
+                    Id = log.CreatedBy,
+                    FullName = sender == null ? string.Empty : sender.FirstName + " " + sender.LastName,
+                    PictureId = sender == null ? null : sender.PictureId
+                },
                 Id = log.Id,
                 Points = log.Points,
                 Receiver = new KudosLogUserDto

@@ -39,6 +39,22 @@
         public const string EventReminderCannotBeRemoved = "230";
         public const string EventReminderCannotBeUpdated = "231";
         public const string EventReminderCannotBeAdded = "232";
+        public const string EventQuestionLimitExceeded = "233";
+        public const string EventQuestionOptionLimitExceeded = "234";
+        public const string EventQuestionTitleInvalid = "235";
+        public const string EventQuestionOptionNameInvalid = "236";
+        public const string EventQuestionConditionAmbiguous = "237";
+        public const string EventQuestionConditionInvalid = "238";
+        public const string EventQuestionDepthExceeded = "239";
+        public const string EventQuestionClientIdMissing = "240";
+        public const string EventAnswersInvalid = "241";
+        public const string EventQuestionOptionsMissing = "242";
+        public const string EventQuestionDuplicateId = "243";
+        public const string EventQuestionDuplicateClientId = "244";
+        public const string EventQuestionDuplicateOrder = "245";
+        public const string EventQuestionPayloadInvalid = "246";
+        public const string EventQuestionNotFound = "247";
+        public const string EventQuestionOptionNotFound = "248";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

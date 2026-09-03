@@ -2892,6 +2892,54 @@ namespace Shrooms.Resources.Models.Events {
         ///<summary>
         ///    <list type='bullet'>
         ///        <item>
+        ///            <description>Combination</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string Combination => GetResourceString(CombinationKey);
+
+        /// <summary>
+        /// Resource key for <see cref="Combination"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string CombinationKey = "Combination";
+    }
+}
+
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>People</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string People => GetResourceString(PeopleKey);
+
+        /// <summary>
+        /// Resource key for <see cref="People"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string PeopleKey = "People";
+    }
+}
+
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
         ///            <description>I will eat at this event</description>
         ///        </item>
         ///        <item>

@@ -60,11 +60,20 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         {
             var eventOptionsDto = await _eventsDbSet
                 .Include(e => e.EventOptions)
+                .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                 .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapOptionsToDto())
                 .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(eventOptionsDto);
+
+            // A second small query rather than reshaping MapOptionsToDto: that expression is
+            // static over Event and has no way to see who is asking.
+            eventOptionsDto.MyChosenOptions = await _eventParticipantsDbSet
+                .Where(p => p.EventId == eventId && p.ApplicationUserId == userOrg.UserId)
+                .SelectMany(p => p.EventOptions.Select(o => o.Id))
+                .ToListAsync();
+
             return eventOptionsDto;
         }
 
@@ -156,6 +165,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         SelectedOption = e.EventParticipants
                             .Where(p => p.ApplicationUserId == userOrg.UserId)
                             .SelectMany(p => p.EventOptions)
+                            .Where(o => o.QuestionId == null)
                             .OrderBy(o => o.Id)
                             .Select(o => o.Option)
                             .FirstOrDefault()
@@ -413,13 +423,44 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return e => new EventOptionsDto
             {
                 MaxOptions = e.MaxChoices,
-                Options = e.EventOptions.Select(o => new EventOptionDto
+
+                // Legacy flat options only. Question options are returned under Questions below;
+                // without this filter they appear in both places and the wizard's choices show up
+                // as though they were top-level food options.
+                Options = e.EventOptions
+                    .Where(o => o.QuestionId == null)
+                    .Select(o => new EventOptionDto
                     {
                         Id = o.Id,
                         Option = o.Option,
                         Rule = o.Rule
                     })
                     .OrderByDescending(o => o.Rule == OptionRules.Default)
+                    .ToList(),
+
+                Questions = e.EventQuestions
+                    .OrderBy(q => q.Order)
+                    .ThenBy(q => q.Id)
+                    .Select(q => new EventQuestionStructureDto
+                    {
+                        Id = q.Id,
+                        Title = q.Title,
+                        Order = q.Order,
+                        SelectType = q.SelectType,
+                        IsRequired = q.IsRequired,
+                        ShowIfOptionId = q.ShowIfOptionId,
+                        Options = q.Options
+                            .OrderBy(o => o.Order)
+                            .ThenBy(o => o.Id)
+                            .Select(o => new EventQuestionOptionStructureDto
+                            {
+                                Id = o.Id,
+                                Name = o.Option,
+                                Order = o.Order,
+                                Rule = o.Rule
+                            })
+                            .ToList()
+                    })
                     .ToList()
             };
         }

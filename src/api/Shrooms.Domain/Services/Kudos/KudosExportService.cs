@@ -43,11 +43,11 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(KudosServiceHelper.StatusFilter(filter.Status))
                 .Where(KudosServiceHelper.UserFilter(filter.SearchUserId))
                 .Where(KudosServiceHelper.TypeFilter(filter.FilteringType))
-                .GroupJoin(_userDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto());
+                .SelectMany(log => _userDbSet.Where(user => user.Id == log.CreatedBy).DefaultIfEmpty(), KudosServiceHelper.MapKudosLogsToDto());
 
             var sortedLogs = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
                 logsQuery.AsQueryable(),
-                string.Concat(filter.SortBy, " ", filter.SortOrder));
+                string.Concat(filter.SortBy, " ", filter.SortOrder, ", Id ", filter.SortOrder));
 
             var kudos = await sortedLogs.ToListAsync();
 

@@ -22,6 +22,9 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IEventUtilitiesService, EventUtilitiesService>();
             services.AddScoped<IEventValidationService, EventValidationService>();
             services.AddScoped<IEventParticipationService, EventParticipationService>();
+            services.AddScoped<IEventQuestionWriter, EventQuestionWriter>();
+            services.AddScoped<IEventQuestionStructureValidator, EventQuestionStructureValidator>();
+            services.AddScoped<IEventAnswerValidator, EventAnswerValidator>();
             return services;
         }
     }
