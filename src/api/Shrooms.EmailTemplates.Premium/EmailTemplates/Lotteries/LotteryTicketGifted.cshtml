@@ -1,0 +1,14 @@
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.LotteryTicketGiftedEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.BuyerFullName} gifted you tickets for {Model.LotteryTitle}.";
+}
+
+<email-heading eyebrow="Lotteries">You were gifted <email-em>@Model.GiftedTicketCount ticket@(Model.GiftedTicketCount == 1 ? "" : "s")</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        <strong>@Model.BuyerFullName</strong> gifted them to you for the
+        "@Model.LotteryTitle" lottery.
+    </p>
+    <email-button href="@Model.LotteryUrl">See the lottery</email-button>
+</email-card>

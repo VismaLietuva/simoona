@@ -1,0 +1,13 @@
+﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NewMentionTemplateViewModel
+@using Shrooms.Domain.Helpers
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.MentioningUsersFullName} mentioned you in a post.";
+}
+
+<email-heading eyebrow="Wall">@Model.Subject</email-heading>
+<email-card>
+    <p style="margin:0;"><strong>@Model.MentioningUsersFullName</strong> mentioned you:</p>
+    <email-quote>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Content))</email-quote>
+    <email-button href="@Model.PostUrl">Open the post</email-button>
+</email-card>

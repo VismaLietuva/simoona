@@ -9,6 +9,8 @@ namespace Shrooms.Infrastructure.Configuration
 {
     public class ApplicationSettings : IApplicationSettings
     {
+        private const string ClientLocale = "en";
+
         private readonly IConfiguration _configuration;
 
         public ApplicationSettings(IConfiguration configuration)
@@ -51,42 +53,47 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string ApiUrl => _configuration["ApiUrl"] ?? string.Empty;
 
-        public string ClientUrlWithOrg(string tenant) => GetClientPath(tenant);
+        public string PictureUrl(string tenantPicturesContainer, string pictureName) =>
+            $"{ApiUrl.TrimEnd('/')}/storage/{tenantPicturesContainer.ToLowerInvariant()}/{pictureName}";
 
-        public string PictureUrl(string tenantPicturesContainer, string pictureName) => GetClientPath($"api/storage/{tenantPicturesContainer.ToLowerInvariant()}/{pictureName}");
+        public string WallPostUrl(string organization, int postId) => GetClientPath($"posts/{postId}");
 
-        public string WallPostUrl(string organization, int postId) => GetClientPath($"{organization}/Wall/feed?post={postId}");
+        public string UserNotificationSettingsUrl(string tenant) => GetClientPath("settings/notifications");
 
-        public string UserNotificationSettingsUrl(string tenant) => GetClientPath($"{tenant}/Settings/Notifications");
+        public string UserProfileUrl(string tenant, string userId) => GetClientPath($"profile/{userId}");
 
-        public string UserProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/profiles/{userId}");
+        public string GroupUrl(string tenant, int groupId) => GetClientPath($"groups/{groupId}");
 
-        public string GroupUrl(string tenant, int groupId) => GetClientPath($"{tenant}/Groups/{groupId}");
+        // The client resolves the office from the book itself, so officeId stays out of the path.
+        public string BookUrl(string tenant, int bookOfficeId, int officeId) => GetClientPath($"books/{bookOfficeId}");
 
-        public string BookUrl(string tenant, int bookOfficeId, int officeId) => GetClientPath($"{tenant}/Books/Edit/{bookOfficeId}/{officeId}");
+        public string KudosProfileUrl(string tenant, string userId) => GetClientPath($"kudos?userId={WebUtility.UrlEncode(userId)}");
 
-        public string KudosProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/Kudos/KudosUserInformation/{userId}");
+        public string EventUrl(string tenant, string eventId) => GetClientPath($"events/{eventId}");
 
-        public string EventUrl(string tenant, string eventId) => GetClientPath($"{tenant}/Events/EventContent/{eventId}");
+        public string EventListByTypeUrl(string tenant, string eventTypeId) => GetClientPath($"events?typeId={WebUtility.UrlEncode(eventTypeId)}");
 
-        public string EventListByTypeUrl(string tenant, string eventTypeId) => GetClientPath($"{tenant}/Events/List/{eventTypeId}/office/all");
+        public string ProjectUrl(string tenant, string projectId) => GetClientPath($"projects/{projectId}");
 
-        public string ProjectUrl(string tenant, string projectId) => GetClientPath($"{tenant}/Projects/Details/{projectId}");
+        // Committees are a group type on the client, so the suggestion lands on the group list.
+        public string CommitteeSugestionUrl(string tenant) => GetClientPath("groups");
 
-        public string CommitteeSugestionUrl(string tenant) => GetClientPath($"{tenant}/Committees/List");
+        public string ServiceRequestUrl(string tenant, int id) => GetClientPath($"service-requests/{id}/edit");
 
-        public string ServiceRequestUrl(string tenant, int id) => GetClientPath($"{tenant}/ServiceRequests/List?Id={id}");
+        public string ResetPasswordUrl(string organization, string userName, string token) =>
+            GetClientPath($"reset-password?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}&org={WebUtility.UrlEncode(organization)}");
 
-        public string ResetPasswordUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Reset?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}");
+        public string VerifyEmailUrl(string organization, string userName, string token) =>
+            GetClientPath($"verify-email?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}&org={WebUtility.UrlEncode(organization)}");
 
-        public string VerifyEmailUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Verify?UserName={WebUtility.UrlEncode(userName)}&Token={WebUtility.UrlEncode(token)}");
+        public string FeedUrl(string tenant) => GetClientPath(string.Empty);
 
-        public string FeedUrl(string tenant) => GetClientPath($"{tenant}/Wall/Feed");
-
+        // Emails are English-only, so every client link is pinned to the en locale
+        // rather than threading a recipient locale through the notification services.
         private string GetClientPath(string relativePath)
         {
             var baseUrl = ClientUrl.TrimEnd('/');
-            return $"{baseUrl}/{relativePath}";
+            return $"{baseUrl}/{ClientLocale}/{relativePath}";
         }
     }
 }

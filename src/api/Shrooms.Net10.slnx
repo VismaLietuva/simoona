@@ -13,9 +13,13 @@
   <Project Path="Shrooms.Presentation.ModelMappings/Shrooms.Presentation.ModelMappings.csproj" />
   <Project Path="Shrooms.Presentation.WebViewModels/Shrooms.Presentation.WebViewModels.csproj" />
   <Project Path="Shrooms.Resources/Shrooms.Resources.csproj" />
+  <Project Path="Shrooms.EmailTemplates/Shrooms.EmailTemplates.csproj" />
+  <Project Path="Shrooms.EmailTemplates.Premium/Shrooms.EmailTemplates.Premium.csproj" />
+  <Project Path="Shrooms.EmailTemplates.Seeds/Shrooms.EmailTemplates.Seeds.csproj" />
   <Project Path="Shrooms.IoC/Shrooms.IoC.csproj" />
   <Project Path="Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj" />
   <Project Path="Shrooms.Tests/Shrooms.Tests.csproj" />
   <Project Path="Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj" />
+  <Project Path="Shrooms.EmailTemplates.Tests/Shrooms.EmailTemplates.Tests.csproj" />
   <Project Path="Simoona.AppHost/Simoona.AppHost.csproj" />
 </Solution>
