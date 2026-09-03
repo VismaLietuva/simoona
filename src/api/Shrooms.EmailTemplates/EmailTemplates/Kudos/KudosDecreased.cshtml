@@ -1,13 +1,14 @@
 ﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.KudosReceivedDecreasedEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"{Model.KudosSenderName} reduced your kudos by {Model.KudosAmount}.";
+    var amount = Model.KudosAmount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    ViewData["Preheader"] = $"{Model.KudosSenderName} reduced your kudos by {amount}.";
 }
 
 <email-heading eyebrow="Kudos">Your kudos were <email-em>reduced</email-em></email-heading>
 <email-card>
     <p style="margin:0;">
-        <span style="color:@Shrooms.EmailTemplates.EmailDesign.Destructive;font-weight:600;">-@Model.KudosAmount</span>
+        <span style="color:@Shrooms.EmailTemplates.EmailDesign.Destructive;font-weight:600;">-@amount</span>
         by <strong>@Model.KudosSenderName</strong>.
     </p>
     <email-quote>@Model.Comment</email-quote>
