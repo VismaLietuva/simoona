@@ -38,12 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="EmailTemplates\**\*.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Shrooms.EmailTemplates.Seeds\Shrooms.EmailTemplates.Seeds.csproj" />
     <ProjectReference Include="..\Shrooms.IoC\Shrooms.IoC.csproj" />
   </ItemGroup>
 
