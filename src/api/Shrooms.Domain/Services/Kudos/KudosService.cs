@@ -562,16 +562,15 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             var now = DateTime.UtcNow;
-            var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            var nextMonthStart = monthStart.AddMonths(1);
 
-            var sentThisMonth = await _kudosLogRepository
+            var currentMonthLogs = await _kudosLogRepository
                 .Get(l => l.CreatedBy == id &&
-                          l.Created >= monthStart &&
-                          l.Created < nextMonthStart &&
+                          l.Created.Month == now.Month &&
+                          l.Created.Year == now.Year &&
                           l.KudosSystemType == KudosTypeEnum.Send)
-                .SumAsync(l => (decimal?)l.Points) ?? 0m;
+                .ToListAsync();
 
+            var sentThisMonth = currentMonthLogs.Sum(log => log.Points);
             var remaining = (await _applicationUserRepository.GetByIdAsync(id)).RemainingKudos;
             var maxAvailableToSend = _settings.KudosAvailableToSendPerMonth ?? BusinessLayerConstants.DefaultKudosAvailableToSendPerMonth;
 
@@ -944,13 +943,11 @@ namespace Shrooms.Domain.Services.Kudos
         private async Task ValidateAvailableKudosThisMonthAsync(AddKudosDto kudos, decimal totalKudosPointsInLog)
         {
             var timestamp = DateTime.UtcNow;
-            var monthStart = new DateTime(timestamp.Year, timestamp.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            var nextMonthStart = monthStart.AddMonths(1);
 
             var currentMonthSum = await _kudosLogsDbSet
                 .Where(l => l.CreatedBy == kudos.SendingUser.Id &&
-                            l.Created >= monthStart &&
-                            l.Created < nextMonthStart &&
+                            l.Created.Month == timestamp.Month &&
+                            l.Created.Year == timestamp.Year &&
                             l.KudosSystemType == KudosTypeEnum.Send &&
                             l.OrganizationId == kudos.KudosLog.OrganizationId)
                 .SumAsync(p => (decimal?)p.Points) ?? 0m;

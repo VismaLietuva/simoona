@@ -1978,7 +1978,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeId")
                         .HasMaxLength(128)
@@ -2030,15 +2030,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("KudosBasketId");
 
+                    b.HasIndex("OrganizationId");
+
                     b.HasIndex("SentToId");
-
-                    b.HasIndex("CreatedBy", "Created");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("CreatedBy", "Created"), new[] { "OrganizationId", "KudosSystemType", "Points" });
-
-                    b.HasIndex("OrganizationId", "Status", "Created");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OrganizationId", "Status", "Created"), new[] { "KudosSystemType", "KudosBasketId", "EmployeeId", "Points", "CreatedBy" });
 
                     b.ToTable("KudosLogs");
                 });

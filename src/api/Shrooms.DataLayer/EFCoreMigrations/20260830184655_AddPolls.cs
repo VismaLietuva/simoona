@@ -239,13 +239,13 @@ END
 IF NOT EXISTS (SELECT 1 FROM dbo.Permissions WHERE Name = N'POLL_ADMINISTRATION')
 BEGIN
     INSERT dbo.Permissions ([Name], [Created], [CreatedBy], [Modified], [ModifiedBy], [IsDeleted], [Scope], [ModuleId])
-    VALUES (N'POLL_ADMINISTRATION', GETDATE(), NULL, GETDATE(), NULL, 0, N'admin', NULL)
+    VALUES (N'POLL_ADMINISTRATION', GETDATE(), NULL, GETDATE(), NULL, 0, N'administration', NULL)
 END
 
 DECLARE @pollBasic INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'POLL_BASIC')
 DECLARE @pollAdmin INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'POLL_ADMINISTRATION')
 DECLARE @eventBasic INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'EVENT_BASIC')
-DECLARE @orgAdmin INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'ORGANIZATION_ADMINISTRATION')
+DECLARE @eventAdmin INT = (SELECT Id FROM dbo.Permissions WHERE Name = N'EVENT_ADMINISTRATION')
 
 IF @pollBasic IS NOT NULL AND @eventBasic IS NOT NULL
 BEGIN
@@ -256,12 +256,12 @@ BEGIN
       AND  NOT EXISTS (SELECT 1 FROM dbo.RolePermissions x WHERE x.PermissionId = @pollBasic AND x.RoleId = rp.RoleId)
 END
 
-IF @pollAdmin IS NOT NULL AND @orgAdmin IS NOT NULL
+IF @pollAdmin IS NOT NULL AND @eventAdmin IS NOT NULL
 BEGIN
     INSERT dbo.RolePermissions ([PermissionId], [RoleId])
     SELECT @pollAdmin, rp.RoleId
     FROM   dbo.RolePermissions rp
-    WHERE  rp.PermissionId = @orgAdmin
+    WHERE  rp.PermissionId = @eventAdmin
       AND  NOT EXISTS (SELECT 1 FROM dbo.RolePermissions x WHERE x.PermissionId = @pollAdmin AND x.RoleId = rp.RoleId)
 END
 ");
