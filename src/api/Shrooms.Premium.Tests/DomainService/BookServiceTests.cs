@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -102,7 +103,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
             var res = await _bookService.GetBooksByOfficeAsync(options);
-            ClassicAssert.AreEqual(res.ItemCount, 2);
+            ClassicAssert.AreEqual(res.ItemCount, 3);
             ClassicAssert.AreEqual(res.Entries.First().QuantityLeft, 1);
             ClassicAssert.AreEqual(res.Entries.First().Readers.First().Id, "testUserId");
             ClassicAssert.IsTrue(res.Entries.First().TakenByCurrentUser);
@@ -125,7 +126,47 @@ namespace Shrooms.Premium.Tests.DomainService
             var options = new BooksByOfficeOptionsDto { OrganizationId = 2, Page = 1 };
             var res = await _bookService.GetBooksByOfficeAsync(options);
 
-            ClassicAssert.AreEqual(res.ItemCount, 3);
+            ClassicAssert.AreEqual(res.ItemCount, 4);
+        }
+        [Test]
+        public async Task Should_Return_The_Requested_Page_Size()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, PageSize = 2, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(3, res.ItemCount);
+            ClassicAssert.AreEqual(2, res.PageSize);
+            ClassicAssert.AreEqual(2, res.PageCount);
+            ClassicAssert.AreEqual(2, res.Entries.Count());
+        }
+
+        [Test]
+        public async Task Should_Skip_By_The_Requested_Page_Size()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 2, PageSize = 2, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(1, res.Entries.Count());
+            ClassicAssert.AreEqual("Test3borrowed", res.Entries.First().Title);
+        }
+
+        [Test]
+        public async Task Should_Fall_Back_To_Default_Page_Size_When_Unset()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(BusinessLayerConstants.BooksPerPage, res.PageSize);
+        }
+
+        [Test]
+        public async Task Should_Exclude_Fully_Borrowed_Books_When_Only_Available()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId", OnlyAvailable = true };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(2, res.ItemCount);
+            ClassicAssert.IsTrue(res.Entries.All(x => x.QuantityLeft > 0));
         }
 
         [Test]
@@ -741,6 +782,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "Test2search"
             };
 
+            var book3 = new Book
+            {
+                Id = 3,
+                Author = "Test3",
+                OrganizationId = 2,
+                Title = "Test3borrowed"
+            };
+
             var office1 = new Office
             {
                 Id = 1,
@@ -828,6 +877,26 @@ namespace Shrooms.Premium.Tests.DomainService
                     Office = office2,
                     BookLogs = new List<BookLog>(),
                     Quantity = 3,
+                    OrganizationId = 2
+                },
+                new BookOffice
+                {
+                    BookId = 3,
+                    Book = book3,
+                    OfficeId = 1,
+                    Office = office1,
+                    BookLogs = new List<BookLog>
+                    {
+                        new BookLog
+                        {
+                            Id = 5,
+                            Returned = null,
+                            OrganizationId = 2,
+                            ApplicationUserId = "testUserId",
+                            ApplicationUser = user
+                        }
+                    },
+                    Quantity = 1,
                     OrganizationId = 2
                 }
             };
