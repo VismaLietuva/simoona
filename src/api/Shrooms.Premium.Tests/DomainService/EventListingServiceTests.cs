@@ -814,12 +814,14 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            CollectionAssert.AreEqual(new[] { "Pepperoni", "Margherita" }, result.JoinedEvent.SelectedOptions);
+            CollectionAssert.AreEqual(
+                new[] { "Pepperoni", "Margherita", "Extra cheese" },
+                result.JoinedEvent.SelectedOptions);
         }
 
-        // A wizard answer is not a food pick, so it stays out of the widget.
+        // The wizard's steps are the only way to offer choices, so its answers are the order.
         [Test]
-        public async Task Should_Not_Return_Question_Answers_Among_The_Selected_Options()
+        public async Task Should_Return_Question_Answers_Among_The_Selected_Options()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -832,7 +834,7 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            CollectionAssert.DoesNotContain(result.JoinedEvent.SelectedOptions, "Extra cheese");
+            CollectionAssert.Contains(result.JoinedEvent.SelectedOptions, "Extra cheese");
         }
 
         // Nothing stops a second participant row for the same user; a declined one must not

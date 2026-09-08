@@ -162,14 +162,17 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         ImageName = e.ImageName,
                         StartDate = e.StartDate,
                         EndDate = e.EndDate,
-                        // Legacy flat options only: the wizard's question answers are not
-                        // food picks and would read as extra pizzas in the widget.
+                        // Every answer the user gave, question-owned included: the sign-up wizard
+                        // is the only way to offer choices now, so filtering those out left the
+                        // widget empty for any event created since. Legacy flat options sort
+                        // first, then each question's answers in the order they were asked.
                         SelectedOptions = e.EventParticipants
                             .Where(p => p.ApplicationUserId == userOrg.UserId &&
                                         p.AttendStatus == (int)AttendingStatus.Attending)
                             .SelectMany(p => p.EventOptions)
-                            .Where(o => o.QuestionId == null)
-                            .OrderBy(o => o.Id)
+                            .OrderBy(o => o.QuestionId)
+                            .ThenBy(o => o.Order)
+                            .ThenBy(o => o.Id)
                             .Select(o => o.Option)
                             .ToList()
                     }
