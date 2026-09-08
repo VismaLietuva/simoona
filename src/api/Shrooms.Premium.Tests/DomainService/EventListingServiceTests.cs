@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -801,7 +801,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Return_The_Option_This_User_Selected()
+        public async Task Should_Return_Every_Option_This_User_Selected()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -814,11 +814,29 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.AreEqual("Pepperoni", result.JoinedEvent.SelectedOption);
+            CollectionAssert.AreEqual(new[] { "Pepperoni", "Margherita" }, result.JoinedEvent.SelectedOptions);
+        }
+
+        // A wizard answer is not a food pick, so it stays out of the widget.
+        [Test]
+        public async Task Should_Not_Return_Question_Answers_Among_The_Selected_Options()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            CollectionAssert.DoesNotContain(result.JoinedEvent.SelectedOptions, "Extra cheese");
         }
 
         [Test]
-        public async Task Should_Return_No_Selected_Option_When_User_Picked_None()
+        public async Task Should_Return_No_Selected_Options_When_User_Picked_None()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -831,11 +849,11 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+            CollectionAssert.IsEmpty(result.JoinedEvent.SelectedOptions);
         }
 
         [Test]
-        public async Task Should_Return_No_Selected_Option_When_The_Food_Team_Has_No_Options()
+        public async Task Should_Return_No_Selected_Options_When_The_Food_Team_Has_No_Options()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -848,7 +866,7 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+            CollectionAssert.IsEmpty(result.JoinedEvent.SelectedOptions);
         }
 
         // This week's food day is over, so the widget rolls over to next week's team even though
@@ -1025,7 +1043,9 @@ namespace Shrooms.Premium.Tests.DomainService
                             AttendStatus = (int)AttendingStatus.Attending,
                             EventOptions = new List<EventOption>
                             {
-                                new EventOption { Id = 1, Option = "Pepperoni" }
+                                new EventOption { Id = 1, Option = "Pepperoni" },
+                                new EventOption { Id = 2, Option = "Margherita" },
+                                new EventOption { Id = 10, Option = "Extra cheese", QuestionId = 1 }
                             }
                         },
                         new EventParticipant

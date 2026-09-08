@@ -162,13 +162,15 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         ImageName = e.ImageName,
                         StartDate = e.StartDate,
                         EndDate = e.EndDate,
-                        SelectedOption = e.EventParticipants
+                        // Legacy flat options only: the wizard's question answers are not
+                        // food picks and would read as extra pizzas in the widget.
+                        SelectedOptions = e.EventParticipants
                             .Where(p => p.ApplicationUserId == userOrg.UserId)
                             .SelectMany(p => p.EventOptions)
                             .Where(o => o.QuestionId == null)
                             .OrderBy(o => o.Id)
                             .Select(o => o.Option)
-                            .FirstOrDefault()
+                            .ToList()
                     }
                 })
                 .FirstOrDefaultAsync();
