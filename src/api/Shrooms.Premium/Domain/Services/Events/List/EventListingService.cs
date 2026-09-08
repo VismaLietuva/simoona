@@ -140,16 +140,16 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var horizon = now.AddDays(FoodTeamHorizonInDays);
 
             // EndDate > now keeps an ongoing team and skips one that already finished today,
-            // so a second team starting later the same day is the one that surfaces.
+            // so a second team starting later the same day is the one that surfaces. Only a
+            // plain Attending counts: there is no maybe or virtual seat at a food team, and the
+            // picks read the same status so a stale row cannot add options to the order.
             var joined = await _eventsDbSet
                 .Where(e => e.OrganizationId == userOrg.OrganizationId &&
                             foodTypeIds.Contains(e.EventTypeId) &&
                             e.EndDate > now &&
                             e.StartDate < horizon &&
                             e.EventParticipants.Any(p => p.ApplicationUserId == userOrg.UserId &&
-                                                         (p.AttendStatus == (int)AttendingStatus.Attending ||
-                                                          p.AttendStatus == (int)AttendingStatus.MaybeAttending ||
-                                                          p.AttendStatus == (int)AttendingStatus.AttendingVirtually)))
+                                                         p.AttendStatus == (int)AttendingStatus.Attending))
                 .OrderBy(e => e.StartDate)
                 .Select(e => new
                 {
@@ -165,7 +165,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         // Legacy flat options only: the wizard's question answers are not
                         // food picks and would read as extra pizzas in the widget.
                         SelectedOptions = e.EventParticipants
-                            .Where(p => p.ApplicationUserId == userOrg.UserId)
+                            .Where(p => p.ApplicationUserId == userOrg.UserId &&
+                                        p.AttendStatus == (int)AttendingStatus.Attending)
                             .SelectMany(p => p.EventOptions)
                             .Where(o => o.QuestionId == null)
                             .OrderBy(o => o.Id)

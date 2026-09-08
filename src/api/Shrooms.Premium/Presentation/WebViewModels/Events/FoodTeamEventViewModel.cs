@@ -17,7 +17,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public DateTime EndDate { get; set; }
 
-        // The options this user picked when joining; empty when the event has no options.
+        // The options this user picked when joining; empty when they picked none or the event has none.
         public IEnumerable<string> SelectedOptions { get; set; } = new List<string>();
     }
 }
