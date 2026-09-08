@@ -273,6 +273,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddShrooms();
 builder.Services.AddTransient<PostNotifier>();
 builder.Services.AddTransient<CommentNotifier>();
+builder.Services.AddTransient<RecurringEventsJob>();
 
 // ImageSharp.Web: on-the-fly image resizing for /storage/* URLs that carry
 // width/height/mode query commands. Source images are read via IStorage (local FS in dev,
@@ -415,6 +416,32 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHangfireDashboard();
+
+// Rolling recurring events forward used to rely on an external scheduler POSTing
+// /externalpremiumjobs/updaterecurringevents; that endpoint stays as a manual trigger. The job
+// is organization-agnostic, so a single schedule covers every tenant. It runs on office hours
+// in the default organization timezone, which is the one event dates fall back to.
+TimeZoneInfo recurringEventsTimeZone;
+
+try
+{
+    recurringEventsTimeZone = TimeZoneInfo.FindSystemTimeZoneById(DataLayerConstants.DefaultTimeZone);
+}
+catch (Exception ex) when (ex is TimeZoneNotFoundException or InvalidTimeZoneException)
+{
+    // A schedule on the wrong hour beats an API that refuses to start.
+    recurringEventsTimeZone = TimeZoneInfo.Utc;
+    app.Logger.LogWarning(
+        ex,
+        "Could not resolve time zone '{TimeZone}'; the recurring events schedule falls back to UTC.",
+        DataLayerConstants.DefaultTimeZone);
+}
+
+app.Services.GetRequiredService<IRecurringJobManager>().AddOrUpdate<RecurringEventsJob>(
+    "update-recurring-events",
+    job => job.RollForwardExpiredOccurrencesAsync(),
+    app.Configuration["RecurringEventsCron"] ?? "0 8-16 * * 1-5",
+    new RecurringJobOptions { TimeZone = recurringEventsTimeZone });
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");

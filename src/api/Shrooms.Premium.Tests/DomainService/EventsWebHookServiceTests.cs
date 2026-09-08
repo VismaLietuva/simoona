@@ -26,6 +26,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private DbSet<EventOption> _optionsDbSet;
         private DbSet<EventQuestion> _questionsDbSet;
         private IEventsWebHookService _service;
+        private Event _expiredEvent;
 
         [SetUp]
         public void TestInitializer()
@@ -36,7 +37,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion>());
 
             var systemClock = Substitute.For<ISystemClock>();
-            systemClock.UtcNow.Returns(DateTime.Parse("2026-09-01"));
+            systemClock.UtcNow.Returns(new DateTime(2026, 9, 1));
 
             var wallService = Substitute.For<IWallService>();
             wallService.CreateNewWallAsync(Arg.Any<CreateWallDto>()).Returns(77);
@@ -88,6 +89,61 @@ namespace Shrooms.Premium.Tests.DomainService
                 "Rule must survive the clone");
         }
 
+        [Test]
+        public async Task Should_Catch_Up_To_A_Future_Occurrence_When_Runs_Were_Missed()
+        {
+            MockExpiredRecurringEventWithQuestions();
+
+            await _service.UpdateRecurringEventsAsync();
+
+            var newEvent = GetClonedEvent();
+
+            // The source ended 2026-08-01 and the clock reads 2026-09-01, so five weekly shifts.
+            Assert.That(newEvent.LocalStartDate, Is.EqualTo(new DateTime(2026, 9, 4)));
+            Assert.That(newEvent.LocalEndDate, Is.EqualTo(new DateTime(2026, 9, 5)));
+            Assert.That(newEvent.LocalRegistrationDeadline, Is.EqualTo(new DateTime(2026, 9, 3)),
+                "the registration lead time must survive the catch-up");
+            Assert.That(newEvent.EndDate, Is.GreaterThan(new DateTime(2026, 9, 1)),
+                "a single run must land the occurrence in the future, not one period on from a stale one");
+        }
+
+        [Test]
+        public async Task Should_Carry_The_Rsvp_And_Widget_Flags_But_Not_The_Pin()
+        {
+            MockExpiredRecurringEventWithQuestions();
+
+            await _service.UpdateRecurringEventsAsync();
+
+            var newEvent = GetClonedEvent();
+
+            Assert.That(newEvent.AllowMaybeGoing, Is.True);
+            Assert.That(newEvent.AllowNotGoing, Is.True);
+            Assert.That(newEvent.IsShownInUpcomingEventsWidget, Is.True);
+            Assert.That(newEvent.MaxParticipants, Is.EqualTo(12));
+            Assert.That(newEvent.IsPinned, Is.False, "a pin curates one occurrence, not the series");
+        }
+
+        [Test]
+        public async Task Should_Not_Carry_Attendees_Onto_The_Next_Occurrence()
+        {
+            MockExpiredRecurringEventWithQuestions();
+
+            await _service.UpdateRecurringEventsAsync();
+
+            Assert.That(GetClonedEvent().EventParticipants, Is.Null.Or.Empty,
+                "attendance is per occurrence; everyone registers again for the next one");
+            Assert.That(_expiredEvent.EventParticipants, Has.Count.EqualTo(2),
+                "the finished occurrence keeps its own attendance record");
+        }
+
+        private Event GetClonedEvent()
+        {
+            return _eventsDbSet.ReceivedCalls()
+                .Where(call => call.GetMethodInfo().Name == nameof(DbSet<Event>.Add))
+                .Select(call => (Event)call.GetArguments()[0])
+                .Single();
+        }
+
         private void MockExpiredRecurringEventWithQuestions()
         {
             var eventId = Guid.NewGuid();
@@ -105,13 +161,23 @@ namespace Shrooms.Premium.Tests.DomainService
                     OrganizationId = 2,
                     Name = "Weekly lunch",
                     EventRecurring = EventRecurrenceOptions.EveryWeek,
-                    EndDate = DateTime.Parse("2026-08-01"),
-                    LocalStartDate = DateTime.Parse("2026-07-31"),
-                    LocalEndDate = DateTime.Parse("2026-08-01"),
-                    LocalRegistrationDeadline = DateTime.Parse("2026-07-30"),
+                    EndDate = new DateTime(2026, 8, 1),
+                    LocalStartDate = new DateTime(2026, 7, 31),
+                    LocalEndDate = new DateTime(2026, 8, 1),
+                    LocalRegistrationDeadline = new DateTime(2026, 7, 30),
                     ResponsibleUserId = "host1",
                     ResponsibleUser = new ApplicationUser { Id = "host1", TimeZone = DataLayerConstants.DefaultTimeZone },
                     MaxChoices = 1,
+                    MaxParticipants = 12,
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    IsShownInUpcomingEventsWidget = true,
+                    IsPinned = true,
+                    EventParticipants = new List<EventParticipant>
+                    {
+                        new EventParticipant { EventId = eventId, ApplicationUserId = "guest1", AttendStatus = 1 },
+                        new EventParticipant { EventId = eventId, ApplicationUserId = "guest2", AttendStatus = 1 }
+                    },
                     EventOptions = new List<EventOption> { soup, pasta, pizzaOption, margherita },
                     EventQuestions = new List<EventQuestion>
                     {
@@ -131,6 +197,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
+            _expiredEvent = events.Single();
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
         }
     }

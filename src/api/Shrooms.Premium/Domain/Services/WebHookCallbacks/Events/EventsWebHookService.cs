@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             foreach (var @event in eventsToUpdate)
             {
                 var newWallId = await CreateEventWallAsync(@event);
-                var newEvent = CreateNewEvent(@event, newWallId);
+                var newEvent = CreateNewEvent(@event, newWallId, _systemClock.UtcNow);
                 _eventsDbSet.Add(newEvent);
                 @event.EventRecurring = EventRecurrenceOptions.None;
                 CreateNewOptions(@event.EventOptions, newEvent);
@@ -65,9 +65,10 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             await _uow.SaveChangesAsync(false);
         }
 
-        private static Event CreateNewEvent(Event @event, int wallId)
+        private static Event CreateNewEvent(Event @event, int wallId, DateTime utcNow)
         {
-            return new Event
+            // IsPinned is deliberately left behind: pinning curates one occurrence, not the series.
+            var newEvent = new Event
             {
                 ResponsibleUser = @event.ResponsibleUser,
                 Description = @event.Description,
@@ -78,18 +79,36 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 MaxChoices = @event.MaxChoices,
                 MaxParticipants = @event.MaxParticipants,
                 MaxVirtualParticipants = @event.MaxVirtualParticipants,
+                AllowMaybeGoing = @event.AllowMaybeGoing,
+                AllowNotGoing = @event.AllowNotGoing,
+                IsShownInUpcomingEventsWidget = @event.IsShownInUpcomingEventsWidget,
+                OfficeId = @event.OfficeId,
                 Offices = @event.Offices,
                 OrganizationId = @event.OrganizationId,
                 Name = @event.Name,
-                Modified = @event.Modified,
+                Modified = utcNow,
                 ModifiedBy = @event.ModifiedBy,
                 Place = @event.Place,
-                Created = @event.Created,
-                LocalStartDate = _recurrencePeriods[@event.EventRecurring](@event.LocalStartDate),
-                LocalEndDate = _recurrencePeriods[@event.EventRecurring](@event.LocalEndDate),
-                LocalRegistrationDeadline = _recurrencePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
+                Created = utcNow,
+                LocalStartDate = @event.LocalStartDate,
+                LocalEndDate = @event.LocalEndDate,
+                LocalRegistrationDeadline = @event.LocalRegistrationDeadline,
                 WallId = wallId
             };
+
+            // Shifting local dates keeps the wall-clock time across DST; repeating until the
+            // occurrence is in the future catches a missed schedule up in a single run.
+            var shiftByOnePeriod = _recurrencePeriods[@event.EventRecurring];
+
+            do
+            {
+                newEvent.LocalStartDate = shiftByOnePeriod(newEvent.LocalStartDate);
+                newEvent.LocalEndDate = shiftByOnePeriod(newEvent.LocalEndDate);
+                newEvent.LocalRegistrationDeadline = shiftByOnePeriod(newEvent.LocalRegistrationDeadline);
+            }
+            while (newEvent.EndDate < utcNow);
+
+            return newEvent;
         }
 
         private async Task<int> CreateEventWallAsync([NotNull]Event @event)
