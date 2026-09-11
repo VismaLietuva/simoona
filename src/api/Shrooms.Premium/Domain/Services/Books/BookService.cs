@@ -88,7 +88,11 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         public async Task<ILazyPaged<BooksByOfficeDto>> GetBooksByOfficeAsync(BooksByOfficeOptionsDto options)
         {
-            var pageSize = options.PageSize < 1 ? BusinessLayerConstants.BooksPerPage : options.PageSize;
+            // Clamped here as well as in the controller: the query is what a huge
+            // size would hurt, and the options DTO is public.
+            var pageSize = options.PageSize < 1
+                ? BusinessLayerConstants.BooksPerPage
+                : Math.Min(options.PageSize, BusinessLayerConstants.MaxBooksPerPage);
 
             var allBooks = _bookOfficesDbSet
                 .Include(x => x.Book)
@@ -522,7 +526,8 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private static int EntriesCountToSkip(int pageRequested, int pageSize)
         {
-            return (pageRequested - LastPage) * pageSize;
+            // Skip throws on a negative count, so a page below the first reads as the first.
+            return (Math.Max(pageRequested, LastPage) - LastPage) * pageSize;
         }
 
         private static RetrievedBookInfoDto MapBookInfoToDto(ExternalBookInfo book)

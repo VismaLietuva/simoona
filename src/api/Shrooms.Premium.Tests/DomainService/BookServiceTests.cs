@@ -160,6 +160,24 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Clamp_An_Over_Large_Page_Size()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, PageSize = int.MaxValue, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(BusinessLayerConstants.MaxBooksPerPage, res.PageSize);
+        }
+
+        [Test]
+        public async Task Should_Treat_A_Page_Below_The_First_As_The_First()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 0, PageSize = 2, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(2, res.Entries.Count());
+        }
+
+        [Test]
         public async Task Should_Exclude_Fully_Borrowed_Books_When_Only_Available()
         {
             MockBooksByOffice();
