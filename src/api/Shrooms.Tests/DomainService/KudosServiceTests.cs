@@ -925,6 +925,36 @@ namespace Shrooms.Tests.DomainService
             Assert.That(actual[3].KudosAmount, Is.EqualTo(10));
         }
 
+        [Test]
+        public async Task Should_Omit_Stats_Rows_Whose_Employee_No_Longer_Exists()
+        {
+            MockKudosLogsForStats();
+            _usersDbSet.SetDbSetDataForAsync(MockStatsUsers().Where(user => user.Id != "User1").AsQueryable());
+
+            var actual = (await _kudosService.GetKudosStatsAsync(3, 10, 2)).ToList();
+
+            Assert.That(actual.Select(stat => stat.Name), Does.Not.Contain("User 1"));
+            Assert.That(actual[0].Name, Is.EqualTo("User 3"));
+            Assert.That(actual[0].KudosAmount, Is.EqualTo(34));
+        }
+
+        [Test]
+        public async Task Should_Return_Both_Widget_Tabs_Each_Sorted_By_Amount()
+        {
+            MockKudosLogsForStats();
+
+            var actual = await _kudosService.GetKudosWidgetStatsAsync(3, 10, 3, 2, 2);
+
+            var tabOne = actual.TabOne.ToList();
+            var tabTwo = actual.TabTwo.ToList();
+
+            Assert.That(tabOne.Select(stat => stat.Name), Is.EqualTo(new[] { "User 1", "User 3", "User 2", "User 4" }));
+            Assert.That(tabOne.Select(stat => stat.KudosAmount), Is.EqualTo(new[] { 274.4m, 34m, 20m, 10m }));
+
+            Assert.That(tabTwo, Has.Count.EqualTo(2), "the second tab must honour its own row limit");
+            Assert.That(tabTwo.Select(stat => stat.Name), Is.EqualTo(new[] { "User 1", "User 3" }));
+        }
+
         #endregion
 
         #region HasPendingKudos
@@ -1758,7 +1788,14 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            var users = new List<ApplicationUser>
+            var users = MockStatsUsers();
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
+            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+        }
+
+        private static List<ApplicationUser> MockStatsUsers()
+        {
+            return new List<ApplicationUser>
             {
                 new()
                 {
@@ -1789,9 +1826,6 @@ namespace Shrooms.Tests.DomainService
                     EmploymentDate = DateTime.UtcNow
                 }
             };
-
-            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
-            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
         }
 
         private void MockKudosLogsForProfileUpdate()

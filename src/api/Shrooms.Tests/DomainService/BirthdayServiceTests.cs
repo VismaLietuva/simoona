@@ -25,9 +25,7 @@ namespace Shrooms.Tests.DomainService
 
             var roleService = Substitute.For<IRoleService>();
 
-            var newRoleId = Guid.NewGuid().ToString();
-            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
-            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
+            roleService.ExcludeUsersWithRoleName(Roles.NewUser).ReturnsForAnyArgs(x => true);
 
             _birthdayService = new BirthdayService(uow, roleService);
         }

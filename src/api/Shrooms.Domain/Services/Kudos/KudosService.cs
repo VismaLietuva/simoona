@@ -34,6 +34,8 @@ namespace Shrooms.Domain.Services.Kudos
     public class KudosService : IKudosService
     {
         private const int LastPage = 1;
+        private const int TabOne = 1;
+        private const int TabTwo = 2;
 
         private static readonly SemaphoreSlim _kudosLogLikeLock = new SemaphoreSlim(1, 1);
 
@@ -659,35 +661,89 @@ namespace Shrooms.Domain.Services.Kudos
 
         public async Task<IEnumerable<KudosBasicDataDto>> GetKudosStatsAsync(int months, int amount, int organizationId)
         {
+            var rows = await BuildKudosStatsQuery(TabOne, months, amount, organizationId).ToListAsync();
+            var names = await GetEmployeeNamesAsync(rows);
+
+            return SelectTab(rows, names, TabOne);
+        }
+
+        public async Task<KudosWidgetStatsDto> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount, int organizationId)
+        {
+            // Both tabs differ only by their month window and row count, so their aggregates go out
+            // as one UNION ALL round trip instead of two, and the two name lookups they used to do
+            // separately collapse into the single one below.
+            var rows = await BuildKudosStatsQuery(TabOne, tabOneMonths, tabOneAmount, organizationId)
+                .Concat(BuildKudosStatsQuery(TabTwo, tabTwoMonths, tabTwoAmount, organizationId))
+                .ToListAsync();
+
+            var names = await GetEmployeeNamesAsync(rows);
+
+            return new KudosWidgetStatsDto
+            {
+                TabOne = SelectTab(rows, names, TabOne),
+                TabTwo = SelectTab(rows, names, TabTwo)
+            };
+        }
+
+        // Aggregates off IX_KudosLogs_OrganizationId_Status_Created and stops at the top `amount`
+        // rows. Names are resolved separately rather than joined here: joining inside the
+        // aggregate leaves the optimizer no useful row estimate and it scans AspNetUsers instead
+        // of seeking the handful of ids this returns.
+        private IQueryable<KudosTabStatRow> BuildKudosStatsQuery(int tab, int months, int amount, int organizationId)
+        {
             var date = DateTime.UtcNow.AddMonths(-months);
 
-            var kudosLogsStats = await _kudosLogsDbSet
-                .Include(log => log.Employee)
+            return _kudosLogsDbSet
                 .Where(log => log.OrganizationId == organizationId
                               && log.KudosBasketId == null
                               && log.Status == KudosStatus.Approved
                               && log.KudosSystemType != KudosTypeEnum.Minus
                               && log.Created >= date
-                              && log.Employee != null)
-                .GroupBy(log => log.Employee.Id)
-                .Select(log => new KudosBasicDataDto
+                              && log.EmployeeId != null)
+                .GroupBy(log => log.EmployeeId)
+                .Select(group => new KudosTabStatRow
                 {
-                    Name = log.Key,
-                    KudosAmount = log.Sum(s => s.Points)
+                    Tab = tab,
+                    EmployeeId = group.Key,
+                    KudosAmount = group.Sum(log => log.Points)
                 })
-                .OrderByDescending(log => log.KudosAmount)
-                .Take(amount)
-                .ToListAsync();
+                .OrderByDescending(row => row.KudosAmount)
+                .Take(amount);
+        }
 
-            var userIds = kudosLogsStats.Select(s => s.Name).ToArray();
+        // One seek-friendly lookup covering every id both tabs need.
+        private async Task<Dictionary<string, string>> GetEmployeeNamesAsync(IEnumerable<KudosTabStatRow> rows)
+        {
+            var employeeIds = rows
+                .Select(row => row.EmployeeId)
+                .Where(id => id != null)
+                .Distinct()
+                .ToArray();
 
-            var users = await _usersDbSet
-                .Where(w => userIds.Contains(w.Id))
-                .ToListAsync();
+            if (employeeIds.Length == 0)
+            {
+                return new Dictionary<string, string>();
+            }
 
-            kudosLogsStats.ForEach(f => f.Name = users.Single(s => s.Id == f.Name).FullName);
+            return await _usersDbSet
+                .Where(user => employeeIds.Contains(user.Id))
+                .Select(user => new { user.Id, user.FirstName, user.LastName })
+                .ToDictionaryAsync(user => user.Id, user => user.FirstName + " " + user.LastName);
+        }
 
-            return kudosLogsStats;
+        // Employees missing from the name lookup are dropped rather than throwing, which is what
+        // the previous users.Single(...) call did when a log referenced a since-deleted user.
+        private static List<KudosBasicDataDto> SelectTab(IEnumerable<KudosTabStatRow> rows, IReadOnlyDictionary<string, string> names, int tab)
+        {
+            return rows
+                .Where(row => row.Tab == tab && row.EmployeeId != null && names.ContainsKey(row.EmployeeId))
+                .OrderByDescending(row => row.KudosAmount)
+                .Select(row => new KudosBasicDataDto
+                {
+                    Name = names[row.EmployeeId],
+                    KudosAmount = row.KudosAmount
+                })
+                .ToList();
         }
 
         public async Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDto userOrg)
@@ -1046,6 +1102,18 @@ namespace Shrooms.Domain.Services.Kudos
             return type == KudosTypeEnum.Send ||
                    type == KudosTypeEnum.Minus ||
                    type == KudosTypeEnum.Other;
+        }
+
+        // Carries which leaderboard a row belongs to through the UNION ALL in
+        // GetKudosWidgetStatsAsync. Needs settable properties and a parameterless constructor so
+        // EF Core can project both halves of the set operation into the same type.
+        private sealed class KudosTabStatRow
+        {
+            public int Tab { get; set; }
+
+            public string EmployeeId { get; set; }
+
+            public decimal KudosAmount { get; set; }
         }
     }
 }

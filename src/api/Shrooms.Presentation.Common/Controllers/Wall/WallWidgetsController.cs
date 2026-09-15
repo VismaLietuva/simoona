@@ -114,22 +114,20 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
 
         private async Task<IEnumerable<KudosListBasicDataViewModel>> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
-            var result = new List<KudosListBasicDataViewModel>
-            {
-                await CalculateStatsAsync(tabOneMonths, tabOneAmount),
-                await CalculateStatsAsync(tabTwoMonths, tabTwoAmount)
-            };
+            var stats = await _kudosService.GetKudosWidgetStatsAsync(tabOneMonths, tabOneAmount, tabTwoMonths, tabTwoAmount, User.Identity.GetOrganizationId());
 
-            return result;
+            return new List<KudosListBasicDataViewModel>
+            {
+                ToTabViewModel(stats.TabOne, tabOneMonths),
+                ToTabViewModel(stats.TabTwo, tabTwoMonths)
+            };
         }
 
-        private async Task<KudosListBasicDataViewModel> CalculateStatsAsync(int months, int amount)
+        private KudosListBasicDataViewModel ToTabViewModel(IEnumerable<KudosBasicDataDto> tab, int months)
         {
-            var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, User.Identity.GetOrganizationId());
-            var stats = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return new KudosListBasicDataViewModel
             {
-                Users = stats,
+                Users = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(tab),
                 Months = months
             };
         }
