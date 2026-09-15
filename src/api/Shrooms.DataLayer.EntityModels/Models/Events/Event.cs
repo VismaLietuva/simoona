@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using TimeZoneConverter;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Events
 {
@@ -97,8 +98,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
             set => RegistrationDeadline = GetUtcDateFromLocalDate(value);
         }
 
-        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
 
-        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
     }
 }
