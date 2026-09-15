@@ -699,7 +699,7 @@ namespace Shrooms.Domain.Services.Kudos
                               && log.Status == KudosStatus.Approved
                               && log.KudosSystemType != KudosTypeEnum.Minus
                               && log.Created >= date
-                              && log.EmployeeId != null)
+                              && _usersDbSet.Any(user => user.Id == log.EmployeeId))
                 .GroupBy(log => log.EmployeeId)
                 .Select(group => new KudosTabStatRow
                 {

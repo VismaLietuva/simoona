@@ -926,16 +926,18 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Omit_Stats_Rows_Whose_Employee_No_Longer_Exists()
+        public async Task Should_Not_Let_A_Missing_Employee_Take_A_Leaderboard_Slot()
         {
+            // User 1 tops the board but no longer resolves, so the top three must be the next
+            // three live employees rather than two rows plus a silent gap.
             MockKudosLogsForStats();
             _usersDbSet.SetDbSetDataForAsync(MockStatsUsers().Where(user => user.Id != "User1").AsQueryable());
 
-            var actual = (await _kudosService.GetKudosStatsAsync(3, 10, 2)).ToList();
+            var actual = (await _kudosService.GetKudosStatsAsync(3, 3, 2)).ToList();
 
             Assert.That(actual.Select(stat => stat.Name), Does.Not.Contain("User 1"));
-            Assert.That(actual[0].Name, Is.EqualTo("User 3"));
-            Assert.That(actual[0].KudosAmount, Is.EqualTo(34));
+            Assert.That(actual, Has.Count.EqualTo(3), "a deleted employee must not shorten the widget");
+            Assert.That(actual.Select(stat => stat.Name), Is.EqualTo(new[] { "User 3", "User 2", "User 4" }));
         }
 
         [Test]
