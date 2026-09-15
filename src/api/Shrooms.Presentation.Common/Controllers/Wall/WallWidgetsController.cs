@@ -56,7 +56,7 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
 
         [HttpGet]
         [Route("Get")]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.FiveMinutes)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.FiveMinutes, CacheGroup = WidgetCacheTag.WallWidgets)]
         public async Task<WidgetsViewModel> Get([FromQuery] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();

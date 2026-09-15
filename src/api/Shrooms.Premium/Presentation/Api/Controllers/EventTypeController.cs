@@ -99,6 +99,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
