@@ -43,6 +43,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Group
 
         public virtual KudosType KudosType { get; set; }
 
+        public string AwardTemplate { get; set; }
+
         [NotMapped]
         public bool ReceivesKudos => KudosTypeId != null;
 

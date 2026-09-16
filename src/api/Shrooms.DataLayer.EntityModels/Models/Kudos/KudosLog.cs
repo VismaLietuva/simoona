@@ -42,6 +42,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Kudos
 
         public string RejectionMessage { get; set; }
 
+        public DateTime? GroupKudosPeriod { get; set; }
+
         public bool IsRecipientDeleted() => !string.IsNullOrEmpty(EmployeeId) && Employee == null;
 
         public bool IsMinus() => KudosSystemType == KudosTypeEnum.Minus;

@@ -25,6 +25,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.HasIndex(log => new { log.OrganizationId, log.Status, log.Created })
                 .IncludeProperties(log => new { log.KudosSystemType, log.KudosBasketId, log.EmployeeId, log.Points, log.CreatedBy });
+
+            builder.HasIndex(log => new { log.OrganizationId, log.GroupKudosPeriod })
+                .HasFilter("[GroupKudosPeriod] IS NOT NULL");
         }
     }
 }

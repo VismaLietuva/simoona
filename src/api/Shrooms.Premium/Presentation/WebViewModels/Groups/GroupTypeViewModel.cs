@@ -23,6 +23,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Groups
 
         public decimal? KudosTypeValue { get; set; }
 
+        public string AwardTemplate { get; set; }
+
         public int GroupCount { get; set; }
     }
 }

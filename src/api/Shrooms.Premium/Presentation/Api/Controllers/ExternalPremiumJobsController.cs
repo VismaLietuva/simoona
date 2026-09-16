@@ -1,6 +1,10 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Shrooms.Contracts.Exceptions;
+using Shrooms.Premium.DataTransferObjects.Models.Groups;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Controllers.Kudos;
@@ -68,6 +72,23 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         public async Task ProcessExpiredLotteries()
         {
             await _webHookService.LotteryStatusChangeService.ProcessExpiredLotteriesAsync();
+        }
+
+        [HttpPost]
+        [Route("AwardMonthlyGroupKudos")]
+        [ProducesResponseType(typeof(IList<GroupMonthlyKudosResultDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> AwardMonthlyGroupKudos(int? year = null, int? month = null)
+        {
+            try
+            {
+                var result = await _webHookService.GroupKudos.AwardMonthlyGroupKudosAsync(GetOrganizationName(), year, month);
+
+                return Ok(result);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
     }
 }

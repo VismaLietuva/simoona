@@ -18,5 +18,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Groups
         public string ApprovalQuestions { get; set; }
 
         public int? KudosTypeId { get; set; }
+
+        public string AwardTemplate { get; set; }
     }
 }
