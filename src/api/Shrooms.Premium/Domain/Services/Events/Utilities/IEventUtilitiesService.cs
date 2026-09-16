@@ -26,8 +26,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 
         Task<IEnumerable<EventTypeDto>> GetEventTypesToRemindAsync(int organizationId);
 
-        Task<IEnumerable<EventOptionCountDto>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDto userAndOrg);
-
         Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds);
 
         Task<IEnumerable<string>> GetEventTypesSingleJoinGroupsAsync(int organizationId);

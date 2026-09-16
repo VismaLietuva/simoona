@@ -19,6 +19,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         Task<VacationRequestDto> CancelAsync(int id, UserAndOrganizationDto userOrg);
 
+        /// <summary>The one request a reviewer is about to act on, for the approve and reject links in their mail.</summary>
+        Task<VacationRequestDto> GetForReviewAsync(int id, UserAndOrganizationDto userOrg);
+
         Task<VacationRequestDto> ApproveAsync(int id, UserAndOrganizationDto userOrg);
 
         Task<VacationRequestDto> RejectAsync(int id, string reason, UserAndOrganizationDto userOrg);

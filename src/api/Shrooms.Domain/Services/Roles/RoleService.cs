@@ -37,6 +37,12 @@ namespace Shrooms.Domain.Services.Roles
             return x => !_userRolesDbSet.Any(ur => ur.UserId == x.Id && ur.RoleId == roleId);
         }
 
+        public Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRoleName(string roleName)
+        {
+            return x => !_userRolesDbSet.Any(ur => ur.UserId == x.Id &&
+                                                  _roleDbSet.Any(role => role.Id == ur.RoleId && role.Name == roleName));
+        }
+
         public async Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
         {
             return await _roleDbSet

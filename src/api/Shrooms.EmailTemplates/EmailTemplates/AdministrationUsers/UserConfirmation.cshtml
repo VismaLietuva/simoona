@@ -1,0 +1,11 @@
+﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.UserConfirmationEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = "Your Simoona account is ready to use.";
+}
+
+<email-heading eyebrow="Account">Your registration is <email-em>confirmed</email-em></email-heading>
+<email-card>
+    @Html.Raw(Model.Content)
+    <email-button href="@Model.MainPageUrl">Log in to Simoona</email-button>
+</email-card>

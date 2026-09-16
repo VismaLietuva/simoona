@@ -1,5 +1,6 @@
-using RazorLight;
+﻿using Razor.Templating.Core;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Attributes;
 using Shrooms.Infrastructure.Email.Extensions;
@@ -14,11 +15,13 @@ namespace Shrooms.Infrastructure.Email.Templating
 {
     public class MailTemplate : IMailTemplate
     {
-        private readonly IRazorLightEngine _razorLightEngine;
+        private readonly IRazorTemplateEngine _razorTemplateEngine;
+        private readonly IApplicationSettings _appSettings;
 
-        public MailTemplate(IRazorLightEngine razorLightEngine)
+        public MailTemplate(IRazorTemplateEngine razorTemplateEngine, IApplicationSettings appSettings)
         {
-            _razorLightEngine = razorLightEngine ?? throw new ArgumentNullException(nameof(razorLightEngine));
+            _razorTemplateEngine = razorTemplateEngine ?? throw new ArgumentNullException(nameof(razorTemplateEngine));
+            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
         public async Task<string> GenerateAsync<TEmailTemplate>(TEmailTemplate viewModel, string key, string timeZoneKey = null)
@@ -126,7 +129,10 @@ namespace Shrooms.Infrastructure.Email.Templating
         private async Task<string> GenerateInternalAsync<TEmailTemplate>(TEmailTemplate viewModel, string key)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            return await _razorLightEngine.CompileRenderAsync(key, viewModel);
+            // The layout's only environment-dependent link, filled here so no caller has to pass it.
+            viewModel.HomeUrl = _appSettings.ClientUrl;
+
+            return await _razorTemplateEngine.RenderAsync(key, viewModel);
         }
     }
 }

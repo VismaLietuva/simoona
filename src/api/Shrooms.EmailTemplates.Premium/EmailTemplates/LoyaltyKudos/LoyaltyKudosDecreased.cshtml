@@ -1,0 +1,16 @@
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.LoyaltyKudosReceivedDecreasedEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    var amount = Model.KudosAmount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    ViewData["Preheader"] = $"{Model.KudosSenderName} reduced your kudos by {amount}.";
+}
+
+<email-heading eyebrow="Loyalty kudos">Your kudos were <email-em>reduced</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        <span style="color:@Shrooms.EmailTemplates.EmailDesign.Destructive;font-weight:600;">-@amount</span>
+        by <strong>@Model.KudosSenderName</strong>.
+    </p>
+    <email-quote>@Model.Comment</email-quote>
+    <email-button href="@Model.KudosProfileUrl">View your kudos</email-button>
+</email-card>

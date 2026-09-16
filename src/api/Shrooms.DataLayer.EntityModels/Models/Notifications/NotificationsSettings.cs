@@ -26,6 +26,9 @@
 
         public bool CreatedLotteryEmailNotifications { get; set; }
 
+        /// <summary>In-app only: a leave decision always goes out by email as well.</summary>
+        public bool VacationsAppNotifications { get; set; }
+
         public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }

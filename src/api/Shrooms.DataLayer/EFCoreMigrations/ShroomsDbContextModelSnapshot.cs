@@ -2030,9 +2030,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("KudosBasketId");
 
-                    b.HasIndex("OrganizationId");
-
                     b.HasIndex("SentToId");
+
+                    b.HasIndex("OrganizationId", "Status", "Created");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OrganizationId", "Status", "Created"), new[] { "KudosSystemType", "KudosBasketId", "EmployeeId", "Points", "CreatedBy" });
 
                     b.ToTable("KudosLogs");
                 });
@@ -2724,6 +2726,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("ProjectsEmailNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("VacationsAppNotifications")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -5458,6 +5463,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                             b1.Property<string>("Serialized")
                                 .HasColumnType("nvarchar(max)")
                                 .HasColumnName("Sources");
+
+                            b1.Property<int>("VacationRequestId")
+                                .HasColumnType("int");
 
                             b1.HasKey("NotificationId");
 

@@ -1,0 +1,26 @@
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.NewEventEmailTemplateViewModel
+@using Shrooms.Domain.Helpers
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.EventName} starts {Model.StartDate:yyyy-MM-dd HH:mm} at {Model.Location}.";
+}
+
+<email-heading eyebrow="New event">@Model.EventName</email-heading>
+<email-card>
+    <p style="margin:0;">
+        📆 <a href="@Model.EventUrl"><strong>@Model.EventName</strong></a>
+    </p>
+    <email-details>
+        <email-detail label="Location">@Model.Location</email-detail>
+        <email-detail label="Starts">@Model.StartDate.ToString("yyyy-MM-dd HH:mm")</email-detail>
+    </email-details>
+    @if (string.IsNullOrEmpty(Model.Description))
+    {
+        <p style="margin:0;color:@Shrooms.EmailTemplates.EmailDesign.MutedForeground;">No description provided</p>
+    }
+    else
+    {
+        <email-quote>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Description))</email-quote>
+    }
+    <email-button href="@Model.EventUrl">Open the event</email-button>
+</email-card>

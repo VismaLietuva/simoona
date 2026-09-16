@@ -1,7 +1,6 @@
 using System;
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using RazorLight;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
@@ -18,7 +17,6 @@ using Shrooms.Infrastructure.Storage;
 using Shrooms.Infrastructure.Storage.AzureBlob;
 using Shrooms.Infrastructure.Storage.FileSystem;
 using Shrooms.Infrastructure.SystemClock;
-using System.IO;
 
 namespace Shrooms.IoC.Modules
 {
@@ -32,12 +30,6 @@ namespace Shrooms.IoC.Modules
             services.AddScoped<IApplicationSettings, ApplicationSettings>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddScoped<IExcelBuilderFactory, ExcelBuilderFactory>();
-            services.AddSingleton<IRazorLightEngine>(_ =>
-                new RazorLightEngineBuilder()
-                    .UseProject(new Shrooms.Infrastructure.Email.Templating.NormalizedFileSystemRazorProject(
-                        Path.Combine(AppContext.BaseDirectory, "EmailTemplates")))
-                    .UseMemoryCachingProvider()
-                    .Build());
             services.AddScoped<IMailTemplate, MailTemplate>();
             services.AddScoped<IDailyMailingService, DailyMailingService>();
             services.AddScoped<IJobScheduler, HangFireScheduler>();

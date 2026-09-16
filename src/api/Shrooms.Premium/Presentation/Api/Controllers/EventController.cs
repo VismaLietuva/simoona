@@ -154,6 +154,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> CreateEvent(CreateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
@@ -188,6 +189,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> UpdateEvent(UpdateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
@@ -500,6 +502,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> Delete(Guid eventId)
         {
             try

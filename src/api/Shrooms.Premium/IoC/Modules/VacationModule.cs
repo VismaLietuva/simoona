@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shrooms.Premium.Domain.Services.Email.Vacations;
 using Shrooms.Premium.Domain.Services.Vacations;
 using Shrooms.Premium.Infrastructure.VacationBot;
 
@@ -21,6 +22,7 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IVacationSettingsService, VacationSettingsService>();
             services.AddScoped<IVacationReportService, VacationReportService>();
             services.AddScoped<IVacationOrderService, VacationOrderService>();
+            services.AddScoped<IVacationNotificationService, VacationNotificationService>();
 
             return services;
         }

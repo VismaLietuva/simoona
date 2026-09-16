@@ -24,7 +24,6 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private DbSet<EventType> _eventTypesDbSet;
         private DbSet<EventOption> _eventOptionsDbSet;
-        private DbSet<Event> _eventDbSet;
 
         [SetUp]
         public void TestInitializer()
@@ -35,7 +34,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _eventOptionsDbSet = uow.MockDbSetForAsync<EventOption>();
             _eventTypesDbSet = uow.MockDbSetForAsync<EventType>();
-            _eventDbSet = uow.MockDbSetForAsync<Event>(new List<Event>());
+            uow.MockDbSetForAsync<Event>(new List<Event>());
 
             _eventUtilitiesService = new EventUtilitiesService(uow, _filterPresetService);
         }
@@ -58,23 +57,6 @@ namespace Shrooms.Premium.Tests.DomainService
 
             ClassicAssert.AreEqual(result.Count, 3);
             ClassicAssert.AreEqual(result.First(x => x.Id == 1).Name, "type1");
-        }
-
-        [Test]
-        public async Task Should_Return_Event_Chosen_Options()
-        {
-            var userAndOrg = new UserAndOrganizationDto
-            {
-                OrganizationId = 2
-            };
-            var guid = MockParticipantsWithOptionsForExport();
-
-            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(guid, userAndOrg)).ToList();
-            ClassicAssert.AreEqual("Option1", options.ToArray()[0].Option);
-            ClassicAssert.AreEqual("Option2", options.ToArray()[1].Option);
-            ClassicAssert.AreEqual(2, options.ToArray()[0].Count);
-            ClassicAssert.AreEqual(1, options.ToArray()[1].Count);
-            ClassicAssert.AreEqual(2, options.Count);
         }
 
         [Test]
@@ -148,70 +130,6 @@ namespace Shrooms.Premium.Tests.DomainService
             // Assert
             await _filterPresetService.Received(1)
                 .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Events), Arg.Is(userOrg.OrganizationId));
-        }
-
-        private Guid MockParticipantsWithOptionsForExport()
-        {
-            var eventId = Guid.NewGuid();
-
-            var @event = new Event
-            {
-                Id = eventId,
-                OrganizationId = 2,
-                ResponsibleUserId = "user"
-            };
-
-            var options = new List<EventOption>
-            {
-                new EventOption
-                {
-                    EventId = eventId,
-                    Option = "Option1",
-                    Event = @event,
-                    EventParticipants = new List<EventParticipant>
-                    {
-                        new EventParticipant
-                        {
-                            EventId = eventId
-                        },
-                        new EventParticipant
-                        {
-                            EventId = eventId
-                        },
-                        new EventParticipant
-                        {
-                            EventId = default
-                        }
-                    }
-                },
-                new EventOption
-                {
-                    EventId = eventId,
-                    Option = "Option2",
-                    Event = @event,
-                    EventParticipants = new List<EventParticipant>
-                    {
-                        new EventParticipant
-                        {
-                            EventId = eventId
-                        },
-                        new EventParticipant
-                        {
-                            EventId = default
-                        }
-                    }
-                },
-                new EventOption
-                {
-                    EventId = eventId,
-                    Option = "Option3",
-                    Event = @event,
-                    EventParticipants = new List<EventParticipant>()
-                }
-            };
-            _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
-            _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
-            return eventId;
         }
 
         private Guid MockCommentsForEvent()

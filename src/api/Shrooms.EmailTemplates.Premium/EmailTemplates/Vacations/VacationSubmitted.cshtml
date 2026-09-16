@@ -1,0 +1,36 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.VacationSubmittedEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.EmployeeName} asks for {Model.Period}. Approve it from here.";
+}
+
+<email-heading eyebrow="Vacation">@Model.EmployeeName asks for <email-em>time off</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        The request is waiting for your decision. Approving takes one click — you do not need to open the app.
+    </p>
+    <email-details>
+        <email-detail label="Period">@Model.Period</email-detail>
+        <email-detail label="Type">@Model.LeaveType</email-detail>
+        <email-detail label="Working days">@Model.WorkingDays</email-detail>
+    </email-details>
+    @if (!string.IsNullOrWhiteSpace(Model.Note))
+    {
+        <email-quote>@Model.Note</email-quote>
+    }
+    @if (string.IsNullOrEmpty(Model.ApproveUrl))
+    {
+        <email-button href="@Model.RequestUrl">Open the request</email-button>
+    }
+    else
+    {
+        <email-actions>
+            <email-action>
+                <email-button href="@Model.ApproveUrl">Approve</email-button>
+            </email-action>
+            <email-action>
+                <email-button href="@Model.RejectUrl" variant="outline">Reject</email-button>
+            </email-action>
+        </email-actions>
+    }
+</email-card>

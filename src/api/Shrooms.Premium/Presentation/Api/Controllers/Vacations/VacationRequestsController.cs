@@ -130,6 +130,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
             return GuardedAsync(() => _requestService.CancelAsync(id, GetUserAndOrganization()));
         }
 
+        [HttpGet]
+        [Route("Requests/{id:int}/Review")]
+        [ProducesResponseType(typeof(VacationRequestDto), StatusCodes.Status200OK)]
+        public Task<IActionResult> ForReview(int id)
+        {
+            return GuardedAsync(() => _requestService.GetForReviewAsync(id, GetUserAndOrganization()));
+        }
+
         [HttpPost]
         [Route("Requests/{id:int}/Approve")]
         [ProducesResponseType(typeof(VacationRequestDto), StatusCodes.Status200OK)]

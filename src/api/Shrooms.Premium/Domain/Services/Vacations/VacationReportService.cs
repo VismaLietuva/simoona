@@ -82,9 +82,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             {
                 FileName = FileNameFor(start, end),
                 ContentType = "text/csv",
-                // A BOM, or Excel reads the Lithuanian names as the local ANSI
-                // code page and mangles every diacritic.
-                Content = new UTF8Encoding(true).GetBytes(builder.ToString())
+                // UTF-16LE with a BOM, not UTF-8 — see VacationReportEncoding.
+                Content = VacationReportEncoding.ToBytes(builder.ToString())
             };
         }
 

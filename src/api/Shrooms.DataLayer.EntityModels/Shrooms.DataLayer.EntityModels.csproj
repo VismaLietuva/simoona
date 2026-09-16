@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="TimeZoneConverter" />
   </ItemGroup>
 
   <ItemGroup>

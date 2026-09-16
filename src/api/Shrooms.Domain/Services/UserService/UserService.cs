@@ -113,6 +113,7 @@ namespace Shrooms.Domain.Services.UserService
             settings.FollowingPostsEmailNotifications = settingsDto.FollowingPostsEmailNotifications;
             settings.MentionEmailNotifications = settingsDto.MentionEmailNotifications;
             settings.CreatedLotteryEmailNotifications = settingsDto.CreatedLotteryEmailNotifications;
+            settings.VacationsAppNotifications = settingsDto.VacationsAppNotifications;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -299,6 +300,7 @@ namespace Shrooms.Domain.Services.UserService
                 FollowingPostsEmailNotifications = settings?.FollowingPostsEmailNotifications ?? true,
                 MentionEmailNotifications = settings?.MentionEmailNotifications ?? true,
                 CreatedLotteryEmailNotifications = settings?.CreatedLotteryEmailNotifications ?? true,
+                VacationsAppNotifications = settings?.VacationsAppNotifications ?? true,
 
                 Walls = _wallMembersDbSet
                     .Include(x => x.Wall)

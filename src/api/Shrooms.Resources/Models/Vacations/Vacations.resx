@@ -210,4 +210,19 @@
   <data name="archiveTooLarge" xml:space="preserve">
     <value>That period holds more than {0} orders. Narrow it and download again</value>
   </data>
+  <data name="notificationSubmittedSubject" xml:space="preserve">
+    <value>{0} asks for time off</value>
+  </data>
+  <data name="notificationChangedSubject" xml:space="preserve">
+    <value>{0}'s leave request changed</value>
+  </data>
+  <data name="notificationWithdrawnSubject" xml:space="preserve">
+    <value>{0} withdrew a leave request</value>
+  </data>
+  <data name="notificationDecidedSubject" xml:space="preserve">
+    <value>Your leave was {0}</value>
+  </data>
+  <data name="notificationDecidedByAdminSubject" xml:space="preserve">
+    <value>{0}'s leave was answered by an administrator</value>
+  </data>
 </root>

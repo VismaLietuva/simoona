@@ -98,6 +98,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPost]
         [Route("Create")]
         [ProducesResponseType(typeof(CreateLotteryViewModel), StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> CreateLottery(CreateLotteryViewModel createViewModel)
         {
             if (!ModelState.IsValid)
@@ -122,6 +123,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPatch]
         [Route("{id}/Abort")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> Abort(int id)
         {
             var success = await _lotteryService.AbortLotteryAsync(id, GetUserAndOrganization());
@@ -185,6 +187,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPut]
         [Route("UpdateDrafted")]
         [ProducesResponseType(typeof(EditDraftedLotteryViewModel), StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
         {
             if (!ModelState.IsValid)
@@ -209,6 +212,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPatch]
         [Route("UpdateStarted")]
         [ProducesResponseType(typeof(EditStartedLotteryViewModel), StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
         {
             if (!ModelState.IsValid)
@@ -233,6 +237,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPatch]
         [Route("{id}/Finish")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> FinishLottery(int id)
         {
             try

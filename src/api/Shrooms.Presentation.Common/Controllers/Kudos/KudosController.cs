@@ -270,6 +270,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> AddKudosLog([FromBody] AddKudosLogViewModel kudosLog)
         {
             if (!ModelState.IsValid)
@@ -306,6 +307,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> ApproveKudos(int id)
         {
             try
