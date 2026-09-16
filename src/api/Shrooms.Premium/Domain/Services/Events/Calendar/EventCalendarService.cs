@@ -28,6 +28,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private IEventValidationService _eventValidationService;
@@ -37,6 +38,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventsDbSet = uow.GetDbSet<Event>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
+            _eventParticipantsDbSet = uow.GetDbSet<EventParticipant>();
             _mailingService = mailingService;
             _appSettings = appSettings;
             _eventValidationService = eventValidationService;
@@ -50,6 +52,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 .ToListAsync();
 
             var calendarEvent = MapToCalendarEvent(@event);
+            AddChoices(calendarEvent, @event.Name, @event.SelectedOptions);
             await AddEventLinkToDescriptionAsync(calendarEvent, @event.Id, orgId);
 
             var calendar = new Ical.Net.Calendar();
@@ -66,7 +69,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             }
         }
 
-        public async Task<FileExportDto> DownloadEventAsync(Guid eventId, int orgId)
+        public async Task<FileExportDto> DownloadEventAsync(Guid eventId, int orgId, string userId)
         {
             var @event = await _eventsDbSet.FindAsync(eventId);
 
@@ -85,6 +88,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 Status = EventStatus.Confirmed
             };
 
+            AddChoices(calEvent, @event.Name, await GetChosenOptionsAsync(eventId, userId));
             await AddEventLinkToDescriptionAsync(calEvent, eventId, orgId);
             var cal = new Ical.Net.Calendar();
             cal.Events.Add(calEvent);
@@ -93,6 +97,47 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 
             var fileName = FileExportName.Sanitize(@event.Name, "event", ".ics");
             return new FileExportDto(calByteArray, fileName);
+        }
+
+        private async Task<List<EventOption>> GetChosenOptionsAsync(Guid eventId, string userId)
+        {
+            return await _eventParticipantsDbSet
+                .Where(participant => participant.EventId == eventId && participant.ApplicationUserId == userId)
+                .SelectMany(participant => participant.EventOptions)
+                .ToListAsync();
+        }
+
+        // Both kinds of pick, flat options before question answers, so the order is stable
+        // whatever the event is built from. An answer carries its option name alone: with the
+        // question title it would not fit a calendar entry title.
+        private static List<string> ChoiceNames(IEnumerable<EventOption> chosenOptions)
+        {
+            return (chosenOptions ?? Enumerable.Empty<EventOption>())
+                .OrderBy(option => option.QuestionId == null ? 0 : 1)
+                .ThenBy(option => option.QuestionId)
+                .ThenBy(option => option.Order)
+                .Select(option => option.Option)
+                .Where(option => !string.IsNullOrWhiteSpace(option))
+                .ToList();
+        }
+
+        private static string Summarize(string eventName, List<string> choices)
+        {
+            return choices.Count == 0 ? eventName : $"{eventName} — {string.Join(", ", choices)}";
+        }
+
+        private static void AddChoices(CalendarEvent calEvent, string eventName, IEnumerable<EventOption> chosenOptions)
+        {
+            var choices = ChoiceNames(chosenOptions);
+
+            calEvent.Summary = Summarize(eventName, choices);
+
+            if (choices.Count == 0)
+            {
+                return;
+            }
+
+            calEvent.Description += $"\n\nYour choices: {string.Join(", ", choices)}";
         }
 
         private async Task AddEventLinkToDescriptionAsync(CalendarEvent calEvent, Guid eventId, int orgId)
