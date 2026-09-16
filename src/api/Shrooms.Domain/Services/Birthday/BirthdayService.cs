@@ -42,12 +42,10 @@ namespace Shrooms.Domain.Services.Birthday
 
         private async Task<IEnumerable<UserBirthdayInfoDto>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
-            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
-
             return await _userDbSet
                 .Where(u => u.BirthDay.HasValue)
                 .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
-                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
+                .Where(_roleService.ExcludeUsersWithRoleName(ConstantsRoles.NewUser))
                 .Select(MapUserBirthdayInfo())
                 .ToListAsync();
         }

@@ -31,6 +31,7 @@
     <PackageReference Include="Ical.Net" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="PDFsharp" />
+    <PackageReference Include="TimeZoneConverter" />
     <PackageReference Include="X.PagedList" />
     <PackageReference Include="X.PagedList.EF" />
   </ItemGroup>

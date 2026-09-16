@@ -1,4 +1,5 @@
 ﻿using System;
+using TimeZoneConverter;
 
 namespace Shrooms.Infrastructure.Email.Extensions
 {
@@ -11,7 +12,7 @@ namespace Shrooms.Infrastructure.Email.Extensions
                 return date;
             }
 
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneKey);
+            var timeZone = TZConvert.GetTimeZoneInfo(timeZoneKey);
             return TimeZoneInfo.ConvertTimeFromUtc(date, timeZone);
         }
     }

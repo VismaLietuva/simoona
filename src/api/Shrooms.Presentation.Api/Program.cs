@@ -16,6 +16,7 @@ using Shrooms.IoC;
 using Shrooms.Presentation.Api.BackgroundWorkers;
 using Shrooms.Presentation.Api.Endpoints;
 using Shrooms.Presentation.Api.Middlewares;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Hubs;
 using Shrooms.Presentation.Api.Caching;
 using SixLabors.ImageSharp.Web.Caching;
@@ -57,6 +58,12 @@ builder.Services.AddScoped<ShroomsDbContext>(sp =>
     };
 });
 builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbContext>());
+
+// Output caching for the widget endpoints. Their responses are shaped by organization and
+// permission set rather than by user, so PermissionAwareCacheOutputFilterAttribute keys entries
+// on those and writes evict them by tag through IWidgetCacheInvalidator.
+builder.Services.AddOutputCache();
+builder.Services.AddScoped<IWidgetCacheInvalidator, WidgetCacheInvalidator>();
 
 // ASP.NET Core Identity (provides UserManager, RoleManager infra)
 builder.Services.AddIdentityCore<ApplicationUser>(opts =>
@@ -410,6 +417,10 @@ app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
 app.UseMiddleware<ImageResizerMiddleware>();
 app.UseAuthorization();
+
+// After UseAuthorization on purpose: a cache hit short-circuits the rest of the pipeline, so
+// placing this earlier would serve stored responses without running the endpoint.s authorization.
+app.UseOutputCache();
 
 app.UseSwagger();
 app.UseSwaggerUI();
