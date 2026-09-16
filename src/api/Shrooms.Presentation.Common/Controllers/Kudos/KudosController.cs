@@ -392,6 +392,7 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> Like([FromBody] AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
