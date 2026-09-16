@@ -3,6 +3,7 @@ using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Domain.Services.Email.Kudos;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.Domain.Services.WebHookCallbacks.Groups;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
@@ -18,6 +19,7 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IBookRemindService, BookRemindService>();
             services.AddScoped<ILotteryStatusChangeService, LotteryStatusChangeService>();
             services.AddScoped<IEventsWebHookService, EventsWebHookService>();
+            services.AddScoped<IGroupKudosWebHookService, GroupKudosWebHookService>();
             services.AddScoped<IWebHookCallbackPremiumServices, WebHookCallbackPremiumServices>();
             return services;
         }
