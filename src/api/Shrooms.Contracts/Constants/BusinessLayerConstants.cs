@@ -56,6 +56,7 @@ namespace Shrooms.Contracts.Constants
 
         #region Books
         public const int BooksPerPage = 10;
+        public const int MaxBooksPerPage = 500;
         public const int MinCharactersInBookSearch = 2;
         public const string LoyaltyBotName = "Loyalty bot";
 
