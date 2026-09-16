@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -9,12 +10,14 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.Banners;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Events;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall.Widgets;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models.Banners;
@@ -36,6 +39,7 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
         private readonly IBirthdayService _birthdayService;
         private readonly IEventWidgetService _eventWidgetService;
         private readonly IBannerWidgetService _bannerWidgetService;
+        private readonly IWallWidgetPreferencesService _wallWidgetPreferencesService;
 
         public WallWidgetsController(IMapper mapper,
             IKudosService kudosService,
@@ -43,7 +47,8 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
             IKudosBasketService kudosBasketService,
             IBirthdayService birthdayService,
             IEventWidgetService eventWidgetService,
-            IBannerWidgetService bannerWidgetService)
+            IBannerWidgetService bannerWidgetService,
+            IWallWidgetPreferencesService wallWidgetPreferencesService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
@@ -52,6 +57,41 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
             _birthdayService = birthdayService;
             _eventWidgetService = eventWidgetService;
             _bannerWidgetService = bannerWidgetService;
+            _wallWidgetPreferencesService = wallWidgetPreferencesService;
+        }
+
+        [HttpGet]
+        [Route("Preferences")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<WallWidgetPreferencesViewModel> GetPreferences()
+        {
+            return new WallWidgetPreferencesViewModel
+            {
+                Preferences = await _wallWidgetPreferencesService.GetAsync(GetUserAndOrganization())
+            };
+        }
+
+        [HttpPut]
+        [Route("Preferences")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SavePreferences([FromBody] WallWidgetPreferencesViewModel preferences)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _wallWidgetPreferencesService.SaveAsync(preferences.Preferences, GetUserAndOrganization());
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            return NoContent();
         }
 
         [HttpGet]
