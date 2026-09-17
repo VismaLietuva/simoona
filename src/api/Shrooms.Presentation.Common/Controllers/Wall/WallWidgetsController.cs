@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -9,12 +10,14 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.Banners;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Events;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall.Widgets;
 using Shrooms.Presentation.Common.Filters;
 using Shrooms.Presentation.Common.Helpers;
 using Shrooms.Presentation.WebViewModels.Models.Banners;
@@ -36,6 +39,7 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
         private readonly IBirthdayService _birthdayService;
         private readonly IEventWidgetService _eventWidgetService;
         private readonly IBannerWidgetService _bannerWidgetService;
+        private readonly IWallWidgetPreferencesService _wallWidgetPreferencesService;
 
         public WallWidgetsController(IMapper mapper,
             IKudosService kudosService,
@@ -43,7 +47,8 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
             IKudosBasketService kudosBasketService,
             IBirthdayService birthdayService,
             IEventWidgetService eventWidgetService,
-            IBannerWidgetService bannerWidgetService)
+            IBannerWidgetService bannerWidgetService,
+            IWallWidgetPreferencesService wallWidgetPreferencesService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
@@ -52,11 +57,46 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
             _birthdayService = birthdayService;
             _eventWidgetService = eventWidgetService;
             _bannerWidgetService = bannerWidgetService;
+            _wallWidgetPreferencesService = wallWidgetPreferencesService;
+        }
+
+        [HttpGet]
+        [Route("Preferences")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<WallWidgetPreferencesViewModel> GetPreferences()
+        {
+            return new WallWidgetPreferencesViewModel
+            {
+                Preferences = await _wallWidgetPreferencesService.GetAsync(GetUserAndOrganization())
+            };
+        }
+
+        [HttpPut]
+        [Route("Preferences")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SavePreferences([FromBody] WallWidgetPreferencesViewModel preferences)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _wallWidgetPreferencesService.SaveAsync(preferences.Preferences, GetUserAndOrganization());
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            return NoContent();
         }
 
         [HttpGet]
         [Route("Get")]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.FiveMinutes)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, BasicPermissions.Event, ServerTimeSpan = WebApiConstants.FiveMinutes, CacheGroup = WidgetCacheTag.WallWidgets)]
         public async Task<WidgetsViewModel> Get([FromQuery] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
@@ -114,22 +154,20 @@ namespace Shrooms.Presentation.Common.Controllers.Wall
 
         private async Task<IEnumerable<KudosListBasicDataViewModel>> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
-            var result = new List<KudosListBasicDataViewModel>
-            {
-                await CalculateStatsAsync(tabOneMonths, tabOneAmount),
-                await CalculateStatsAsync(tabTwoMonths, tabTwoAmount)
-            };
+            var stats = await _kudosService.GetKudosWidgetStatsAsync(tabOneMonths, tabOneAmount, tabTwoMonths, tabTwoAmount, User.Identity.GetOrganizationId());
 
-            return result;
+            return new List<KudosListBasicDataViewModel>
+            {
+                ToTabViewModel(stats.TabOne, tabOneMonths),
+                ToTabViewModel(stats.TabTwo, tabTwoMonths)
+            };
         }
 
-        private async Task<KudosListBasicDataViewModel> CalculateStatsAsync(int months, int amount)
+        private KudosListBasicDataViewModel ToTabViewModel(IEnumerable<KudosBasicDataDto> tab, int months)
         {
-            var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, User.Identity.GetOrganizationId());
-            var stats = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return new KudosListBasicDataViewModel
             {
-                Users = stats,
+                Users = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(tab),
                 Months = months
             };
         }

@@ -63,6 +63,8 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task<IEnumerable<KudosBasicDataDto>> GetKudosStatsAsync(int months, int amount, int organizationId);
 
+        Task<KudosWidgetStatsDto> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount, int organizationId);
+
         Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDto userOrg);
 
         Task<bool> HasPendingKudosAsync(string employeeId);

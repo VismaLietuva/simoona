@@ -25,7 +25,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         }
 
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = WebApiConstants.OneHour)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = WebApiConstants.OneHour, CacheGroup = WidgetCacheTag.LotteryWidget)]
         public async Task<IEnumerable<LotteryWidgetViewModel>> Get()
         {
             var lotteriesDto = await _lotteryService.GetRunningLotteriesAsync(GetUserAndOrganization());

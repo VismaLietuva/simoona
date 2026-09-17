@@ -22,6 +22,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             builder.Property(log => log.SentToId)
                 .IsRequired(false);
+
+            builder.HasIndex(log => new { log.OrganizationId, log.Status, log.Created })
+                .IncludeProperties(log => new { log.KudosSystemType, log.KudosBasketId, log.EmployeeId, log.Points, log.CreatedBy });
         }
     }
 }
