@@ -282,6 +282,22 @@ namespace Shrooms.Domain.Services.Kudos
                 .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
+            var logIds = userLogs.Select(log => log.Id).ToList();
+            var likesByLogId = logIds.Count == 0
+                ? new Dictionary<int, LikesCollection>()
+                : await _kudosLogsDbSet
+                    .AsNoTracking()
+                    .Where(log => logIds.Contains(log.Id))
+                    .Select(log => new { log.Id, log.Likes })
+                    .ToDictionaryAsync(log => log.Id, log => log.Likes);
+
+            var likersById = await GetLikersByIdAsync(likesByLogId.Values);
+
+            foreach (var userLog in userLogs)
+            {
+                userLog.Likes = MapLikesToDto(likesByLogId.GetValueOrDefault(userLog.Id), likersById);
+            }
+
             var user = await _usersDbSet.FindAsync(userId);
 
             if (user != null)
@@ -317,15 +333,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Take(BusinessLayerConstants.WallKudosLogCount)
                 .ToListAsync();
 
-            var likerIds = approvedKudos
-                .Where(x => x.Log.Likes != null)
-                .SelectMany(x => x.Log.Likes.Select(like => like.UserId))
-                .Distinct()
-                .ToList();
-
-            var likersById = likerIds.Count == 0
-                ? new Dictionary<string, ApplicationUser>()
-                : await _usersDbSet.Where(u => likerIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
+            var likersById = await GetLikersByIdAsync(approvedKudos.Select(x => x.Log.Likes));
 
             return approvedKudos
                 .Select(x => new WallKudosLogDto
@@ -387,6 +395,19 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 _kudosLogLikeLock.Release();
             }
+        }
+
+        private async Task<Dictionary<string, ApplicationUser>> GetLikersByIdAsync(IEnumerable<LikesCollection> likesCollections)
+        {
+            var likerIds = likesCollections
+                .Where(likes => likes != null)
+                .SelectMany(likes => likes.Select(like => like.UserId))
+                .Distinct()
+                .ToList();
+
+            return likerIds.Count == 0
+                ? new Dictionary<string, ApplicationUser>()
+                : await _usersDbSet.Where(u => likerIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
         }
 
         private static IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IReadOnlyDictionary<string, ApplicationUser> usersById)
