@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.Constants
+namespace Shrooms.Contracts.Constants
 {
     public static class ErrorCodes
     {
@@ -29,6 +29,7 @@
         public const int WallNameAlreadyExists = 405;
         public const int WallModeratorCanNotLeave = 406;
         public const int WallCannotLeaveMain = 407;
+        public const int WallWidgetPreferencesInvalid = 408;
 
         // Post, 5**
         public const int UserIsNotAMemberOfWall = 501;

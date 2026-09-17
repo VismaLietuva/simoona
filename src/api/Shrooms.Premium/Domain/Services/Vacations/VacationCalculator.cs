@@ -4,6 +4,7 @@ using System.Linq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
+using TimeZoneConverter;
 
 namespace Shrooms.Premium.Domain.Services.Vacations
 {
@@ -245,7 +246,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             try
             {
-                return TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                return TZConvert.GetTimeZoneInfo(timeZoneId);
             }
             catch (Exception ex) when (ex is TimeZoneNotFoundException || ex is InvalidTimeZoneException)
             {

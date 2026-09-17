@@ -598,6 +598,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<double?>("VacationUsedTime")
                         .HasColumnType("float");
 
+                    b.Property<string>("WallWidgetPreferences")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("WorkingHoursId")
                         .HasColumnType("int");
 
@@ -2030,9 +2033,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("KudosBasketId");
 
-                    b.HasIndex("OrganizationId");
-
                     b.HasIndex("SentToId");
+
+                    b.HasIndex("OrganizationId", "Status", "Created");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OrganizationId", "Status", "Created"), new[] { "KudosSystemType", "KudosBasketId", "EmployeeId", "Points", "CreatedBy" });
 
                     b.ToTable("KudosLogs");
                 });

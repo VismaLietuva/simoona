@@ -42,6 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [ProducesResponseType(typeof(KudosBasketCreateViewModel), StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> CreateNewKudosBasket(KudosBasketCreateViewModel newBasket)
         {
             if (!ModelState.IsValid)
@@ -86,6 +87,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> DeleteKudosBasket()
         {
             var userAndOrganization = GetUserAndOrganization();
@@ -96,6 +98,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> EditKudosBasket(KudosBasketEditViewModel editedBasket)
         {
             if (!ModelState.IsValid)
@@ -112,6 +115,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.KudosBasket)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         public async Task<IActionResult> MakeDonation(KudosBasketDonateViewModel donation)
         {
             if (!ModelState.IsValid)
