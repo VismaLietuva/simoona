@@ -165,12 +165,15 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         // Every answer the user gave, question-owned included: the sign-up wizard
                         // is the only way to offer choices now, so filtering those out left the
                         // widget empty for any event created since. Legacy flat options sort
-                        // first, then each question's answers in the order they were asked.
+                        // first, then each question's answers in the order the wizard asked them,
+                        // which is EventQuestion.Order and not the question's id.
                         SelectedOptions = e.EventParticipants
                             .Where(p => p.ApplicationUserId == userOrg.UserId &&
                                         p.AttendStatus == (int)AttendingStatus.Attending)
                             .SelectMany(p => p.EventOptions)
-                            .OrderBy(o => o.QuestionId)
+                            .OrderBy(o => o.QuestionId == null ? 0 : 1)
+                            .ThenBy(o => o.Question == null ? 0 : o.Question.Order)
+                            .ThenBy(o => o.QuestionId)
                             .ThenBy(o => o.Order)
                             .ThenBy(o => o.Id)
                             .Select(o => o.Option)
