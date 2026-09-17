@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels.Wall.Likes;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 {
@@ -25,5 +27,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
         public KudosLogTypeViewModel Type { get; set; }
 
         public string PictureId { get; set; }
+
+        public IEnumerable<LikeViewModel> Likes { get; set; }
     }
 }
