@@ -140,16 +140,16 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var horizon = now.AddDays(FoodTeamHorizonInDays);
 
             // EndDate > now keeps an ongoing team and skips one that already finished today,
-            // so a second team starting later the same day is the one that surfaces.
+            // so a second team starting later the same day is the one that surfaces. Only a
+            // plain Attending counts: there is no maybe or virtual seat at a food team, and the
+            // picks read the same status so a stale row cannot add options to the order.
             var joined = await _eventsDbSet
                 .Where(e => e.OrganizationId == userOrg.OrganizationId &&
                             foodTypeIds.Contains(e.EventTypeId) &&
                             e.EndDate > now &&
                             e.StartDate < horizon &&
                             e.EventParticipants.Any(p => p.ApplicationUserId == userOrg.UserId &&
-                                                         (p.AttendStatus == (int)AttendingStatus.Attending ||
-                                                          p.AttendStatus == (int)AttendingStatus.MaybeAttending ||
-                                                          p.AttendStatus == (int)AttendingStatus.AttendingVirtually)))
+                                                         p.AttendStatus == (int)AttendingStatus.Attending))
                 .OrderBy(e => e.StartDate)
                 .Select(e => new
                 {
@@ -162,13 +162,22 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         ImageName = e.ImageName,
                         StartDate = e.StartDate,
                         EndDate = e.EndDate,
-                        SelectedOption = e.EventParticipants
-                            .Where(p => p.ApplicationUserId == userOrg.UserId)
+                        // Every answer the user gave, question-owned included: the sign-up wizard
+                        // is the only way to offer choices now, so filtering those out left the
+                        // widget empty for any event created since. Legacy flat options sort
+                        // first, then each question's answers in the order the wizard asked them,
+                        // which is EventQuestion.Order and not the question's id.
+                        SelectedOptions = e.EventParticipants
+                            .Where(p => p.ApplicationUserId == userOrg.UserId &&
+                                        p.AttendStatus == (int)AttendingStatus.Attending)
                             .SelectMany(p => p.EventOptions)
-                            .Where(o => o.QuestionId == null)
-                            .OrderBy(o => o.Id)
+                            .OrderBy(o => o.QuestionId == null ? 0 : 1)
+                            .ThenBy(o => o.Question == null ? 0 : o.Question.Order)
+                            .ThenBy(o => o.QuestionId)
+                            .ThenBy(o => o.Order)
+                            .ThenBy(o => o.Id)
                             .Select(o => o.Option)
-                            .FirstOrDefault()
+                            .ToList()
                     }
                 })
                 .FirstOrDefaultAsync();
