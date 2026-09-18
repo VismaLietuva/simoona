@@ -12,6 +12,7 @@
         public const int DefaultAutocompleteListSize = 20;
         public static readonly string[] AbstractClassifierTypes = { "Project", "Language" };
         public static readonly char[] SearchSplitter = { ' ', ',', ';', '|' };
+        public const int MaxSearchWords = 10;
         public const int MonitorNameMaxLength = 50;
         public const int ProjectNameMaxLength = 100;
 

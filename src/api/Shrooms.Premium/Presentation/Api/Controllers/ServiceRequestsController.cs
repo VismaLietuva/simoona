@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -93,7 +93,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             // Every word has to match something, but each may match a different
             // field, so "ann smith" spans FirstName and LastName instead of
             // being looked for verbatim in either one.
-            var searchWords = search.Split(WebApiConstants.SearchSplitter, StringSplitOptions.RemoveEmptyEntries);
+            // Capped because each word becomes its own SQL parameter and CHARINDEX call.
+            var searchWords = search
+                .Split(WebApiConstants.SearchSplitter, StringSplitOptions.RemoveEmptyEntries)
+                .Take(WebApiConstants.MaxSearchWords)
+                .ToArray();
             var hasSearch = searchWords.Length > 0;
 
             if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest))
@@ -118,10 +122,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
                 (u.EmployeeId == id &&
-                (!hasSearch || searchWords.Count(word =>
-                    u.Title.Contains(word) ||
-                    u.Employee.FirstName.Contains(word) ||
-                    u.Employee.LastName.Contains(word)) == searchWords.Length) &&
+                // Title only: this clause is already the viewer's own requests, so
+                // matching their own name would match every one of them.
+                (!hasSearch || searchWords.Count(word => u.Title.Contains(word)) == searchWords.Length) &&
                 u.Priority.Title.Contains(priority) &&
                 u.Status.Title.Contains(status) &&
                 (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory))
