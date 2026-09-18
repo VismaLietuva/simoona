@@ -815,8 +815,28 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             CollectionAssert.AreEqual(
-                new[] { "Pepperoni", "Margherita", "Extra cheese" },
+                new[] { "Pepperoni", "Margherita", "Garlic dip", "Extra cheese" },
                 result.JoinedEvent.SelectedOptions);
+        }
+
+        // Questions are reorderable, so their answers follow EventQuestion.Order, not the id
+        // the question happened to get.
+        [Test]
+        public async Task Should_Order_Question_Answers_By_The_Wizard_Step()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            var selected = result.JoinedEvent.SelectedOptions.ToList();
+            Assert.That(selected.IndexOf("Garlic dip"), Is.LessThan(selected.IndexOf("Extra cheese")));
         }
 
         // The wizard's steps are the only way to offer choices, so its answers are the order.
@@ -1022,6 +1042,10 @@ namespace Shrooms.Premium.Tests.DomainService
             var guids = Enumerable.Repeat(0, 7).Select(_ => Guid.NewGuid()).ToArray();
             var now = DateTime.UtcNow;
 
+            // The dip question is asked first despite its higher id, so ordering by id is wrong.
+            var dipQuestion = new EventQuestion { Id = 2, Title = "Which dip?", Order = 0 };
+            var toppingQuestion = new EventQuestion { Id = 1, Title = "Any extras?", Order = 1 };
+
             var eventTypes = new List<EventType>
             {
                 new EventType
@@ -1084,7 +1108,8 @@ namespace Shrooms.Premium.Tests.DomainService
                             {
                                 new EventOption { Id = 1, Option = "Pepperoni" },
                                 new EventOption { Id = 2, Option = "Margherita" },
-                                new EventOption { Id = 10, Option = "Extra cheese", QuestionId = 1 }
+                                new EventOption { Id = 10, Option = "Extra cheese", QuestionId = toppingQuestion.Id, Question = toppingQuestion },
+                                new EventOption { Id = 14, Option = "Garlic dip", QuestionId = dipQuestion.Id, Question = dipQuestion }
                             }
                         },
                         new EventParticipant
