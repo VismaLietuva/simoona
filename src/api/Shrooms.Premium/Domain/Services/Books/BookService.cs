@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 .Take(pageSize)
                 .ToListAsync();
 
-            var pageDto = new LazyPaged<BooksByOfficeDto>(books, options.Page, pageSize, totalBooksCount);
+            var pageDto = new LazyPaged<BooksByOfficeDto>(books, Math.Max(options.Page, LastPage), pageSize, totalBooksCount);
             return pageDto;
         }
 
@@ -527,8 +527,9 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private static int EntriesCountToSkip(int pageRequested, int pageSize)
         {
-            // Skip throws on a negative count, so a page below the first reads as the first.
-            return (Math.Max(pageRequested, LastPage) - LastPage) * pageSize;
+            // Skip throws on a negative, which both a page below the first and an int overflow produce.
+            var skip = (long)(Math.Max(pageRequested, LastPage) - LastPage) * pageSize;
+            return (int)Math.Min(skip, int.MaxValue);
         }
 
         private static RetrievedBookInfoDto MapBookInfoToDto(ExternalBookInfo book)

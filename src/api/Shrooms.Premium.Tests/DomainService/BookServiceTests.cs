@@ -178,6 +178,25 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Report_The_First_Page_When_A_Page_Below_It_Was_Asked_For()
+        {
+            MockBooksByOffice();
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 0, PageSize = 2, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.AreEqual(1, res.Page);
+        }
+
+        [Test]
+        public async Task Should_Not_Overflow_The_Skip_On_A_Far_Page()
+        {
+            MockBooksByOffice();
+            // This page times the size exceeds int.MaxValue, which wrapped negative before the widening.
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = int.MaxValue, PageSize = BusinessLayerConstants.MaxBooksPerPage, UserId = "testUserId" };
+            var res = await _bookService.GetBooksByOfficeAsync(options);
+            ClassicAssert.IsEmpty(res.Entries);
+        }
+
+        [Test]
         public async Task Should_Exclude_Fully_Borrowed_Books_When_Only_Available()
         {
             MockBooksByOffice();
