@@ -652,7 +652,19 @@ namespace Shrooms.Domain.Services.Kudos
 
             foreach (var receivingUser in receivingUsers)
             {
-                _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyAboutKudosSentAsync(kudosDto), _uow.ConnectionName);
+                var notificationDto = new AddKudosDto
+                {
+                    KudosLog = kudosDto.KudosLog,
+                    ReceivingUser = _mapper.Map<ApplicationUserDto>(receivingUser),
+                    SendingUser = kudosDto.SendingUser,
+                    KudosType = kudosDto.KudosType,
+                    TotalKudosPointsInLog = kudosDto.TotalKudosPointsInLog,
+                    TotalPointsSent = kudosDto.TotalPointsSent,
+                    PictureId = kudosDto.PictureId,
+                    SentToId = kudosDto.SentToId
+                };
+
+                _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyAboutKudosSentAsync(notificationDto), _uow.ConnectionName);
                 await UpdateProfileKudosAsync(receivingUser, kudosLog);
             }
 

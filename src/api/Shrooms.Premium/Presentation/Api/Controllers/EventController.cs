@@ -313,7 +313,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var userOrg = GetUserAndOrganization();
-                var export = await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId);
+                var export = await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId, userOrg.UserId);
                 return File(export.Content, "text/calendar", export.FileName);
             }
             catch (EventException e)
