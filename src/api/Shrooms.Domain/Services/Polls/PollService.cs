@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Polls;
+using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
@@ -27,6 +28,7 @@ namespace Shrooms.Domain.Services.Polls
 
         private readonly IUnitOfWork2 _uow;
         private readonly IWallService _wallService;
+        private readonly IRoleService _roleService;
         private readonly DbSet<Poll> _pollDbSet;
         private readonly DbSet<PollQuestion> _questionDbSet;
         private readonly DbSet<PollOption> _optionDbSet;
@@ -35,10 +37,11 @@ namespace Shrooms.Domain.Services.Polls
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<MultiwallWall> _wallDbSet;
 
-        public PollService(IUnitOfWork2 uow, IWallService wallService)
+        public PollService(IUnitOfWork2 uow, IWallService wallService, IRoleService roleService)
         {
             _uow = uow;
             _wallService = wallService;
+            _roleService = roleService;
             _pollDbSet = uow.GetDbSet<Poll>();
             _questionDbSet = uow.GetDbSet<PollQuestion>();
             _optionDbSet = uow.GetDbSet<PollOption>();
@@ -705,7 +708,11 @@ namespace Shrooms.Domain.Services.Polls
 
         private async Task<int> GetAudienceSizeAsync(int organizationId)
         {
-            return await _userDbSet.CountAsync(user => user.OrganizationId == organizationId && !user.IsDeleted);
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser);
+
+            return await _userDbSet
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
+                .CountAsync(user => user.OrganizationId == organizationId && !user.IsDeleted);
         }
 
         private async Task<PollPersonDto> GetPersonAsync(string userId)
