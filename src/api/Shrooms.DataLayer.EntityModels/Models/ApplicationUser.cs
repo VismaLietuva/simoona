@@ -159,6 +159,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public bool IsTutorialComplete { get; set; }
 
+        public string WallWidgetPreferences { get; set; }
+
         public virtual NotificationsSettings NotificationsSettings { get; set; }
 
         public string GoogleEmail { get; set; }

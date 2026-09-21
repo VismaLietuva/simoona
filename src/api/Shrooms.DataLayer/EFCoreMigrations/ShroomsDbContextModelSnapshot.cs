@@ -598,6 +598,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<double?>("VacationUsedTime")
                         .HasColumnType("float");
 
+                    b.Property<string>("WallWidgetPreferences")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("WorkingHoursId")
                         .HasColumnType("int");
 

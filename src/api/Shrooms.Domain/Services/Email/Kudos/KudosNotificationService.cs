@@ -61,11 +61,17 @@ namespace Shrooms.Domain.Services.Email.Kudos
 
         public async Task NotifyAboutKudosSentAsync(AddKudosDto kudosDto)
         {
-            var organization = await GetOrganizationAsync(kudosDto.KudosLog.OrganizationId);
-            var recipient = _usersDbSet
-                .Where(u => kudosDto.ReceivingUser.Id.Contains(u.Id))
-                .Select(u => u.Email);
+            var recipientEmail = await _usersDbSet
+                .Where(u => u.Id == kudosDto.ReceivingUser.Id)
+                .Select(u => u.Email)
+                .FirstOrDefaultAsync();
 
+            if (recipientEmail == null)
+            {
+                return;
+            }
+
+            var organization = await GetOrganizationAsync(kudosDto.KudosLog.OrganizationId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosDto.ReceivingUser.Id);
             var emailTemplateViewModel = new KudosSentEmailTemplateViewModel(userNotificationSettingsUrl,
@@ -74,8 +80,8 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosDto.KudosLog.Comment,
                 kudosProfileUrl);
 
-            await SendMultipleEmailsAsync(
-                recipient,
+            await SendSingleEmailAsync(
+                recipientEmail,
                 Resources.Models.Kudos.Kudos.EmailSubject,
                 emailTemplateViewModel,
                 EmailTemplateCacheKeys.KudosSent);
