@@ -491,6 +491,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Author = bookOffice.Book.Author,
                 Title = bookOffice.Book.Title,
                 Url = bookOffice.Book.Url,
+                CoverUrl = bookOffice.Book.BookCoverUrl,
                 QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Count(x => x.Returned == null),
                 OwnerId = bookOffice.Book.ApplicationUserId,
                 Note = bookOffice.Book.Note,

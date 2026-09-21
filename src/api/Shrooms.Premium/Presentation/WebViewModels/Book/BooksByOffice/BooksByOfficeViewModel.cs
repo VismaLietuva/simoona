@@ -12,6 +12,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Book.BooksByOffice
 
         public string Url { get; set; }
 
+        public string CoverUrl { get; set; }
+
         public int QuantityLeft { get; set; }
 
         public IEnumerable<BasicBookUserViewModel> Readers { get; set; }
