@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -12,6 +13,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Polls;
 using Shrooms.Domain.Services.Polls;
+using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
 
 namespace Shrooms.Tests.DomainService
@@ -23,6 +25,7 @@ namespace Shrooms.Tests.DomainService
 
         private ShroomsDbContext _dbContext;
         private IWallService _wallService;
+        private IRoleService _roleService;
         private PollService _pollService;
 
         [SetUp]
@@ -43,7 +46,12 @@ namespace Shrooms.Tests.DomainService
             _dbContext.SaveChanges(false);
 
             _wallService = Substitute.For<IWallService>();
-            _pollService = new PollService(new UnitOfWork2(_dbContext), _wallService);
+
+            _roleService = Substitute.For<IRoleService>();
+            Expression<Func<ApplicationUser, bool>> everyUser = user => true;
+            _roleService.ExcludeUsersWithRole(Arg.Any<string>()).Returns(everyUser);
+
+            _pollService = new PollService(new UnitOfWork2(_dbContext), _wallService, _roleService);
         }
 
         [TearDown]
