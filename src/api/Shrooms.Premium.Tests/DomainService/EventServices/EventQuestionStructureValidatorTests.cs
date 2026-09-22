@@ -67,10 +67,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Reject_More_Than_30_Options_In_One_Question()
+        public void Should_Reject_More_Than_50_Options_In_One_Question()
         {
             var question = Question("q1", 0);
-            question.Options = Enumerable.Range(0, 31)
+            question.Options = Enumerable.Range(0, 51)
                 .Select(i => new EventQuestionOptionStructureDto { ClientId = "o" + i, Name = "Option", Order = i })
                 .ToList();
 
