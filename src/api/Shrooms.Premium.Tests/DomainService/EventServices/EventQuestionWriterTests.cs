@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -67,6 +67,72 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Order = order,
                 Rule = OptionRules.Default
             };
+        }
+
+        /// <summary>
+        /// An option carrying a database id and no rule - what the edit form sends when it is
+        /// handing a legacy flat option over to a question.
+        /// </summary>
+        private static EventQuestionOptionStructureDto AdoptedOption(int id, string name, int order)
+        {
+            return new EventQuestionOptionStructureDto
+            {
+                Id = id,
+                ClientId = null,
+                Name = name,
+                Order = order
+            };
+        }
+
+        [Test]
+        public async Task Should_Adopt_A_Legacy_Option_Into_A_New_Question()
+        {
+            var legacy = new EventOption
+            {
+                Id = 11,
+                EventId = _eventId,
+                Option = "Pizza",
+                Rule = OptionRules.IgnoreSingleJoin,
+                QuestionId = null
+            };
+
+            // Re-seed the whole unit of work, the way the "dragged between questions" test below
+            // does - re-stubbing a single DbSet on the existing substitute is not reliable.
+            _systemClock ??= Substitute.For<ISystemClock>();
+            _uow = Substitute.For<IUnitOfWork2>();
+            _questionsDbSet = _uow.MockDbSetForAsync(new List<EventQuestion>());
+            _optionsDbSet = _uow.MockDbSetForAsync(new List<EventOption> { legacy });
+            _writer = new EventQuestionWriter(_uow, new EventQuestionStructureValidator(), _systemClock);
+
+            var questions = new List<EventQuestionStructureDto>
+            {
+                Question("q1", 0, "Pick your dish", AdoptedOption(11, "Pizza", 0))
+            };
+
+            await _writer.WriteAsync(_eventId, questions, "user-1");
+
+            // Re-parented, not re-created: the row keeps its id, so the participants' picks
+            // (EventParticipantEventOptions rows) travel with it.
+            Assert.That(legacy.Question, Is.Not.Null);
+            Assert.That(legacy.Option, Is.EqualTo("Pizza"));
+            Assert.That(legacy.Order, Is.EqualTo(0));
+            // Omitted rule leaves the stored one alone.
+            Assert.That(legacy.Rule, Is.EqualTo(OptionRules.IgnoreSingleJoin));
+            _optionsDbSet.DidNotReceive().Add(Arg.Any<EventOption>());
+        }
+
+        [Test]
+        public void Should_Reject_An_Option_Id_The_Event_Does_Not_Own()
+        {
+            var questions = new List<EventQuestionStructureDto>
+            {
+                Question("q1", 0, "Pick your dish", AdoptedOption(999, "Borrowed", 0))
+            };
+
+            var ex = Assert.ThrowsAsync<EventException>(
+                () => _writer.WriteAsync(_eventId, questions, "user-1"));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventQuestionOptionNotFound));
         }
 
         [Test]
