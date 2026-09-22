@@ -70,23 +70,29 @@ namespace Shrooms.Premium.Domain.Services.Groups
             return groups
                 .SelectMany(g => (g.Members ?? new List<GroupMember>())
                     .Where(m => m.IsActiveDuring(periodStart, periodEnd))
-                    // Several memberships of one group - separate stints, or one per role.
-                    // Pay once per group, keep every role.
                     .GroupBy(m => m.UserId)
-                    .Select(byUser => new
+                    .Select(byUser =>
                     {
-                        UserId = byUser.Key,
-                        GroupName = g.Name,
-                        Roles = byUser
+                        // Several memberships of one group are either separate stints of the
+                        // same role or one per role. Distinct role names are what is paid, so
+                        // two jobs in a group pay twice and two stints in one job pay once.
+                        var roles = byUser
                             .Select(m => m.Description)
                             .Where(d => !string.IsNullOrWhiteSpace(d))
                             .Distinct()
                             .OrderBy(d => d)
-                            .ToList(),
-                        KudosTypeId = g.GroupType.KudosTypeId.Value,
-                        GroupTypeId = g.GroupTypeId,
-                        g.GroupType.AwardTemplate,
-                        Value = g.GroupType.KudosType?.Value ?? 0
+                            .ToList();
+
+                        return new
+                        {
+                            UserId = byUser.Key,
+                            GroupName = g.Name,
+                            Roles = roles,
+                            KudosTypeId = g.GroupType.KudosTypeId.Value,
+                            GroupTypeId = g.GroupTypeId,
+                            g.GroupType.AwardTemplate,
+                            Value = (g.GroupType.KudosType?.Value ?? 0) * Math.Max(1, roles.Count)
+                        };
                     }))
                 .GroupBy(a => new { a.UserId, a.GroupTypeId })
                 .Select(byUserAndType => new

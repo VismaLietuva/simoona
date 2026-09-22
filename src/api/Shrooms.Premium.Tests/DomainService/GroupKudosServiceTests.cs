@@ -196,6 +196,62 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Pay_A_Group_Once_Per_Role_Held_In_It()
+        {
+            // Two jobs in one group is twice the work, so it is twice the kudos. Found in
+            // staging data: the comment listed both roles but the points counted one.
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                KudosGroup(1, "Team A", Member("alice", role: "Organiser"), Member("alice", role: "Taster"))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(allocations.Single().Amount, Is.EqualTo(10));
+                Assert.That(allocations.Single().Roles, Is.EqualTo(new[] { "Organiser", "Taster" }));
+            });
+        }
+
+        [Test]
+        public async Task Should_Pay_One_Role_Once_However_Many_Stints_It_Was_Held_Over()
+        {
+            // Same job, two spells in the month - one job, one payment.
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                KudosGroup(
+                    1,
+                    "Team A",
+                    Member("alice", end: new DateTime(2026, 8, 10), role: "Organiser"),
+                    Member("alice", start: new DateTime(2026, 8, 20), role: "Organiser"))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.That(allocations.Single().Amount, Is.EqualTo(5));
+        }
+
+        [Test]
+        public async Task Should_Count_Roles_Per_Group_Rather_Than_Across_The_Type()
+        {
+            // The same role name in two groups is two jobs, even though the comment lists it once.
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                KudosGroup(1, "Team A", Member("alice", role: "Organiser")),
+                KudosGroup(2, "Team B", Member("alice", role: "Organiser"))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(allocations.Single().Amount, Is.EqualTo(10));
+                Assert.That(allocations.Single().Roles, Is.EqualTo(new[] { "Organiser" }));
+            });
+        }
+
+        [Test]
         public async Task Should_Exclude_Members_Whose_Membership_Ended_Before_The_Period()
         {
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
