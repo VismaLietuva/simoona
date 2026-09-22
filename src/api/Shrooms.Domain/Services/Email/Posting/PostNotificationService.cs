@@ -153,45 +153,21 @@ namespace Shrooms.Domain.Services.Email.Posting
             var subject = CreateSubject(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
             var body = ConvertBodyToHtml(post.MessageBody, organization.ShortName);
 
-            var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(GetWallTitle(wall),
+            var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(WallEmailPresentation.GetPostTitle(wall),
+                wall.Name,
+                WallEmailPresentation.GetEyebrow(wall),
                 authorPictureUrl,
                 postCreator.FullName,
                 postLink,
                 body,
                 userNotificationSettingsUrl,
-                GetActionButtonTitle(wall));
+                WallEmailPresentation.GetActionButtonTitle(wall));
 
             await SendMultipleEmailsAsync(
                 destinationEmails,
                 subject,
                 emailTemplateViewModel,
                 EmailTemplateCacheKeys.NewWallPost);
-        }
-
-        private static string GetActionButtonTitle(MultiwallWall wall)
-        {
-            switch (wall.Type)
-            {
-                case WallType.Events:
-                    return EmailTemplates.EventActionButtonTitle;
-                case WallType.Project:
-                    return EmailTemplates.ProjectActionButtonTitle;
-                default:
-                    return EmailTemplates.DefaultActionButtonTitle;
-            }
-        }
-
-        private static string GetWallTitle(MultiwallWall wall)
-        {
-            switch (wall.Type)
-            {
-                case WallType.Events:
-                    return string.Format(EmailTemplates.EventPostTitle, wall.Name);
-                case WallType.Project:
-                    return string.Format(EmailTemplates.ProjectPostTitle, wall.Name);
-                default:
-                    return string.Format(EmailTemplates.DefaultPostTitle, wall.Name);
-            }
         }
 
         private async Task<string> GetPostLinkAsync(WallType wallType, int wallId, string orgName, int postId)

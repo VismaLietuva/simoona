@@ -133,7 +133,7 @@
     <value>New message in {0}</value>
   </data>
   <data name="NewPostCommentEmailSubject" xml:space="preserve">
-    <value>New comment in "{0}" post by {1}</value>
+    <value>New comment in {0} by {1}</value>
   </data>
   <data name="NewWallPostEmailSubject" xml:space="preserve">
     <value>New post in {0} by {1}</value>
