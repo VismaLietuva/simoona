@@ -88,23 +88,32 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         public async Task<ILazyPaged<BooksByOfficeDto>> GetBooksByOfficeAsync(BooksByOfficeOptionsDto options)
         {
+            // Clamped here as well as in the controller: the query is what a huge
+            // size would hurt, and the options DTO is public.
+            var pageSize = options.PageSize < 1
+                ? BusinessLayerConstants.BooksPerPage
+                : Math.Min(options.PageSize, BusinessLayerConstants.MaxBooksPerPage);
+
             var allBooks = _bookOfficesDbSet
                 .Include(x => x.Book)
                 .Include(x => x.BookLogs).ThenInclude(v => v.ApplicationUser)
                 .Where(x => x.OrganizationId == options.OrganizationId && x.Quantity != 0)
                 .Where(OfficeFilter(options.OfficeId))
                 .Where(SearchFilter(options.SearchString))
+                .Where(AvailabilityFilter(options.OnlyAvailable))
+                // Title is not unique, so without a tiebreaker a row can repeat or vanish across pages.
                 .OrderBy(x => x.Book.Title)
+                .ThenBy(x => x.Id)
                 .Select(MapBooksWithReadersToDto(options.UserId));
 
             var totalBooksCount = await allBooks.CountAsync();
-            var entriesCountToSkip = EntriesCountToSkip(options.Page);
+            var entriesCountToSkip = EntriesCountToSkip(options.Page, pageSize);
             var books = await allBooks
                 .Skip(entriesCountToSkip)
-                .Take(BusinessLayerConstants.BooksPerPage)
+                .Take(pageSize)
                 .ToListAsync();
 
-            var pageDto = new LazyPaged<BooksByOfficeDto>(books, options.Page, BusinessLayerConstants.BooksPerPage, totalBooksCount);
+            var pageDto = new LazyPaged<BooksByOfficeDto>(books, Math.Max(options.Page, LastPage), pageSize, totalBooksCount);
             return pageDto;
         }
 
@@ -482,6 +491,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Author = bookOffice.Book.Author,
                 Title = bookOffice.Book.Title,
                 Url = bookOffice.Book.Url,
+                CoverUrl = bookOffice.Book.BookCoverUrl,
                 QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Count(x => x.Returned == null),
                 OwnerId = bookOffice.Book.ApplicationUserId,
                 Note = bookOffice.Book.Note,
@@ -494,6 +504,17 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
+        // Availability is quantity minus the copies still out, matching the projection.
+        private static Expression<Func<BookOffice, bool>> AvailabilityFilter(bool onlyAvailable)
+        {
+            if (!onlyAvailable)
+            {
+                return x => true;
+            }
+
+            return x => x.Quantity - x.BookLogs.Count(log => log.Returned == null) > 0;
+        }
+
         private static Expression<Func<BookOffice, bool>> OfficeFilter(int officeId)
         {
             if (officeId == 0)
@@ -504,9 +525,11 @@ namespace Shrooms.Premium.Domain.Services.Books
             return x => x.OfficeId == officeId;
         }
 
-        private static int EntriesCountToSkip(int pageRequested)
+        private static int EntriesCountToSkip(int pageRequested, int pageSize)
         {
-            return (pageRequested - LastPage) * BusinessLayerConstants.BooksPerPage;
+            // Skip throws on a negative, which both a page below the first and an int overflow produce.
+            var skip = (long)(Math.Max(pageRequested, LastPage) - LastPage) * pageSize;
+            return (int)Math.Min(skip, int.MaxValue);
         }
 
         private static RetrievedBookInfoDto MapBookInfoToDto(ExternalBookInfo book)

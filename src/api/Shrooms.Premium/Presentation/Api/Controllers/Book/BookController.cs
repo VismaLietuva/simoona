@@ -110,9 +110,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [Route("ListByOffice")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
         [ProducesResponseType(typeof(LazyPaged<BooksByOfficeViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetBooksByOffice(int officeId, int page = 1, string searchString = null)
+        public async Task<IActionResult> GetBooksByOffice(int officeId, int page = 1, string searchString = null, int pageSize = BusinessLayerConstants.BooksPerPage, bool onlyAvailable = false)
         {
-            if (!string.IsNullOrEmpty(searchString) && searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch || officeId < 1)
+            if (!string.IsNullOrEmpty(searchString) && searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch || officeId < 1 || page < 1)
             {
                 return BadRequest();
             }
@@ -121,7 +121,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             {
                 OfficeId = officeId,
                 Page = page,
-                SearchString = searchString
+                SearchString = searchString,
+                // Clamped, not rejected: the size grows with scroll depth, so a 400 would land mid-scroll.
+                PageSize = Math.Clamp(pageSize, 1, BusinessLayerConstants.MaxBooksPerPage),
+                OnlyAvailable = onlyAvailable
             };
 
             SetOrganizationAndUser(options);
