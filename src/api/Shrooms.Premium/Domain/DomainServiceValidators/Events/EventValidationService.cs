@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Contracts.Constants;
@@ -49,7 +49,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
         public void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule)
         {
-            if (options.Any(op => op.Rule == rule) && options.Count > 1)
+            // Grouped by owning question, with the legacy flat options (QuestionId null) forming a
+            // group of their own. An exempt option rules out anything else picked in *its* group;
+            // an answer to an unrelated question is none of its business.
+            var offending = options
+                .GroupBy(option => option.QuestionId)
+                .Any(group => group.Any(option => option.Rule == rule) && group.Count() > 1);
+
+            if (offending)
             {
                 throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly);
             }

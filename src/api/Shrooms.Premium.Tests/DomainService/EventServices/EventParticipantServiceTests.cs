@@ -239,6 +239,70 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
         }
 
+        // The exemption used to be read off the legacy flat options alone, so adopting the
+        // "not eating" option into a question silently revoked it - locking its holder out of every
+        // other event in the single-join group.
+        [Test]
+        public void Should_Keep_The_Multi_Join_Exemption_For_An_Adopted_Exempt_Option()
+        {
+            var eventId = MockEventWithAdoptedIgnoreSingleJoinOption();
+
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner,
+                _eventAnswerValidator);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 90 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+        }
+
+        [Test]
+        public void Should_Reject_An_Exempt_Option_Picked_With_Another_In_The_Same_Question()
+        {
+            var eventId = MockEventWithAdoptedIgnoreSingleJoinOption();
+
+            _eventParticipationService = new EventParticipationService(
+                _uow2,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                Substitute.For<IPermissionService>(),
+                _eventValidationService,
+                _wallService,
+                _asyncRunner,
+                _eventAnswerValidator);
+
+            var eventJoinDto = new EventJoinDto
+            {
+                // 90 is exempt, 91 is ordinary, and they share a question - the one grouping where
+                // picking both is still forbidden.
+                ChosenOptions = new List<int> { 90, 91 },
+                EventId = eventId,
+                ParticipantIds = new List<string> { "user1" },
+                UserId = "user1",
+                OrganizationId = 2,
+                AttendStatus = AttendingStatus.Attending
+            };
+
+            var ex = Assert.ThrowsAsync<EventException>(
+                async () => await _eventParticipationService.JoinAsync(eventJoinDto));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventChoiceCanBeSingleOnly));
+        }
+
         [Test]
         public void Should_Reject_A_Join_That_Skips_A_Required_Question()
         {
@@ -2112,6 +2176,99 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>().AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2 }
+            });
+
+            return eventId;
+        }
+
+        /// <summary>
+        /// The post-conversion shape: the exempt option now lives under a question rather than in
+        /// the legacy flat list.
+        ///
+        /// A second event of the same single-join type, already joined that week with no exempt
+        /// pick, is what makes the exemption load-bearing - without it the lockout never fires and
+        /// a test would pass whatever the rule says.
+        /// </summary>
+        private Guid MockEventWithAdoptedIgnoreSingleJoinOption()
+        {
+            var eventId = Guid.NewGuid();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2026-01-01"));
+
+            var alreadyJoined = new Event
+            {
+                Id = Guid.NewGuid(),
+                OrganizationId = 2,
+                Name = "Last week's food event",
+                MaxChoices = 0,
+                MaxParticipants = 20,
+                StartDate = DateTime.Parse("2026-06-01"),
+                EndDate = DateTime.Parse("2026-06-02"),
+                RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                ResponsibleUserId = "host1",
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "food", IsSingleJoin = true },
+                EventOptions = new List<EventOption>(),
+                EventQuestions = new List<EventQuestion>(),
+                EventParticipants = new List<EventParticipant>
+                {
+                    new EventParticipant
+                    {
+                        Id = 1,
+                        ApplicationUserId = "user1",
+                        AttendStatus = (int)AttendingStatus.Attending,
+                        EventOptions = new List<EventOption>()
+                    }
+                }
+            };
+
+            var questionOptions = new List<EventOption>
+            {
+                new EventOption { Id = 90, EventId = eventId, Option = "Not eating", QuestionId = 5, Rule = OptionRules.IgnoreSingleJoin, Order = 0 },
+                new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Rule = OptionRules.Default, Order = 1 }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Name = "Converted food event",
+                    MaxChoices = 0,
+                    MaxParticipants = 20,
+                    MaxVirtualParticipants = 0,
+                    StartDate = DateTime.Parse("2026-06-01"),
+                    EndDate = DateTime.Parse("2026-06-02"),
+                    RegistrationDeadline = DateTime.Parse("2026-05-01"),
+                    AllowMaybeGoing = true,
+                    AllowNotGoing = true,
+                    ResponsibleUserId = "host1",
+                    EventTypeId = 1,
+                    EventType = new EventType { Id = 1, Name = "food", IsSingleJoin = true },
+                    EventParticipants = new List<EventParticipant>(),
+                    EventOptions = questionOptions,
+                    EventQuestions = new List<EventQuestion>
+                    {
+                        new EventQuestion
+                        {
+                            Id = 5,
+                            EventId = eventId,
+                            Title = "Choose your options",
+                            Order = 0,
+                            SelectType = EventQuestionSelectType.Multi,
+                            IsRequired = true,
+                            ShowIfOptionId = null,
+                            Options = questionOptions
+                        }
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.Append(alreadyJoined).AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(alreadyJoined.EventParticipants.AsQueryable());
             _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
             {
                 new ApplicationUser { Id = "user1", OrganizationId = 2 }

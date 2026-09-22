@@ -354,10 +354,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
 
-            // Only legacy options participate in the single-choice-with-rule check; question
-            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            // The rule is scoped per question inside the validator, so the whole selection goes in:
+            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
-                eventEntity.SelectedOptions.Where(option => option.QuestionId == null).ToList(),
+                eventEntity.SelectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
 
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
@@ -439,9 +439,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             // since a Going switch on a legacy food event has never had to carry a food pick.
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, chosenOptions.Count(legacyOptionIds.Contains));
 
-            // Question answers are excluded for the same reason they are excluded from MaxChoices.
+            // The rule is scoped per question inside the validator, so the whole selection goes in:
+            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
-                selectedOptions.Where(option => option.QuestionId == null).ToList(),
+                selectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
 
             // Only what the caller actually submitted is judged. Validating stored answers would
@@ -467,10 +468,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
 
-            // Only legacy options participate in the single-choice-with-rule check; question
-            // answers are not counted here for the same reason they are excluded from MaxChoices.
+            // The rule is scoped per question inside the validator, so the whole selection goes in:
+            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
-                eventDto.SelectedOptions.Where(option => option.QuestionId == null).ToList(),
+                eventDto.SelectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
 
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
@@ -774,15 +775,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
-            // Legacy options only, as everywhere else this rule is applied. Question answers carry
-            // Rule = Default, so counting them here would make All(...) false and silently revoke
-            // the multi-join exemption for anyone who answered a question.
-            var legacySelectedOptions = validationDto.SelectedOptions
-                .Where(option => option.QuestionId == null)
-                .ToList();
-
-            if (legacySelectedOptions.All(x => x.Rule == OptionRules.IgnoreSingleJoin) &&
-                legacySelectedOptions.Count != 0 ||
+            // An exempt pick grants the exemption wherever it now lives - the legacy flat options or
+            // the question that adopted them. CheckIfSingleChoiceSelectedWithRule has already
+            // rejected an exempt option picked alongside another in its own group, so "any" and
+            // "all" agree here.
+            if (validationDto.SelectedOptions.Any(option => option.Rule == OptionRules.IgnoreSingleJoin) ||
                 !validationDto.IsSingleJoin)
             {
                 return;
@@ -810,8 +807,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             var anyEventsAlreadyJoined = await query.AnyAsync(x => !x.EventParticipants.Any(y =>
                 y.ApplicationUserId == userId &&
-                y.EventOptions.Where(z => z.QuestionId == null).All(z => z.Rule == OptionRules.IgnoreSingleJoin) &&
-                y.EventOptions.Count(z => z.QuestionId == null) > 0));
+                y.EventOptions.Any(z => z.Rule == OptionRules.IgnoreSingleJoin)));
 
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }
