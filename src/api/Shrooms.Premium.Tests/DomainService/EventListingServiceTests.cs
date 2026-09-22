@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -801,7 +801,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Return_The_Option_This_User_Selected()
+        public async Task Should_Return_Every_Option_This_User_Selected()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -814,11 +814,70 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.AreEqual("Pepperoni", result.JoinedEvent.SelectedOption);
+            CollectionAssert.AreEqual(
+                new[] { "Pepperoni", "Margherita", "Garlic dip", "Extra cheese" },
+                result.JoinedEvent.SelectedOptions);
+        }
+
+        // Questions are reorderable, so their answers follow EventQuestion.Order, not the id
+        // the question happened to get.
+        [Test]
+        public async Task Should_Order_Question_Answers_By_The_Wizard_Step()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            var selected = result.JoinedEvent.SelectedOptions.ToList();
+            Assert.That(selected.IndexOf("Garlic dip"), Is.LessThan(selected.IndexOf("Extra cheese")));
+        }
+
+        // The wizard's steps are the only way to offer choices, so its answers are the order.
+        [Test]
+        public async Task Should_Return_Question_Answers_Among_The_Selected_Options()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUser1"
+            });
+
+            // Assert
+            CollectionAssert.Contains(result.JoinedEvent.SelectedOptions, "Extra cheese");
+        }
+
+        // Nothing stops a second participant row for the same user; a declined one must not
+        // put its options on the order.
+        [Test]
+        public async Task Should_Not_Return_Options_From_A_Participation_The_User_Declined()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserWithDeclinedParticipation"
+            });
+
+            // Assert
+            CollectionAssert.AreEqual(new[] { "Pepperoni" }, result.JoinedEvent.SelectedOptions);
         }
 
         [Test]
-        public async Task Should_Return_No_Selected_Option_When_User_Picked_None()
+        public async Task Should_Return_No_Selected_Options_When_User_Picked_None()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -831,11 +890,11 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+            CollectionAssert.IsEmpty(result.JoinedEvent.SelectedOptions);
         }
 
         [Test]
-        public async Task Should_Return_No_Selected_Option_When_The_Food_Team_Has_No_Options()
+        public async Task Should_Return_No_Selected_Options_When_The_Food_Team_Has_No_Options()
         {
             // Arrange
             MockFoodTeamEvents();
@@ -848,7 +907,7 @@ namespace Shrooms.Premium.Tests.DomainService
             });
 
             // Assert
-            ClassicAssert.IsNull(result.JoinedEvent.SelectedOption);
+            CollectionAssert.IsEmpty(result.JoinedEvent.SelectedOptions);
         }
 
         // This week's food day is over, so the widget rolls over to next week's team even though
@@ -904,6 +963,24 @@ namespace Shrooms.Premium.Tests.DomainService
             // Assert
             ClassicAssert.AreEqual(guids[4], result.JoinedEvent.Id);
             ClassicAssert.AreEqual("Late lunch pizza", result.JoinedEvent.Name);
+        }
+
+        // A food team seat is a plain Attending: nobody eats a pizza maybe or virtually.
+        [Test]
+        public async Task Should_Not_Return_Food_Team_The_User_Only_Maybe_Attends()
+        {
+            // Arrange
+            MockFoodTeamEvents();
+
+            // Act
+            var result = await _eventListingService.GetMyFoodTeamAsync(new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "testUserMaybeAttending"
+            });
+
+            // Assert
+            ClassicAssert.IsNull(result.JoinedEvent);
         }
 
         [Test]
@@ -965,6 +1042,10 @@ namespace Shrooms.Premium.Tests.DomainService
             var guids = Enumerable.Repeat(0, 7).Select(_ => Guid.NewGuid()).ToArray();
             var now = DateTime.UtcNow;
 
+            // The dip question is asked first despite its higher id, so ordering by id is wrong.
+            var dipQuestion = new EventQuestion { Id = 2, Title = "Which dip?", Order = 0 };
+            var toppingQuestion = new EventQuestion { Id = 1, Title = "Any extras?", Order = 1 };
+
             var eventTypes = new List<EventType>
             {
                 new EventType
@@ -1025,7 +1106,10 @@ namespace Shrooms.Premium.Tests.DomainService
                             AttendStatus = (int)AttendingStatus.Attending,
                             EventOptions = new List<EventOption>
                             {
-                                new EventOption { Id = 1, Option = "Pepperoni" }
+                                new EventOption { Id = 1, Option = "Pepperoni" },
+                                new EventOption { Id = 2, Option = "Margherita" },
+                                new EventOption { Id = 10, Option = "Extra cheese", QuestionId = toppingQuestion.Id, Question = toppingQuestion },
+                                new EventOption { Id = 14, Option = "Garlic dip", QuestionId = dipQuestion.Id, Question = dipQuestion }
                             }
                         },
                         new EventParticipant
@@ -1036,6 +1120,36 @@ namespace Shrooms.Premium.Tests.DomainService
                             EventOptions = new List<EventOption>
                             {
                                 new EventOption { Id = 3, Option = "Hawaiian" }
+                            }
+                        },
+                        new EventParticipant
+                        {
+                            Id = 10,
+                            ApplicationUserId = "testUserWithDeclinedParticipation",
+                            AttendStatus = (int)AttendingStatus.NotAttending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Id = 11, Option = "Hawaiian" }
+                            }
+                        },
+                        new EventParticipant
+                        {
+                            Id = 11,
+                            ApplicationUserId = "testUserWithDeclinedParticipation",
+                            AttendStatus = (int)AttendingStatus.Attending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Id = 12, Option = "Pepperoni" }
+                            }
+                        },
+                        new EventParticipant
+                        {
+                            Id = 12,
+                            ApplicationUserId = "testUserMaybeAttending",
+                            AttendStatus = (int)AttendingStatus.MaybeAttending,
+                            EventOptions = new List<EventOption>
+                            {
+                                new EventOption { Id = 13, Option = "Quattro formaggi" }
                             }
                         },
                         new EventParticipant

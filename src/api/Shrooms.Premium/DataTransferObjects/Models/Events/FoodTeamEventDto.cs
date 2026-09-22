@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
@@ -16,8 +17,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public DateTime EndDate { get; set; }
 
-        // The option this user picked when joining; null when the event has no options.
-        // Food team events let a participant pick a single option, so this is not a collection.
-        public string SelectedOption { get; set; }
+        // The options this user picked when joining; empty when they picked none or the event has none.
+        public IEnumerable<string> SelectedOptions { get; set; } = new List<string>();
     }
 }
