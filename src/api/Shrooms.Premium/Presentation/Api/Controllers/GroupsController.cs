@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -20,14 +19,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
     public class GroupsController : BaseController
     {
         private readonly IGroupsService _groupsService;
-        private readonly IGroupKudosService _groupKudosService;
         private readonly IMapper _mapper;
 
-        public GroupsController(IMapper mapper, IGroupsService groupsService, IGroupKudosService groupKudosService)
+        public GroupsController(IMapper mapper, IGroupsService groupsService)
         {
             _mapper = mapper;
             _groupsService = groupsService;
-            _groupKudosService = groupKudosService;
         }
 
         [HttpGet]
@@ -157,33 +154,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             return Ok();
-        }
-
-        /// <summary>
-        /// Logic App entry point. Not idempotent - the caller owns scheduling, so running
-        /// it twice for the same period awards twice. Defaults to the current month.
-        /// </summary>
-        [HttpPost]
-        [Route("AwardMonthlyKudos")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        [ProducesResponseType(typeof(GroupMonthlyKudosResultDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> AwardMonthlyKudos(int? year = null, int? month = null)
-        {
-            var now = DateTime.UtcNow;
-
-            try
-            {
-                var result = await _groupKudosService.AwardMonthlyKudosAsync(
-                    GetUserAndOrganization(),
-                    year ?? now.Year,
-                    month ?? now.Month);
-
-                return Ok(result);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequestWithError(e);
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Shrooms.Premium.Domain.Services.Badges;
+using Shrooms.Premium.Domain.Services.Badges;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.Domain.Services.WebHookCallbacks.Groups;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
@@ -20,13 +21,16 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks
 
         public ILotteryStatusChangeService LotteryStatusChangeService { get; }
 
+        public IGroupKudosWebHookService GroupKudos { get; }
+
         public WebHookCallbackPremiumServices(
             IEventsWebHookService events,
             IBookRemindService books,
             ILoyaltyKudosService loyaltyKudos,
             IBadgesService badgesService,
             IEventRemindService eventRemindService,
-            ILotteryStatusChangeService lotteryStatusChangeService)
+            ILotteryStatusChangeService lotteryStatusChangeService,
+            IGroupKudosWebHookService groupKudos)
         {
             Events = events;
             Books = books;
@@ -34,6 +38,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks
             BadgesService = badgesService;
             EventRemindService = eventRemindService;
             LotteryStatusChangeService = lotteryStatusChangeService;
+            GroupKudos = groupKudos;
         }
     }
 }
