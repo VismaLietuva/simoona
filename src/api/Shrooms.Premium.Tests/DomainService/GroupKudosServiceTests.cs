@@ -288,6 +288,20 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Not_Leave_A_Gap_Where_A_Placeholder_Rendered_Nothing()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                TemplatedKudosGroup(1, "Team A", "Foodmaster {month} {role} 🍕", Member("alice"))
+            });
+
+            await _service.AwardMonthlyKudosAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, Year, Month);
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(l => l.Comments == "Foodmaster 2026-08 🍕"));
+        }
+
+        [Test]
         public async Task Should_Fall_Back_To_Plain_Wording_When_The_Type_Has_No_Template()
         {
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
@@ -368,6 +382,64 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _kudosLogsDbSet.DidNotReceiveWithAnyArgs().Add(default);
             await _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync(default(string));
+        }
+
+        [Test]
+        public async Task Should_Award_A_Period_Again_When_Every_Log_For_It_Was_Rejected()
+        {
+            // Rejecting the batch is how a kudos admin says the run was wrong. The stamp
+            // would otherwise keep the month awarded with nobody paid for it.
+            var alice = AwardedLog(Year, Month, "alice", 15);
+            var bob = AwardedLog(Year, Month, "bob");
+
+            alice.Status = KudosStatus.Rejected;
+            bob.Status = KudosStatus.Rejected;
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { alice, bob });
+
+            var result = await _service.AwardMonthlyKudosAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, Year, Month);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.AlreadyAwarded, Is.False);
+                Assert.That(result.AwardedCount, Is.EqualTo(2));
+            });
+        }
+
+        [Test]
+        public async Task Should_Keep_A_Period_Awarded_When_Only_Some_Of_Its_Logs_Were_Rejected()
+        {
+            // Re-running would pay everyone whose log survived a second time.
+            var alice = AwardedLog(Year, Month, "alice", 15);
+
+            alice.Status = KudosStatus.Rejected;
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { alice, AwardedLog(Year, Month, "bob") });
+
+            var result = await _service.AwardMonthlyKudosAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, Year, Month);
+
+            Assert.That(result.AlreadyAwarded, Is.True);
+
+            _kudosLogsDbSet.DidNotReceiveWithAnyArgs().Add(default);
+        }
+
+        [Test]
+        public async Task Should_Treat_A_Fully_Rejected_Month_As_Outstanding_In_A_Catch_Up()
+        {
+            var rejected = AwardedLog(2026, 8);
+
+            rejected.Status = KudosStatus.Rejected;
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { rejected, AwardedLog(2026, 7) });
+
+            var result = await _service.AwardOutstandingMonthsAsync(
+                new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, 2026, 9);
+
+            Assert.That(
+                result.Select(p => (p.Year, p.Month)),
+                Is.EqualTo(new[] { (2026, 8), (2026, 9) }));
         }
 
         [Test]

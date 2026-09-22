@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.Constants;
@@ -29,6 +31,12 @@ namespace Shrooms.Premium.Domain.Services.Groups
         private static readonly DateTime EarliestAwardablePeriod = new DateTime(2026, 7, 1);
 
         private const int MaxCatchUpMonths = 3;
+
+        // Narrows the read-then-write window between the awarded check and the write.
+        // Process-local, so a scaled-out deployment can still double-award.
+        private static readonly SemaphoreSlim _awardLock = new SemaphoreSlim(1, 1);
+
+        private static readonly Regex RepeatedSpaces = new Regex("[ ]{2,}", RegexOptions.Compiled);
 
         private readonly IUnitOfWork2 _uow;
         private readonly DbSet<GroupEntity> _groupsDbSet;
@@ -107,37 +115,45 @@ namespace Shrooms.Premium.Domain.Services.Groups
             int month)
         {
             EnsurePeriodIsValid(year, month);
+            await _awardLock.WaitAsync();
 
-            var awarded = await AwardedPeriodsAsync(userAndOrg.OrganizationId);
-
-            var outstanding = new List<DateTime>();
-
-            var latest = new DateTime(year, month, 1);
-            var oldest = latest.AddMonths(-(MaxCatchUpMonths - 1));
-
-            if (oldest < EarliestAwardablePeriod)
+            try
             {
-                oldest = EarliestAwardablePeriod;
-            }
+                var awarded = await AwardedPeriodsAsync(userAndOrg.OrganizationId);
 
-            // Collects every unawarded month instead of stopping at the first awarded one, so a
-            // month awarded on its own leaves no gap the walk could never come back for.
-            for (var period = latest; period >= oldest; period = period.AddMonths(-1))
-            {
-                if (!awarded.Contains(period))
+                var outstanding = new List<DateTime>();
+
+                var latest = new DateTime(year, month, 1);
+                var oldest = latest.AddMonths(-(MaxCatchUpMonths - 1));
+
+                if (oldest < EarliestAwardablePeriod)
                 {
-                    outstanding.Add(period);
+                    oldest = EarliestAwardablePeriod;
                 }
+
+                // Collects every unawarded month instead of stopping at the first awarded one, so a
+                // month awarded on its own leaves no gap the walk could never come back for.
+                for (var period = latest; period >= oldest; period = period.AddMonths(-1))
+                {
+                    if (!awarded.Contains(period))
+                    {
+                        outstanding.Add(period);
+                    }
+                }
+
+                var results = new List<GroupMonthlyKudosResultDto>();
+
+                foreach (var period in Enumerable.Reverse(outstanding))
+                {
+                    results.Add(await AwardPeriodAsync(userAndOrg, period.Year, period.Month));
+                }
+
+                return results;
             }
-
-            var results = new List<GroupMonthlyKudosResultDto>();
-
-            foreach (var period in Enumerable.Reverse(outstanding))
+            finally
             {
-                results.Add(await AwardPeriodAsync(userAndOrg, period.Year, period.Month));
+                _awardLock.Release();
             }
-
-            return results;
         }
 
         public async Task<GroupMonthlyKudosResultDto> AwardMonthlyKudosAsync(
@@ -146,13 +162,21 @@ namespace Shrooms.Premium.Domain.Services.Groups
             int month)
         {
             EnsurePeriodIsValid(year, month);
+            await _awardLock.WaitAsync();
 
-            if (await IsAlreadyAwardedAsync(userAndOrg.OrganizationId, year, month))
+            try
             {
-                return new GroupMonthlyKudosResultDto { Year = year, Month = month, AlreadyAwarded = true };
-            }
+                if (await IsAlreadyAwardedAsync(userAndOrg.OrganizationId, year, month))
+                {
+                    return new GroupMonthlyKudosResultDto { Year = year, Month = month, AlreadyAwarded = true };
+                }
 
-            return await AwardPeriodAsync(userAndOrg, year, month);
+                return await AwardPeriodAsync(userAndOrg, year, month);
+            }
+            finally
+            {
+                _awardLock.Release();
+            }
         }
 
         private async Task<GroupMonthlyKudosResultDto> AwardPeriodAsync(
@@ -218,6 +242,9 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 .Replace(RolePlaceholder, string.Join(PlaceholderSeparator, allocation.Roles), StringComparison.OrdinalIgnoreCase)
                 .Replace(MonthPlaceholder, Period(year, month), StringComparison.OrdinalIgnoreCase);
 
+            // A placeholder with nothing to render leaves the spaces that framed it.
+            rendered = RepeatedSpaces.Replace(rendered, " ").Trim();
+
             // Comments is required, and a template of nothing but placeholders can render empty.
             return string.IsNullOrWhiteSpace(rendered)
                 ? $"Monthly group kudos for {Period(year, month)}"
@@ -230,14 +257,18 @@ namespace Shrooms.Premium.Domain.Services.Groups
 
             return await _kudosLogsDbSet
                 .AsNoTracking()
-                .AnyAsync(log => log.OrganizationId == organizationId && log.GroupKudosPeriod == period);
+                .AnyAsync(log => log.OrganizationId == organizationId
+                             && log.GroupKudosPeriod == period
+                             && log.Status != KudosStatus.Rejected);
         }
 
         private async Task<HashSet<DateTime>> AwardedPeriodsAsync(int organizationId)
         {
             var periods = await _kudosLogsDbSet
                 .AsNoTracking()
-                .Where(log => log.OrganizationId == organizationId && log.GroupKudosPeriod >= EarliestAwardablePeriod)
+                .Where(log => log.OrganizationId == organizationId
+                           && log.GroupKudosPeriod >= EarliestAwardablePeriod
+                           && log.Status != KudosStatus.Rejected)
                 .Select(log => log.GroupKudosPeriod.Value)
                 .Distinct()
                 .ToListAsync();
