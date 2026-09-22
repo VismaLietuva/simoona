@@ -483,13 +483,25 @@ namespace Shrooms.Premium.Domain.Services.Events
             // question option as "removed" and hard-deleting it.
             var legacyOptions = @event.EventOptions.Where(o => o.QuestionId == null).ToList();
 
+            // Ids the incoming question tree claims are being adopted by EventQuestionWriter, which
+            // runs after this. Removing them here hard-deletes the rows - and cascades away the
+            // participants' picks - before they can be re-parented.
+            var adoptedIds = (editedEvent.Questions ?? new List<EventQuestionStructureDto>())
+                .SelectMany(question => question.Options ?? new List<EventQuestionOptionStructureDto>())
+                .Where(option => option.Id != null)
+                .Select(option => option.Id.Value)
+                .ToHashSet();
+
             foreach (var editedOption in editedEvent.EditedOptions)
             {
                 var option = legacyOptions.Single(o => o.Id == editedOption.Id);
                 option.Option = editedOption.Option;
             }
 
-            var removedOptions = legacyOptions.Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id)).ToList();
+            var removedOptions = legacyOptions
+                .Where(o => !editedEvent.EditedOptions.Select(x => x.Id).Contains(o.Id) &&
+                            !adoptedIds.Contains(o.Id))
+                .ToList();
 
             foreach (var option in removedOptions)
             {
