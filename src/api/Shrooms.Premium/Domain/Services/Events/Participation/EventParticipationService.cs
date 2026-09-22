@@ -776,9 +776,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
             // An exempt pick grants the exemption wherever it now lives - the legacy flat options or
-            // the question that adopted them. CheckIfSingleChoiceSelectedWithRule has already
-            // rejected an exempt option picked alongside another in its own group, so "any" and
-            // "all" agree here.
+            // the question that adopted them.
+            //
+            // Deliberately "any", not the old "all": CheckIfSingleChoiceSelectedWithRule is scoped
+            // per question, so it only rules out an ordinary pick in the exempt option's *own*
+            // group. An attendee who picks "Not eating" under one question and answers an unrelated
+            // one still counts as exempt. That is the opt-out option deciding, which is what it is
+            // for, and it takes a host deliberately splitting food across questions to reach.
             if (validationDto.SelectedOptions.Any(option => option.Rule == OptionRules.IgnoreSingleJoin) ||
                 !validationDto.IsSingleJoin)
             {
