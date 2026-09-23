@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.Constants
+namespace Shrooms.Contracts.Constants
 {
     public static class EmailTemplates
     {
@@ -6,9 +6,16 @@
         public const string EventActionButtonTitle = "Visit event page";
         public const string ProjectActionButtonTitle = "Visit project page";
 
+        public const string DefaultEyebrow = "Wall";
+        public const string EventEyebrow = "Event";
+        public const string ProjectEyebrow = "Project";
+
         public const string EventPostTitle = "New post in \"{0}\" event";
         public const string ProjectPostTitle = "New post in \"{0}\" project";
         public const string DefaultPostTitle = "New post in {0}";
-        public const string PostCommentTitle = "New comment in \"{0}\" post";
+
+        public const string EventCommentTitle = "New comment in \"{0}\" event";
+        public const string ProjectCommentTitle = "New comment in \"{0}\" project";
+        public const string DefaultCommentTitle = "New comment in {0}";
     }
 }

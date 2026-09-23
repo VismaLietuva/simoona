@@ -16,6 +16,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice
 
         public string Note { get; set; }
 
+        public string CoverUrl { get; set; }
+
         public int QuantityLeft { get; set; }
 
         public IEnumerable<BasicBookUserDto> Readers { get; set; }
