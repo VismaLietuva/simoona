@@ -287,8 +287,7 @@ namespace Shrooms.Domain.Services.Kudos
                 ? new Dictionary<int, LikesCollection>()
                 : await _kudosLogsDbSet
                     .AsNoTracking()
-                    .Where(log => logIds.Contains(log.Id))
-                    .Select(log => new { log.Id, log.Likes })
+                    .Where(log => logIds.Contains(log.Id) && log.OrganizationId == organizationId)
                     .ToDictionaryAsync(log => log.Id, log => log.Likes);
 
             var likersById = await GetLikersByIdAsync(likesByLogId.Values);
