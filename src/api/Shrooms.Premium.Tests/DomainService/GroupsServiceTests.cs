@@ -938,5 +938,179 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupNameAlreadyExists));
         }
 
+        private void SeedKudosGroupWith(GroupMember member) =>
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 20,
+                    OrganizationId = 1,
+                    Name = "Team 1",
+                    GroupTypeId = 3,
+                    Members = new List<GroupMember> { member }
+                }
+            });
+
+        private static GroupPostDto KudosPostWith(DateTime? start, DateTime? end)
+        {
+            var dto = ValidPost(3);
+            dto.Members = new List<GroupMemberPostDto>
+            {
+                new GroupMemberPostDto { Id = "user2", StartDate = start, EndDate = end }
+            };
+
+            return dto;
+        }
+
+        [TestCase(null, null)]
+        [TestCase("2026-01-15", null)]
+        [TestCase(null, "2026-01-01")]
+        [TestCase("2026-01-05", "2026-01-10")]
+        [TestCase("2025-12-01", "2026-02-01")]
+        public void Should_Throw_When_A_Membership_Overlaps_Another_Group_Of_The_Same_Kudos_Type(string start, string end)
+        {
+            SeedKudosGroupWith(new GroupMember
+            {
+                Id = 50,
+                UserId = "user2",
+                StartDate = new DateTime(2026, 1, 1),
+                EndDate = new DateTime(2026, 1, 15)
+            });
+
+            var dto = KudosPostWith(
+                start == null ? (DateTime?)null : DateTime.Parse(start),
+                end == null ? (DateTime?)null : DateTime.Parse(end));
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _service.CreateAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupMembershipOverlaps));
+        }
+
+        [TestCase(null, "2025-12-31")]
+        [TestCase("2026-01-16", null)]
+        public async Task Should_Allow_A_Membership_Next_To_Another_Group_Of_The_Same_Kudos_Type(string start, string end)
+        {
+            SeedKudosGroupWith(new GroupMember
+            {
+                Id = 50,
+                UserId = "user2",
+                StartDate = new DateTime(2026, 1, 1),
+                EndDate = new DateTime(2026, 1, 15)
+            });
+
+            var dto = KudosPostWith(
+                start == null ? (DateTime?)null : DateTime.Parse(start),
+                end == null ? (DateTime?)null : DateTime.Parse(end));
+
+            await _service.CreateAsync(dto);
+
+            _groupsDbSet.Received(1).Add(Arg.Any<GroupEntity>());
+        }
+
+        [Test]
+        public void Should_Treat_A_Membership_Without_Dates_As_All_Time()
+        {
+            SeedKudosGroupWith(new GroupMember { Id = 50, UserId = "user2" });
+
+            var dto = KudosPostWith(new DateTime(2030, 1, 1), new DateTime(2030, 1, 31));
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _service.CreateAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupMembershipOverlaps));
+        }
+
+        [Test]
+        public async Task Should_Allow_Overlapping_Memberships_In_Types_That_Do_Not_Receive_Kudos()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 20,
+                    OrganizationId = 1,
+                    Name = "Other 1",
+                    GroupTypeId = 1,
+                    Members = new List<GroupMember> { new GroupMember { Id = 50, UserId = "user2" } }
+                }
+            });
+
+            var dto = ValidPost(1);
+            dto.Members = new List<GroupMemberPostDto> { new GroupMemberPostDto { Id = "user2" } };
+
+            await _service.CreateAsync(dto);
+
+            _groupsDbSet.Received(1).Add(Arg.Any<GroupEntity>());
+        }
+
+        [Test]
+        public void Should_Throw_When_An_Edit_Makes_A_Membership_Overlap_Another_Group_Of_The_Same_Kudos_Type()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 20,
+                    OrganizationId = 1,
+                    Name = "Team 1",
+                    GroupTypeId = 3,
+                    Members = new List<GroupMember>
+                    {
+                        new GroupMember { Id = 50, UserId = "user2", EndDate = new DateTime(2026, 1, 15) }
+                    }
+                },
+                new GroupEntity
+                {
+                    Id = 21,
+                    OrganizationId = 1,
+                    Name = "Team 2",
+                    GroupTypeId = 3,
+                    Members = new List<GroupMember>
+                    {
+                        new GroupMember { Id = 51, UserId = "user2", StartDate = new DateTime(2026, 1, 16) }
+                    }
+                }
+            });
+
+            var dto = ValidPost(3);
+            dto.Id = 21;
+            dto.Name = "Team 2";
+            dto.Members = new List<GroupMemberPostDto>
+            {
+                new GroupMemberPostDto { MembershipId = 51, Id = "user2", StartDate = new DateTime(2026, 1, 10) }
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _service.UpdateAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.GroupMembershipOverlaps));
+        }
+
+        [Test]
+        public async Task Should_Not_Compare_A_Group_With_Itself_When_Editing()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity
+                {
+                    Id = 20,
+                    OrganizationId = 1,
+                    Name = "Team 1",
+                    GroupTypeId = 3,
+                    Members = new List<GroupMember> { new GroupMember { Id = 50, UserId = "user2" } }
+                }
+            });
+
+            var dto = ValidPost(3);
+            dto.Id = 20;
+            dto.Name = "Team 1";
+            dto.Members = new List<GroupMemberPostDto>
+            {
+                new GroupMemberPostDto { MembershipId = 50, Id = "user2", Description = "Organiser" },
+                new GroupMemberPostDto { Id = "user2", Description = "Taster" }
+            };
+
+            await _service.UpdateAsync(dto);
+
+            await _uow.Received(1).SaveChangesAsync(Arg.Any<string>());
+        }
     }
 }

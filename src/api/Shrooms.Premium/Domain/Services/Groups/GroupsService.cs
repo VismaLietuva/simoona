@@ -115,6 +115,8 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 group.Members.Add(new GroupMember { UserId = dto.UserId });
             }
 
+            await EnsureNoOverlappingKudosMembershipsAsync(type, group.Members, dto.OrganizationId, null);
+
             _groupsDbSet.Add(group);
 
             await _uow.SaveChangesAsync(dto.UserId);
@@ -182,6 +184,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
 
             ApplyPost(group, dto);
             group.Members = await ReconcileMembersAsync(group.Members, dto.Members, isAdmin);
+            await EnsureNoOverlappingKudosMembershipsAsync(type, group.Members, dto.OrganizationId, group.Id);
             group.References = ResolveReferences(dto.References).Concat(hiddenFromCaller).ToList();
             group.Modified = DateTime.UtcNow;
             group.ModifiedBy = dto.UserId;
@@ -260,6 +263,51 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 throw new ValidationException(ErrorCodes.GroupNameAlreadyExists, "Group name already exists");
             }
         }
+
+        /// <summary>
+        /// A kudos-receiving type pays once a month per person, so a person can belong to
+        /// only one group of that type at a time. A missing date is open-ended.
+        /// </summary>
+        private async Task EnsureNoOverlappingKudosMembershipsAsync(
+            GroupType type,
+            ICollection<GroupMember> members,
+            int organizationId,
+            int? excludeId)
+        {
+            if (!type.ReceivesKudos || members == null || !members.Any())
+            {
+                return;
+            }
+
+            var otherGroups = await _groupsDbSet
+                .AsNoTracking()
+                .Include(g => g.Members)
+                .Where(g => g.OrganizationId == organizationId
+                         && g.GroupTypeId == type.Id
+                         && (excludeId == null || g.Id != excludeId))
+                .ToListAsync();
+
+            foreach (var member in members)
+            {
+                var clash = otherGroups.FirstOrDefault(g => (g.Members ?? new List<GroupMember>())
+                    .Any(m => m.UserId == member.UserId && Overlaps(m, member)));
+
+                if (clash == null)
+                {
+                    continue;
+                }
+
+                var user = await _usersDbSet.FirstOrDefaultAsync(u => u.Id == member.UserId);
+                var userName = user == null ? member.UserId : $"{user.FirstName} {user.LastName}".Trim();
+
+                throw new ValidationException(
+                    ErrorCodes.GroupMembershipOverlaps,
+                    $"{userName} is already a member of \"{clash.Name}\" of the same group type during this period");
+            }
+        }
+
+        private static bool Overlaps(GroupMember first, GroupMember second) =>
+            first.IsActiveDuring(second.StartDate ?? DateTime.MinValue, second.EndDate ?? DateTime.MaxValue);
 
         /// <summary>
         /// A group is editable by a groups administrator, or by anyone currently in it.
