@@ -175,6 +175,33 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_User_Kudos_Logs_With_Likes()
+        {
+            var logs = MockKudosLogs().ToList();
+            logs.First(log => log.Id == 3).Likes = new LikesCollection
+            {
+                new Like("testUserId3", LikeTypeEnum.Congrats),
+                new Like("deletedUserId", LikeTypeEnum.Like)
+            };
+            _kudosLogsDbSet.SetDbSetDataForAsync(logs.AsQueryable());
+
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+
+            var liked = result.KudosLogs.First(log => log.Id == 3);
+            var unliked = result.KudosLogs.First(log => log.Id == 1);
+
+            Assert.Multiple(() =>
+            {
+                // Likes from users that no longer exist are filtered out.
+                Assert.That(liked.Likes.Count(), Is.EqualTo(1));
+                Assert.That(liked.Likes.First().UserId, Is.EqualTo("testUserId3"));
+                Assert.That(liked.Likes.First().Type, Is.EqualTo(LikeTypeEnum.Congrats));
+                Assert.That(liked.Likes.First().FullName, Is.Not.Empty);
+                Assert.That(unliked.Likes, Is.Empty);
+            });
+        }
+
+        [Test]
         public async Task Should_Return_Only_Matching_Type_When_User_Kudos_Logs_Are_Filtered()
         {
             var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1" });
