@@ -1,11 +1,13 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
+namespace Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
 {
     public class NewWallPostEmailTemplateViewModel : BaseEmailTemplateViewModel
     {
-        public NewWallPostEmailTemplateViewModel(string wallTitle, string pictureUrl, string fullName, string postDeepLink, string messageBody, string userNotificationSettingsUrl, string actionButtonTitle)
+        public NewWallPostEmailTemplateViewModel(string wallTitle, string wallName, string eyebrow, string pictureUrl, string fullName, string postDeepLink, string messageBody, string userNotificationSettingsUrl, string actionButtonTitle)
             : base(userNotificationSettingsUrl)
         {
             WallTitle = wallTitle;
+            WallName = wallName;
+            Eyebrow = eyebrow;
             PictureUrl = pictureUrl;
             FullName = fullName;
             PostDeepLink = postDeepLink;
@@ -14,6 +16,8 @@
         }
 
         public string WallTitle { get; set; }
+        public string WallName { get; set; }
+        public string Eyebrow { get; set; }
         public string PictureUrl { get; set; }
         public string FullName { get; set; }
         public string PostDeepLink { get; set; }

@@ -20,5 +20,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Groups
         public string ApprovalQuestions { get; set; }
 
         public int? KudosTypeId { get; set; }
+
+        [StringLength(500)]
+        public string AwardTemplate { get; set; }
     }
 }

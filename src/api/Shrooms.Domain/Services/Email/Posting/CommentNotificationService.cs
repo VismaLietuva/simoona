@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +21,7 @@ using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Models.Walls.Comments;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Resources.Emails;
+using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
@@ -38,6 +38,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Project> _projectsDbSet;
         private readonly DbSet<Comment> _commentsDbSet;
+        private readonly DbSet<MultiwallWall> _wallsDbSet;
 
         public CommentNotificationService(
             IUnitOfWork2 uow,
@@ -64,6 +65,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
             _commentsDbSet = uow.GetDbSet<Comment>();
+            _wallsDbSet = uow.GetDbSet<MultiwallWall>();
         }
 
         public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto)
@@ -156,21 +158,24 @@ namespace Shrooms.Domain.Services.Email.Posting
         private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentAuthor, Organization organization)
         {
             var comment = await LoadCommentAsync(commentDto.CommentId);
+            var wall = await _wallsDbSet.SingleAsync(w => w.Id == commentDto.WallId);
             var postLink = await GetPostLinkAsync(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
 
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentAuthor.PictureId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
 
-            var subject = CreateSubject(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentAuthor.FullName);
+            var subject = CreateSubject(Templates.NewPostCommentEmailSubject, wall.Name, commentAuthor.FullName);
             var body = ConvertBodyToHtml(comment.MessageBody, organization.ShortName);
 
-            var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
+            var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(WallEmailPresentation.GetCommentTitle(wall),
+                wall.Name,
+                WallEmailPresentation.GetEyebrow(wall),
                 authorPictureUrl,
                 commentAuthor.FullName,
                 postLink,
                 body,
                 userNotificationSettingsUrl,
-                EmailTemplates.DefaultActionButtonTitle);
+                WallEmailPresentation.GetActionButtonTitle(wall));
 
             await SendMultipleEmailsAsync(emails, subject, emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
         }
@@ -184,22 +189,6 @@ namespace Shrooms.Domain.Services.Email.Posting
                 .Select(u => u.Email)
                 .Distinct()
                 .ToList();
-        }
-
-        private static string CutMessage(string value)
-        {
-            var newLine = value.IndexOf("\n", StringComparison.Ordinal);
-            if (newLine > 0 && newLine <= 30)
-            {
-                return value.Substring(0, newLine) + "...";
-            }
-
-            if (value.Length > 30)
-            {
-                return value.Substring(0, 30) + "...";
-            }
-
-            return value;
         }
 
         private async Task<string> GetPostLinkAsync(WallType wallType, int wallId, string orgName, int postId)
@@ -232,7 +221,6 @@ namespace Shrooms.Domain.Services.Email.Posting
         private async Task<Comment> LoadCommentAsync(int commentId)
         {
             var comment = await _commentsDbSet
-                .Include(x => x.Post)
                 .FirstOrDefaultAsync(c => c.Id == commentId);
 
             if (comment == null)

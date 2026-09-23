@@ -29,10 +29,10 @@ namespace Shrooms.EmailTemplates.Seeds
             {
                 // Core
                 new(EmailTemplateCacheKeys.NewWallPost, new NewWallPostEmailTemplateViewModel(
-                    "Engineering wall", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1",
+                    "New post in Engineering wall", "Engineering wall", "Wall", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1",
                     "We are shipping the new email templates this week.", SettingsUrl, "Read it")),
                 new(EmailTemplateCacheKeys.NewPostComment, new NewCommentEmailTemplateViewModel(
-                    "Quarterly planning", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1#c2",
+                    "New comment in Engineering wall", "Engineering wall", "Wall", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1#c2",
                     "Agreed - let us pick this up on Monday.", SettingsUrl, "View comment")),
                 new(EmailTemplateCacheKeys.NewMention, new NewMentionTemplateViewModel(
                     "You were mentioned", "Tomas Kazlauskas", "Rasa Petraitiene",

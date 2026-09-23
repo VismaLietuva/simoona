@@ -10,6 +10,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
         {
             builder.HasQueryFilter(e => !e.IsDeleted);
 
+            builder.Property(t => t.AwardTemplate).HasMaxLength(500);
+
             builder.HasMany(t => t.Groups)
                 .WithOne(g => g.GroupType)
                 .HasForeignKey(g => g.GroupTypeId)

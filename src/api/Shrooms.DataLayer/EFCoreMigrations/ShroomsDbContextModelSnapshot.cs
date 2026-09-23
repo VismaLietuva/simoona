@@ -1884,6 +1884,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<string>("ApprovalQuestions")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AwardTemplate")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -1987,6 +1991,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
+                    b.Property<DateTime?>("GroupKudosPeriod")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("KudosBasketId")
                         .HasColumnType("int");
 
@@ -2034,6 +2041,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.HasIndex("KudosBasketId");
 
                     b.HasIndex("SentToId");
+
+                    b.HasIndex("OrganizationId", "GroupKudosPeriod")
+                        .HasFilter("[GroupKudosPeriod] IS NOT NULL");
 
                     b.HasIndex("OrganizationId", "Status", "Created");
 

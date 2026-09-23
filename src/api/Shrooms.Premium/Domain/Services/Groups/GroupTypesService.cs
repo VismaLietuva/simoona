@@ -75,6 +75,8 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 dto.KudosTypeId = null;
             }
 
+            ClearTemplateWithoutKudosType(dto);
+
             var now = DateTime.UtcNow;
 
             _groupTypesDbSet.Add(new GroupType
@@ -87,6 +89,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
                 CreationPolicy = dto.CreationPolicy,
                 ApprovalQuestions = dto.ApprovalQuestions,
                 KudosTypeId = dto.KudosTypeId,
+                AwardTemplate = dto.AwardTemplate,
                 Created = now,
                 CreatedBy = dto.UserId,
                 Modified = now,
@@ -116,7 +119,10 @@ namespace Shrooms.Premium.Domain.Services.Groups
             if (!await CanEditKudosAsync(dto))
             {
                 dto.KudosTypeId = type.KudosTypeId;
+                dto.AwardTemplate = type.AwardTemplate;
             }
+
+            ClearTemplateWithoutKudosType(dto);
 
             await ClearFieldsForDisabledFlagsAsync(type, dto);
 
@@ -127,6 +133,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
             type.CreationPolicy = dto.CreationPolicy;
             type.ApprovalQuestions = dto.ApprovalQuestions;
             type.KudosTypeId = dto.KudosTypeId;
+            type.AwardTemplate = dto.AwardTemplate;
             type.Modified = DateTime.UtcNow;
             type.ModifiedBy = dto.UserId;
 
@@ -169,8 +176,17 @@ namespace Shrooms.Premium.Domain.Services.Groups
             KudosTypeId = showKudos ? type.KudosTypeId : null,
             KudosTypeName = showKudos ? type.KudosType?.Name : null,
             KudosTypeValue = showKudos ? type.KudosType?.Value : null,
+            AwardTemplate = showKudos ? type.AwardTemplate : null,
             GroupCount = groupCount
         };
+
+        private static void ClearTemplateWithoutKudosType(CreateGroupTypeDto dto)
+        {
+            if (dto.KudosTypeId == null)
+            {
+                dto.AwardTemplate = null;
+            }
+        }
 
         private Task<bool> CanEditKudosAsync(UserAndOrganizationDto userAndOrg) =>
             _permissionService.UserHasPermissionAsync(userAndOrg, AdministrationPermissions.Kudos);

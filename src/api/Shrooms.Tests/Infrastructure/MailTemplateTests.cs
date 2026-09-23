@@ -58,6 +58,8 @@ namespace Shrooms.Tests.Infrastructure
         {
             var newWallPostEmailTemplateViewModel = new NewWallPostEmailTemplateViewModel(
                 "WallTitle",
+                "WallName",
+                "Wall",
                 "http://picture.example.com",
                 "Iam Creator",
                 "http://post.example.com/1",
