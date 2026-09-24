@@ -49,9 +49,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
         public void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule)
         {
-            // Grouped by owning question, with the legacy flat options (QuestionId null) forming a
-            // group of their own. An exempt option rules out anything else picked in *its* group;
-            // an answer to an unrelated question is none of its business.
+            // Per question; the legacy flat options (QuestionId null) form their own group.
             var offending = options
                 .GroupBy(option => option.QuestionId)
                 .Any(group => group.Any(option => option.Rule == rule) && group.Count() > 1);

@@ -354,8 +354,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, legacyChosenCount);
 
-            // The rule is scoped per question inside the validator, so the whole selection goes in:
-            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
                 eventEntity.SelectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
@@ -439,8 +437,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             // since a Going switch on a legacy food event has never had to carry a food pick.
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, chosenOptions.Count(legacyOptionIds.Contains));
 
-            // The rule is scoped per question inside the validator, so the whole selection goes in:
-            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
                 selectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
@@ -468,8 +464,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, legacyChosenCount);
 
-            // The rule is scoped per question inside the validator, so the whole selection goes in:
-            // an exempt option rules out only the other picks in its own group.
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(
                 eventDto.SelectedOptions.ToList(),
                 OptionRules.IgnoreSingleJoin);
@@ -775,14 +769,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
-            // An exempt pick grants the exemption wherever it now lives - the legacy flat options or
-            // the question that adopted them.
-            //
-            // Deliberately "any", not the old "all": CheckIfSingleChoiceSelectedWithRule is scoped
-            // per question, so it only rules out an ordinary pick in the exempt option's *own*
-            // group. An attendee who picks "Not eating" under one question and answers an unrelated
-            // one still counts as exempt. That is the opt-out option deciding, which is what it is
-            // for, and it takes a host deliberately splitting food across questions to reach.
             if (validationDto.SelectedOptions.Any(option => option.Rule == OptionRules.IgnoreSingleJoin) ||
                 !validationDto.IsSingleJoin)
             {

@@ -785,10 +785,6 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventOptionsDbSet.DidNotReceive().Remove(legacyOptionKept2);
         }
 
-        // The conversion path: the host's save carries no EditedOptions at all and instead claims
-        // the legacy options inside the question tree. This sweep runs before EventQuestionWriter,
-        // so sparing the claimed ids is what lets the writer re-parent those rows - and what keeps
-        // the participants' picks, which cascade away with a hard delete.
         [Test]
         public async Task Should_Not_Remove_A_Legacy_Option_That_A_Question_Is_Adopting()
         {
@@ -868,7 +864,6 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventService.UpdateEventAsync(editDto);
 
             _eventOptionsDbSet.DidNotReceive().Remove(adopted);
-            // Still swept: absent from EditedOptions *and* unclaimed by the tree.
             _eventOptionsDbSet.Received(1).Remove(abandoned);
         }
 

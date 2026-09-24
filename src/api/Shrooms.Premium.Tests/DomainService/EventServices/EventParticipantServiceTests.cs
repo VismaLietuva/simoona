@@ -239,9 +239,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.DoesNotThrowAsync(async () => await _eventParticipationService.JoinAsync(eventJoinDto));
         }
 
-        // The exemption used to be read off the legacy flat options alone, so adopting the
-        // "not eating" option into a question silently revoked it - locking its holder out of every
-        // other event in the single-join group.
         [Test]
         public void Should_Keep_The_Multi_Join_Exemption_For_An_Adopted_Exempt_Option()
         {
@@ -287,8 +284,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var eventJoinDto = new EventJoinDto
             {
-                // 90 is exempt, 91 is ordinary, and they share a question - the one grouping where
-                // picking both is still forbidden.
                 ChosenOptions = new List<int> { 90, 91 },
                 EventId = eventId,
                 ParticipantIds = new List<string> { "user1" },
@@ -2184,14 +2179,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        /// <summary>
-        /// The post-conversion shape: the exempt option now lives under a question rather than in
-        /// the legacy flat list.
-        ///
-        /// A second event of the same single-join type, already joined that week with no exempt
-        /// pick, is what makes the exemption load-bearing - without it the lockout never fires and
-        /// a test would pass whatever the rule says.
-        /// </summary>
         private Guid MockEventWithAdoptedIgnoreSingleJoinOption()
         {
             var eventId = Guid.NewGuid();

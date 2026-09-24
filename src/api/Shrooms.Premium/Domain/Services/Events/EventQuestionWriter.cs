@@ -74,8 +74,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                 ? await LoadExistingAsync(eventId)
                 : new List<EventQuestion>();
 
-            // A brand-new event has no rows to adopt, and querying for them would hit the database
-            // for ids that cannot exist.
             var adoptable = eventEntity == null
                 ? await LoadAdoptableAsync(eventId)
                 : new List<EventOption>();
@@ -122,10 +120,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// The event's legacy flat options - the rows a question may adopt. Re-parenting one keeps
-        /// its id, so every participant pick hanging off it survives the conversion.
-        /// </summary>
         private async Task<List<EventOption>> LoadAdoptableAsync(Guid eventId)
         {
             return await _optionsDbSet
@@ -161,9 +155,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                     ? existingById[dto.Id.Value].Options?.Select(option => option.Id).ToHashSet() ?? new HashSet<int>()
                     : new HashSet<int>();
 
-                // An id is legal under the question that already owns it, or when it names a legacy
-                // flat option of this event that the payload is adopting. Anything else - another
-                // event's id, or an option dragged between questions - still rejects.
                 if (dto.Options.Any(option => option.Id != null &&
                                               !ownedOptionIds.Contains(option.Id.Value) &&
                                               !adoptableIds.Contains(option.Id.Value)))
@@ -339,9 +330,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 }
                 else
                 {
-                    // Already under this question, or a legacy flat option being adopted. Assigning
-                    // Question is the re-parent - a no-op for the first case, and for the second the
-                    // whole point: EF writes QuestionId on SaveChanges and the row keeps its id.
+                    // Assigning Question re-parents an adopted legacy option; the row keeps its id and picks.
                     var option = existingOptions.FirstOrDefault(o => o.Id == optionDto.Id.Value)
                                  ?? adoptable.Single(o => o.Id == optionDto.Id.Value);
 
