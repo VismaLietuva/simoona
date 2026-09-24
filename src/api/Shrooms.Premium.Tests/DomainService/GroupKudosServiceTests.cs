@@ -478,10 +478,9 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Award_A_Period_Again_When_Every_Log_For_It_Was_Rejected()
+        public async Task Should_Not_Award_A_Period_Again_When_Every_Log_For_It_Was_Rejected()
         {
-            // Rejecting the batch is how a kudos admin says the run was wrong. The stamp
-            // would otherwise keep the month awarded with nobody paid for it.
+            // Found in production: an admin rejected a whole run and the next daily run paid it again.
             var alice = AwardedLog(Year, Month, "alice", 15);
             var bob = AwardedLog(Year, Month, "bob");
 
@@ -493,11 +492,9 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _service.AwardMonthlyKudosAsync(
                 new UserAndOrganizationDto { OrganizationId = 1, UserId = "admin" }, Year, Month);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.AlreadyAwarded, Is.False);
-                Assert.That(result.AwardedCount, Is.EqualTo(2));
-            });
+            Assert.That(result.AlreadyAwarded, Is.True);
+
+            _kudosLogsDbSet.DidNotReceiveWithAnyArgs().Add(default);
         }
 
         [Test]
@@ -519,7 +516,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Treat_A_Fully_Rejected_Month_As_Outstanding_In_A_Catch_Up()
+        public async Task Should_Not_Treat_A_Fully_Rejected_Month_As_Outstanding_In_A_Catch_Up()
         {
             var rejected = AwardedLog(2026, 8);
 
@@ -532,7 +529,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             Assert.That(
                 result.Select(p => (p.Year, p.Month)),
-                Is.EqualTo(new[] { (2026, 8), (2026, 9) }));
+                Is.EqualTo(new[] { (2026, 9) }));
         }
 
         [Test]

@@ -269,8 +269,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
             return await _kudosLogsDbSet
                 .AsNoTracking()
                 .AnyAsync(log => log.OrganizationId == organizationId
-                             && log.GroupKudosPeriod == period
-                             && log.Status != KudosStatus.Rejected);
+                             && log.GroupKudosPeriod == period);
         }
 
         private async Task<HashSet<DateTime>> AwardedPeriodsAsync(int organizationId)
@@ -278,8 +277,7 @@ namespace Shrooms.Premium.Domain.Services.Groups
             var periods = await _kudosLogsDbSet
                 .AsNoTracking()
                 .Where(log => log.OrganizationId == organizationId
-                           && log.GroupKudosPeriod >= EarliestAwardablePeriod
-                           && log.Status != KudosStatus.Rejected)
+                           && log.GroupKudosPeriod >= EarliestAwardablePeriod)
                 .Select(log => log.GroupKudosPeriod.Value)
                 .Distinct()
                 .ToListAsync();
