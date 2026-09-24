@@ -1,4 +1,4 @@
-using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
