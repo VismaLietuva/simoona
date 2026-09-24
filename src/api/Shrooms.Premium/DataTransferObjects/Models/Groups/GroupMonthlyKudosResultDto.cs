@@ -9,5 +9,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Groups
         public int AwardedCount { get; set; }
 
         public decimal TotalAmount { get; set; }
+
+        public bool AlreadyAwarded { get; set; }
     }
 }

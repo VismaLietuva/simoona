@@ -2,10 +2,10 @@
 @using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"{Model.FullName} posted in {Model.WallTitle}.";
+    ViewData["Preheader"] = $"{Model.FullName} posted in {Model.WallName}.";
 }
 
-<email-heading eyebrow="Wall">@Model.WallTitle</email-heading>
+<email-heading eyebrow="@Model.Eyebrow">@Model.WallTitle</email-heading>
 <email-card>
     <p style="margin:0;"><strong>@Model.FullName</strong> posted:</p>
     <email-quote>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.MessageBody))</email-quote>

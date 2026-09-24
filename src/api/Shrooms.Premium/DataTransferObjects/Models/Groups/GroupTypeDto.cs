@@ -27,6 +27,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Groups
 
         public decimal? KudosTypeValue { get; set; }
 
+        public string AwardTemplate { get; set; }
+
         /// <summary>
         /// Lets the admin UI warn before a flag change clears data.
         /// </summary>

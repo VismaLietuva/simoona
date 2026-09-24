@@ -1,6 +1,7 @@
-﻿using Shrooms.Premium.Domain.Services.Badges;
+using Shrooms.Premium.Domain.Services.Badges;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.Domain.Services.WebHookCallbacks.Groups;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
@@ -19,5 +20,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks
         IEventRemindService EventRemindService { get; }
 
         ILotteryStatusChangeService LotteryStatusChangeService { get; }
+
+        IGroupKudosWebHookService GroupKudos { get; }
     }
 }

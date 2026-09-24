@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
 {
@@ -15,5 +17,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public int? KudosBasketId { get; set; }
         public KudosLogTypeDto Type { get; set; }
         public string PictureId { get; set; }
+        public IEnumerable<LikeDto> Likes { get; set; }
     }
 }
