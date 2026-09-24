@@ -267,7 +267,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All, includeJoinedEventWalls: true);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
@@ -691,7 +691,7 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter)
+        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter, bool includeJoinedEventWalls = false)
         {
             if (filter == null)
             {
@@ -709,7 +709,7 @@ namespace Shrooms.Domain.Services.Wall
             {
                 wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
                 // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
-                includeEventWalls = wallsListFilter == WallsListFilter.Followed &&
+                includeEventWalls = (wallsListFilter == WallsListFilter.Followed || includeJoinedEventWalls) &&
                                     await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event);
             }
 
