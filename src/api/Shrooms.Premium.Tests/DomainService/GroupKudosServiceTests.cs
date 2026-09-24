@@ -109,15 +109,49 @@ namespace Shrooms.Premium.Tests.DomainService
         };
 
         [Test]
-        public async Task Should_Sum_Kudos_Type_Value_Across_A_Users_Groups()
+        public async Task Should_Pay_Only_One_Group_Per_Type_However_Many_Groups_Of_It_A_User_Is_In()
         {
             var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
 
             Assert.Multiple(() =>
             {
-                Assert.That(allocations.Single(a => a.UserId == "alice").Amount, Is.EqualTo(15));
+                Assert.That(allocations.Single(a => a.UserId == "alice").Amount, Is.EqualTo(5));
+                Assert.That(allocations.Single(a => a.UserId == "alice").GroupNames, Has.Count.EqualTo(1));
                 Assert.That(allocations.Single(a => a.UserId == "bob").Amount, Is.EqualTo(5));
             });
+        }
+
+        [Test]
+        public async Task Should_Pay_Only_The_Group_A_User_Moved_To_During_The_Month()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                KudosGroup(2, "New team", Member("alice", start: new DateTime(2026, 8, 16), role: "Organiser"), Member("alice", start: new DateTime(2026, 8, 16), role: "Taster")),
+                KudosGroup(1, "Old team", Member("alice", end: new DateTime(2026, 8, 15), role: "Cook"))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(allocations.Single().GroupNames, Is.EqualTo(new[] { "New team" }));
+                Assert.That(allocations.Single().Roles, Is.EqualTo(new[] { "Organiser", "Taster" }));
+                Assert.That(allocations.Single().Amount, Is.EqualTo(10));
+            });
+        }
+
+        [Test]
+        public async Task Should_Pay_The_Later_Group_Even_When_The_Later_Membership_Also_Ends_In_The_Month()
+        {
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                KudosGroup(1, "Old team", Member("alice", end: new DateTime(2026, 8, 10))),
+                KudosGroup(2, "New team", Member("alice", start: new DateTime(2026, 8, 11), end: new DateTime(2026, 8, 20)))
+            });
+
+            var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
+
+            Assert.That(allocations.Single().GroupNames, Is.EqualTo(new[] { "New team" }));
         }
 
         [Test]
@@ -233,20 +267,19 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Count_Roles_Per_Group_Rather_Than_Across_The_Type()
+        public async Task Should_Not_Pay_Roles_Held_In_The_Group_A_User_Moved_Away_From()
         {
-            // The same role name in two groups is two jobs, even though the comment lists it once.
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
             {
-                KudosGroup(1, "Team A", Member("alice", role: "Organiser")),
-                KudosGroup(2, "Team B", Member("alice", role: "Organiser"))
+                KudosGroup(1, "Team A", Member("alice", end: new DateTime(2026, 8, 15), role: "Organiser"), Member("alice", end: new DateTime(2026, 8, 15), role: "Taster")),
+                KudosGroup(2, "Team B", Member("alice", start: new DateTime(2026, 8, 16), role: "Organiser"))
             });
 
             var allocations = (await _service.GetAllocationsAsync(1, Year, Month)).ToList();
 
             Assert.Multiple(() =>
             {
-                Assert.That(allocations.Single().Amount, Is.EqualTo(10));
+                Assert.That(allocations.Single().Amount, Is.EqualTo(5));
                 Assert.That(allocations.Single().Roles, Is.EqualTo(new[] { "Organiser" }));
             });
         }
@@ -300,13 +333,13 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.Multiple(() =>
             {
                 Assert.That(result.AwardedCount, Is.EqualTo(2));
-                Assert.That(result.TotalAmount, Is.EqualTo(20));
+                Assert.That(result.TotalAmount, Is.EqualTo(10));
             });
 
             // Pending, so a kudos administrator still approves the monthly run. Approval is
             // what recomputes the profile balance; nothing here should touch it.
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(l =>
-                l.EmployeeId == "alice" && l.Points == 15 && l.Status == KudosStatus.Pending));
+                l.EmployeeId == "alice" && l.Points == 5 && l.Status == KudosStatus.Pending));
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(l =>
                 l.EmployeeId == "bob" && l.Points == 5 && l.Status == KudosStatus.Pending));
         }
@@ -331,9 +364,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
             {
-                TemplatedKudosGroup(1, "Team A", "Foodmaster {month} {role} 🍕", Member("alice", role: "Role1")),
-                TemplatedKudosGroup(2, "Team B", "Foodmaster {month} {role} 🍕", Member("alice", role: "Role2")),
-                TemplatedKudosGroup(3, "Team C", "Foodmaster {month} {role} 🍕", Member("alice", role: "Role3"))
+                TemplatedKudosGroup(
+                    1,
+                    "Team A",
+                    "Foodmaster {month} {role} 🍕",
+                    Member("alice", role: "Role1"),
+                    Member("alice", role: "Role2"),
+                    Member("alice", role: "Role3"))
             });
 
             await _service.AwardMonthlyKudosAsync(

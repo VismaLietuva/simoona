@@ -86,29 +86,34 @@ namespace Shrooms.Premium.Domain.Services.Groups
                         return new
                         {
                             UserId = byUser.Key,
+                            GroupId = g.Id,
                             GroupName = g.Name,
                             Roles = roles,
                             KudosTypeId = g.GroupType.KudosTypeId.Value,
                             GroupTypeId = g.GroupTypeId,
                             g.GroupType.AwardTemplate,
-                            Value = (g.GroupType.KudosType?.Value ?? 0) * Math.Max(1, roles.Count)
+                            Value = (g.GroupType.KudosType?.Value ?? 0) * Math.Max(1, roles.Count),
+                            LatestEnd = byUser.Max(m => m.EndDate ?? DateTime.MaxValue),
+                            LatestStart = byUser.Max(m => m.StartDate ?? DateTime.MinValue)
                         };
                     }))
                 .GroupBy(a => new { a.UserId, a.GroupTypeId })
-                .Select(byUserAndType => new
+                // A type pays once a month. Someone who moved between groups of it during the
+                // month is paid by the group they moved to.
+                .Select(byUserAndType => byUserAndType
+                    .OrderByDescending(a => a.LatestEnd)
+                    .ThenByDescending(a => a.LatestStart)
+                    .ThenByDescending(a => a.GroupId)
+                    .First())
+                .Select(a => new GroupKudosAllocationDto
                 {
-                    byUserAndType.Key,
-                    Groups = byUserAndType.OrderBy(a => a.GroupName).ToList()
-                })
-                .Select(byUserAndType => new GroupKudosAllocationDto
-                {
-                    UserId = byUserAndType.Key.UserId,
-                    GroupTypeId = byUserAndType.Key.GroupTypeId,
-                    KudosTypeId = byUserAndType.Groups[0].KudosTypeId,
-                    AwardTemplate = byUserAndType.Groups[0].AwardTemplate,
-                    Amount = byUserAndType.Groups.Sum(a => a.Value),
-                    GroupNames = byUserAndType.Groups.Select(a => a.GroupName).ToList(),
-                    Roles = byUserAndType.Groups.SelectMany(a => a.Roles).Distinct().ToList()
+                    UserId = a.UserId,
+                    GroupTypeId = a.GroupTypeId,
+                    KudosTypeId = a.KudosTypeId,
+                    AwardTemplate = a.AwardTemplate,
+                    Amount = a.Value,
+                    GroupNames = new List<string> { a.GroupName },
+                    Roles = a.Roles
                 })
                 .Where(a => a.Amount > 0)
                 .OrderBy(a => a.UserId)
