@@ -30,6 +30,7 @@ namespace Shrooms.Tests.DomainService
         private const string FeedUserId = "feedUser";
         private const int FollowedWallId = 1;
         private const int EventWallId = 2;
+        private const string PostBody = "wall post body";
 
         private DbSet<Wall> _wallsDbSet;
         private DbSet<WallModerator> _wallModeratorDbSet;
@@ -1080,6 +1081,40 @@ namespace Shrooms.Tests.DomainService
             Assert.That(followedWallPost.EventId, Is.Null);
         }
 
+        [Test]
+        public async Task Should_Return_Event_Wall_Posts_In_Search_Results()
+        {
+            var eventId = MockPostsForFollowedFeed();
+            MockEventPermission(true);
+
+            var posts = (await _wallService.SearchWallAsync(PostBody, FeedUser(), 1, 10)).ToList();
+
+            Assert.That(posts.Select(p => p.WallId), Is.EquivalentTo(new[] { FollowedWallId, EventWallId }));
+            Assert.That(posts.First(p => p.WallId == EventWallId).EventId, Is.EqualTo(eventId));
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Event_Wall_Posts_In_Search_Results_When_User_Has_No_Event_Permission()
+        {
+            MockPostsForFollowedFeed();
+            MockEventPermission(false);
+
+            var posts = (await _wallService.SearchWallAsync(PostBody, FeedUser(), 1, 10)).ToList();
+
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Not_Return_Event_Wall_Posts_In_Search_Results_When_User_Did_Not_Join_The_Event()
+        {
+            MockPostsForFollowedFeed(isEventWallMember: false);
+            MockEventPermission(true);
+
+            var posts = (await _wallService.SearchWallAsync(PostBody, FeedUser(), 1, 10)).ToList();
+
+            Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
+        }
+
         private static UserAndOrganizationDto FeedUser()
         {
             return new UserAndOrganizationDto { UserId = FeedUserId, OrganizationId = 2 };
@@ -1130,6 +1165,7 @@ namespace Shrooms.Tests.DomainService
                 WallId = FollowedWallId,
                 Wall = followedWall,
                 AuthorId = FeedUserId,
+                MessageBody = PostBody,
                 LastActivity = DateTime.UtcNow,
                 Comments = new List<Comment>(),
                 Likes = new LikesCollection()
@@ -1141,6 +1177,7 @@ namespace Shrooms.Tests.DomainService
                 WallId = EventWallId,
                 Wall = eventWall,
                 AuthorId = FeedUserId,
+                MessageBody = PostBody,
                 LastActivity = eventPostLastActivity ?? DateTime.UtcNow.AddMinutes(-1),
                 Comments = new List<Comment>(),
                 Likes = new LikesCollection()
