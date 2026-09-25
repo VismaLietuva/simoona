@@ -785,6 +785,88 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventOptionsDbSet.DidNotReceive().Remove(legacyOptionKept2);
         }
 
+        [Test]
+        public async Task Should_Not_Remove_A_Legacy_Option_That_A_Question_Is_Adopting()
+        {
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var adopted = new EventOption { Id = 1, EventId = eventId, Option = "Pizza", QuestionId = null };
+            var abandoned = new EventOption { Id = 2, EventId = eventId, Option = "Sushi", QuestionId = null };
+
+            var @event = new Event
+            {
+                Id = eventId,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                EndDate = DateTime.UtcNow.AddDays(4),
+                Created = DateTime.UtcNow,
+                ResponsibleUserId = users.First().Id,
+                ResponsibleUser = users.First(),
+                EventRecurring = EventRecurrenceOptions.None,
+                ImageName = "imageUrl",
+                Name = "Dinner event",
+                Place = "City",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                EventOptions = new List<EventOption> { adopted, abandoned },
+                EventParticipants = new List<EventParticipant>(),
+                Offices = $"[\"{office.Id}\"]",
+                RegistrationDeadline = DateTime.UtcNow,
+                MaxChoices = 1,
+                EventType = eventTypes.Last(),
+                EventTypeId = eventTypes.Last().Id,
+                Reminders = new List<EventReminder>()
+            };
+            _eventsDbSet.SetDbSetDataForAsync(new[] { @event });
+
+            var editDto = new EditEventDto
+            {
+                Id = eventId.ToString(),
+                UserId = users.First().Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Dinner event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto { OfficeNames = new List<string> { office.Name } },
+                RegistrationDeadlineDate = @event.RegistrationDeadline,
+                MaxOptions = 0,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                Questions = new List<EventQuestionStructureDto>
+                {
+                    new EventQuestionStructureDto
+                    {
+                        Id = null,
+                        ClientId = "q:legacy",
+                        Title = "Choose your options",
+                        Order = 0,
+                        SelectType = EventQuestionSelectType.Single,
+                        IsRequired = true,
+                        Options = new List<EventQuestionOptionStructureDto>
+                        {
+                            new EventQuestionOptionStructureDto { Id = adopted.Id, Name = "Pizza", Order = 0 }
+                        }
+                    }
+                },
+                Reminders = new List<EventReminderDto>()
+            };
+
+            await _eventService.UpdateEventAsync(editDto);
+
+            _eventOptionsDbSet.DidNotReceive().Remove(adopted);
+            _eventOptionsDbSet.Received(1).Remove(abandoned);
+        }
+
         private List<EventType> MockEventTypes()
         {
             var types = new List<EventType>

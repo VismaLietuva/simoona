@@ -11,9 +11,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int Order { get; set; }
 
         /// <summary>
-        /// Carried on the read shape only so a client echoing this payload back does not reset a
-        /// stored rule. It does not affect sign-up: both single-join checks are scoped to legacy
-        /// options, so IgnoreSingleJoin on a question option is never consulted.
+        /// Carried so a client echoing this payload back does not reset a stored rule, and can enforce it.
         /// </summary>
         public OptionRules? Rule { get; set; }
     }

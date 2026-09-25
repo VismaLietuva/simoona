@@ -45,7 +45,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 ? new List<EventQuestion>()
                 : await LoadExistingAsync(eventId.Value);
 
-            CheckSuppliedIdsBelongToEvent(existing, desired);
+            var adoptable = eventId == null
+                ? new List<EventOption>()
+                : await LoadAdoptableAsync(eventId.Value);
+
+            CheckSuppliedIdsBelongToEvent(existing, adoptable, desired);
 
             _structureValidator.ValidateResolved(BuildResolvedFromPayload(desired));
         }
@@ -70,7 +74,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 ? await LoadExistingAsync(eventId)
                 : new List<EventQuestion>();
 
-            CheckSuppliedIdsBelongToEvent(existing, desired);
+            var adoptable = eventEntity == null
+                ? await LoadAdoptableAsync(eventId)
+                : new List<EventOption>();
+
+            CheckSuppliedIdsBelongToEvent(existing, adoptable, desired);
 
             // Validate the entire tree before touching the database. A payload that fails here must
             // leave no trace: persisting questions whose conditions were silently dropped would turn
@@ -94,7 +102,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             foreach (var (dto, entity) in entities)
             {
-                WriteOptions(eventId, eventEntity, dto, entity, existing, optionByClientId, userId);
+                WriteOptions(eventId, eventEntity, dto, entity, existing, adoptable, optionByClientId, userId);
             }
 
             foreach (var (dto, entity) in entities)
@@ -112,6 +120,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .ToListAsync();
         }
 
+        private async Task<List<EventOption>> LoadAdoptableAsync(Guid eventId)
+        {
+            return await _optionsDbSet
+                .Where(option => option.EventId == eventId && option.QuestionId == null)
+                .ToListAsync();
+        }
+
         /// <summary>
         /// Every id the client supplies has to name a live row of this event, and an option id has
         /// to sit under the question that claims it. Without this the lookups below throw
@@ -120,9 +135,11 @@ namespace Shrooms.Premium.Domain.Services.Events
         /// </summary>
         private static void CheckSuppliedIdsBelongToEvent(
             List<EventQuestion> existing,
+            List<EventOption> adoptable,
             IList<EventQuestionStructureDto> desired)
         {
             var existingById = existing.ToDictionary(question => question.Id);
+            var adoptableIds = adoptable.Select(option => option.Id).ToHashSet();
 
             foreach (var dto in desired.Where(question => question.Id != null))
             {
@@ -138,7 +155,9 @@ namespace Shrooms.Premium.Domain.Services.Events
                     ? existingById[dto.Id.Value].Options?.Select(option => option.Id).ToHashSet() ?? new HashSet<int>()
                     : new HashSet<int>();
 
-                if (dto.Options.Any(option => option.Id != null && !ownedOptionIds.Contains(option.Id.Value)))
+                if (dto.Options.Any(option => option.Id != null &&
+                                              !ownedOptionIds.Contains(option.Id.Value) &&
+                                              !adoptableIds.Contains(option.Id.Value)))
                 {
                     throw new EventException(PremiumErrorCodes.EventQuestionOptionNotFound);
                 }
@@ -270,6 +289,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             EventQuestionStructureDto dto,
             EventQuestion entity,
             List<EventQuestion> existing,
+            List<EventOption> adoptable,
             Dictionary<string, EventOption> optionByClientId,
             string userId)
         {
@@ -310,7 +330,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 }
                 else
                 {
-                    var option = existingOptions.Single(o => o.Id == optionDto.Id.Value);
+                    // Assigning Question re-parents an adopted legacy option; the row keeps its id and picks.
+                    var option = existingOptions.FirstOrDefault(o => o.Id == optionDto.Id.Value)
+                                 ?? adoptable.Single(o => o.Id == optionDto.Id.Value);
+
+                    option.Question = entity;
                     option.Option = optionDto.Name;
                     option.Order = optionDto.Order;
 

@@ -49,7 +49,12 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
         public void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule)
         {
-            if (options.Any(op => op.Rule == rule) && options.Count > 1)
+            // Per question; the legacy flat options (QuestionId null) form their own group.
+            var offending = options
+                .GroupBy(option => option.QuestionId)
+                .Any(group => group.Any(option => option.Rule == rule) && group.Count() > 1);
+
+            if (offending)
             {
                 throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly);
             }
