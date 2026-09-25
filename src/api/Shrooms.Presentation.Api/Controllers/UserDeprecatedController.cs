@@ -661,6 +661,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("PutPersonalInfo")]
         [ValidationFilter]
         [HttpPut]
+        [InvalidatesWidgetCache(WidgetCacheTag.WallWidgets)]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]        public async Task<IActionResult> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
         {
             var validatedModel = await ValidateModelAsync(model);
