@@ -39,8 +39,11 @@ namespace Shrooms.Premium.Tests.Mocks
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
             var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            // Execute has a generic and a non-generic overload, so it cannot be
+            // picked by name alone.
             var executeMethod = typeof(IQueryProvider)
-                .GetMethod(nameof(IQueryProvider.Execute))
+                .GetMethods()
+                .Single(method => method.Name == nameof(IQueryProvider.Execute) && method.IsGenericMethodDefinition)
                 .MakeGenericMethod(expectedResultType);
             var result = executeMethod.Invoke(_inner, new object[] { expression });
             return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
