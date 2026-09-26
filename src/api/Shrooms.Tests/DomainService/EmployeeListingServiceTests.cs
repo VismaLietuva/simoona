@@ -326,8 +326,8 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
-                .Returns(false);
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string> { AdministrationPermissions.ApplicationUser });
 
             _roleService
                 .ExcludeUsersWithRole(Arg.Any<string>())
@@ -345,6 +345,109 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             Assert.That(result.Select(employee => employee.Id), Is.EqualTo(expectedEmployeeIdsOrder));
+        }
+
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenUserIsNotAdminAndSortsByBirthDay_SortsByMonthAndDayOnly()
+        {
+            // Arrange
+            var employees = GetTestDataForGetPagedEmployeesAsync();
+            employees[0].BirthDay = new DateTime(1980, 3, 2);
+            employees[1].BirthDay = new DateTime(1990, 3, 1);
+            employees[2].BirthDay = new DateTime(1985, 1, 15);
+
+            SetupNonAdmin(employees);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = "BirthDay asc;",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, new UserAndOrganizationDto { OrganizationId = 1 });
+
+            // Assert
+            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(new[] { employees[2].Id, employees[1].Id, employees[0].Id }));
+        }
+
+        [Test]
+        public async Task GetPagedEmployeesAsync_WhenUserIsNotAdminAndBirthDaysDifferOnlyByYear_OrdersById()
+        {
+            // Arrange
+            var employees = GetEmployeesBornOnSameDayInDifferentYears();
+
+            SetupNonAdmin(employees);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = "BirthDay desc;",
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, new UserAndOrganizationDto { OrganizationId = 1 });
+
+            // Assert
+            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(new[] { "a", "b", "c" }));
+        }
+
+        [TestCase("BirthDay.Value.Year desc;")]
+        [TestCase("PhoneNumber asc;")]
+        [TestCase("WorkingHours.StartTime.Ticks asc;")]
+        public async Task GetPagedEmployeesAsync_WhenUserIsNotAdminAndSortsByHiddenOrUnknownField_OrdersById(string sortByProperties)
+        {
+            // Arrange
+            var employees = GetEmployeesBornOnSameDayInDifferentYears();
+
+            SetupNonAdmin(employees);
+
+            var args = new EmployeeListingArgsDto
+            {
+                SortByProperties = sortByProperties,
+                Page = 1,
+                PageSize = 10
+            };
+
+            // Act
+            var result = await _employeeListingService.GetPagedEmployeesAsync(args, new UserAndOrganizationDto { OrganizationId = 1 });
+
+            // Assert
+            Assert.That(result.Select(employee => employee.Id), Is.EqualTo(new[] { "a", "b", "c" }));
+        }
+
+        private IList<ApplicationUser> GetEmployeesBornOnSameDayInDifferentYears()
+        {
+            var employees = GetTestDataForGetPagedEmployeesAsync();
+
+            employees[0].Id = "a";
+            employees[0].BirthDay = new DateTime(1970, 5, 5);
+            employees[0].PhoneNumber = "+370600000003";
+
+            employees[1].Id = "b";
+            employees[1].BirthDay = new DateTime(2000, 5, 5);
+            employees[1].PhoneNumber = "+370600000001";
+
+            employees[2].Id = "c";
+            employees[2].BirthDay = new DateTime(1985, 5, 5);
+            employees[2].PhoneNumber = "+370600000002";
+
+            return employees;
+        }
+
+        private void SetupNonAdmin(IList<ApplicationUser> employees)
+        {
+            _usersDbSet.SetDbSetDataForAsync(employees);
+
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string>());
+
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
         }
 
         private IList<ApplicationUser> GetTestDataForGetPagedEmployeesAsync()

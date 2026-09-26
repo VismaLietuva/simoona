@@ -1,3 +1,4 @@
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 ﻿using Shrooms.Contracts.Constants;
@@ -12,6 +13,7 @@ using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -20,6 +22,17 @@ namespace Shrooms.Domain.Services.Employees
 {
     public class EmployeeListingService : IEmployeeListingService
     {
+        private static readonly HashSet<string> SortableProperties = new(StringComparer.OrdinalIgnoreCase)
+        {
+            nameof(EmployeeDto.Id),
+            nameof(EmployeeDto.FirstName),
+            nameof(EmployeeDto.LastName),
+            nameof(EmployeeDto.JobTitle),
+            nameof(EmployeeDto.BirthDay)
+        };
+
+        private static readonly string BlacklistSortProperty = $"{nameof(EmployeeDto.BlacklistEntry)}.{nameof(BlacklistUserDto.EndDate)}";
+
         private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly IPermissionService _permissionService;
@@ -56,29 +69,8 @@ namespace Shrooms.Domain.Services.Employees
                 .Where(blacklistFilter)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .Where(user => user.OrganizationId == userOrg.OrganizationId)
-                .Select(user => new EmployeeDto
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    JobTitle = user.JobPosition.Title,
-                    PictureId = user.PictureId,
-                    BirthDay = user.BirthDay,
-                    PhoneNumber = user.PhoneNumber,
-                    WorkingHours = new WorkingHourslWithOutLunchDto
-                    {
-                        StartTime = user.WorkingHours.StartTime,
-                        EndTime = user.WorkingHours.EndTime
-                    },
-                    BlacklistEntry = user.BlacklistEntries
-                        .Where(blacklistUser => blacklistUser.Status == BlacklistStatus.Active)
-                        .Select(blacklistUser => new BlacklistUserDto
-                        {
-                            EndDate = blacklistUser.EndDate
-                        })
-                        .FirstOrDefault()
-                })
-                .OrderByPropertyNames(employeeArgsDto);
+                .Select(GetEmployeeProjection(hasApplicationUserPermission, hasBlacklistPermission))
+                .OrderByPropertyNames(GetSafeSortable(employeeArgsDto, hasBlacklistPermission));
 
             // X.PagedList doesn't have async support for IQueryable, need to materialize first
             var totalCount = await employeesQuery.CountAsync();
@@ -87,33 +79,75 @@ namespace Shrooms.Domain.Services.Employees
                 .Take(employeeArgsDto.PageSize)
                 .ToListAsync();
 
-            var users = new StaticPagedList<EmployeeDto>(items, employeeArgsDto.Page, employeeArgsDto.PageSize, totalCount);
-
-            HidePrivateInformationBasedOnPermissions(users, hasApplicationUserPermission, hasBlacklistPermission);
-
-            return users;
+            return new StaticPagedList<EmployeeDto>(items, employeeArgsDto.Page, employeeArgsDto.PageSize, totalCount);
         }
 
-        private void HidePrivateInformationBasedOnPermissions(IPagedList<EmployeeDto> employees, bool hasApplicationUserPermission, bool hasBlacklistPermission)
+        // Private fields are hidden inside the SQL projection, so sorting and paging never see the real values.
+        private static Expression<Func<ApplicationUser, EmployeeDto>> GetEmployeeProjection(bool hasApplicationUserPermission, bool hasBlacklistPermission)
         {
-            if (hasApplicationUserPermission && hasBlacklistPermission)
+            Expression<Func<ApplicationUser, DateTime?>> birthDay = hasApplicationUserPermission
+                ? user => user.BirthDay
+                : user => user.BirthDay.HasValue
+                    ? user.BirthDay.Value.Date.AddYears(BirthdayDateTimeHelper.HiddenYear - user.BirthDay.Value.Year)
+                    : null;
+
+            Expression<Func<ApplicationUser, string>> phoneNumber = hasApplicationUserPermission
+                ? user => user.PhoneNumber
+                : user => null;
+
+            Expression<Func<ApplicationUser, BlacklistUserDto>> blacklistEntry = hasBlacklistPermission
+                ? user => user.BlacklistEntries
+                    .Where(blacklistUser => blacklistUser.Status == BlacklistStatus.Active)
+                    .Select(blacklistUser => new BlacklistUserDto
+                    {
+                        EndDate = blacklistUser.EndDate
+                    })
+                    .FirstOrDefault()
+                : user => null;
+
+            Expression<Func<ApplicationUser, EmployeeDto>> projection = user => new EmployeeDto
             {
-                return;
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                JobTitle = user.JobPosition.Title,
+                PictureId = user.PictureId,
+                BirthDay = birthDay.Invoke(user),
+                PhoneNumber = phoneNumber.Invoke(user),
+                WorkingHours = new WorkingHourslWithOutLunchDto
+                {
+                    StartTime = user.WorkingHours.StartTime,
+                    EndTime = user.WorkingHours.EndTime
+                },
+                BlacklistEntry = blacklistEntry.Invoke(user)
+            };
+
+            return projection.Expand();
+        }
+
+        private static EmployeeListingArgsDto GetSafeSortable(EmployeeListingArgsDto employeeArgsDto, bool hasBlacklistPermission)
+        {
+            var requestedSorts = (employeeArgsDto.SortByProperties ?? string.Empty)
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(sort => IsSortable(sort.Split(' ')[0], hasBlacklistPermission))
+                .ToList();
+
+            // Stable tie-breaker so equal sort keys never fall back to an order that could reveal hidden data.
+            if (!requestedSorts.Any(sort => sort.Split(' ')[0].Equals(nameof(EmployeeDto.Id), StringComparison.OrdinalIgnoreCase)))
+            {
+                requestedSorts.Add($"{nameof(EmployeeDto.Id)} {SortDirectionConstants.Ascending}");
             }
 
-            foreach (var employee in employees)
+            return new EmployeeListingArgsDto
             {
-                if (!hasApplicationUserPermission)
-                {
-                    employee.BirthDay = BirthdayDateTimeHelper.RemoveYear(employee.BirthDay);
-                    employee.PhoneNumber = null;
-                }
+                SortByProperties = string.Join(";", requestedSorts)
+            };
+        }
 
-                if (!hasBlacklistPermission)
-                {
-                    employee.BlacklistEntry = null;
-                }
-            }
+        private static bool IsSortable(string propertyName, bool hasBlacklistPermission)
+        {
+            return SortableProperties.Contains(propertyName) ||
+                   (hasBlacklistPermission && BlacklistSortProperty.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
         }
 
         private Expression<Func<ApplicationUser, bool>> GetBlacklistFilter(EmployeeListingArgsDto employeeArgsDto, bool hasBlacklistPermission)
