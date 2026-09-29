@@ -397,6 +397,7 @@ namespace Shrooms.Tests.DomainService
         [TestCase("BirthDay.Value.Year desc;")]
         [TestCase("PhoneNumber asc;")]
         [TestCase("WorkingHours.StartTime.Ticks asc;")]
+        [TestCase("BlacklistEntry.EndDate desc;")]
         public async Task GetPagedEmployeesAsync_WhenUserIsNotAdminAndSortsByHiddenOrUnknownField_OrdersById(string sortByProperties)
         {
             // Arrange
