@@ -3970,6 +3970,48 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("Holidays", (string)null);
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.ParentalEntitlement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("OrganizationId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ParentalEntitlements_OrganizationId_EmployeeId");
+
+                    b.ToTable("ParentalEntitlements", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
                 {
                     b.Property<int>("Id")
@@ -5949,6 +5991,25 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.ParentalEntitlement", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Organization");
                 });

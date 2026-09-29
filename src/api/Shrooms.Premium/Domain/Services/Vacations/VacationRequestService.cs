@@ -22,6 +22,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
+        private readonly DbSet<ParentalEntitlement> _parentalEntitlementDbSet;
 
         private readonly IVacationNotificationService _notificationService;
         private readonly ILogger<VacationRequestService> _logger;
@@ -40,6 +41,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationDbSet = uow.GetDbSet<Organization>();
+            _parentalEntitlementDbSet = uow.GetDbSet<ParentalEntitlement>();
         }
 
         public async Task<VacationBalanceDto> GetBalanceAsync(UserAndOrganizationDto userOrg)
@@ -107,6 +109,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 ownRequests,
                 holidays);
 
+            await EnsureParentalAllowedAsync(parsed.Type, parsed.DateFrom, parsed.DateTo, ownRequests, holidays, userOrg);
+
             var now = DateTime.UtcNow;
             var request = new VacationRequest
             {
@@ -157,6 +161,8 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 ownRequests,
                 holidays,
                 request.DateFrom);
+
+            await EnsureParentalAllowedAsync(parsed.Type, parsed.DateFrom, parsed.DateTo, ownRequests, holidays, userOrg);
 
             var before = Snapshot(request);
 
@@ -431,6 +437,32 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             return request;
+        }
+
+        private async Task EnsureParentalAllowedAsync(
+            VacationRequestType type,
+            DateTime dateFrom,
+            DateTime dateTo,
+            IEnumerable<VacationRequest> ownRequests,
+            HolidayCalendar holidays,
+            UserAndOrganizationDto userOrg)
+        {
+            if (type != VacationRequestType.Parental)
+            {
+                return;
+            }
+
+            var entitlement = await _parentalEntitlementDbSet
+                .AsNoTracking()
+                .Where(e => e.OrganizationId == userOrg.OrganizationId && e.EmployeeId == userOrg.UserId)
+                .Select(e => (ParentalEntitlementType?)e.Type)
+                .FirstOrDefaultAsync();
+
+            ParentalEntitlementRules.EnsureAllowed(
+                entitlement,
+                dateFrom,
+                VacationCalculator.CountWorkingDays(dateFrom, dateTo, holidays),
+                ownRequests);
         }
 
         private async Task<List<VacationRequest>> OwnActiveRequestsAsync(int organizationId, string userId, int? excludeId)
