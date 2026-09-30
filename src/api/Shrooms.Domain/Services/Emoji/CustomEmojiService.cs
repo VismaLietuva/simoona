@@ -5,6 +5,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
@@ -21,6 +22,7 @@ namespace Shrooms.Domain.Services.Emoji
         private readonly IPermissionService _permissionService;
         private readonly ICustomEmojiValidator _validator;
         private readonly DbSet<CustomEmojiEntity> _customEmojisDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly ICustomCache<int, EmojiListCacheEntry> _emojiListCache;
         private readonly ICustomCache<int, long> _generationCache;
 
@@ -39,6 +41,7 @@ namespace Shrooms.Domain.Services.Emoji
             _emojiListCache = emojiListCache;
             _generationCache = generationCache;
             _customEmojisDbSet = uow.GetDbSet<CustomEmojiEntity>();
+            _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
         public async Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
@@ -57,11 +60,19 @@ namespace Shrooms.Domain.Services.Emoji
             var emojis = await _customEmojisDbSet
                 .Where(x => x.OrganizationId == userOrg.OrganizationId)
                 .OrderBy(x => x.Name)
+                .Select(x => new
+                {
+                    Emoji = x,
+                    CreatorFullName = _usersDbSet
+                        .Where(u => u.Id == x.CreatedBy)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault()
+                })
                 .ToListAsync();
 
             var result = new CustomEmojiListDto
             {
-                Emojis = emojis.Select(x => MapToDto(x, tenant)).ToList(),
+                Emojis = emojis.Select(x => MapToDto(x.Emoji, tenant, x.CreatorFullName)).ToList(),
                 ETag = Guid.NewGuid().ToString("N")
             };
 
@@ -93,7 +104,12 @@ namespace Shrooms.Domain.Services.Emoji
             BumpGeneration(userOrg.OrganizationId);
             _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
 
-            return MapToDto(emoji, tenantName.ToLowerInvariant());
+            var creatorFullName = await _usersDbSet
+                .Where(u => u.Id == userOrg.UserId)
+                .Select(u => u.FirstName + " " + u.LastName)
+                .FirstOrDefaultAsync();
+
+            return MapToDto(emoji, tenantName.ToLowerInvariant(), creatorFullName);
         }
 
         public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
@@ -132,14 +148,15 @@ namespace Shrooms.Domain.Services.Emoji
             _generationCache.AddOrUpdate(organizationId, 1, (_, current) => current + 1);
         }
 
-        private static CustomEmojiDto MapToDto(CustomEmojiEntity emoji, string tenant)
+        private static CustomEmojiDto MapToDto(CustomEmojiEntity emoji, string tenant, string createdByFullName)
         {
             return new CustomEmojiDto
             {
                 Id = emoji.Id,
                 Name = emoji.Name,
                 Url = $"/storage/{tenant}/{emoji.BlobName}",
-                CreatedBy = emoji.CreatedBy
+                CreatedBy = emoji.CreatedBy,
+                CreatedByFullName = createdByFullName
             };
         }
     }
