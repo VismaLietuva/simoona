@@ -85,7 +85,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 Entitlement = entitlement,
                 BalanceAsOf = VacationWireFormat.ToDay(balanceAsOf),
                 Booked = booked,
-                Remaining = accruedNow - booked,
+                Remaining = Math.Round(accruedNow - booked, 2),
                 AccruedNow = accruedNow,
                 MonthlyAccrualRate = Math.Round(annualRate / 12, 2),
                 YearsOfService = user.YearsEmployed

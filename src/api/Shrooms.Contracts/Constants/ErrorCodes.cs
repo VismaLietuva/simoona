@@ -40,6 +40,7 @@ namespace Shrooms.Contracts.Constants
         // User settings. Culture, 9**
         public const int CultureUnsupported = 900;
         public const int TimezoneUnsupported = 901;
+        public const int SidebarFavoritesInvalid = 902;
 
         // Project, 11**
         public const int CantRemoveProjectOwner = 1100;

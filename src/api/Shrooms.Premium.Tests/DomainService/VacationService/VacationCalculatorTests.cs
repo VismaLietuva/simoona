@@ -239,6 +239,13 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
         }
 
         [Test]
+        public void ApproxAccruedNow_KeepsTwoDecimals()
+        {
+            // 10 days at 20 a year earns 0.5476.
+            Assert.That(VacationCalculator.ApproxAccruedNow(10, Monday, Monday.AddDays(10), 20), Is.EqualTo(10.55));
+        }
+
+        [Test]
         public void CommittedAnnualDays_ChargesOnlyThePartAfterTheCutoff()
         {
             var cutoff = new DateTime(2026, 8, 19);
