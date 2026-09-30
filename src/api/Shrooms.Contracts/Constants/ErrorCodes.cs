@@ -107,5 +107,9 @@ namespace Shrooms.Contracts.Constants
         public const int VacationImportUnreadable = 1917;
         public const int VacationOrderRaceLost = 1918;
         public const int VacationArchiveTooLarge = 1919;
+        public const int VacationParentalNotEntitled = 1920;
+        public const int VacationParentalLimit = 1921;
+        public const int VacationParentalHoursOnly = 1922;
+        public const int VacationParentalTypeInvalid = 1923;
     }
 }
