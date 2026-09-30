@@ -128,6 +128,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Deny by default: every endpoint requires an authenticated user unless it opts out with [AllowAnonymous]
+// (or .AllowAnonymous() on minimal endpoints). Until now a controller that forgot [Authorize] was only
+// protected as a side effect of MultiTenancyMiddleware rejecting requests without a tenant claim.
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
 // External cookie used to round-trip the identity returned by social IdPs back to /Account/ExternalLoginCallback.
 // Required because every social handler below uses IdentityConstants.ExternalScheme as its SignInScheme.
 var externalSchemeRegistered = false;
@@ -428,6 +438,15 @@ app.UseImageSharp();
 app.UseRouting();
 app.UseCors();
 
+// Swagger is a development aid: keep it out of Production (it lists every admin route) and register it
+// ahead of UseAuthorization so the deny-by-default fallback policy, which also covers middleware-served
+// paths, does not block the UI in Development.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
 app.UseMiddleware<ImageResizerMiddleware>();
@@ -437,14 +456,12 @@ app.UseAuthorization();
 // placing this earlier would serve stored responses without running the endpoint.s authorization.
 app.UseOutputCache();
 
-app.UseSwagger();
-app.UseSwaggerUI();
 
 app.UseHangfireDashboard();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz").AllowAnonymous();
 app.MapEmailPreview();
 
 // Serve uploaded pictures via the configured IStorage so the same provider that handles
