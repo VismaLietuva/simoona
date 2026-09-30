@@ -128,5 +128,37 @@ namespace Shrooms.Tests.DomainService
                 async () => await _pictureService.UploadOriginalAsync(stream, "image/jpeg", "garbage.jpg", 2),
                 Throws.ArgumentException);
         }
+
+        [Test]
+        public async Task RemoveImage_ShouldForwardToStorage_WhenKeyIsBareFileName()
+        {
+            await _pictureService.RemoveImageAsync("746afdc0-ea3b-4a94-836e-5e3e7774bca3.jpg", 2);
+
+            await _storage.Received(1).RemovePictureAsync("746afdc0-ea3b-4a94-836e-5e3e7774bca3.jpg", "pictures");
+        }
+
+        [TestCase("../../appsettings.json")]
+        [TestCase("..\\..\\appsettings.json")]
+        [TestCase("sub/dir.jpg")]
+        [TestCase("")]
+        [TestCase(null)]
+        public async Task RemoveImage_ShouldNotTouchStorage_WhenKeyIsNotABareFileName(string key)
+        {
+            await _pictureService.RemoveImageAsync(key, 2);
+
+            await _storage.DidNotReceiveWithAnyArgs().RemovePictureAsync(default, default);
+        }
+
+        [TestCase("photo.jpg", ".jpg")]
+        [TestCase("photo.JPG", ".jpg")]
+        [TestCase("photo.p n g", ".png")]
+        [TestCase("photo.jp*g", ".jpg")]
+        public async Task UploadFromStream_ShouldGenerateKeyThatPassesGuard(string fileName, string expectedExtension)
+        {
+            var result = await _pictureService.UploadFromStreamAsync(null, null, fileName, 2);
+
+            Assert.That(result, Does.EndWith(expectedExtension));
+            Assert.That(Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(result), Is.True);
+        }
     }
 }
