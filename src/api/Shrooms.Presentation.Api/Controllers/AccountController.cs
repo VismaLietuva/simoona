@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Shrooms.Presentation.Api.Filters;
 using Microsoft.AspNetCore.WebUtilities;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
@@ -82,6 +84,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [AllowAnonymous]
         [Route("Register")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
@@ -126,6 +129,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RequestPasswordReset")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RequestPasswordReset([FromBody] ForgotPasswordViewModel model)
         {
@@ -149,6 +153,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("VerifyEmail")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailViewModel model)
         {
@@ -177,6 +182,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("ResetPassword")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
         {
