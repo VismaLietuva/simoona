@@ -31,6 +31,11 @@ using Shrooms.Presentation.Api.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = false;
+});
 
 // DbContext with per-request tenant-aware connection string
 builder.Services.AddHttpContextAccessor();
@@ -476,6 +481,42 @@ if (trustForwardedHeaders)
     app.UseForwardedHeaders(forwardedHeadersOptions);
 }
 
+// Transport and response hardening. HSTS/HTTPS redirect are skipped for local development (plain
+// http) and the docker-compose environment; App Service terminates TLS and reports the original
+// scheme through X-Forwarded-Proto, which the forwarded-headers block above honours.
+var enforceHttps = builder.Configuration.GetValue<bool?>("EnforceHttps")
+    ?? !(app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"));
+if (enforceHttps)
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
+
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var headers = context.Response.Headers;
+        headers["X-Content-Type-Options"] = "nosniff";
+        headers["X-Frame-Options"] = "DENY";
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+
+        // JSON and image responses never need to run anything. Swagger UI and the Hangfire dashboard
+        // are real pages with their own scripts, so they are left out.
+        var path = context.Request.Path.Value ?? string.Empty;
+        if (!path.Contains("/swagger", StringComparison.OrdinalIgnoreCase)
+            && !path.Contains("/hangfire", StringComparison.OrdinalIgnoreCase))
+        {
+            headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 // Normalize double-slash paths (e.g. //Account/Foo → /Account/Foo) sent by the SPA
 app.Use(async (context, next) =>
 {
@@ -544,7 +585,12 @@ app.UseAuthorization();
 app.UseOutputCache();
 
 
-app.UseHangfireDashboard();
+// Job dashboard: an authenticated Admin only. The deny-by-default fallback policy already demands a
+// JWT; this replaces Hangfire's local-request filter, which is meaningless behind a reverse proxy.
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAdminAuthorizationFilter() }
+});
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");

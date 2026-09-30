@@ -295,7 +295,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
             foreach (var provider in ExternalProviders)
             {
-                if (!ContainsProvider(organizationProviders, provider))
+                // Only providers the organisation enabled AND whose scheme is actually registered (i.e. the
+                // credentials are configured); otherwise the button would lead to a 400 from ExternalLogin.
+                if (!ContainsProvider(organizationProviders, provider) || !await IsKnownExternalProviderAsync(provider))
                 {
                     continue;
                 }
