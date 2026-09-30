@@ -23,6 +23,10 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
+using Shrooms.Presentation.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,12 +72,20 @@ builder.Services.AddScoped<IWidgetCacheInvalidator, WidgetCacheInvalidator>();
 // ASP.NET Core Identity (provides UserManager, RoleManager infra)
 builder.Services.AddIdentityCore<ApplicationUser>(opts =>
 {
-    opts.Password.RequireDigit = false;
-    opts.Password.RequireLowercase = false;
+    // Mirrors the Next.js client's password schema (src/lib/password-schema.ts) so the server is the
+    // authority and the client only gives early feedback.
+    opts.Password.RequireDigit = true;
+    opts.Password.RequireLowercase = true;
+    opts.Password.RequireUppercase = true;
     opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireUppercase = false;
-    opts.Password.RequiredLength = 6;
+    opts.Password.RequiredLength = 8;
     opts.SignIn.RequireConfirmedEmail = false;
+
+    // Brute-force protection: five wrong passwords lock the account for fifteen minutes. The token
+    // endpoint records failures and resets the counter on success.
+    opts.Lockout.AllowedForNewUsers = true;
+    opts.Lockout.MaxFailedAccessAttempts = 5;
+    opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ShroomsDbContext>()
@@ -229,6 +241,32 @@ builder.Services.AddCors(options =>
                   .WithExposedHeaders("Content-Disposition");
         }
     });
+});
+
+// Rate limiting for the anonymous authentication routes (/token, register, password reset, verify).
+// Fixed window per client IP; the account lockout above covers per-user credential stuffing.
+var authRequestsPerMinute = int.TryParse(builder.Configuration["AuthRateLimitPerMinute"], out var authLimit) && authLimit > 0
+    ? authLimit
+    : 10;
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsync(
+            "{\"error\":\"too_many_requests\",\"error_description\":\"Too many attempts. Try again in a minute.\"}",
+            cancellationToken);
+    };
+    options.AddPolicy(AuthRateLimit.PolicyName, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = authRequestsPerMinute,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 // SignalR (in-box with Sdk.Web)
@@ -417,6 +455,23 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
+// Behind a reverse proxy (Azure App Service, Docker) the client address arrives in X-Forwarded-For.
+// The rate limiter and the JWT failure log key on RemoteIpAddress, so honour the header there. Only the
+// right-most entry is used (ForwardLimit = 1), which is the one the trusted proxy appended. Disabled in
+// Development, where Kestrel is reached directly and a client could otherwise spoof its own address.
+var trustForwardedHeaders = builder.Configuration.GetValue<bool?>("TrustForwardedHeaders") ?? !app.Environment.IsDevelopment();
+if (trustForwardedHeaders)
+{
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        ForwardLimit = 1
+    };
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedHeadersOptions);
+}
+
 // Normalize double-slash paths (e.g. //Account/Foo → /Account/Foo) sent by the SPA
 app.Use(async (context, next) =>
 {
@@ -464,6 +519,7 @@ app.UseImageSharp();
 
 app.UseRouting();
 app.UseCors();
+app.UseRateLimiter();
 
 // Swagger is a development aid: keep it out of Production (it lists every admin route) and register it
 // ahead of UseAuthorization so the deny-by-default fallback policy, which also covers middleware-served

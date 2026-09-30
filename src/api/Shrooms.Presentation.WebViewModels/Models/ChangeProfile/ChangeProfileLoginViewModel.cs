@@ -15,7 +15,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.ChangeProfile
 
         [Required]
         [DataType(DataType.Password)]
-        [StringLength(255, MinimumLength = 6)]
+        [StringLength(255, MinimumLength = 8)]
         public string NewPassword { get; set; }
     }
 }
