@@ -162,7 +162,15 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 holidays,
                 request.DateFrom);
 
-            await EnsureParentalAllowedAsync(parsed.Type, parsed.DateFrom, parsed.DateTo, ownRequests, holidays, userOrg);
+            // Otherwise requests without an entitlement could not even have their note edited.
+            var bookingChanged = request.Type != parsed.Type
+                                 || request.DateFrom != parsed.DateFrom
+                                 || request.DateTo != parsed.DateTo;
+
+            if (bookingChanged)
+            {
+                await EnsureParentalAllowedAsync(parsed.Type, parsed.DateFrom, parsed.DateTo, ownRequests, holidays, userOrg);
+            }
 
             var before = Snapshot(request);
 
