@@ -1,7 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
@@ -41,7 +40,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
-                queryableSet = queryableSet.Where(string.Format("{0}={1} || {0}=null", ClaimOrganizationId, OrganizationId));
+                queryableSet = queryableSet.Where(OrganizationFilter(OrganizationId));
             }
 
             if (filter != null)
@@ -56,7 +55,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -66,7 +65,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                queryableSet = queryableSet.OrderBy(orderBy);
+                queryableSet = SafeQuery.OrderBy(queryableSet, orderBy);
             }
 
             return queryableSet;
@@ -79,7 +78,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
-                queryableSet = queryableSet.Where(string.Format("{0}={1} || {0}=null", ClaimOrganizationId, OrganizationId));
+                queryableSet = queryableSet.Where(OrganizationFilter(OrganizationId));
             }
 
             if (filter != null)
@@ -94,7 +93,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -123,6 +122,21 @@ namespace Shrooms.DataLayer.DAL
 
             // Use ToPagedList() which is synchronous, as X.PagedList doesn't have proper EF Core async support
             return await Task.FromResult(queryableSet.ToPagedList(page.Value, pageSize));
+        }
+
+        // Typed replacement for the former Dynamic LINQ "OrganizationId=N || OrganizationId=null" filter.
+        private static Expression<Func<TEntity, bool>> OrganizationFilter(int organizationId)
+        {
+            var entity = Expression.Parameter(typeof(TEntity), "e");
+            var property = Expression.Property(entity, ClaimOrganizationId);
+
+            Expression body = property.Type == typeof(int?)
+                ? Expression.OrElse(
+                    Expression.Equal(property, Expression.Constant(organizationId, typeof(int?))),
+                    Expression.Equal(property, Expression.Constant(null, typeof(int?))))
+                : Expression.Equal(property, Expression.Constant(organizationId));
+
+            return Expression.Lambda<Func<TEntity, bool>>(body, entity);
         }
 
         public virtual async Task<TEntity> GetByIdAsync(object id)

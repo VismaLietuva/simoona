@@ -1,8 +1,8 @@
+using System.Linq;
 using NUnit.Framework;
 using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
 using Shrooms.Infrastructure.Sorting;
 
 namespace Shrooms.Tests.Extensions
@@ -34,7 +34,7 @@ namespace Shrooms.Tests.Extensions
                 SortByProperties = sortByProperties
             };
 
-            var expectedQuery = _mockDbSet.OrderBy("Id asc").ToString();
+            var expectedQuery = _mockDbSet.OrderBy(x => x.Id).ToString();
 
             // Act
             var actualQuery = _mockDbSet.OrderByPropertyNames(sortable).ToString();
@@ -53,7 +53,7 @@ namespace Shrooms.Tests.Extensions
                 SortByProperties = $"{nameof(MockModel.Value)} asc;{nameof(MockModel.Id)} desc;"
             };
 
-            var expectedQuery = _mockDbSet.OrderBy($"{nameof(MockModel.Value)} asc, {nameof(MockModel.Id)} desc").ToString();
+            var expectedQuery = _mockDbSet.OrderBy(x => x.Value).ThenByDescending(x => x.Id).ToString();
 
             // Act
             var actualQuery = _mockDbSet.OrderByPropertyNames(sortable).ToString();
