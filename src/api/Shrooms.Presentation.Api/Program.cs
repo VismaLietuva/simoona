@@ -69,6 +69,10 @@ builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbCont
 builder.Services.AddOutputCache();
 builder.Services.AddScoped<IWidgetCacheInvalidator, WidgetCacheInvalidator>();
 
+// Allowed origins for the external-login returnUrl: ClientUrl plus CorsOrigins (and AllowedReturnUrlOrigins).
+builder.Services.AddSingleton<Shrooms.Presentation.Api.Helpers.IReturnUrlValidator>(sp =>
+    new Shrooms.Presentation.Api.Helpers.ReturnUrlValidator(sp.GetRequiredService<IConfiguration>()));
+
 // ASP.NET Core Identity (provides UserManager, RoleManager infra)
 builder.Services.AddIdentityCore<ApplicationUser>(opts =>
 {

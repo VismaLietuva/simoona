@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Api.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
@@ -40,6 +41,15 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IAdministrationUsersService _administrationService;
         private readonly IApplicationSettings _applicationSettings;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IReturnUrlValidator _returnUrlValidator;
+        private readonly IAuthenticationSchemeProvider _schemeProvider;
+
+        private static readonly string[] ExternalProviders =
+        {
+            AuthenticationConstants.GoogleLoginProvider,
+            AuthenticationConstants.FacebookLoginProvider,
+            AuthenticationConstants.MicrosoftLoginProvider,
+        };
 
         private string RequestedOrganization => HttpContext.GetRequestedTenant();
 
@@ -51,8 +61,12 @@ namespace Shrooms.Presentation.Api.Controllers
             IRefreshTokenService refreshTokenService,
             IAdministrationUsersService administrationService,
             IApplicationSettings applicationSettings,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            IReturnUrlValidator returnUrlValidator,
+            IAuthenticationSchemeProvider schemeProvider)
         {
+            _returnUrlValidator = returnUrlValidator;
+            _schemeProvider = schemeProvider;
             _mapper = mapper;
             _userManager = userManager;
             _permissionService = permissionService;
@@ -250,6 +264,11 @@ namespace Shrooms.Presentation.Api.Controllers
         [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
+            if (!_returnUrlValidator.IsAllowed(returnUrl))
+            {
+                return BadRequest("returnUrl must point to a configured client origin.");
+            }
+
             var logins = new List<ExternalLoginViewModel>();
             var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
 
@@ -258,14 +277,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Ok(logins);
             }
 
-            var externalProviders = new[]
-            {
-                AuthenticationConstants.GoogleLoginProvider,
-                AuthenticationConstants.FacebookLoginProvider,
-                AuthenticationConstants.MicrosoftLoginProvider,
-            };
-
-            foreach (var provider in externalProviders)
+            foreach (var provider in ExternalProviders)
             {
                 if (!ContainsProvider(organizationProviders, provider))
                 {
@@ -295,11 +307,24 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("ExternalLogin")]
-        public IActionResult ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
+        public async Task<IActionResult> ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
             if (string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(returnUrl))
             {
                 return BadRequest();
+            }
+
+            // The callback appends the access token to returnUrl as a fragment, so only origins we
+            // configured may ever receive it. Checked here, before the IdP round-trip, and again in the
+            // callback because both parameters travel through the IdP redirect.
+            if (!_returnUrlValidator.IsAllowed(returnUrl))
+            {
+                return BadRequest("returnUrl must point to a configured client origin.");
+            }
+
+            if (!await IsKnownExternalProviderAsync(provider))
+            {
+                return BadRequest("Unknown authentication provider.");
             }
 
             var callback = Url.Action(nameof(ExternalLoginCallback), "Account", new
@@ -320,6 +345,11 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IActionResult> ExternalLoginCallback(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
             if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider))
+            {
+                return BadRequest();
+            }
+
+            if (!_returnUrlValidator.IsAllowed(returnUrl) || !await IsKnownExternalProviderAsync(provider))
             {
                 return BadRequest();
             }
@@ -402,6 +432,18 @@ namespace Shrooms.Presentation.Api.Controllers
                 ["isRegistration"] = isRegistration ? "true" : "false"
             };
             return QueryHelpers.AddQueryString("/Account/ExternalLogin", qs);
+        }
+
+        // Only the social providers Simoona knows, and only when the scheme is actually registered
+        // (a provider without configured credentials is not added at startup).
+        private async Task<bool> IsKnownExternalProviderAsync(string provider)
+        {
+            if (!ExternalProviders.Contains(provider, StringComparer.Ordinal))
+            {
+                return false;
+            }
+
+            return await _schemeProvider.GetSchemeAsync(provider) != null;
         }
 
         private static string AppendHash(string url, string hash)
