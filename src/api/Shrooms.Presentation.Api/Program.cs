@@ -79,8 +79,20 @@ builder.Services.AddIdentityCore<ApplicationUser>(opts =>
     .AddEntityFrameworkStores<ShroomsDbContext>()
     .AddDefaultTokenProviders();
 
-// JWT Authentication
-var jwtKey = builder.Configuration["JwtSecret"] ?? "default-secret-key-change-in-production-min32chars!!";
+// JWT Authentication. No fallback key: a deployment without JwtSecret must fail to start rather than
+// validate tokens against a public string. Issuer and audience are validated too, so a token minted
+// for another Simoona instance that happens to share a key is rejected.
+var jwtKey = builder.Configuration["JwtSecret"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException("JwtSecret must be configured and at least 32 bytes long.");
+}
+if (builder.Environment.IsProduction() && jwtKey.StartsWith("your-secret-key", StringComparison.OrdinalIgnoreCase))
+{
+    throw new InvalidOperationException("JwtSecret is still the sample value from appsettings.json; set a real secret in Production.");
+}
+var jwtIssuer = builder.Configuration["JwtIssuer"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultIssuer;
+var jwtAudience = builder.Configuration["JwtAudience"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultAudience;
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -93,8 +105,10 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
         ClockSkew = TimeSpan.FromSeconds(30)
     };
     // Allow token from query string for SignalR
@@ -192,6 +206,15 @@ builder.Services.AddCors(options =>
     {
         if (string.IsNullOrEmpty(corsOrigins) || corsOrigins == "*")
         {
+            // Reflecting any origin together with credentials is only acceptable for local development
+            // (Development and the docker-compose "Docker" environment). Everywhere else an explicit
+            // semicolon-separated origin list is required.
+            if (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Docker"))
+            {
+                throw new InvalidOperationException(
+                    "CorsOrigins must list the allowed client origins (semicolon-separated) outside Development; '*' is not permitted.");
+            }
+
             // AllowAnyOrigin() cannot be combined with AllowCredentials() per CORS spec.
             // SetIsOriginAllowed echoes the actual request origin, satisfying withCredentials.
             policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
@@ -309,6 +332,10 @@ builder.Services.AddImageSharp(options =>
             context.Commands.Remove("mode");
             context.Commands.Add("rmode", mode);
         }
+
+        // The resize endpoint is anonymous: cap requested dimensions so a single URL cannot
+        // make the server allocate a huge canvas or fill the on-disk cache with giant variants.
+        ResizeCommandGuard.Clamp(context.Commands);
         if (defaultOnParse != null)
         {
             await defaultOnParse(context);
@@ -468,12 +495,15 @@ app.MapEmailPreview();
 // uploads also handles reads (local FS in dev, Azure Blob in staging/prod). Browser <img>
 // tags don't send JWT, so this endpoint is anonymous — GUID filenames make URLs unguessable.
 var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage) =>
+app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage, HttpContext httpContext) =>
 {
     // Reject anything that is not a bare file name before it reaches the storage provider. Route values are
     // URL-decoded, so "..%5C..%5Cappsettings.json" would otherwise arrive as a backslash traversal on Windows.
+    // Only image extensions are ever stored, so only those are served. Anything else (e.g. a legacy
+    // ".html" key) is treated as missing rather than handed to the browser with a sniffable type.
     if (!Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(filename)
-        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeContainer(tenant))
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeContainer(tenant)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.HasAllowedImageExtension(filename))
     {
         return Results.NotFound();
     }
@@ -489,6 +519,7 @@ app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename
         contentType = "application/octet-stream";
     }
 
+    httpContext.Response.Headers["X-Content-Type-Options"] = "nosniff";
     return Results.File(stream, contentType);
 }).AllowAnonymous();
 

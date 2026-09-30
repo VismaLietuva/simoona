@@ -15,6 +15,39 @@ namespace Shrooms.Infrastructure.Storage
         public const int MaxBlobKeyLength = 255;
         public const int MaxContainerLength = 63;
 
+        /// <summary>
+        /// The only extensions a picture may be stored under, and the only ones the anonymous storage
+        /// endpoint will serve. Keeps client-controlled names like "x.html" or "x.svg" from ever becoming
+        /// a document that renders on the API origin.
+        /// </summary>
+        public static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+
+        public static bool HasAllowedImageExtension(string blobKey)
+        {
+            if (string.IsNullOrEmpty(blobKey))
+            {
+                return false;
+            }
+
+            var extension = Path.GetExtension(blobKey);
+            return extension.Length > 0
+                && Array.Exists(AllowedImageExtensions, e => string.Equals(e, extension, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>Maps an allowlisted image media type to the extension used for stored keys, or null.</summary>
+        public static string ExtensionForMimeType(string mimeType)
+        {
+            return mimeType?.ToLowerInvariant() switch
+            {
+                "image/jpeg" or "image/jpg" or "image/pjpeg" => ".jpg",
+                "image/png" => ".png",
+                "image/gif" => ".gif",
+                "image/bmp" or "image/x-ms-bmp" => ".bmp",
+                "image/webp" => ".webp",
+                _ => null
+            };
+        }
+
         public static bool IsSafeBlobKey(string blobKey)
         {
             if (string.IsNullOrWhiteSpace(blobKey) || blobKey.Length > MaxBlobKeyLength)

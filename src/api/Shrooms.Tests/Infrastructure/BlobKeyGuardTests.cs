@@ -65,6 +65,40 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(BlobKeyGuard.IsSafeContainer(container), Is.False);
         }
 
+        [TestCase("a.jpg")]
+        [TestCase("a.JPEG")]
+        [TestCase("a.png")]
+        [TestCase("a.gif")]
+        [TestCase("a.bmp")]
+        [TestCase("a.webp")]
+        public void HasAllowedImageExtension_AcceptsImageExtensions(string key)
+        {
+            Assert.That(BlobKeyGuard.HasAllowedImageExtension(key), Is.True);
+        }
+
+        [TestCase("a.html")]
+        [TestCase("a.svg")]
+        [TestCase("a.xhtml")]
+        [TestCase("a.js")]
+        [TestCase("a")]
+        [TestCase("")]
+        [TestCase(null)]
+        public void HasAllowedImageExtension_RejectsEverythingElse(string key)
+        {
+            Assert.That(BlobKeyGuard.HasAllowedImageExtension(key), Is.False);
+        }
+
+        [TestCase("image/jpeg", ".jpg")]
+        [TestCase("IMAGE/PNG", ".png")]
+        [TestCase("image/webp", ".webp")]
+        [TestCase("image/svg+xml", null)]
+        [TestCase("text/html", null)]
+        [TestCase(null, null)]
+        public void ExtensionForMimeType_MapsOnlyAllowedImageTypes(string mimeType, string expected)
+        {
+            Assert.That(BlobKeyGuard.ExtensionForMimeType(mimeType), Is.EqualTo(expected));
+        }
+
         [Test]
         public void EnsureSafeBlobKey_ThrowsForTraversal()
         {
