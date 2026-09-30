@@ -324,6 +324,21 @@ if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
     builder.Services.AddSingleton<IImageCache, NullImageCache>();
 }
 
+// Webhook Basic auth guards the external job endpoints (/externaljobs, /externalpremiumjobs). Refuse to start
+// in Production when the credentials are missing or still the sample values from appsettings.json, so a
+// deployment that forgot to override the template cannot expose those endpoints.
+if (builder.Environment.IsProduction())
+{
+    var basicUsername = builder.Configuration["BasicUsername"];
+    var basicPassword = builder.Configuration["BasicPassword"];
+    if (string.IsNullOrWhiteSpace(basicUsername) || string.IsNullOrWhiteSpace(basicPassword)
+        || basicUsername == "basicUsername" || basicPassword == "basicPassword")
+    {
+        throw new InvalidOperationException(
+            "BasicUsername and BasicPassword must be set to non-default values in Production. They protect the external job endpoints.");
+    }
+}
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
