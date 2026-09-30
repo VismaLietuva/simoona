@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
@@ -22,7 +21,13 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            var pictureName = GetNewPictureName(fileName);
+            // Legacy endpoint without a magic-byte check: the stored extension comes from the client file
+            // name only when it is an allowlisted image extension, otherwise from the (controller-validated)
+            // media type. Anything else is rejected so no ".html"/".svg" key can be created.
+            var extension = AllowedExtensionFromFileName(fileName) ?? BlobKeyGuard.ExtensionForMimeType(mimeType)
+                ?? throw new ArgumentException("Unsupported image type.");
+
+            var pictureName = GetNewPictureName(extension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
@@ -38,14 +43,17 @@ namespace Shrooms.Domain.Services.Picture
             // We intentionally do NOT decode dimensions here — this endpoint streams
             // the bytes to storage verbatim and never decodes them, so the decode-bomb
             // attack surface lives on the serve path, not here.
-            if (!await IsRecognizedImageAsync(stream))
+            var detectedExtension = await DetectImageExtensionAsync(stream);
+            if (detectedExtension == null)
             {
                 throw new ArgumentException("Image format not recognized.");
             }
 
             stream.Position = 0;
 
-            var pictureName = GetNewPictureName(fileName);
+            // The stored extension follows the detected format, never the client file name, so a
+            // "GIF89a<script>" polyglot named x.html is stored (and served) as a .gif.
+            var pictureName = GetNewPictureName(detectedExtension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
@@ -68,37 +76,37 @@ namespace Shrooms.Domain.Services.Picture
             await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
         }
 
-        private static async Task<bool> IsRecognizedImageAsync(Stream stream)
+        private static async Task<string> DetectImageExtensionAsync(Stream stream)
         {
             var header = new byte[12];
             var read = await stream.ReadAsync(header.AsMemory(0, header.Length));
             if (read < 4)
             {
-                return false;
+                return null;
             }
 
             // JPEG: FF D8 FF
             if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
             {
-                return true;
+                return ".jpg";
             }
 
             // PNG: 89 50 4E 47 0D 0A 1A 0A
             if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
             {
-                return true;
+                return ".png";
             }
 
             // GIF: "GIF8"
             if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
             {
-                return true;
+                return ".gif";
             }
 
             // BMP: "BM"
             if (header[0] == 0x42 && header[1] == 0x4D)
             {
-                return true;
+                return ".bmp";
             }
 
             // WebP: "RIFF" ???? "WEBP"
@@ -106,22 +114,26 @@ namespace Shrooms.Domain.Services.Picture
                 && header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46
                 && header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
             {
-                return true;
+                return ".webp";
             }
 
-            return false;
+            return null;
         }
 
-        private static string GetNewPictureName(string fileName)
+        private static string AllowedExtensionFromFileName(string fileName)
         {
-            var id = Guid.NewGuid().ToString();
-            var extension = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
 
-            // Keep only alphanumerics from the client-supplied extension so the generated key always
-            // passes BlobKeyGuard (no separators, spaces or control characters can sneak in).
-            var safeExtension = new string(extension.Where(char.IsAsciiLetterOrDigit).Take(10).ToArray());
+            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
+            return BlobKeyGuard.HasAllowedImageExtension(extension) ? extension : null;
+        }
 
-            return safeExtension.Length > 0 ? $"{id}.{safeExtension}" : id;
+        private static string GetNewPictureName(string extension)
+        {
+            return $"{Guid.NewGuid()}{extension}";
         }
 
         private async Task<string> GetPictureContainerAsync(int id)

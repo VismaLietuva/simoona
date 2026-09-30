@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -149,16 +150,56 @@ namespace Shrooms.Tests.DomainService
             await _storage.DidNotReceiveWithAnyArgs().RemovePictureAsync(default, default);
         }
 
-        [TestCase("photo.jpg", ".jpg")]
-        [TestCase("photo.JPG", ".jpg")]
-        [TestCase("photo.p n g", ".png")]
-        [TestCase("photo.jp*g", ".jpg")]
-        public async Task UploadFromStream_ShouldGenerateKeyThatPassesGuard(string fileName, string expectedExtension)
+        [TestCase("photo.jpg", "image/png", ".jpg")]
+        [TestCase("photo.JPG", null, ".jpg")]
+        [TestCase("photo.webp", null, ".webp")]
+        [TestCase("blob", "image/png", ".png")]
+        [TestCase("photo.html", "image/jpeg", ".jpg")]
+        [TestCase("photo.svg", "image/gif", ".gif")]
+        [TestCase("photo.p n g", "image/bmp", ".bmp")]
+        public async Task UploadFromStream_ShouldStoreOnlyAllowlistedImageExtensions(string fileName, string mimeType, string expectedExtension)
         {
-            var result = await _pictureService.UploadFromStreamAsync(null, null, fileName, 2);
+            var result = await _pictureService.UploadFromStreamAsync(null, mimeType, fileName, 2);
 
             Assert.That(result, Does.EndWith(expectedExtension));
             Assert.That(Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(result), Is.True);
+            Assert.That(Shrooms.Infrastructure.Storage.BlobKeyGuard.HasAllowedImageExtension(result), Is.True);
+        }
+
+        [TestCase("photo.html", "text/html")]
+        [TestCase("photo.svg", "image/svg+xml")]
+        [TestCase("photo.exe", null)]
+        [TestCase("noextension", "application/octet-stream")]
+        public void UploadFromStream_ShouldReject_WhenNeitherExtensionNorMimeTypeIsAnAllowedImage(string fileName, string mimeType)
+        {
+            Assert.That(
+                async () => await _pictureService.UploadFromStreamAsync(null, mimeType, fileName, 2),
+                Throws.ArgumentException);
+
+            _storage.DidNotReceiveWithAnyArgs().UploadPictureAsync(default, default, default, default);
+        }
+
+        [Test]
+        public async Task UploadOriginal_ShouldDeriveExtensionFromDetectedFormat_NotFromFileName()
+        {
+            using var stream = new MemoryStream(GifHeader.Concat(Encoding.ASCII.GetBytes("<script>alert(1)</script>")).ToArray());
+
+            var result = await _pictureService.UploadOriginalAsync(stream, "image/png", "polyglot.html", 2);
+
+            Assert.That(result, Does.EndWith(".gif"));
+            await _storage.Received(1).UploadPictureAsync(Arg.Any<Stream>(), result, "image/png", "pictures");
+        }
+
+        [TestCase("image/jpeg", "anything.png", ".jpg")]
+        [TestCase("image/png", "x.jpg", ".png")]
+        public async Task UploadOriginal_ShouldUseDetectedFormat(string mimeType, string fileName, string expectedExtension)
+        {
+            var header = expectedExtension == ".jpg" ? JpegHeader : PngHeader;
+            using var stream = new MemoryStream(header);
+
+            var result = await _pictureService.UploadOriginalAsync(stream, mimeType, fileName, 2);
+
+            Assert.That(result, Does.EndWith(expectedExtension));
         }
     }
 }
