@@ -13,6 +13,8 @@ using Shrooms.Presentation.Common.Filters;
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
     [Route("ExternalPremiumJobs")]
+    // Authenticated by the Basic filter below, not by JWT: opt out of the fallback policy explicitly.
+    [AllowAnonymous]
     [IdentityBasicAuthentication]
     public class ExternalPremiumJobsController : BaseController
     {

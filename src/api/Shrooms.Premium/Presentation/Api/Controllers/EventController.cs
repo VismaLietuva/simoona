@@ -433,6 +433,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("GetPagedReportParticipants")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [ProducesResponseType(typeof(PagedViewModel<EventParticipantReportViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPagedReportParticipants([FromQuery] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
         {
