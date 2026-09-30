@@ -438,6 +438,14 @@ app.MapEmailPreview();
 var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
 app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage) =>
 {
+    // Reject anything that is not a bare file name before it reaches the storage provider. Route values are
+    // URL-decoded, so "..%5C..%5Cappsettings.json" would otherwise arrive as a backslash traversal on Windows.
+    if (!Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(filename)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeContainer(tenant))
+    {
+        return Results.NotFound();
+    }
+
     var stream = await storage.GetPictureAsync(filename, tenant.ToLowerInvariant());
     if (stream == null)
     {

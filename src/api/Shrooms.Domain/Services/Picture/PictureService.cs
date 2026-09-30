@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
@@ -54,6 +55,14 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task RemoveImageAsync(string blobKey, int orgId)
         {
+            // Picture ids are stored from client input. A key that is not a bare file name can never have been
+            // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
+            // profile with a tampered picture id editable while the storage layer stays a hard boundary.
+            if (!BlobKeyGuard.IsSafeBlobKey(blobKey))
+            {
+                return;
+            }
+
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
@@ -106,9 +115,13 @@ namespace Shrooms.Domain.Services.Picture
         private static string GetNewPictureName(string fileName)
         {
             var id = Guid.NewGuid().ToString();
-            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
+            var extension = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
 
-            return $"{id}{extension}";
+            // Keep only alphanumerics from the client-supplied extension so the generated key always
+            // passes BlobKeyGuard (no separators, spaces or control characters can sneak in).
+            var safeExtension = new string(extension.Where(char.IsAsciiLetterOrDigit).Take(10).ToArray());
+
+            return safeExtension.Length > 0 ? $"{id}.{safeExtension}" : id;
         }
 
         private async Task<string> GetPictureContainerAsync(int id)

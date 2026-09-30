@@ -69,6 +69,13 @@ namespace Shrooms.Presentation.Api.Middlewares
             var tenant = match.Groups["tenant"].Value.ToLowerInvariant();
             var file = match.Groups["file"].Value;
 
+            // The "file" group is greedy and the path is already URL-decoded, so guard against
+            // traversal before handing the key to the storage provider.
+            if (!BlobKeyGuard.IsSafeBlobKey(file) || !BlobKeyGuard.IsSafeContainer(tenant))
+            {
+                return null;
+            }
+
             // Per-request scoped resolution (see constructor comment).
             var storage = context.RequestServices.GetRequiredService<IStorage>();
             var source = await storage.GetPictureAsync(file, tenant);
