@@ -10,6 +10,7 @@ using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.Presentation.ModelMappings.Resolvers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Banners;
@@ -243,6 +244,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<Room, RoomPostViewModel>(MemberList.None);
 
             CreateMap<Room, RoomMiniViewModel>(MemberList.None);
+
+            CreateMap<Seat, PermanentSeatViewModel>(MemberList.None);
 
             CreateMap<ApplicationRole, RoleViewModel>(MemberList.None);
 
