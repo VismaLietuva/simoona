@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Logging;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
@@ -43,6 +44,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IReturnUrlValidator _returnUrlValidator;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
+        private readonly ILogger<AccountController> _logger;
 
         private static readonly string[] ExternalProviders =
         {
@@ -63,10 +65,12 @@ namespace Shrooms.Presentation.Api.Controllers
             IApplicationSettings applicationSettings,
             IJwtTokenService jwtTokenService,
             IReturnUrlValidator returnUrlValidator,
-            IAuthenticationSchemeProvider schemeProvider)
+            IAuthenticationSchemeProvider schemeProvider,
+            ILogger<AccountController> logger)
         {
             _returnUrlValidator = returnUrlValidator;
             _schemeProvider = schemeProvider;
+            _logger = logger;
             _mapper = mapper;
             _userManager = userManager;
             _permissionService = permissionService;
@@ -108,30 +112,42 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (await _administrationService.UserEmailExistsAsync(model.Email))
+            // Internal (password) accounts must be enabled for the organisation, and when it restricts
+            // sign-ups to its own email domain that applies to internal registration too, not only social.
+            var organization = await _organizationService.GetOrganizationByNameAsync(RequestedOrganization);
+            if (!ContainsProvider(organization.AuthenticationProviders ?? string.Empty, AuthenticationConstants.InternalLoginProvider))
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                return BadRequest(new { error = "internal_registration_disabled" });
+            }
 
-                if (user == null || user.EmailConfirmed || !await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
+            if (!await _organizationService.IsOrganizationHostValidAsync(model.Email, RequestedOrganization))
+            {
+                return BadRequest(new { error = "email_host_not_allowed" });
+            }
+
+            var existing = await _userManager.FindByEmailAsync(model.Email);
+            if (existing != null)
+            {
+                // The caller has not proven ownership of this address, so the account is never modified.
+                // An unconfirmed internal account just gets its verification email again; a confirmed one
+                // gets nothing. Both answer 200 so the endpoint does not reveal which addresses exist.
+                if (!existing.EmailConfirmed
+                    && await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
-                    return BadRequest("User already exists");
+                    await _administrationService.SendUserVerificationEmailAsync(existing, RequestedOrganization);
                 }
-
-                await _userManager.RemovePasswordAsync(user);
-                await _userManager.AddPasswordAsync(user, model.Password);
-                await _administrationService.SendUserVerificationEmailAsync(user, RequestedOrganization);
 
                 return Ok();
             }
 
             if (await _administrationService.UserIsSoftDeletedAsync(model.Email))
             {
-                await _administrationService.RestoreUserAsync(model.Email);
+                // Restoring a deleted account (with its previous roles) is an administrator action.
+                _logger.LogInformation("Registration attempted for a deleted account in {Organization}; not restoring.", RequestedOrganization);
                 return Ok();
             }
 
             var result = await _administrationService.CreateNewUserAsync(_mapper.Map<ApplicationUser>(model), model.Password, RequestedOrganization);
-
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -180,7 +196,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return InvalidTokenResult();
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, model.Code);
@@ -209,7 +225,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return InvalidTokenResult();
             }
 
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
@@ -489,6 +505,13 @@ namespace Shrooms.Presentation.Api.Controllers
             };
 
             return userInfo;
+        }
+
+        // Same shape as a failed ConfirmEmailAsync/ResetPasswordAsync, so an unknown address cannot be
+        // told apart from a bad code.
+        private IActionResult InvalidTokenResult()
+        {
+            return GetErrorResult(IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken()));
         }
 
         private IActionResult GetErrorResult(IdentityResult result)
