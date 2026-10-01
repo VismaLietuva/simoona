@@ -12,9 +12,11 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
@@ -50,6 +52,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Room> _roomRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
+        private readonly IRepository<Seat> _seatRepository;
 
         private readonly IRepository<QualificationLevel> _qualificationLevelRepository;
         private readonly IRepository<ApplicationRole> _rolesRepository;
@@ -88,6 +91,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _unitOfWork = unitOfWork;
             _roomRepository = _unitOfWork.GetRepository<Room>();
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
+            _seatRepository = _unitOfWork.GetRepository<Seat>();
             _rolesRepository = unitOfWork.GetRepository<ApplicationRole>();
             _examsRepository = _unitOfWork.GetRepository<Exam>();
             _skillsRepository = _unitOfWork.GetRepository<Skill>();
@@ -310,6 +314,12 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var model = _mapper.Map<ApplicationUserDetailsViewModel>(user);
+
+            // One permanent desk per person, enforced by SeatService.
+            var permanentSeat = await _seatRepository
+                .Get(s => s.OwnerId == user.Id && s.Type == SeatType.Permanent, includeProperties: "Room,Room.Floor,Room.Floor.Office")
+                .FirstOrDefaultAsync();
+            model.PermanentSeat = _mapper.Map<PermanentSeatViewModel>(permanentSeat);
 
             await InfoWithAdditionalPermissionsAsync(user, model);
 

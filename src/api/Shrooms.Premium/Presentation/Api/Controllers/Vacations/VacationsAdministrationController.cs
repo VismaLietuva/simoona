@@ -29,6 +29,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
         private readonly IVacationReportService _reportService;
         private readonly IVacationOrderService _orderService;
         private readonly IVacationService _vacationService;
+        private readonly IParentalEntitlementService _parentalService;
 
         public VacationsAdministrationController(
             IVacationRequestService requestService,
@@ -38,7 +39,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
             IVacationSettingsService settingsService,
             IVacationReportService reportService,
             IVacationOrderService orderService,
-            IVacationService vacationService)
+            IVacationService vacationService,
+            IParentalEntitlementService parentalService)
         {
             _requestService = requestService;
             _listService = listService;
@@ -48,6 +50,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
             _reportService = reportService;
             _orderService = orderService;
             _vacationService = vacationService;
+            _parentalService = parentalService;
         }
 
         [HttpGet]
@@ -99,6 +102,25 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
             var args = (query ?? new VacationStatisticsListingViewModel()).ToArgs(GetUserAndOrganization());
 
             return Ok(await _statisticsService.GetStatisticsAsync(args));
+        }
+
+        [HttpGet]
+        [Route("ParentalEntitlements")]
+        [ProducesResponseType(typeof(IEnumerable<ParentalEntitlementDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ParentalEntitlements([FromQuery] ParentalEntitlementListingViewModel query)
+        {
+            var args = (query ?? new ParentalEntitlementListingViewModel()).ToArgs(GetUserAndOrganization());
+
+            return Ok(await _parentalService.GetAllAsync(args));
+        }
+
+        [HttpPut]
+        [Route("ParentalEntitlements/{employeeId}")]
+        [ProducesResponseType(typeof(ParentalEntitlementDto), StatusCodes.Status200OK)]
+        public Task<IActionResult> SetParentalEntitlement(string employeeId, [FromBody] ParentalEntitlementViewModel model)
+        {
+            return GuardedAsync(() =>
+                _parentalService.SetAsync(employeeId, model?.Type, GetUserAndOrganization()));
         }
 
         [HttpGet]
