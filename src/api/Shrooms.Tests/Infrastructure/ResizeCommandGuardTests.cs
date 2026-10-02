@@ -8,7 +8,7 @@ namespace Shrooms.Tests.Infrastructure
     public class ResizeCommandGuardTests
     {
         [Test]
-        public void Clamp_LeavesDimensionsWithinLimitUntouched()
+        public void Clamp_LeavesAllowedSizesUntouched()
         {
             var commands = new CommandCollection { { "width", "640" }, { "height", "480" }, { "rmode", "max" } };
 
@@ -19,15 +19,21 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(commands["rmode"], Is.EqualTo("max"));
         }
 
-        [Test]
-        public void Clamp_CapsOversizedDimensions()
+        [TestCase(1, 32)]
+        [TestCase(100, 128)]
+        [TestCase(129, 192)]
+        [TestCase(500, 640)]
+        [TestCase(2048, 2048)]
+        [TestCase(2049, 2048)]
+        [TestCase(99999, 2048)]
+        public void Clamp_SnapsRequestedSizesUpToTheNextAllowedSize(int requested, int expected)
         {
-            var commands = new CommandCollection { { "width", "99999" }, { "height", "100000" } };
+            var commands = new CommandCollection { { "width", requested.ToString() }, { "height", requested.ToString() } };
 
             ResizeCommandGuard.Clamp(commands);
 
-            Assert.That(commands["width"], Is.EqualTo(ResizeCommandGuard.MaxDimension.ToString()));
-            Assert.That(commands["height"], Is.EqualTo(ResizeCommandGuard.MaxDimension.ToString()));
+            Assert.That(commands["width"], Is.EqualTo(expected.ToString()));
+            Assert.That(commands["height"], Is.EqualTo(expected.ToString()));
         }
 
         [TestCase("abc")]
@@ -36,12 +42,12 @@ namespace Shrooms.Tests.Infrastructure
         [TestCase("")]
         public void Clamp_DropsInvalidDimensions(string raw)
         {
-            var commands = new CommandCollection { { "width", raw }, { "height", "100" } };
+            var commands = new CommandCollection { { "width", raw }, { "height", "128" } };
 
             ResizeCommandGuard.Clamp(commands);
 
             Assert.That(commands.Contains("width"), Is.False);
-            Assert.That(commands["height"], Is.EqualTo("100"));
+            Assert.That(commands["height"], Is.EqualTo("128"));
         }
 
         [Test]

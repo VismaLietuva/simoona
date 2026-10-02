@@ -21,7 +21,7 @@ namespace Shrooms.Contracts.DAL
         private const int MaxPathDepth = 4;
 
         // Members that must never be usable as a sort key or include path, whichever entity exposes them.
-        private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret" };
+        private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret", "authorizationguid" };
 
         public static IQueryable<T> OrderBy<T>(IQueryable<T> query, string orderBy)
         {
@@ -172,13 +172,25 @@ namespace Shrooms.Contracts.DAL
 
                 if (!isLeaf)
                 {
-                    // Intermediate segments must be single references; ordering through a collection is not a thing.
-                    if (!isNavigation || IsCollectionType(property.PropertyType))
+                    if (!isNavigation)
                     {
                         return null;
                     }
 
-                    current = property.PropertyType;
+                    var isCollection = IsCollectionType(property.PropertyType);
+
+                    // Sorting through a collection is not a thing; an include path may continue into the
+                    // collection's element type (e.g. Floors.Rooms.ApplicationUsers).
+                    if (isCollection && !requireNavigationLeaf)
+                    {
+                        return null;
+                    }
+
+                    current = isCollection ? ElementType(property.PropertyType) : property.PropertyType;
+                    if (current == null)
+                    {
+                        return null;
+                    }
                 }
                 else if (requireNavigationLeaf && !isNavigation)
                 {
@@ -225,6 +237,16 @@ namespace Shrooms.Contracts.DAL
             }
 
             return type.IsClass || type.IsInterface;
+        }
+
+        private static Type ElementType(Type collectionType)
+        {
+            var enumerable = collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                ? collectionType
+                : collectionType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+
+            var element = enumerable?.GetGenericArguments()[0];
+            return element != null && IsNavigationType(element) ? element : null;
         }
 
         private static bool IsCollectionType(Type type)

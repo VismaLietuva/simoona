@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
 using Shrooms.Authentification.Membership;
+using Shrooms.DataLayer.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Jwt;
 using Shrooms.Presentation.Api.Filters;
 using System.Text;
@@ -19,12 +21,14 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly ShroomsUserManager _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ILogger<TokenController> _logger;
+        private readonly ShroomsDbContext _dbContext;
 
-        public TokenController(ShroomsUserManager userManager, IJwtTokenService jwtTokenService, ILogger<TokenController> logger)
+        public TokenController(ShroomsUserManager userManager, IJwtTokenService jwtTokenService, ILogger<TokenController> logger, ShroomsDbContext dbContext)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         [HttpPost]
@@ -70,7 +74,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 if (lockoutSupported)
                 {
-                    await _userManager.AccessFailedAsync(user);
+                    await RecordFailedAttemptAsync(user);
 
                     if (await _userManager.IsLockedOutAsync(user))
                     {
@@ -100,6 +104,36 @@ namespace Shrooms.Presentation.Api.Controllers
                 expires_in = result.ExpiresIn,
                 userIdentifier = user.Id
             });
+        }
+
+        // Parallel wrong guesses race on the user's concurrency stamp and Identity reports the losers as
+        // ConcurrencyFailure, which would let a burst of attempts count as one. The entity is tracked by this
+        // request's context, so FindByIdAsync would hand back the same stale object; reload it from the
+        // database and retry so every attempt is recorded.
+        private async Task RecordFailedAttemptAsync(ApplicationUser user)
+        {
+            for (var attempt = 0; attempt < 5; attempt++)
+            {
+                var result = await _userManager.AccessFailedAsync(user);
+                if (result.Succeeded)
+                {
+                    return;
+                }
+
+                await _dbContext.Entry(user).ReloadAsync();
+                if (_dbContext.Entry(user).State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+                {
+                    return;
+                }
+
+                // Another attempt may already have locked the account while we retried.
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    return;
+                }
+            }
+
+            _logger.LogWarning("Could not record a failed sign-in attempt for user {UserId} after repeated concurrency conflicts", user.Id);
         }
 
         private IActionResult InvalidCredentials()
