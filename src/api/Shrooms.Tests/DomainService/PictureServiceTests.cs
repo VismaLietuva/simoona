@@ -66,6 +66,8 @@ namespace Shrooms.Tests.DomainService
         [TestCase("jpg", "photo.html", "image/jpeg", ".jpg")]
         [TestCase("gif", "photo.svg", "image/gif", ".gif")]
         [TestCase("bmp", "photo.p n g", "image/bmp", ".bmp")]
+        [TestCase("png", "photo.jpg", null, ".png")]
+        [TestCase("gif", "photo.png", "image/jpeg", ".gif")]
         public async Task UploadFromStream_ShouldStoreOnlyAllowlistedImageExtensions(string format, string fileName, string mimeType, string expectedExtension)
         {
             using var stream = TinyImage(format);

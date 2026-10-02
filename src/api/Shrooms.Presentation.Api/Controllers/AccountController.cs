@@ -46,6 +46,9 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly ILogger<AccountController> _logger;
 
+        private const string ChallengeProviderKey = "simoona.provider";
+        private const string ChallengeOrganizationKey = "simoona.organization";
+
         private static readonly string[] ExternalProviders =
         {
             AuthenticationConstants.GoogleLoginProvider,
@@ -360,7 +363,12 @@ namespace Shrooms.Presentation.Api.Controllers
                 isRegistration
             });
 
+            // The provider and organisation ride inside the authentication properties, which the remote
+            // handler carries through its state parameter and into the external cookie, so the callback can
+            // check that the principal really came from this provider for this tenant.
             var props = new AuthenticationProperties { RedirectUri = callback };
+            props.Items[ChallengeProviderKey] = provider;
+            props.Items[ChallengeOrganizationKey] = organization;
             return Challenge(props, provider);
         }
 
@@ -386,6 +394,20 @@ namespace Shrooms.Presentation.Api.Controllers
             if (!result.Succeeded || result.Principal == null)
             {
                 return Redirect(AppendHash(returnUrl, "error=external_auth_failed"));
+            }
+
+            // All social handlers sign into the same external cookie. The query string names a provider and
+            // tenant, but the cookie records which scheme actually authenticated and for which tenant the
+            // challenge was issued; they must match, otherwise a Google principal could be attached as a
+            // Facebook login, or a login issued for one tenant replayed against another.
+            var items = result.Properties?.Items;
+            if (items == null
+                || !items.TryGetValue(".AuthScheme", out var authenticatedScheme) || !string.Equals(authenticatedScheme, provider, StringComparison.Ordinal)
+                || !items.TryGetValue(ChallengeProviderKey, out var challengedProvider) || !string.Equals(challengedProvider, provider, StringComparison.Ordinal)
+                || !items.TryGetValue(ChallengeOrganizationKey, out var challengedOrganization) || !string.Equals(challengedOrganization, organization, StringComparison.OrdinalIgnoreCase))
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                return BadRequest();
             }
 
             var providerKey = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);

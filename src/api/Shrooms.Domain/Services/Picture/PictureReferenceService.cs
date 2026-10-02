@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
+using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -15,7 +16,7 @@ namespace Shrooms.Domain.Services.Picture
 {
     public interface IPictureReferenceService
     {
-        /// <summary>How many stored records currently point at the given picture key, across every table that holds pictures.</summary>
+        /// <summary>How many stored records currently point at the given picture key, across every table that holds pictures, including custom emoji.</summary>
         Task<int> CountReferencesAsync(string blobKey);
     }
 
@@ -58,7 +59,9 @@ namespace Shrooms.Domain.Services.Picture
             // Posts, comments and lotteries store a serialized list of keys.
             count += await _uow.GetDbSet<Post>().IgnoreQueryFilters().CountAsync(p => p.Images.Serialized.Contains(blobKey));
             count += await _uow.GetDbSet<Comment>().IgnoreQueryFilters().CountAsync(c => c.Images.Serialized.Contains(blobKey));
-            count += await _uow.GetDbSet<Lottery>().IgnoreQueryFilters().CountAsync(l => l.Images.Serialized.Contains(blobKey));
+            // Lottery.Images is mapped as a primitive collection (not an owned Serialized string).
+            count += await _uow.GetDbSet<Lottery>().IgnoreQueryFilters().CountAsync(l => l.Images.Contains(blobKey));
+            count += await _uow.GetDbSet<CustomEmoji>().IgnoreQueryFilters().CountAsync(e => e.BlobName == blobKey);
 
             return count;
         }
