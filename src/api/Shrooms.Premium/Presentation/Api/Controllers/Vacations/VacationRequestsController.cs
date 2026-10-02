@@ -29,15 +29,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
         private readonly IVacationRequestService _requestService;
         private readonly IVacationRequestListService _listService;
         private readonly IHolidayService _holidayService;
+        private readonly IParentalEntitlementService _parentalService;
 
         public VacationRequestsController(
             IVacationRequestService requestService,
             IVacationRequestListService listService,
-            IHolidayService holidayService)
+            IHolidayService holidayService,
+            IParentalEntitlementService parentalService)
         {
             _requestService = requestService;
             _listService = listService;
             _holidayService = holidayService;
+            _parentalService = parentalService;
         }
 
         [HttpGet]
@@ -46,6 +49,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
         public async Task<IActionResult> Balance()
         {
             return Ok(await _requestService.GetBalanceAsync(GetUserAndOrganization()));
+        }
+
+        [HttpGet]
+        [Route("ParentalBalance")]
+        [ProducesResponseType(typeof(ParentalBalanceDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ParentalBalance()
+        {
+            return Ok(await _parentalService.GetBalanceAsync(GetUserAndOrganization()));
         }
 
         [HttpGet]

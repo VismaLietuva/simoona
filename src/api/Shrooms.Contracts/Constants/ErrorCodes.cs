@@ -40,6 +40,7 @@ namespace Shrooms.Contracts.Constants
         // User settings. Culture, 9**
         public const int CultureUnsupported = 900;
         public const int TimezoneUnsupported = 901;
+        public const int SidebarFavoritesInvalid = 902;
 
         // Project, 11**
         public const int CantRemoveProjectOwner = 1100;
@@ -106,5 +107,9 @@ namespace Shrooms.Contracts.Constants
         public const int VacationImportUnreadable = 1917;
         public const int VacationOrderRaceLost = 1918;
         public const int VacationArchiveTooLarge = 1919;
+        public const int VacationParentalNotEntitled = 1920;
+        public const int VacationParentalLimit = 1921;
+        public const int VacationParentalHoursOnly = 1922;
+        public const int VacationParentalTypeInvalid = 1923;
     }
 }

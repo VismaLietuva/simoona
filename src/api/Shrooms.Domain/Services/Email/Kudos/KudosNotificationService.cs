@@ -97,7 +97,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName ?? BusinessLayerConstants.DeletedUserName,
+                sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
 
@@ -118,7 +118,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName ?? BusinessLayerConstants.DeletedUserName,
+                sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
 

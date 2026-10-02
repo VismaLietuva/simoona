@@ -225,4 +225,16 @@
   <data name="notificationDecidedByAdminSubject" xml:space="preserve">
     <value>{0}'s leave was answered by an administrator</value>
   </data>
+  <data name="parentalNotEntitled" xml:space="preserve">
+    <value>You have no parental days assigned. Ask the accountant to set up your entitlement.</value>
+  </data>
+  <data name="parentalLimit" xml:space="preserve">
+    <value>You have already booked {0} of {1} parental days for {2} – {3}</value>
+  </data>
+  <data name="parentalHoursOnly" xml:space="preserve">
+    <value>Your parental time off is taken as shorter working hours, so there is no parental day to book</value>
+  </data>
+  <data name="parentalTypeInvalid" xml:space="preserve">
+    <value>Unknown parental entitlement type</value>
+  </data>
 </root>
