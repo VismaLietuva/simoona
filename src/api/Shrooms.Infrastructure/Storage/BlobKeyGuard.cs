@@ -20,7 +20,7 @@ namespace Shrooms.Infrastructure.Storage
         /// endpoint will serve. Keeps client-controlled names like "x.html" or "x.svg" from ever becoming
         /// a document that renders on the API origin.
         /// </summary>
-        public static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+        public static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".jfif", ".png", ".gif", ".bmp", ".webp" };
 
         public static bool HasAllowedImageExtension(string blobKey)
         {

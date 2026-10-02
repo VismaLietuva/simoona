@@ -27,7 +27,10 @@ IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("ALTER TABLE [dbo].[AspNetUsers] ALTER COLUMN [LockoutEndDateUtc] datetime NULL");
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+           WHERE TABLE_NAME = 'AspNetUsers' AND COLUMN_NAME = 'LockoutEndDateUtc' AND DATA_TYPE = 'datetimeoffset')
+    ALTER TABLE [dbo].[AspNetUsers] ALTER COLUMN [LockoutEndDateUtc] datetime NULL;");
             // LockoutEnabled is left as is: there is no record of which users had it disabled before.
         }
     }

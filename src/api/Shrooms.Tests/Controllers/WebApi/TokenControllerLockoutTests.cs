@@ -4,12 +4,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Jwt;
 using Shrooms.Presentation.Api.Controllers;
@@ -22,6 +24,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         private const string Password = "Correct-Horse-1";
 
         private ShroomsUserManager _userManager;
+        private ShroomsDbContext _dbContext;
         private IJwtTokenService _jwtTokenService;
         private TokenController _controller;
         private ApplicationUser _user;
@@ -49,7 +52,14 @@ namespace Shrooms.Tests.Controllers.WebApi
             _jwtTokenService = Substitute.For<IJwtTokenService>();
             _jwtTokenService.GenerateTokenAsync(_user).Returns(Task.FromResult(new JwtTokenResult("jwt", 3600)));
 
-            _controller = new TokenController(_userManager, _jwtTokenService, Substitute.For<ILogger<TokenController>>());
+            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+                .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
+                .Options;
+            _dbContext = new ShroomsDbContext(options);
+            _dbContext.Users.Add(_user);
+            _dbContext.SaveChanges(false);
+
+            _controller = new TokenController(_userManager, _jwtTokenService, Substitute.For<ILogger<TokenController>>(), _dbContext);
         }
 
         [Test]
@@ -59,6 +69,32 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             await _userManager.Received(1).AccessFailedAsync(_user);
             await _userManager.DidNotReceive().ResetAccessFailedCountAsync(_user);
+            AssertError(result, "invalid_grant");
+        }
+
+        [Test]
+        public async Task WrongPassword_RetriesRecordingTheFailure_WhenAnotherAttemptWonTheConcurrencyRace()
+        {
+            _userManager.AccessFailedAsync(_user).Returns(
+                Task.FromResult(IdentityResult.Failed(new IdentityErrorDescriber().ConcurrencyFailure())),
+                Task.FromResult(IdentityResult.Success));
+
+            var result = await Post("jane", "wrong");
+
+            await _userManager.Received(2).AccessFailedAsync(_user);
+            AssertError(result, "invalid_grant");
+        }
+
+        [Test]
+        public async Task WrongPassword_StopsRetrying_WhenAnotherAttemptAlreadyLockedTheAccount()
+        {
+            _userManager.AccessFailedAsync(_user).Returns(
+                Task.FromResult(IdentityResult.Failed(new IdentityErrorDescriber().ConcurrencyFailure())));
+            _userManager.IsLockedOutAsync(_user).Returns(Task.FromResult(false), Task.FromResult(true));
+
+            var result = await Post("jane", "wrong");
+
+            await _userManager.Received(1).AccessFailedAsync(_user);
             AssertError(result, "invalid_grant");
         }
 

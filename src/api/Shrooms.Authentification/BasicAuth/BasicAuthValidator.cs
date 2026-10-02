@@ -39,7 +39,11 @@ namespace Shrooms.Authentification.BasicAuth
                 return null;
             }
 
-            if (!FixedTimeEquals(userName, expectedUserName) || !FixedTimeEquals(password, expectedPassword))
+            // Both comparisons always run and operate on fixed-size digests, so neither the username match nor
+            // the configured lengths leak through timing.
+            var userNameMatches = FixedTimeEquals(userName, expectedUserName);
+            var passwordMatches = FixedTimeEquals(password, expectedPassword);
+            if (!(userNameMatches & passwordMatches))
             {
                 return null;
             }
@@ -66,10 +70,10 @@ namespace Shrooms.Authentification.BasicAuth
 
         private static bool FixedTimeEquals(string supplied, string expected)
         {
-            var suppliedBytes = Encoding.UTF8.GetBytes(supplied);
-            var expectedBytes = Encoding.UTF8.GetBytes(expected);
+            var suppliedDigest = SHA256.HashData(Encoding.UTF8.GetBytes(supplied));
+            var expectedDigest = SHA256.HashData(Encoding.UTF8.GetBytes(expected));
 
-            return CryptographicOperations.FixedTimeEquals(suppliedBytes, expectedBytes);
+            return CryptographicOperations.FixedTimeEquals(suppliedDigest, expectedDigest);
         }
 
         private bool DoesOrganizationExists(string tenantName)

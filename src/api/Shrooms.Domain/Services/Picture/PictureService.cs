@@ -5,27 +5,39 @@ using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.Storage;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 
 namespace Shrooms.Domain.Services.Picture
 {
     public class PictureService : IPictureService
     {
+        /// <summary>
+        /// Largest image accepted for storage, in pixels. Anonymous resize requests decode stored images,
+        /// so a 40000x40000 PNG (a few hundred KB on disk, several GB decoded) must never get in.
+        /// </summary>
+        public const long MaxPixels = 40_000_000;
+
         private readonly IStorage _storage;
         private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly IPictureReferenceService _pictureReferences;
 
-        public PictureService(IStorage storage, IUnitOfWork2 uow)
+        public PictureService(IStorage storage, IUnitOfWork2 uow, IPictureReferenceService pictureReferences)
         {
             _storage = storage;
             _organizationsDbSet = uow.GetDbSet<Organization>();
+            _pictureReferences = pictureReferences;
         }
 
         public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            // Legacy endpoint without a magic-byte check: the stored extension comes from the client file
-            // name only when it is an allowlisted image extension, otherwise from the (controller-validated)
-            // media type. Anything else is rejected so no ".html"/".svg" key can be created.
+            // Legacy endpoint: the stored extension comes from the client file name only when it is an
+            // allowlisted image extension, otherwise from the (controller-validated) media type. Anything
+            // else is rejected so no ".html"/".svg" key can be created.
             var extension = AllowedExtensionFromFileName(fileName) ?? BlobKeyGuard.ExtensionForMimeType(mimeType)
                 ?? throw new ArgumentException("Unsupported image type.");
+
+            ValidateDimensions(stream);
 
             var pictureName = GetNewPictureName(extension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
@@ -37,22 +49,12 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task<string> UploadOriginalAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            // Magic-byte sniff: confirms the upload's leading bytes match a real image
-            // format and not a renamed binary. The mime allowlist in the controller is
-            // client-asserted and trivially spoofable; this is the server-side check.
-            // We intentionally do NOT decode dimensions here — this endpoint streams
-            // the bytes to storage verbatim and never decodes them, so the decode-bomb
-            // attack surface lives on the serve path, not here.
-            var detectedExtension = await DetectImageExtensionAsync(stream);
-            if (detectedExtension == null)
-            {
-                throw new ArgumentException("Image format not recognized.");
-            }
+            // The real format comes from the bytes, never from the client's file name or media type, so a
+            // "GIF89a<script>" polyglot named x.html is either a valid GIF stored as .gif or rejected.
+            var (_, format) = ValidateDimensions(stream);
+            var detectedExtension = BlobKeyGuard.ExtensionForMimeType(format?.DefaultMimeType)
+                ?? throw new ArgumentException("Image format not recognized.");
 
-            stream.Position = 0;
-
-            // The stored extension follows the detected format, never the client file name, so a
-            // "GIF89a<script>" polyglot named x.html is stored (and served) as a .gif.
             var pictureName = GetNewPictureName(detectedExtension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
@@ -71,53 +73,59 @@ namespace Shrooms.Domain.Services.Picture
                 return;
             }
 
+            // Callers remove the "previous" picture while their own record still references it, so one
+            // reference is expected. Any other reference means someone else uses the file: a user could
+            // otherwise set their PictureId to a colleague's avatar and delete it on the next change.
+            if (await _pictureReferences.CountReferencesAsync(blobKey) > 1)
+            {
+                return;
+            }
+
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
         }
 
-        private static async Task<string> DetectImageExtensionAsync(Stream stream)
+        /// <summary>
+        /// Reads only the image header: rejects anything that is not a decodable image and anything whose
+        /// declared canvas exceeds <see cref="MaxPixels"/>. Leaves the stream at position 0.
+        /// </summary>
+        private static (IImageInfo Info, IImageFormat Format) ValidateDimensions(Stream stream)
         {
-            var header = new byte[12];
-            var read = await stream.ReadAsync(header.AsMemory(0, header.Length));
-            if (read < 4)
+            if (stream == null)
             {
-                return null;
+                throw new ArgumentException("No image data.");
             }
 
-            // JPEG: FF D8 FF
-            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            IImageInfo info;
+            IImageFormat format;
+            try
             {
-                return ".jpg";
+                info = Image.Identify(stream, out format);
+            }
+            catch (Exception ex) when (ex is UnknownImageFormatException || ex is InvalidImageContentException || ex is NotSupportedException)
+            {
+                throw new ArgumentException("Image format not recognized.", ex);
+            }
+            finally
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position = 0;
+                }
             }
 
-            // PNG: 89 50 4E 47 0D 0A 1A 0A
-            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            if (info == null)
             {
-                return ".png";
+                throw new ArgumentException("Image format not recognized.");
             }
 
-            // GIF: "GIF8"
-            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            if ((long)info.Width * info.Height > MaxPixels)
             {
-                return ".gif";
+                throw new ArgumentException($"Image is too large: at most {MaxPixels / 1_000_000} megapixels are allowed.");
             }
 
-            // BMP: "BM"
-            if (header[0] == 0x42 && header[1] == 0x4D)
-            {
-                return ".bmp";
-            }
-
-            // WebP: "RIFF" ???? "WEBP"
-            if (read >= 12
-                && header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46
-                && header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-            {
-                return ".webp";
-            }
-
-            return null;
+            return (info, format);
         }
 
         private static string AllowedExtensionFromFileName(string fileName)

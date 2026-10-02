@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -235,6 +235,13 @@ namespace Shrooms.Presentation.Api.Controllers
                 return GetErrorResult(result);
             }
 
+            // The owner proved control of the mailbox; a lockout caused by someone else's guesses ends here.
+            if (_userManager.SupportsUserLockout)
+            {
+                await _userManager.SetLockoutEndDateAsync(user, null);
+                await _userManager.ResetAccessFailedCountAsync(user);
+            }
+
             return Ok();
         }
 
@@ -340,7 +347,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest("returnUrl must point to a configured client origin.");
             }
 
-            if (!await IsKnownExternalProviderAsync(provider))
+            if (!await IsKnownExternalProviderAsync(provider) || !await IsProviderEnabledForOrganizationAsync(provider, organization))
             {
                 return BadRequest("Unknown authentication provider.");
             }
@@ -367,7 +374,9 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            if (!_returnUrlValidator.IsAllowed(returnUrl) || !await IsKnownExternalProviderAsync(provider))
+            if (!_returnUrlValidator.IsAllowed(returnUrl)
+                || !await IsKnownExternalProviderAsync(provider)
+                || !await IsProviderEnabledForOrganizationAsync(provider, organization))
             {
                 return BadRequest();
             }
@@ -402,7 +411,20 @@ namespace Shrooms.Presentation.Api.Controllers
 
                 if (existing != null)
                 {
-                    // Email exists in this tenant: attach the social login to the existing user.
+                    // Email exists in this tenant: attach the social login to the existing user. If that account
+                    // was never confirmed, whoever registered it could not prove they own the address, so its
+                    // password is discarded; the identity provider has just verified the email, so confirm it.
+                    if (!existing.EmailConfirmed)
+                    {
+                        if (await _userManager.HasPasswordAsync(existing))
+                        {
+                            await _userManager.RemovePasswordAsync(existing);
+                        }
+
+                        existing.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(existing);
+                    }
+
                     await _userManager.AddLoginAsync(existing, new UserLoginInfo(loginProvider, providerKey, loginProvider));
                     user = existing;
                 }
@@ -462,6 +484,12 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             return await _schemeProvider.GetSchemeAsync(provider) != null;
+        }
+
+        private async Task<bool> IsProviderEnabledForOrganizationAsync(string provider, string organizationName)
+        {
+            var organization = await _organizationService.GetOrganizationByNameAsync(organizationName);
+            return organization != null && ContainsProvider(organization.AuthenticationProviders ?? string.Empty, provider);
         }
 
         private static string AppendHash(string url, string hash)

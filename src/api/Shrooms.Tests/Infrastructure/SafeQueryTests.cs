@@ -94,12 +94,56 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(ids, Is.EqualTo(new[] { 3, 1, 2 }));
         }
 
+        private class Room
+        {
+            public int Id { get; set; }
+            public List<Item> ApplicationUsers { get; set; }
+        }
+
+        private class Floor
+        {
+            public int Id { get; set; }
+            public List<Room> Rooms { get; set; }
+        }
+
+        private class Office
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public List<Floor> Floors { get; set; }
+        }
+
         [Test]
         public void ValidIncludePaths_KeepsNavigationsOnly_InCanonicalCasing()
         {
             var includes = SafeQuery.ValidIncludePaths<Item>("organization, Children, Name, Nope, Organization.ShortName, PasswordHash");
 
             Assert.That(includes, Is.EqualTo(new[] { "Organization", "Children" }));
+        }
+
+        [Test]
+        public void ValidIncludePaths_FollowsCollectionsIntoTheirElementType()
+        {
+            var includes = SafeQuery.ValidIncludePaths<Office>("Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers,Floors.Rooms.ApplicationUsers.Organization,Floors.Rooms.ApplicationUsers.Name,Floors.Nope");
+
+            Assert.That(includes, Is.EqualTo(new[] { "Floors", "Floors.Rooms", "Floors.Rooms.ApplicationUsers", "Floors.Rooms.ApplicationUsers.Organization" }));
+        }
+
+        [Test]
+        public void OrderBy_StillRejectsPathsThroughCollections()
+        {
+            var offices = new[] { new Office { Id = 2, Name = "b" }, new Office { Id = 1, Name = "a" } }.AsQueryable();
+
+            Assert.That(SafeQuery.IsValidOrderBy<Office>("Floors.Rooms.Id"), Is.False);
+            Assert.That(SafeQuery.OrderBy(offices, "Floors.Id desc").Select(o => o.Id).ToArray(), Is.EqualTo(new[] { 2, 1 }));
+        }
+
+        [TestCase("BookAppAuthorizationGuid")]
+        [TestCase("SecurityStamp")]
+        public void SensitiveMembers_AreNeverIncludedOrSorted(string member)
+        {
+            Assert.That(SafeQuery.IsValidOrderBy<Item>(member), Is.False);
+            Assert.That(SafeQuery.ValidIncludePaths<Item>(member), Is.Empty);
         }
 
         [Test]
