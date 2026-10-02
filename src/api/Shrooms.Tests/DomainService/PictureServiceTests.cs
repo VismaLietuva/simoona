@@ -36,7 +36,7 @@ namespace Shrooms.Tests.DomainService
 
             _storage = Substitute.For<IStorage>();
             _references = Substitute.For<IPictureReferenceService>();
-            _references.CountReferencesAsync(Arg.Any<string>()).Returns(Task.FromResult(1));
+            _references.CountReferencesAsync(Arg.Any<string>()).Returns(Task.FromResult(0));
             _pictureService = new PictureService(_storage, uow, _references);
         }
 
@@ -166,7 +166,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task RemoveImage_ShouldNotDelete_WhenAnotherRecordStillUsesThePicture()
         {
-            _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(2));
+            _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(1));
 
             await _pictureService.RemoveImageAsync("victim.jpg", 2);
 

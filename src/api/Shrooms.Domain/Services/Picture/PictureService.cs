@@ -77,10 +77,11 @@ namespace Shrooms.Domain.Services.Picture
                 return;
             }
 
-            // Callers remove the "previous" picture while their own record still references it, so one
-            // reference is expected. Any other reference means someone else uses the file: a user could
-            // otherwise set their PictureId to a colleague's avatar and delete it on the next change.
-            if (await _pictureReferences.CountReferencesAsync(blobKey) > 1)
+            // Only a picture that no stored record references any more is deleted. Callers therefore save
+            // their own change first and remove the previous picture afterwards. Picture keys are public
+            // (every avatar URL shows one), so a user could otherwise set their PictureId to a colleague's
+            // avatar and have it deleted on the next change.
+            if (await _pictureReferences.CountReferencesAsync(blobKey) > 0)
             {
                 return;
             }
