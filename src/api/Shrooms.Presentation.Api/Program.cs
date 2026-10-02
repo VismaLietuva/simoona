@@ -622,8 +622,8 @@ app.UseOutputCache();
 // JWT; this replaces Hangfire's local-request filter, which is meaningless behind a reverse proxy.
 // In Development the dashboard is reachable from the local machine without a token (browsers do not
 // send the JWT), so it opts out of the deny-by-default policy and relies on Hangfire's local-request
-// filter; elsewhere an authenticated Admin is required. Hangfire storage is shared by all tenants, so the
-// dashboard is an operator tool, not a tenant-admin one.
+// filter; elsewhere an authenticated Admin listed in HangfireOperators is required, because Hangfire
+// storage is shared by all tenants and the Admin role is assignable by any tenant's administration.
 if (app.Environment.IsDevelopment())
 {
     app.MapHangfireDashboard("/hangfire", new DashboardOptions

@@ -31,13 +31,17 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            // Legacy endpoint: the stored extension comes from the client file name only when it is an
-            // allowlisted image extension, otherwise from the (controller-validated) media type. Anything
-            // else is rejected so no ".html"/".svg" key can be created.
-            var extension = AllowedExtensionFromFileName(fileName) ?? BlobKeyGuard.ExtensionForMimeType(mimeType)
-                ?? throw new ArgumentException("Unsupported image type.");
+            // Legacy endpoint: the client must at least declare an image (allowlisted file extension or
+            // media type), but the stored extension follows the format detected from the bytes, exactly as
+            // UploadOriginalAsync does, so a PNG uploaded as "photo.jpg" is stored and served as PNG.
+            if (AllowedExtensionFromFileName(fileName) == null && BlobKeyGuard.ExtensionForMimeType(mimeType) == null)
+            {
+                throw new ArgumentException("Unsupported image type.");
+            }
 
-            ValidateDimensions(stream);
+            var (_, format) = ValidateDimensions(stream);
+            var extension = BlobKeyGuard.ExtensionForMimeType(format?.DefaultMimeType)
+                ?? throw new ArgumentException("Image format not recognized.");
 
             var pictureName = GetNewPictureName(extension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
