@@ -47,19 +47,22 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             foreach (var user in usersToAnonymize)
             {
+                var previousPictureId = user.PictureId;
+
                 await AnonymizeAsync(user, organization.Id);
 
                 await _uow.SaveChangesAsync();
+
+                // After the save: the picture service deletes only pictures nothing references any more.
+                if (!string.IsNullOrEmpty(previousPictureId))
+                {
+                    await _pictureService.RemoveImageAsync(previousPictureId, organization.Id);
+                }
             }
         }
 
         private async Task AnonymizeAsync(ApplicationUser user, int organizationId)
         {
-            if (!string.IsNullOrEmpty(user.PictureId))
-            {
-                await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
-            }
-
             var randomString = Guid.NewGuid().ToString();
 
             user.Email = randomString;
