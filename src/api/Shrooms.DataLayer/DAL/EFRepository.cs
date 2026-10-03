@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -55,7 +56,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties, IsMapped))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -65,7 +66,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                queryableSet = SafeQuery.OrderBy(queryableSet, orderBy);
+                queryableSet = SafeQuery.OrderBy(queryableSet, orderBy, IsMapped);
             }
 
             return queryableSet;
@@ -93,7 +94,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties, IsMapped))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -122,6 +123,28 @@ namespace Shrooms.DataLayer.DAL
 
             // Use ToPagedList() which is synchronous, as X.PagedList doesn't have proper EF Core async support
             return await Task.FromResult(queryableSet.ToPagedList(page.Value, pageSize));
+        }
+
+        // Only members the EF model knows about (scalars, navigations, skip navigations) are queryable;
+        // [NotMapped] and fluent-ignored CLR properties would fail at translation time.
+        private bool IsMapped(PropertyInfo property)
+        {
+            if (_context is not DbContext dbContext)
+            {
+                return true;
+            }
+
+            var entityType = dbContext.Model.FindEntityType(property.DeclaringType!);
+            if (entityType == null)
+            {
+                // Owned/complex types or non-entities: let the provider decide.
+                return true;
+            }
+
+            return entityType.FindProperty(property.Name) != null
+                || entityType.FindNavigation(property.Name) != null
+                || entityType.FindSkipNavigation(property.Name) != null
+                || entityType.FindComplexProperty(property.Name) != null;
         }
 
         // Typed replacement for the former Dynamic LINQ "OrganizationId=N || OrganizationId=null" filter.

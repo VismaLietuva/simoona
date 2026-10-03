@@ -23,7 +23,12 @@ namespace Shrooms.Contracts.DAL
         // Members that must never be usable as a sort key or include path, whichever entity exposes them.
         private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret", "authorizationguid" };
 
-        public static IQueryable<T> OrderBy<T>(IQueryable<T> query, string orderBy)
+        /// <param name="isQueryable">
+        /// Optional extra filter, e.g. the EF model: a property that exists on the CLR type but is not mapped
+        /// ([NotMapped] members are always excluded; fluent-ignored ones need this hook) would otherwise
+        /// still fail at translation time.
+        /// </param>
+        public static IQueryable<T> OrderBy<T>(IQueryable<T> query, string orderBy, Func<PropertyInfo, bool> isQueryable = null)
         {
             if (query == null)
             {
@@ -32,7 +37,7 @@ namespace Shrooms.Contracts.DAL
 
             IOrderedQueryable<T> ordered = null;
 
-            foreach (var (path, descending) in ParseOrderBy(typeof(T), orderBy))
+            foreach (var (path, descending) in ParseOrderBy(typeof(T), orderBy, isQueryable))
             {
                 var parameter = Expression.Parameter(typeof(T), "x");
                 Expression body = parameter;
@@ -63,7 +68,7 @@ namespace Shrooms.Contracts.DAL
         /// The subset of comma-separated include paths that name real navigation properties of
         /// <typeparamref name="T"/>, in their canonical casing. Scalars and blocked members are dropped.
         /// </summary>
-        public static IReadOnlyList<string> ValidIncludePaths<T>(string includeProperties)
+        public static IReadOnlyList<string> ValidIncludePaths<T>(string includeProperties, Func<PropertyInfo, bool> isQueryable = null)
         {
             var result = new List<string>();
             if (string.IsNullOrWhiteSpace(includeProperties))
@@ -73,7 +78,7 @@ namespace Shrooms.Contracts.DAL
 
             foreach (var rawPath in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                var resolved = ResolvePath(typeof(T), rawPath, requireNavigationLeaf: true);
+                var resolved = ResolvePath(typeof(T), rawPath, requireNavigationLeaf: true, isQueryable);
                 if (resolved != null)
                 {
                     result.Add(string.Join(".", resolved.Select(p => p.Name)));
@@ -84,12 +89,12 @@ namespace Shrooms.Contracts.DAL
         }
 
         /// <summary>True when <paramref name="orderBy"/> contains at least one usable clause for <typeparamref name="T"/>.</summary>
-        public static bool IsValidOrderBy<T>(string orderBy)
+        public static bool IsValidOrderBy<T>(string orderBy, Func<PropertyInfo, bool> isQueryable = null)
         {
-            return ParseOrderBy(typeof(T), orderBy).Any();
+            return ParseOrderBy(typeof(T), orderBy, isQueryable).Any();
         }
 
-        private static IEnumerable<(PropertyInfo[] Path, bool Descending)> ParseOrderBy(Type elementType, string orderBy)
+        private static IEnumerable<(PropertyInfo[] Path, bool Descending)> ParseOrderBy(Type elementType, string orderBy, Func<PropertyInfo, bool> isQueryable)
         {
             if (string.IsNullOrWhiteSpace(orderBy))
             {
@@ -125,7 +130,7 @@ namespace Shrooms.Contracts.DAL
                     }
                 }
 
-                var path = ResolvePath(elementType, parts[0], requireNavigationLeaf: false);
+                var path = ResolvePath(elementType, parts[0], requireNavigationLeaf: false, isQueryable);
                 if (path == null || !IsSortableType(path[^1].PropertyType))
                 {
                     continue;
@@ -136,7 +141,7 @@ namespace Shrooms.Contracts.DAL
             }
         }
 
-        private static PropertyInfo[] ResolvePath(Type type, string path, bool requireNavigationLeaf)
+        private static PropertyInfo[] ResolvePath(Type type, string path, bool requireNavigationLeaf, Func<PropertyInfo, bool> isQueryable)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -162,6 +167,14 @@ namespace Shrooms.Contracts.DAL
 
                 var property = current.GetProperty(segment, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
                 if (property == null || property.GetIndexParameters().Length > 0)
+                {
+                    return null;
+                }
+
+                // A CLR property that the data model does not map would pass reflection and then fail inside
+                // the query provider, which is exactly the 500 this parser exists to prevent.
+                if (property.IsDefined(typeof(System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute), inherit: true)
+                    || (isQueryable != null && !isQueryable(property)))
                 {
                     return null;
                 }

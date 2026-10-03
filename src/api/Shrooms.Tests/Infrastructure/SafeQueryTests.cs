@@ -138,6 +138,32 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(SafeQuery.OrderBy(offices, "Floors.Id desc").Select(o => o.Id).ToArray(), Is.EqualTo(new[] { 2, 1 }));
         }
 
+        private class Mixed
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+            public string FullName { get; set; }
+            public string Ignored { get; set; }
+        }
+
+        [Test]
+        public void NotMappedProperties_AreNeverSortedOrIncluded()
+        {
+            Assert.That(SafeQuery.IsValidOrderBy<Mixed>("FullName"), Is.False);
+            Assert.That(SafeQuery.IsValidOrderBy<Mixed>("Name"), Is.True);
+        }
+
+        [Test]
+        public void QueryablePredicate_ExcludesFluentIgnoredMembers()
+        {
+            bool IsQueryable(System.Reflection.PropertyInfo p) => p.Name != "Ignored";
+
+            Assert.That(SafeQuery.IsValidOrderBy<Mixed>("Ignored", IsQueryable), Is.False);
+            Assert.That(SafeQuery.IsValidOrderBy<Mixed>("Ignored"), Is.True, "without the predicate only [NotMapped] is known");
+            Assert.That(SafeQuery.IsValidOrderBy<Mixed>("Name", IsQueryable), Is.True);
+        }
+
         [TestCase("BookAppAuthorizationGuid")]
         [TestCase("SecurityStamp")]
         public void SensitiveMembers_AreNeverIncludedOrSorted(string member)
