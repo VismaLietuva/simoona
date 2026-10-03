@@ -192,6 +192,7 @@ namespace Shrooms.Tests.DomainService
             {
                 Assert.That(options.Select(option => option.Id), Is.EqualTo(optionIds));
                 Assert.That(options.Select(option => option.Url), Is.EqualTo(new[] { null, "https://example.com/b" }));
+                Assert.That(options.Select(option => option.ModifiedBy), Is.EqualTo(new[] { null, "author" }));
             });
         }
 

@@ -247,7 +247,7 @@ namespace Shrooms.Domain.Services.Polls
             }
             else
             {
-                UpdateOptionUrls(poll, dto.Questions);
+                UpdateOptionUrls(poll, dto.Questions, dto.UserId, now);
             }
 
             await _uow.SaveChangesAsync(false);
@@ -590,7 +590,7 @@ namespace Shrooms.Domain.Services.Polls
             }).ToList();
         }
 
-        private static void UpdateOptionUrls(Poll poll, IList<CreatePollQuestionDto> questions)
+        private static void UpdateOptionUrls(Poll poll, IList<CreatePollQuestionDto> questions, string userId, DateTime now)
         {
             var existing = poll.Questions.OrderBy(question => question.Order).ToList();
 
@@ -603,7 +603,17 @@ namespace Shrooms.Domain.Services.Polls
 
                 for (var optionIndex = 0; optionIndex < currentOptions.Count; optionIndex++)
                 {
-                    currentOptions[optionIndex].Url = NormalizeUrl(submittedOptions[optionIndex].Url);
+                    var option = currentOptions[optionIndex];
+                    var url = NormalizeUrl(submittedOptions[optionIndex].Url);
+
+                    if (option.Url == url)
+                    {
+                        continue;
+                    }
+
+                    option.Url = url;
+                    option.Modified = now;
+                    option.ModifiedBy = userId;
                 }
             }
         }
