@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -697,14 +697,17 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
             }
 
-            if (user.PictureId != model.PictureId && !string.IsNullOrEmpty(user.PictureId))
-            {
-                await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
-            }
+            var previousPictureId = user.PictureId;
 
             _mapper.Map(model, user);
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
+
+            // After the save: the picture service deletes only pictures nothing references any more.
+            if (!string.IsNullOrEmpty(previousPictureId) && previousPictureId != model.PictureId)
+            {
+                await _pictureService.RemoveImageAsync(previousPictureId, userOrg.OrganizationId);
+            }
 
             if (!User.IsInRole(Roles.NewUser) || !await _userManager.IsInRoleAsync(user, Roles.FirstLogin))
             {

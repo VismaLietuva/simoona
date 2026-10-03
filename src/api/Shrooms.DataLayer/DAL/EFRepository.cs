@@ -1,8 +1,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -41,7 +41,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
-                queryableSet = queryableSet.Where(string.Format("{0}={1} || {0}=null", ClaimOrganizationId, OrganizationId));
+                queryableSet = queryableSet.Where(OrganizationFilter(OrganizationId));
             }
 
             if (filter != null)
@@ -56,7 +56,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties, IsMapped))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -66,7 +66,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                queryableSet = queryableSet.OrderBy(orderBy);
+                queryableSet = SafeQuery.OrderBy(queryableSet, orderBy, IsMapped);
             }
 
             return queryableSet;
@@ -79,7 +79,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
-                queryableSet = queryableSet.Where(string.Format("{0}={1} || {0}=null", ClaimOrganizationId, OrganizationId));
+                queryableSet = queryableSet.Where(OrganizationFilter(OrganizationId));
             }
 
             if (filter != null)
@@ -94,7 +94,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in SafeQuery.ValidIncludePaths<TEntity>(includeProperties, IsMapped))
                 {
                     queryableSet = queryableSet.Include(includeProperty.Trim());
                 }
@@ -123,6 +123,43 @@ namespace Shrooms.DataLayer.DAL
 
             // Use ToPagedList() which is synchronous, as X.PagedList doesn't have proper EF Core async support
             return await Task.FromResult(queryableSet.ToPagedList(page.Value, pageSize));
+        }
+
+        // Only members the EF model knows about (scalars, navigations, skip navigations) are queryable;
+        // [NotMapped] and fluent-ignored CLR properties would fail at translation time.
+        private bool IsMapped(PropertyInfo property)
+        {
+            if (_context is not DbContext dbContext)
+            {
+                return true;
+            }
+
+            var entityType = dbContext.Model.FindEntityType(property.DeclaringType!);
+            if (entityType == null)
+            {
+                // Owned/complex types or non-entities: let the provider decide.
+                return true;
+            }
+
+            return entityType.FindProperty(property.Name) != null
+                || entityType.FindNavigation(property.Name) != null
+                || entityType.FindSkipNavigation(property.Name) != null
+                || entityType.FindComplexProperty(property.Name) != null;
+        }
+
+        // Typed replacement for the former Dynamic LINQ "OrganizationId=N || OrganizationId=null" filter.
+        private static Expression<Func<TEntity, bool>> OrganizationFilter(int organizationId)
+        {
+            var entity = Expression.Parameter(typeof(TEntity), "e");
+            var property = Expression.Property(entity, ClaimOrganizationId);
+
+            Expression body = property.Type == typeof(int?)
+                ? Expression.OrElse(
+                    Expression.Equal(property, Expression.Constant(organizationId, typeof(int?))),
+                    Expression.Equal(property, Expression.Constant(null, typeof(int?))))
+                : Expression.Equal(property, Expression.Constant(organizationId));
+
+            return Expression.Lambda<Func<TEntity, bool>>(body, entity);
         }
 
         public virtual async Task<TEntity> GetByIdAsync(object id)

@@ -130,12 +130,11 @@ namespace Shrooms.Domain.Services.Administration
                 throw new ArgumentNullException(nameof(shroomsContext));
             }
 
-            var user = await shroomsContext
-                .Users
-                .FromSqlRaw("SELECT * FROM [dbo].[AspNetUsers] WHERE Email = @email", new SqlParameter("@email", email))
-                .SingleOrDefaultAsync();
-
-            return user != null;
+            // The global query filter hides soft-deleted rows, which also applied on top of the previous
+            // raw SQL and made this always return false. Bypass it explicitly.
+            return await shroomsContext.Users
+                .IgnoreQueryFilters()
+                .AnyAsync(u => u.Email == email && u.IsDeleted);
         }
 
         public async Task RestoreUserAsync(string email)

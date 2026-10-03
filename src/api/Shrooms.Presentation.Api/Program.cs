@@ -1,5 +1,6 @@
 using Hangfire;
 using Hangfire.SqlServer;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +24,19 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
+using Shrooms.Presentation.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = false;
+});
 
 // DbContext with per-request tenant-aware connection string
 builder.Services.AddHttpContextAccessor();
@@ -65,22 +75,47 @@ builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbCont
 builder.Services.AddOutputCache();
 builder.Services.AddScoped<IWidgetCacheInvalidator, WidgetCacheInvalidator>();
 
+// Allowed origins for the external-login returnUrl: ClientUrl plus CorsOrigins (and AllowedReturnUrlOrigins).
+builder.Services.AddSingleton<Shrooms.Presentation.Api.Helpers.IReturnUrlValidator>(sp =>
+    new Shrooms.Presentation.Api.Helpers.ReturnUrlValidator(sp.GetRequiredService<IConfiguration>()));
+
 // ASP.NET Core Identity (provides UserManager, RoleManager infra)
 builder.Services.AddIdentityCore<ApplicationUser>(opts =>
 {
-    opts.Password.RequireDigit = false;
-    opts.Password.RequireLowercase = false;
+    // Mirrors the Next.js client's password schema (src/lib/password-schema.ts) so the server is the
+    // authority and the client only gives early feedback.
+    opts.Password.RequireDigit = true;
+    opts.Password.RequireLowercase = true;
+    opts.Password.RequireUppercase = true;
     opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireUppercase = false;
-    opts.Password.RequiredLength = 6;
+    opts.Password.RequiredLength = 8;
     opts.SignIn.RequireConfirmedEmail = false;
+
+    // Brute-force protection: five wrong passwords lock the account for fifteen minutes. The token
+    // endpoint records failures and resets the counter on success.
+    opts.Lockout.AllowedForNewUsers = true;
+    opts.Lockout.MaxFailedAccessAttempts = 5;
+    opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ShroomsDbContext>()
     .AddDefaultTokenProviders();
 
-// JWT Authentication
-var jwtKey = builder.Configuration["JwtSecret"] ?? "default-secret-key-change-in-production-min32chars!!";
+// JWT Authentication. No fallback key: a deployment without JwtSecret must fail to start rather than
+// validate tokens against a public string. Issuer and audience are validated too, so a token minted
+// for another Simoona instance that happens to share a key is rejected.
+var jwtKey = builder.Configuration["JwtSecret"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException("JwtSecret must be configured and at least 32 bytes long.");
+}
+var isLocalEnvironment = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Docker");
+if (!isLocalEnvironment && jwtKey.StartsWith("your-secret-key", StringComparison.OrdinalIgnoreCase))
+{
+    throw new InvalidOperationException("JwtSecret is still the sample value from appsettings.json; set a real secret outside local development.");
+}
+var jwtIssuer = builder.Configuration["JwtIssuer"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultIssuer;
+var jwtAudience = builder.Configuration["JwtAudience"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultAudience;
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -93,8 +128,10 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
         ClockSkew = TimeSpan.FromSeconds(30)
     };
     // Allow token from query string for SignalR
@@ -126,6 +163,16 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+});
+
+// Deny by default: every endpoint requires an authenticated user unless it opts out with [AllowAnonymous]
+// (or .AllowAnonymous() on minimal endpoints). Until now a controller that forgot [Authorize] was only
+// protected as a side effect of MultiTenancyMiddleware rejecting requests without a tenant claim.
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 });
 
 // External cookie used to round-trip the identity returned by social IdPs back to /Account/ExternalLoginCallback.
@@ -182,6 +229,15 @@ builder.Services.AddCors(options =>
     {
         if (string.IsNullOrEmpty(corsOrigins) || corsOrigins == "*")
         {
+            // Reflecting any origin together with credentials is only acceptable for local development
+            // (Development and the docker-compose "Docker" environment). Everywhere else an explicit
+            // semicolon-separated origin list is required.
+            if (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Docker"))
+            {
+                throw new InvalidOperationException(
+                    "CorsOrigins must list the allowed client origins (semicolon-separated) outside Development; '*' is not permitted.");
+            }
+
             // AllowAnyOrigin() cannot be combined with AllowCredentials() per CORS spec.
             // SetIsOriginAllowed echoes the actual request origin, satisfying withCredentials.
             policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
@@ -189,13 +245,43 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins(corsOrigins.Split(';'))
+            policy.WithOrigins(corsOrigins.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials()
                   .WithExposedHeaders("Content-Disposition");
         }
     });
+});
+
+// Rate limiting for the anonymous authentication routes (/token, register, password reset, verify).
+// Fixed window per client IP; the account lockout above covers per-user credential stuffing.
+var authRequestsPerMinute = int.TryParse(builder.Configuration["AuthRateLimitPerMinute"], out var authLimit) && authLimit > 0
+    ? authLimit
+    : 10;
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsync(
+            "{\"error\":\"too_many_requests\",\"error_description\":\"Too many attempts. Try again in a minute.\"}",
+            cancellationToken);
+    };
+    // The Next.js server calls these endpoints on behalf of every browser, so partitioning on the TCP peer
+    // alone would give the whole organisation one shared budget. The client forwards the browser address in
+    // X-Client-Ip together with a shared secret (TrustedClientIpSecret); only then is that address used.
+    var trustedClientIpSecret = builder.Configuration["TrustedClientIpSecret"];
+    options.AddPolicy(AuthRateLimit.PolicyName, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            AuthRateLimit.PartitionKey(httpContext, trustedClientIpSecret),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = authRequestsPerMinute,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 // SignalR (in-box with Sdk.Web)
@@ -299,6 +385,10 @@ builder.Services.AddImageSharp(options =>
             context.Commands.Remove("mode");
             context.Commands.Add("rmode", mode);
         }
+
+        // The resize endpoint is anonymous: cap requested dimensions so a single URL cannot
+        // make the server allocate a huge canvas or fill the on-disk cache with giant variants.
+        ResizeCommandGuard.Clamp(context.Commands);
         if (defaultOnParse != null)
         {
             await defaultOnParse(context);
@@ -316,15 +406,50 @@ builder.Services.AddImageSharp(options =>
 })
 .ClearProviders()
 .AddProvider<StorageImageProvider>()
+// Only resizing is exposed. Format, quality and background-colour commands would multiply the number of
+// cacheable variants per image without limit, and nothing in the clients uses them.
 .RemoveProcessor<ResizeWebProcessor>()
+.RemoveProcessor<FormatWebProcessor>()
+.RemoveProcessor<QualityWebProcessor>()
+.RemoveProcessor<BackgroundColorWebProcessor>()
 .AddProcessor<ClampingResizeWebProcessor>();
+
+// Bound what a single decode may allocate (a 12 MB PNG can declare a 40000x40000 canvas). Uploads are
+// also dimension-checked in PictureService; this covers images stored before that check existed.
+SixLabors.ImageSharp.Configuration.Default.MemoryAllocator = SixLabors.ImageSharp.Memory.MemoryAllocator.Create(
+    new SixLabors.ImageSharp.Memory.MemoryAllocatorOptions { AllocationLimitMegabytes = 256 });
 
 if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
 {
     builder.Services.AddSingleton<IImageCache, NullImageCache>();
 }
 
+// Webhook Basic auth guards the external job endpoints (/externaljobs, /externalpremiumjobs). Refuse to start
+// in Production when the credentials are missing or still the sample values from appsettings.json, so a
+// deployment that forgot to override the template cannot expose those endpoints.
+// The web client proxies every browser's sign-in through one server, so without the shared secret that
+// lets it forward the browser address, every user would share a single rate-limit budget. Outside local
+// development that is a deployment error, not a degraded mode.
+if (!isLocalEnvironment && string.IsNullOrWhiteSpace(builder.Configuration["TrustedClientIpSecret"]))
+{
+    throw new InvalidOperationException(
+        "TrustedClientIpSecret must be configured (and API_CLIENT_IP_SECRET on the web client) so sign-in rate limits are counted per browser, not per server.");
+}
+
+if (!isLocalEnvironment)
+{
+    var basicUsername = builder.Configuration["BasicUsername"];
+    var basicPassword = builder.Configuration["BasicPassword"];
+    if (string.IsNullOrWhiteSpace(basicUsername) || string.IsNullOrWhiteSpace(basicPassword)
+        || basicUsername == "basicUsername" || basicPassword == "basicPassword")
+    {
+        throw new InvalidOperationException(
+            "BasicUsername and BasicPassword must be set to non-default values outside local development. They protect the external job endpoints.");
+    }
+}
+
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -365,6 +490,70 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
+// Behind a reverse proxy (Azure App Service, Docker) the client address arrives in X-Forwarded-For.
+// The rate limiter and the JWT failure log key on RemoteIpAddress, so honour the header there. Only the
+// right-most entry is used (ForwardLimit = 1), which is the one the trusted proxy appended. Disabled in
+// Development, where Kestrel is reached directly and a client could otherwise spoof its own address.
+// Opt-in (TrustForwardedHeaders=true) because trusting the header from any peer lets a client that can
+// reach Kestrel directly spoof its address and scheme. On Azure App Service the container is reachable
+// only through the platform front end, so enabling it there is safe; when the proxy addresses are known,
+// list them in ForwardedHeadersKnownProxies (semicolon-separated) to restrict trust further.
+var trustForwardedHeaders = builder.Configuration.GetValue<bool?>("TrustForwardedHeaders") ?? false;
+if (trustForwardedHeaders)
+{
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        ForwardLimit = 1
+    };
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+    foreach (var proxy in (builder.Configuration["ForwardedHeadersKnownProxies"] ?? string.Empty)
+                 .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        if (System.Net.IPAddress.TryParse(proxy, out var proxyAddress))
+        {
+            forwardedHeadersOptions.KnownProxies.Add(proxyAddress);
+        }
+    }
+
+    app.UseForwardedHeaders(forwardedHeadersOptions);
+}
+
+// Transport hardening (EnforceHttps=true): HSTS plus HTTPS redirect. Behind a TLS-terminating proxy this
+// needs TrustForwardedHeaders as well, otherwise every request looks like plain http and redirects loop.
+var enforceHttps = builder.Configuration.GetValue<bool?>("EnforceHttps") ?? false;
+if (enforceHttps)
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
+
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var headers = context.Response.Headers;
+        headers["X-Content-Type-Options"] = "nosniff";
+        headers["X-Frame-Options"] = "DENY";
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+
+        // JSON and image responses never need to run anything, so they get a locked-down policy. HTML
+        // documents (the bundled SPA on Linux, Swagger UI, the Hangfire dashboard) carry their own scripts
+        // and styles and are left alone.
+        var contentType = context.Response.ContentType ?? string.Empty;
+        if (!contentType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase))
+        {
+            headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 // Normalize double-slash paths (e.g. //Account/Foo → /Account/Foo) sent by the SPA
 app.Use(async (context, next) =>
 {
@@ -412,6 +601,16 @@ app.UseImageSharp();
 
 app.UseRouting();
 app.UseCors();
+app.UseRateLimiter();
+
+// Swagger is a development aid: keep it out of Production (it lists every admin route) and register it
+// ahead of UseAuthorization so the deny-by-default fallback policy, which also covers middleware-served
+// paths, does not block the UI in Development.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
@@ -422,22 +621,40 @@ app.UseAuthorization();
 // placing this earlier would serve stored responses without running the endpoint.s authorization.
 app.UseOutputCache();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseHangfireDashboard();
+// The job dashboard is a browser page, and the API authenticates with bearer tokens that a browser never
+// attaches to a navigated page, so there is no usable production flow for it. It is therefore mapped only
+// in Development (local requests, no token). Operators inspect production jobs through the database or
+// a future dedicated operator sign-in; Hangfire storage is shared by all tenants either way.
+if (app.Environment.IsDevelopment())
+{
+    app.MapHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new IDashboardAuthorizationFilter[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+    }).AllowAnonymous();
+}
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz").AllowAnonymous();
 app.MapEmailPreview();
 
 // Serve uploaded pictures via the configured IStorage so the same provider that handles
 // uploads also handles reads (local FS in dev, Azure Blob in staging/prod). Browser <img>
 // tags don't send JWT, so this endpoint is anonymous — GUID filenames make URLs unguessable.
 var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage) =>
+app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage, HttpContext httpContext) =>
 {
+    // Reject anything that is not a bare file name before it reaches the storage provider. Route values are
+    // URL-decoded, so "..%5C..%5Cappsettings.json" would otherwise arrive as a backslash traversal on Windows.
+    // Only image extensions are ever stored, so only those are served. Anything else (e.g. a legacy
+    // ".html" key) is treated as missing rather than handed to the browser with a sniffable type.
+    if (!Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(filename)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeContainer(tenant)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.HasAllowedImageExtension(filename))
+    {
+        return Results.NotFound();
+    }
+
     var stream = await storage.GetPictureAsync(filename, tenant.ToLowerInvariant());
     if (stream == null)
     {
@@ -449,6 +666,7 @@ app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename
         contentType = "application/octet-stream";
     }
 
+    httpContext.Response.Headers["X-Content-Type-Options"] = "nosniff";
     return Results.File(stream, contentType);
 }).AllowAnonymous();
 

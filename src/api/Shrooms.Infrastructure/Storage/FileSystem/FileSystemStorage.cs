@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,8 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 {
     public class FileSystemStorage : IStorage
     {
+        private const string StorageFolderName = "storage";
+
         private readonly IWebHostEnvironment _environment;
 
         public FileSystemStorage(IWebHostEnvironment environment)
@@ -15,7 +18,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public Task RemovePictureAsync(string blobKey, string tenantPicturesContainer)
         {
-            var filePath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer, blobKey);
+            var filePath = ResolvePath(blobKey, tenantPicturesContainer);
             var fileInfo = new FileInfo(filePath);
 
             if (fileInfo.Exists)
@@ -28,9 +31,8 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public async Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            var directoryPath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer);
-            var fullPath = Path.Combine(directoryPath, blobKey);
-            Directory.CreateDirectory(directoryPath);
+            var fullPath = ResolvePath(blobKey, tenantPicturesContainer);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
             using var destinationStream = File.Create(fullPath);
             await stream.CopyToAsync(destinationStream);
@@ -38,13 +40,38 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public Task<Stream> GetPictureAsync(string blobKey, string tenantPicturesContainer)
         {
-            var filePath = Path.Combine(_environment.ContentRootPath, "storage", tenantPicturesContainer, blobKey);
+            var filePath = ResolvePath(blobKey, tenantPicturesContainer);
             if (!File.Exists(filePath))
             {
                 return Task.FromResult<Stream>(null);
             }
 
             return Task.FromResult<Stream>(File.OpenRead(filePath));
+        }
+
+        /// <summary>
+        /// Builds the on-disk path for a blob and guarantees it stays inside the storage root.
+        /// The key and container are validated syntactically first; the canonicalised path is then
+        /// checked as a second line of defence against any traversal the syntax check might miss.
+        /// </summary>
+        private string ResolvePath(string blobKey, string tenantPicturesContainer)
+        {
+            BlobKeyGuard.EnsureSafeContainer(tenantPicturesContainer);
+            BlobKeyGuard.EnsureSafeBlobKey(blobKey);
+
+            var storageRoot = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, StorageFolderName));
+            var fullPath = Path.GetFullPath(Path.Combine(storageRoot, tenantPicturesContainer, blobKey));
+
+            var rootWithSeparator = storageRoot.EndsWith(Path.DirectorySeparatorChar)
+                ? storageRoot
+                : storageRoot + Path.DirectorySeparatorChar;
+
+            if (!fullPath.StartsWith(rootWithSeparator, StringComparison.Ordinal))
+            {
+                throw new ArgumentException("Resolved storage path escapes the storage root.", nameof(blobKey));
+            }
+
+            return fullPath;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
         public string OldPassword { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 6)]
+        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 8)]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; }
 
@@ -54,7 +54,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
         public string UserName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 6)]
+        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 8)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
@@ -75,7 +75,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 6)]
+        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 8)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 

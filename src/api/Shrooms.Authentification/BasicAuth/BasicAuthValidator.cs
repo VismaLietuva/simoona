@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.Constants;
@@ -26,12 +28,28 @@ namespace Shrooms.Authentification.BasicAuth
         {
             cancellationToken.ThrowIfCancellationRequested(); // Unfortunately, UserManager doesn't support CancellationTokens.
 
-            var tenantName = httpContext.Items["tenantName"] as string;
+            var expectedUserName = _appSettings.BasicUsername;
+            var expectedPassword = _appSettings.BasicPassword;
 
-            // Reject if any of: username mismatch, password mismatch, tenant unknown.
-            // The previous `&&` chain only rejected when all three failed, so a one-correct-field
-            // combination (e.g. right username, wrong password) authenticated successfully.
-            if (userName != _appSettings.BasicUsername || password != _appSettings.BasicPassword || !DoesOrganizationExists(tenantName))
+            // Fail closed: unconfigured credentials must never match. Without this, an empty
+            // "Authorization: Basic Og==" header authenticated against a blank configuration.
+            if (string.IsNullOrEmpty(expectedUserName) || string.IsNullOrEmpty(expectedPassword)
+                || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+            {
+                return null;
+            }
+
+            // Both comparisons always run and operate on fixed-size digests, so neither the username match nor
+            // the configured lengths leak through timing.
+            var userNameMatches = FixedTimeEquals(userName, expectedUserName);
+            var passwordMatches = FixedTimeEquals(password, expectedPassword);
+            if (!(userNameMatches & passwordMatches))
+            {
+                return null;
+            }
+
+            var tenantName = httpContext.Items["tenantName"] as string;
+            if (string.IsNullOrEmpty(tenantName) || !DoesOrganizationExists(tenantName))
             {
                 return null;
             }
@@ -48,6 +66,14 @@ namespace Shrooms.Authentification.BasicAuth
 
             var identity = new ClaimsIdentity(claims, "Basic", "name", "role");
             return new ClaimsPrincipal(identity);
+        }
+
+        private static bool FixedTimeEquals(string supplied, string expected)
+        {
+            var suppliedDigest = SHA256.HashData(Encoding.UTF8.GetBytes(supplied));
+            var expectedDigest = SHA256.HashData(Encoding.UTF8.GetBytes(expected));
+
+            return CryptographicOperations.FixedTimeEquals(suppliedDigest, expectedDigest);
         }
 
         private bool DoesOrganizationExists(string tenantName)

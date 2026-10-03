@@ -5,23 +5,45 @@ using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.Storage;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 
 namespace Shrooms.Domain.Services.Picture
 {
     public class PictureService : IPictureService
     {
+        /// <summary>
+        /// Largest image accepted for storage, in pixels. Anonymous resize requests decode stored images,
+        /// so a 40000x40000 PNG (a few hundred KB on disk, several GB decoded) must never get in.
+        /// </summary>
+        public const long MaxPixels = 40_000_000;
+
         private readonly IStorage _storage;
         private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly IPictureReferenceService _pictureReferences;
 
-        public PictureService(IStorage storage, IUnitOfWork2 uow)
+        public PictureService(IStorage storage, IUnitOfWork2 uow, IPictureReferenceService pictureReferences)
         {
             _storage = storage;
             _organizationsDbSet = uow.GetDbSet<Organization>();
+            _pictureReferences = pictureReferences;
         }
 
         public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            var pictureName = GetNewPictureName(fileName);
+            // Legacy endpoint: the client must at least declare an image (allowlisted file extension or
+            // media type), but the stored extension follows the format detected from the bytes, exactly as
+            // UploadOriginalAsync does, so a PNG uploaded as "photo.jpg" is stored and served as PNG.
+            if (AllowedExtensionFromFileName(fileName) == null && BlobKeyGuard.ExtensionForMimeType(mimeType) == null)
+            {
+                throw new ArgumentException("Unsupported image type.");
+            }
+
+            var (_, format) = ValidateDimensions(stream);
+            var extension = BlobKeyGuard.ExtensionForMimeType(format?.DefaultMimeType)
+                ?? throw new ArgumentException("Image format not recognized.");
+
+            var pictureName = GetNewPictureName(extension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
@@ -31,20 +53,13 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task<string> UploadOriginalAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
-            // Magic-byte sniff: confirms the upload's leading bytes match a real image
-            // format and not a renamed binary. The mime allowlist in the controller is
-            // client-asserted and trivially spoofable; this is the server-side check.
-            // We intentionally do NOT decode dimensions here — this endpoint streams
-            // the bytes to storage verbatim and never decodes them, so the decode-bomb
-            // attack surface lives on the serve path, not here.
-            if (!await IsRecognizedImageAsync(stream))
-            {
-                throw new ArgumentException("Image format not recognized.");
-            }
+            // The real format comes from the bytes, never from the client's file name or media type, so a
+            // "GIF89a<script>" polyglot named x.html is either a valid GIF stored as .gif or rejected.
+            var (_, format) = ValidateDimensions(stream);
+            var detectedExtension = BlobKeyGuard.ExtensionForMimeType(format?.DefaultMimeType)
+                ?? throw new ArgumentException("Image format not recognized.");
 
-            stream.Position = 0;
-
-            var pictureName = GetNewPictureName(fileName);
+            var pictureName = GetNewPictureName(detectedExtension);
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
@@ -54,61 +69,84 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task RemoveImageAsync(string blobKey, int orgId)
         {
+            // Picture ids are stored from client input. A key that is not a bare file name can never have been
+            // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
+            // profile with a tampered picture id editable while the storage layer stays a hard boundary.
+            if (!BlobKeyGuard.IsSafeBlobKey(blobKey))
+            {
+                return;
+            }
+
+            // Only a picture that no stored record references any more is deleted. Callers therefore save
+            // their own change first and remove the previous picture afterwards. Picture keys are public
+            // (every avatar URL shows one), so a user could otherwise set their PictureId to a colleague's
+            // avatar and have it deleted on the next change.
+            if (await _pictureReferences.CountReferencesAsync(blobKey) > 0)
+            {
+                return;
+            }
+
             var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
         }
 
-        private static async Task<bool> IsRecognizedImageAsync(Stream stream)
+        /// <summary>
+        /// Reads only the image header: rejects anything that is not a decodable image and anything whose
+        /// declared canvas exceeds <see cref="MaxPixels"/>. Leaves the stream at position 0.
+        /// </summary>
+        private static (IImageInfo Info, IImageFormat Format) ValidateDimensions(Stream stream)
         {
-            var header = new byte[12];
-            var read = await stream.ReadAsync(header.AsMemory(0, header.Length));
-            if (read < 4)
+            if (stream == null)
             {
-                return false;
+                throw new ArgumentException("No image data.");
             }
 
-            // JPEG: FF D8 FF
-            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            IImageInfo info;
+            IImageFormat format;
+            try
             {
-                return true;
+                info = Image.Identify(stream, out format);
+            }
+            catch (Exception ex) when (ex is UnknownImageFormatException || ex is InvalidImageContentException || ex is NotSupportedException)
+            {
+                throw new ArgumentException("Image format not recognized.", ex);
+            }
+            finally
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position = 0;
+                }
             }
 
-            // PNG: 89 50 4E 47 0D 0A 1A 0A
-            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            if (info == null)
             {
-                return true;
+                throw new ArgumentException("Image format not recognized.");
             }
 
-            // GIF: "GIF8"
-            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            if ((long)info.Width * info.Height > MaxPixels)
             {
-                return true;
+                throw new ArgumentException($"Image is too large: at most {MaxPixels / 1_000_000} megapixels are allowed.");
             }
 
-            // BMP: "BM"
-            if (header[0] == 0x42 && header[1] == 0x4D)
-            {
-                return true;
-            }
-
-            // WebP: "RIFF" ???? "WEBP"
-            if (read >= 12
-                && header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46
-                && header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-            {
-                return true;
-            }
-
-            return false;
+            return (info, format);
         }
 
-        private static string GetNewPictureName(string fileName)
+        private static string AllowedExtensionFromFileName(string fileName)
         {
-            var id = Guid.NewGuid().ToString();
-            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
 
-            return $"{id}{extension}";
+            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
+            return BlobKeyGuard.HasAllowedImageExtension(extension) ? extension : null;
+        }
+
+        private static string GetNewPictureName(string extension)
+        {
+            return $"{Guid.NewGuid()}{extension}";
         }
 
         private async Task<string> GetPictureContainerAsync(int id)
