@@ -245,6 +245,10 @@ namespace Shrooms.Domain.Services.Polls
                     _questionDbSet.Add(question);
                 }
             }
+            else
+            {
+                UpdateOptionUrls(poll, dto.Questions);
+            }
 
             await _uow.SaveChangesAsync(false);
         }
@@ -502,6 +506,7 @@ namespace Shrooms.Domain.Services.Polls
                     {
                         Id = option.Id,
                         Text = option.Text,
+                        Url = option.Url,
                         Voters = new List<PollPersonDto>()
                     }).ToList()
                 }).ToList();
@@ -543,6 +548,7 @@ namespace Shrooms.Domain.Services.Polls
                         {
                             Id = option.Id,
                             Text = option.Text,
+                            Url = option.Url,
                             VoteCount = optionAnswers.Count,
                             Picked = !poll.IsAnonymous && optionAnswers.Any(answer => answer.ApplicationUserId == userId),
                             Voters = poll.IsAnonymous
@@ -574,6 +580,7 @@ namespace Shrooms.Domain.Services.Polls
                     .Select((option, optionIndex) => new PollOption
                     {
                         Text = option.Text.Trim(),
+                        Url = NormalizeUrl(option.Url),
                         Order = optionIndex,
                         Created = now,
                         CreatedBy = userId,
@@ -581,6 +588,36 @@ namespace Shrooms.Domain.Services.Polls
                         ModifiedBy = userId
                     }).ToList()
             }).ToList();
+        }
+
+        private static void UpdateOptionUrls(Poll poll, IList<CreatePollQuestionDto> questions)
+        {
+            var existing = poll.Questions.OrderBy(question => question.Order).ToList();
+
+            for (var index = 0; index < existing.Count; index++)
+            {
+                var currentOptions = existing[index].Options.OrderBy(option => option.Order).ToList();
+                var submittedOptions = questions[index].Options
+                    .Where(option => !string.IsNullOrWhiteSpace(option.Text))
+                    .ToList();
+
+                for (var optionIndex = 0; optionIndex < currentOptions.Count; optionIndex++)
+                {
+                    currentOptions[optionIndex].Url = NormalizeUrl(submittedOptions[optionIndex].Url);
+                }
+            }
+        }
+
+        private static string NormalizeUrl(string url)
+        {
+            return string.IsNullOrWhiteSpace(url) ? null : url.Trim();
+        }
+
+        private static bool IsValidUrl(string url)
+        {
+            return url.Length <= PollOption.MaxUrlLength &&
+                   Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+                   (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
         }
 
         private static void ValidateBallotUnchanged(Poll poll, UpdatePollDto dto)
@@ -686,6 +723,16 @@ namespace Shrooms.Domain.Services.Polls
                 if (options.Select(option => option.ToLowerInvariant()).Distinct().Count() != options.Count)
                 {
                     throw new ArgumentException("Answers must be different from one another.");
+                }
+
+                var urls = question.Options
+                    .Where(option => !string.IsNullOrWhiteSpace(option.Text))
+                    .Select(option => NormalizeUrl(option.Url))
+                    .Where(url => url != null);
+
+                if (urls.Any(url => !IsValidUrl(url)))
+                {
+                    throw new ArgumentException("An answer link must be a full http(s) address.");
                 }
             }
         }
