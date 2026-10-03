@@ -521,9 +521,18 @@ namespace Shrooms.Presentation.Api.Controllers
             return url + sep + hash;
         }
 
+        // The setting is a delimited list ("internal;google;facebook"); compare whole tokens so that a value
+        // such as "notgoogle" cannot enable Google.
         private static bool ContainsProvider(string providerList, string providerName)
         {
-            return providerList.ToLower().Contains(providerName.ToLower());
+            if (string.IsNullOrWhiteSpace(providerList) || string.IsNullOrWhiteSpace(providerName))
+            {
+                return false;
+            }
+
+            return providerList
+                .Split(new[] { ';', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Any(token => string.Equals(token, providerName, StringComparison.OrdinalIgnoreCase));
         }
 
         private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfoAsync()

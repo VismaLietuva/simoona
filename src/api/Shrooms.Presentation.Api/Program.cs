@@ -427,6 +427,15 @@ if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
 // Webhook Basic auth guards the external job endpoints (/externaljobs, /externalpremiumjobs). Refuse to start
 // in Production when the credentials are missing or still the sample values from appsettings.json, so a
 // deployment that forgot to override the template cannot expose those endpoints.
+// The web client proxies every browser's sign-in through one server, so without the shared secret that
+// lets it forward the browser address, every user would share a single rate-limit budget. Outside local
+// development that is a deployment error, not a degraded mode.
+if (!isLocalEnvironment && string.IsNullOrWhiteSpace(builder.Configuration["TrustedClientIpSecret"]))
+{
+    throw new InvalidOperationException(
+        "TrustedClientIpSecret must be configured (and API_CLIENT_IP_SECRET on the web client) so sign-in rate limits are counted per browser, not per server.");
+}
+
 if (!isLocalEnvironment)
 {
     var basicUsername = builder.Configuration["BasicUsername"];
@@ -441,11 +450,6 @@ if (!isLocalEnvironment)
 
 var app = builder.Build();
 
-if (!isLocalEnvironment && string.IsNullOrWhiteSpace(builder.Configuration["TrustedClientIpSecret"]))
-{
-    app.Logger.LogWarning(
-        "TrustedClientIpSecret is not configured: the authentication rate limit is counted per TCP peer, so all users behind the web client share one budget.");
-}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -617,27 +621,16 @@ app.UseAuthorization();
 // placing this earlier would serve stored responses without running the endpoint.s authorization.
 app.UseOutputCache();
 
-
-// Job dashboard: an authenticated Admin only. The deny-by-default fallback policy already demands a
-// JWT; this replaces Hangfire's local-request filter, which is meaningless behind a reverse proxy.
-// In Development the dashboard is reachable from the local machine without a token (browsers do not
-// send the JWT), so it opts out of the deny-by-default policy and relies on Hangfire's local-request
-// filter; elsewhere an authenticated Admin listed in HangfireOperators ("organization:username") is
-// required, because Hangfire storage is shared by all tenants, the Admin role is assignable by any
-// tenant's administration and user names are only unique within a tenant.
+// The job dashboard is a browser page, and the API authenticates with bearer tokens that a browser never
+// attaches to a navigated page, so there is no usable production flow for it. It is therefore mapped only
+// in Development (local requests, no token). Operators inspect production jobs through the database or
+// a future dedicated operator sign-in; Hangfire storage is shared by all tenants either way.
 if (app.Environment.IsDevelopment())
 {
     app.MapHangfireDashboard("/hangfire", new DashboardOptions
     {
         Authorization = new IDashboardAuthorizationFilter[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
     }).AllowAnonymous();
-}
-else
-{
-    app.MapHangfireDashboard("/hangfire", new DashboardOptions
-    {
-        Authorization = new IDashboardAuthorizationFilter[] { new HangfireAdminAuthorizationFilter() }
-    });
 }
 
 app.MapControllers();
