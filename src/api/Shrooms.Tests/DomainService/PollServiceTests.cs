@@ -178,6 +178,19 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Report_Missing_Answers_When_A_Question_Has_No_Options()
+        {
+            var poll = await AddPollAsync(isAnonymous: false);
+            var update = BuildUpdate(poll, null, null);
+            update.Questions[0].Options = null;
+
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _pollService.UpdateAsync(update, canManage: true));
+
+            Assert.That(exception.Message, Is.EqualTo("Every question needs at least two answers."));
+        }
+
+        [Test]
         public async Task Should_Update_Answer_Links_After_Voting_Has_Started()
         {
             var poll = await AddPollAsync(isAnonymous: false);
