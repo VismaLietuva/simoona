@@ -152,6 +152,97 @@ namespace Shrooms.Tests.DomainService
             });
         }
 
+        [Test]
+        public async Task Should_Store_Answer_Links_Trimmed_And_Blank_Ones_As_Null()
+        {
+            var poll = await AddPollAsync(isAnonymous: false);
+
+            await _pollService.UpdateAsync(BuildUpdate(poll, " https://example.com/a ", "  "), canManage: true);
+
+            var urls = await OptionUrlsAsync(poll);
+
+            Assert.That(urls, Is.EqualTo(new[] { "https://example.com/a", null }));
+        }
+
+        [TestCase("javascript:alert(1)")]
+        [TestCase("example.com")]
+        [TestCase("ftp://example.com")]
+        public async Task Should_Reject_An_Answer_Link_That_Is_Not_An_Http_Address(string url)
+        {
+            var poll = await AddPollAsync(isAnonymous: false);
+
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _pollService.UpdateAsync(BuildUpdate(poll, url, null), canManage: true));
+
+            Assert.That(exception.Message, Is.EqualTo("An answer link must be a full http(s) address."));
+        }
+
+        [Test]
+        public async Task Should_Report_Missing_Answers_When_A_Question_Has_No_Options()
+        {
+            var poll = await AddPollAsync(isAnonymous: false);
+            var update = BuildUpdate(poll, null, null);
+            update.Questions[0].Options = null;
+
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _pollService.UpdateAsync(update, canManage: true));
+
+            Assert.That(exception.Message, Is.EqualTo("Every question needs at least two answers."));
+        }
+
+        [Test]
+        public async Task Should_Update_Answer_Links_After_Voting_Has_Started()
+        {
+            var poll = await AddPollAsync(isAnonymous: false);
+            await _pollService.VoteAsync(BuildVote(poll));
+            var optionIds = poll.Questions.First().Options.Select(option => option.Id).ToList();
+
+            await _pollService.UpdateAsync(BuildUpdate(poll, null, "https://example.com/b"), canManage: true);
+
+            var options = await _dbContext.Set<PollOption>().OrderBy(option => option.Order).ToListAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(options.Select(option => option.Id), Is.EqualTo(optionIds));
+                Assert.That(options.Select(option => option.Url), Is.EqualTo(new[] { null, "https://example.com/b" }));
+                Assert.That(options.Select(option => option.ModifiedBy), Is.EqualTo(new[] { null, "author" }));
+            });
+        }
+
+        private static UpdatePollDto BuildUpdate(Poll poll, string urlA, string urlB)
+        {
+            return new UpdatePollDto
+            {
+                Id = poll.Id,
+                UserId = "author",
+                OrganizationId = 1,
+                Title = poll.Title,
+                IsAnonymous = poll.IsAnonymous,
+                Deadline = poll.Deadline,
+                Questions = new List<CreatePollQuestionDto>
+                {
+                    new CreatePollQuestionDto
+                    {
+                        Text = "Question",
+                        Options = new List<CreatePollOptionDto>
+                        {
+                            new CreatePollOptionDto { Text = "A", Url = urlA },
+                            new CreatePollOptionDto { Text = "B", Url = urlB }
+                        }
+                    }
+                }
+            };
+        }
+
+        private async Task<List<string>> OptionUrlsAsync(Poll poll)
+        {
+            return await _dbContext.Set<PollOption>()
+                .Where(option => option.Question.PollId == poll.Id)
+                .OrderBy(option => option.Order)
+                .Select(option => option.Url)
+                .ToListAsync();
+        }
+
         private async Task<Poll> AddPollAsync(bool isAnonymous)
         {
             var wall = new Wall
