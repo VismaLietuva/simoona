@@ -31,6 +31,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public int VirtualParticipantsCount { get; set; }
 
+        public bool IsFull { get; set; }
+
         public bool IsCreator { get; set; }
 
         public AttendingStatus ParticipatingStatus { get; set; }
