@@ -106,6 +106,46 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 
+        [TestCase(2, new[] { AttendingStatus.Attending, AttendingStatus.Attending }, true)]
+        [TestCase(2, new[] { AttendingStatus.Attending }, false)]
+        [TestCase(2, new[] { AttendingStatus.Attending, AttendingStatus.AttendingVirtually, AttendingStatus.MaybeAttending, AttendingStatus.NotAttending }, false)]
+        [TestCase(0, new AttendingStatus[0], true)]
+        public async Task Should_Return_IsFull_Counting_Only_Physical_Attendees(int maxParticipants, AttendingStatus[] statuses, bool expectedIsFull)
+        {
+            var eventId = Guid.NewGuid();
+            var @event = new Event
+            {
+                Id = eventId,
+                OrganizationId = 2,
+                ResponsibleUserId = "host",
+                StartDate = DateTime.UtcNow.AddDays(1),
+                EndDate = DateTime.UtcNow.AddDays(2),
+                MaxParticipants = maxParticipants,
+                EventParticipants = statuses
+                    .Select((status, i) => new EventParticipant
+                    {
+                        Id = i + 1,
+                        EventId = eventId,
+                        ApplicationUserId = $"user{i}",
+                        AttendStatus = (int)status
+                    })
+                    .ToList()
+            };
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event> { @event });
+
+            var myEventsOptions = new MyEventsOptionsDto
+            {
+                Filter = MyEventsOptions.Host,
+                Page = 1,
+                PageSize = 10
+            };
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "host" };
+
+            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).Single();
+
+            ClassicAssert.AreEqual(expectedIsFull, result.IsFull);
+        }
+
         [Test]
         public async Task Should_Return_Options_By_Event_Id()
         {
