@@ -106,6 +106,7 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(res.ItemCount, 3);
             ClassicAssert.AreEqual(res.Entries.First().QuantityLeft, 1);
             ClassicAssert.AreEqual(res.Entries.First().Readers.First().Id, "testUserId");
+            ClassicAssert.AreEqual("test1.jpg", res.Entries.First().Readers.First().PictureId);
             ClassicAssert.IsTrue(res.Entries.First().TakenByCurrentUser);
         }
 
@@ -221,6 +222,7 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual(1, res.Id);
             ClassicAssert.AreEqual(1, res.BookLogs.First().LogId);
             ClassicAssert.AreEqual("name1 surname1", res.BookLogs.First().FullName);
+            ClassicAssert.AreEqual("name1.jpg", res.BookLogs.First().PictureId);
             ClassicAssert.AreEqual(0, res.AvailableCount);
         }
 
@@ -720,7 +722,8 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = "testUser1",
                 FirstName = "name1",
-                LastName = "surname1"
+                LastName = "surname1",
+                PictureId = "name1.jpg"
             };
 
             var user2 = new ApplicationUser
@@ -845,7 +848,8 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 FirstName = "Test1",
                 LastName = "Test1",
-                Id = "testUserId"
+                Id = "testUserId",
+                PictureId = "test1.jpg"
             };
 
             var booksOfficeList = new List<BookOffice>

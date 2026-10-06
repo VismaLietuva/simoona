@@ -694,31 +694,31 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task<IEnumerable<KudosBasicDataDto>> GetKudosStatsAsync(int months, int amount, int organizationId)
         {
             var rows = await BuildKudosStatsQuery(TabOne, months, amount, organizationId).ToListAsync();
-            var names = await GetEmployeeNamesAsync(rows);
+            var employees = await GetEmployeesAsync(rows);
 
-            return SelectTab(rows, names, TabOne);
+            return SelectTab(rows, employees, TabOne);
         }
 
         public async Task<KudosWidgetStatsDto> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount, int organizationId)
         {
             // Both tabs differ only by their month window and row count, so their aggregates go out
-            // as one UNION ALL round trip instead of two, and the two name lookups they used to do
+            // as one UNION ALL round trip instead of two, and the two employee lookups they used to do
             // separately collapse into the single one below.
             var rows = await BuildKudosStatsQuery(TabOne, tabOneMonths, tabOneAmount, organizationId)
                 .Concat(BuildKudosStatsQuery(TabTwo, tabTwoMonths, tabTwoAmount, organizationId))
                 .ToListAsync();
 
-            var names = await GetEmployeeNamesAsync(rows);
+            var employees = await GetEmployeesAsync(rows);
 
             return new KudosWidgetStatsDto
             {
-                TabOne = SelectTab(rows, names, TabOne),
-                TabTwo = SelectTab(rows, names, TabTwo)
+                TabOne = SelectTab(rows, employees, TabOne),
+                TabTwo = SelectTab(rows, employees, TabTwo)
             };
         }
 
         // Aggregates off IX_KudosLogs_OrganizationId_Status_Created and stops at the top `amount`
-        // rows. Names are resolved separately rather than joined here: joining inside the
+        // rows. Employees are resolved separately rather than joined here: joining inside the
         // aggregate leaves the optimizer no useful row estimate and it scans AspNetUsers instead
         // of seeking the handful of ids this returns.
         private IQueryable<KudosTabStatRow> BuildKudosStatsQuery(int tab, int months, int amount, int organizationId)
@@ -744,7 +744,7 @@ namespace Shrooms.Domain.Services.Kudos
         }
 
         // One seek-friendly lookup covering every id both tabs need.
-        private async Task<Dictionary<string, string>> GetEmployeeNamesAsync(IEnumerable<KudosTabStatRow> rows)
+        private async Task<Dictionary<string, StatEmployee>> GetEmployeesAsync(IEnumerable<KudosTabStatRow> rows)
         {
             var employeeIds = rows
                 .Select(row => row.EmployeeId)
@@ -754,25 +754,27 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (employeeIds.Length == 0)
             {
-                return new Dictionary<string, string>();
+                return new Dictionary<string, StatEmployee>();
             }
 
             return await _usersDbSet
                 .Where(user => employeeIds.Contains(user.Id))
-                .Select(user => new { user.Id, user.FirstName, user.LastName })
-                .ToDictionaryAsync(user => user.Id, user => user.FirstName + " " + user.LastName);
+                .Select(user => new { user.Id, user.FirstName, user.LastName, user.PictureId })
+                .ToDictionaryAsync(user => user.Id, user => new StatEmployee(user.FirstName + " " + user.LastName, user.PictureId));
         }
 
-        // Employees missing from the name lookup are dropped rather than throwing, which is what
+        // Employees missing from the lookup are dropped rather than throwing, which is what
         // the previous users.Single(...) call did when a log referenced a since-deleted user.
-        private static List<KudosBasicDataDto> SelectTab(IEnumerable<KudosTabStatRow> rows, IReadOnlyDictionary<string, string> names, int tab)
+        private static List<KudosBasicDataDto> SelectTab(IEnumerable<KudosTabStatRow> rows, IReadOnlyDictionary<string, StatEmployee> employees, int tab)
         {
             return rows
-                .Where(row => row.Tab == tab && row.EmployeeId != null && names.ContainsKey(row.EmployeeId))
+                .Where(row => row.Tab == tab && row.EmployeeId != null && employees.ContainsKey(row.EmployeeId))
                 .OrderByDescending(row => row.KudosAmount)
                 .Select(row => new KudosBasicDataDto
                 {
-                    Name = names[row.EmployeeId],
+                    Id = row.EmployeeId,
+                    Name = employees[row.EmployeeId].Name,
+                    PictureId = employees[row.EmployeeId].PictureId,
                     KudosAmount = row.KudosAmount
                 })
                 .ToList();
@@ -1147,5 +1149,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             public decimal KudosAmount { get; set; }
         }
+
+        private sealed record StatEmployee(string Name, string PictureId);
     }
 }
