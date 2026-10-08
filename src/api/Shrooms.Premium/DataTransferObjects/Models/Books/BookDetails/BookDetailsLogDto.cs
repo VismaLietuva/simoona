@@ -9,6 +9,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails
         public DateTime TakenFrom { get; set; }
         public DateTime TakenTill { get; set; }
         public string FullName { get; set; }
+        public string PictureId { get; set; }
         public DateTime? Returned { get; set; }
     }
 }

@@ -953,6 +953,19 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_Employee_Id_And_Picture_With_Kudos_Stats()
+        {
+            MockKudosLogsForStats();
+
+            var actual = (await _kudosService.GetKudosStatsAsync(3, 10, 2)).ToList();
+
+            Assert.That(actual[0].Id, Is.EqualTo("User1"));
+            Assert.That(actual[0].PictureId, Is.EqualTo("user1.jpg"));
+            Assert.That(actual[1].Id, Is.EqualTo("User3"));
+            Assert.That(actual[1].PictureId, Is.Null);
+        }
+
+        [Test]
         public async Task Should_Not_Let_A_Missing_Employee_Take_A_Leaderboard_Slot()
         {
             // User 1 tops the board but no longer resolves, so the top three must be the next
@@ -982,6 +995,8 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(tabTwo, Has.Count.EqualTo(2), "the second tab must honour its own row limit");
             Assert.That(tabTwo.Select(stat => stat.Name), Is.EqualTo(new[] { "User 1", "User 3" }));
+            Assert.That(tabTwo[0].Id, Is.EqualTo("User1"));
+            Assert.That(tabTwo[0].PictureId, Is.EqualTo("user1.jpg"));
         }
 
         #endregion
@@ -1831,6 +1846,7 @@ namespace Shrooms.Tests.DomainService
                     Id = "User1",
                     FirstName = "User",
                     LastName = "1",
+                    PictureId = "user1.jpg",
                     EmploymentDate = DateTime.UtcNow
                 },
                 new()

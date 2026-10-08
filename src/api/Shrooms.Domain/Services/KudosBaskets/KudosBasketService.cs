@@ -226,7 +226,8 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 userDto = new KudosBasketLogUserDto
                 {
                     Id = employee.Id,
-                    FullName = $"{employee.FirstName} {employee.LastName}"
+                    FullName = $"{employee.FirstName} {employee.LastName}",
+                    PictureId = employee.PictureId
                 };
             }
 
