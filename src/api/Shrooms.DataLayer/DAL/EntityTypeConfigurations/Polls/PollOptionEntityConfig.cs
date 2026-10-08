@@ -13,6 +13,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Polls
             builder.HasQueryFilter(e => !e.IsDeleted);
 
             builder.Property(x => x.Text).IsRequired().HasMaxLength(PollOption.MaxTextLength);
+            builder.Property(x => x.Url).HasMaxLength(PollOption.MaxUrlLength);
             builder.Property(x => x.Created).HasColumnType("datetime2");
             builder.Property(x => x.Modified).HasColumnType("datetime2");
 
