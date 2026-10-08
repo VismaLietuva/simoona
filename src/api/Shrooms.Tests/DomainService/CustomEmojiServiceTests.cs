@@ -10,6 +10,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Emoji;
@@ -26,6 +27,7 @@ namespace Shrooms.Tests.DomainService
     {
         private IUnitOfWork2 _uow;
         private DbSet<CustomEmoji> _customEmojisDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
         private IPictureService _pictureService;
         private IPermissionService _permissionService;
         private ICustomEmojiValidator _validator;
@@ -45,6 +47,8 @@ namespace Shrooms.Tests.DomainService
             _uow = Substitute.For<IUnitOfWork2>();
 
             _customEmojisDbSet = _uow.MockDbSetForAsync<CustomEmoji>();
+            _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>().AsQueryable());
 
             _pictureService = Substitute.For<IPictureService>();
             _permissionService = Substitute.For<IPermissionService>();
@@ -59,6 +63,10 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Create_New_Custom_Emoji()
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new() { Id = "user1", FirstName = "Ann", LastName = "Adams" }
+            }.AsQueryable());
             _pictureService
                 .UploadOriginalAsync(Arg.Any<Stream>(), "image/png", "parrot.png", 2)
                 .Returns("blob-guid.png");
@@ -86,6 +94,7 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(result.Name, Is.EqualTo("party-parrot"));
             Assert.That(result.Url, Is.EqualTo("/storage/visma/blob-guid.png"));
+            Assert.That(result.CreatedByFullName, Is.EqualTo("Ann Adams"));
         }
 
         [Test]
@@ -130,13 +139,19 @@ namespace Shrooms.Tests.DomainService
                     { Id = 3, Name = "other-org", BlobName = "c.png", CreatedBy = "user3", OrganizationId = 3 }
             };
             _customEmojisDbSet.SetDbSetDataForAsync(emojis.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new() { Id = "user1", FirstName = "Ann", LastName = "Adams" }
+            }.AsQueryable());
 
             var result = (await _customEmojiService.GetAllAsync(_userOrg, "Visma")).Emojis.ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[0].Name, Is.EqualTo("party-parrot"));
             Assert.That(result[0].Url, Is.EqualTo("/storage/visma/a.gif"));
+            Assert.That(result[0].CreatedByFullName, Is.EqualTo("Ann Adams"));
             Assert.That(result[1].Name, Is.EqualTo("ship-it"));
+            Assert.That(result[1].CreatedByFullName, Is.Null);
         }
 
         [Test]
