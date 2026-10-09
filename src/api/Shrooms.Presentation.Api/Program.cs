@@ -275,7 +275,7 @@ builder.Services.AddRateLimiter(options =>
     };
     // The Next.js server calls these endpoints on behalf of every browser, so partitioning on the TCP peer
     // alone would give the whole organisation one shared budget. The client forwards the browser address in
-    // X-Client-Ip together with a shared secret (TrustedClientIpSecret); only then is that address used.
+    // X-Simoona-Client-Ip together with a shared secret (TrustedClientIpSecret); only then is that address used.
     var trustedClientIpSecret = builder.Configuration["TrustedClientIpSecret"];
     options.AddPolicy(AuthRateLimit.PolicyName, httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
@@ -503,7 +503,15 @@ using (var scope = app.Services.CreateScope())
 // only through the platform front end, so enabling it there is safe; when the proxy addresses are known,
 // list them in ForwardedHeadersKnownProxies (semicolon-separated) to restrict trust further.
 var trustForwardedHeaders = builder.Configuration.GetValue<bool?>("TrustForwardedHeaders") ?? false;
-if (trustForwardedHeaders)
+var platformForwardedHeaders = string.Equals(builder.Configuration["ASPNETCORE_FORWARDEDHEADERS_ENABLED"], "true", StringComparison.OrdinalIgnoreCase);
+if (trustForwardedHeaders && platformForwardedHeaders)
+{
+    // The hosting platform already registered the forwarded-headers middleware (App Service does this via
+    // ASPNETCORE_FORWARDEDHEADERS_ENABLED). Running it twice would consume two entries of X-Forwarded-For,
+    // the second of which is client-controlled, so ours is skipped.
+    app.Logger.LogInformation("Forwarded headers are handled by the platform (ASPNETCORE_FORWARDEDHEADERS_ENABLED); skipping the application's own middleware.");
+}
+else if (trustForwardedHeaders)
 {
     var forwardedHeadersOptions = new ForwardedHeadersOptions
     {

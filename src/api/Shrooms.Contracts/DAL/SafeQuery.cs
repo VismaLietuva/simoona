@@ -21,7 +21,7 @@ namespace Shrooms.Contracts.DAL
         private const int MaxPathDepth = 4;
 
         // Members that must never be usable as a sort key or include path, whichever entity exposes them.
-        private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret", "authorizationguid" };
+        private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret", "authorizationguid", "phonenumber" };
 
         /// <param name="isQueryable">
         /// Optional extra filter, e.g. the EF model: a property that exists on the CLR type but is not mapped
@@ -37,13 +37,19 @@ namespace Shrooms.Contracts.DAL
 
             IOrderedQueryable<T> ordered = null;
 
-            foreach (var (path, descending) in ParseOrderBy(typeof(T), orderBy, isQueryable))
+            foreach (var (path, descending, countOfCollection) in ParseOrderBy(typeof(T), orderBy, isQueryable))
             {
                 var parameter = Expression.Parameter(typeof(T), "x");
                 Expression body = parameter;
                 foreach (var property in path)
                 {
                     body = Expression.Property(body, property);
+                }
+
+                if (countOfCollection)
+                {
+                    // "Skills.Count()" style keys: order by the number of related rows.
+                    body = Expression.Call(typeof(Enumerable), nameof(Enumerable.Count), new[] { ElementType(body.Type) }, body);
                 }
 
                 var lambda = Expression.Lambda(body, parameter);
@@ -94,7 +100,7 @@ namespace Shrooms.Contracts.DAL
             return ParseOrderBy(typeof(T), orderBy, isQueryable).Any();
         }
 
-        private static IEnumerable<(PropertyInfo[] Path, bool Descending)> ParseOrderBy(Type elementType, string orderBy, Func<PropertyInfo, bool> isQueryable)
+        private static IEnumerable<(PropertyInfo[] Path, bool Descending, bool CountOfCollection)> ParseOrderBy(Type elementType, string orderBy, Func<PropertyInfo, bool> isQueryable)
         {
             if (string.IsNullOrWhiteSpace(orderBy))
             {
@@ -130,14 +136,28 @@ namespace Shrooms.Contracts.DAL
                     }
                 }
 
-                var path = ResolvePath(elementType, parts[0], requireNavigationLeaf: false, isQueryable);
-                if (path == null || !IsSortableType(path[^1].PropertyType))
+                // "Skills.Count()" / "Skills.Count": the only computed key allowed, the row count of a collection.
+                var key = parts[0];
+                var countOfCollection = false;
+                if (key.EndsWith(".Count()", StringComparison.OrdinalIgnoreCase) || key.EndsWith(".Count", StringComparison.OrdinalIgnoreCase))
+                {
+                    key = key.Substring(0, key.LastIndexOf('.'));
+                    countOfCollection = true;
+                }
+
+                var path = ResolvePath(elementType, key, requireNavigationLeaf: countOfCollection, isQueryable);
+                if (path == null)
+                {
+                    continue;
+                }
+
+                if (countOfCollection ? !IsCollectionType(path[^1].PropertyType) || ElementType(path[^1].PropertyType) == null : !IsSortableType(path[^1].PropertyType))
                 {
                     continue;
                 }
 
                 emitted++;
-                yield return (path, descending);
+                yield return (path, descending, countOfCollection);
             }
         }
 
@@ -193,7 +213,8 @@ namespace Shrooms.Contracts.DAL
                     var isCollection = IsCollectionType(property.PropertyType);
 
                     // Sorting through a collection is not a thing; an include path may continue into the
-                    // collection's element type (e.g. Floors.Rooms.ApplicationUsers).
+                    // collection's element type (e.g. Floors.Rooms.ApplicationUsers). For sorting, only a
+                    // trailing "Collection.Count()" is allowed, which never has a collection in the middle.
                     if (isCollection && !requireNavigationLeaf)
                     {
                         return null;

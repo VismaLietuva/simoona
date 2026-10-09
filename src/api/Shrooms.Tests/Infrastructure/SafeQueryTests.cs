@@ -63,7 +63,6 @@ namespace Shrooms.Tests.Infrastructure
         [TestCase("np(Organization.ShortName)")]
         [TestCase("Name.Contains(\"a\") desc")]
         [TestCase("DoesNotExist asc")]
-        [TestCase("Children.Count")]
         [TestCase("Organization asc")]
         [TestCase("Name sideways")]
         [TestCase("")]
@@ -164,8 +163,25 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(SafeQuery.IsValidOrderBy<Mixed>("Name", IsQueryable), Is.True);
         }
 
+        [Test]
+        public void OrderBy_SupportsCountOfACollection_AsTheAdminUserListSends()
+        {
+            var items = new[]
+            {
+                new Item { Id = 1, Children = new List<Org> { new(), new() } },
+                new Item { Id = 2, Children = new List<Org>() },
+                new Item { Id = 3, Children = new List<Org> { new() } },
+            }.AsQueryable();
+
+            Assert.That(SafeQuery.OrderBy(items, "Children.Count() desc").Select(i => i.Id).ToArray(), Is.EqualTo(new[] { 1, 3, 2 }));
+            Assert.That(SafeQuery.OrderBy(items, "Children.Count asc").Select(i => i.Id).ToArray(), Is.EqualTo(new[] { 2, 3, 1 }));
+            Assert.That(SafeQuery.IsValidOrderBy<Item>("Name.Count()"), Is.False, "Count is only for collections");
+            Assert.That(SafeQuery.IsValidOrderBy<Item>("Children.Count().Foo"), Is.False);
+        }
+
         [TestCase("BookAppAuthorizationGuid")]
         [TestCase("SecurityStamp")]
+        [TestCase("PhoneNumber")]
         public void SensitiveMembers_AreNeverIncludedOrSorted(string member)
         {
             Assert.That(SafeQuery.IsValidOrderBy<Item>(member), Is.False);
