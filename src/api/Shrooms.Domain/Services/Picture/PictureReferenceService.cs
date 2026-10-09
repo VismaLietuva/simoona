@@ -55,6 +55,7 @@ namespace Shrooms.Domain.Services.Picture
             count += await _uow.GetDbSet<Event>().IgnoreQueryFilters().CountAsync(e => e.ImageName == blobKey);
             count += await _uow.GetDbSet<Project>().IgnoreQueryFilters().CountAsync(p => p.Logo == blobKey);
             count += await _uow.GetDbSet<Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall>().IgnoreQueryFilters().CountAsync(w => w.Logo == blobKey);
+            count += await _uow.GetDbSet<RoomType>().IgnoreQueryFilters().CountAsync(r => r.IconId == blobKey);
 
             // Posts, comments and lotteries store a serialized list of keys.
             count += await _uow.GetDbSet<Post>().IgnoreQueryFilters().CountAsync(p => p.Images.Serialized.Contains(blobKey));
