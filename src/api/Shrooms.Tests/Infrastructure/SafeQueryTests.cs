@@ -176,6 +176,8 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(SafeQuery.OrderBy(items, "Children.Count() desc").Select(i => i.Id).ToArray(), Is.EqualTo(new[] { 1, 3, 2 }));
             Assert.That(SafeQuery.OrderBy(items, "Children.Count asc").Select(i => i.Id).ToArray(), Is.EqualTo(new[] { 2, 3, 1 }));
             Assert.That(SafeQuery.IsValidOrderBy<Item>("Name.Count()"), Is.False, "Count is only for collections");
+            Assert.That(SafeQuery.IsValidOrderBy<Office>("Floors.Rooms.Count()"), Is.False, "no collection may sit in the middle of a sort key");
+            Assert.That(SafeQuery.IsValidOrderBy<Office>("Floors.Count()"), Is.True);
             Assert.That(SafeQuery.IsValidOrderBy<Item>("Children.Count().Foo"), Is.False);
         }
 

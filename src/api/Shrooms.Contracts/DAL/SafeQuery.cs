@@ -84,7 +84,7 @@ namespace Shrooms.Contracts.DAL
 
             foreach (var rawPath in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                var resolved = ResolvePath(typeof(T), rawPath, requireNavigationLeaf: true, isQueryable);
+                var resolved = ResolvePath(typeof(T), rawPath, requireNavigationLeaf: true, isQueryable, allowIntermediateCollections: true);
                 if (resolved != null)
                 {
                     result.Add(string.Join(".", resolved.Select(p => p.Name)));
@@ -161,7 +161,7 @@ namespace Shrooms.Contracts.DAL
             }
         }
 
-        private static PropertyInfo[] ResolvePath(Type type, string path, bool requireNavigationLeaf, Func<PropertyInfo, bool> isQueryable)
+        private static PropertyInfo[] ResolvePath(Type type, string path, bool requireNavigationLeaf, Func<PropertyInfo, bool> isQueryable, bool allowIntermediateCollections = false)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -212,10 +212,10 @@ namespace Shrooms.Contracts.DAL
 
                     var isCollection = IsCollectionType(property.PropertyType);
 
-                    // Sorting through a collection is not a thing; an include path may continue into the
-                    // collection's element type (e.g. Floors.Rooms.ApplicationUsers). For sorting, only a
-                    // trailing "Collection.Count()" is allowed, which never has a collection in the middle.
-                    if (isCollection && !requireNavigationLeaf)
+                    // Sorting through a collection is not a thing (neither "Floors.Rooms.Id" nor
+                    // "Floors.Rooms.Count()"); an include path may continue into the collection's element
+                    // type (e.g. Floors.Rooms.ApplicationUsers).
+                    if (isCollection && !allowIntermediateCollections)
                     {
                         return null;
                     }

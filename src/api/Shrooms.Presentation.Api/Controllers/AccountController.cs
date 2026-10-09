@@ -141,10 +141,11 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 // The caller has not proven ownership of this address. A confirmed account is never modified.
                 // An unconfirmed internal account takes the new password and gets a fresh verification email:
-                // setting the password rotates the security stamp, which invalidates every earlier
-                // verification link, so only the latest registrant's password can ever be confirmed, and
-                // only by whoever reads the mailbox. Both cases answer 200 so the endpoint does not reveal
-                // which addresses exist.
+                // setting the password rotates the security stamp (invalidating every earlier link), and
+                // VerifyEmail requires that same password, so only someone holding both the mailbox and the
+                // credential can ever confirm. Repeated re-registration by a stranger is a nuisance (the
+                // pending user re-registers again) but never a takeover. Both cases answer 200 so the
+                // endpoint does not reveal which addresses exist.
                 if (!existing.EmailConfirmed
                     && await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
@@ -215,6 +216,16 @@ namespace Shrooms.Presentation.Api.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
+            {
+                return InvalidTokenResult();
+            }
+
+
+            // Mailbox plus credential: whoever registered the address must also know its password to
+            // confirm it. This is what makes anonymous re-registration safe: an attacker can set a
+            // password on a pending account but can never confirm it, and the real owner can never be
+            // tricked into confirming a password they did not choose. Same response as a bad code.
+            if (!await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 return InvalidTokenResult();
             }
@@ -631,7 +642,7 @@ namespace Shrooms.Presentation.Api.Controllers
         // told apart from a bad code.
         private IActionResult InvalidTokenResult()
         {
-            return GetErrorResult(IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken()));
+            return GetErrorResult(IdentityResult.Failed((_userManager.ErrorDescriber ?? new IdentityErrorDescriber()).InvalidToken()));
         }
 
         private IActionResult GetErrorResult(IdentityResult result)

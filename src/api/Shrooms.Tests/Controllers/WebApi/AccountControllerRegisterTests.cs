@@ -178,6 +178,25 @@ namespace Shrooms.Tests.Controllers.WebApi
             await _userManager.DidNotReceiveWithAnyArgs().FindByEmailAsync(default);
         }
 
+        [Test]
+        public async Task VerifyEmail_RequiresThePasswordChosenAtRegistration()
+        {
+            var pending = new ApplicationUser { Id = "u1", Email = Email, EmailConfirmed = false };
+            _userManager.FindByEmailAsync(Email).Returns(Task.FromResult(pending));
+            _userManager.CheckPasswordAsync(pending, "Str0ngPassw0rd").Returns(Task.FromResult(true));
+            _userManager.CheckPasswordAsync(pending, "attackers-guess").Returns(Task.FromResult(false));
+            _userManager.ConfirmEmailAsync(pending, "code").Returns(Task.FromResult(IdentityResult.Success));
+
+            var wrong = await _controller.VerifyEmail(new VerifyEmailViewModel { Email = Email, Code = "code", Password = "attackers-guess" });
+            Assert.That(wrong, Is.InstanceOf<BadRequestObjectResult>());
+            await _userManager.DidNotReceiveWithAnyArgs().ConfirmEmailAsync(default, default);
+
+            _controller.ModelState.Clear(); // the failed call recorded its errors on this controller instance
+            var right = await _controller.VerifyEmail(new VerifyEmailViewModel { Email = Email, Code = "code", Password = "Str0ngPassw0rd" });
+            Assert.That(right, Is.InstanceOf<OkResult>());
+            await _userManager.Received(1).ConfirmEmailAsync(pending, "code");
+        }
+
         private static RegisterViewModel Model()
         {
             return new RegisterViewModel
