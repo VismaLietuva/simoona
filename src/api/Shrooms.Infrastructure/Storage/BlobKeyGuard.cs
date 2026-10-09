@@ -55,7 +55,9 @@ namespace Shrooms.Infrastructure.Storage
                 return false;
             }
 
-            if (blobKey[0] == '.' || blobKey.Contains("..", StringComparison.Ordinal))
+            // Leading dot: hidden/relative names. Trailing dot or space: Windows silently strips them, so
+            // "victim.jpg." would address "victim.jpg" while passing every string comparison.
+            if (blobKey[0] == '.' || blobKey[^1] == '.' || blobKey[^1] == ' ' || blobKey.Contains("..", StringComparison.Ordinal))
             {
                 return false;
             }

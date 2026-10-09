@@ -25,8 +25,10 @@ namespace Shrooms.Presentation.Api.Middlewares
             @"^/?(?:api/)?storage/(?<tenant>[^/]+)/(?<file>.+)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        // GIF is deliberately absent: an animated GIF decodes to frames x canvas in memory (a small file can
+        // declare thousands of frames), so GIFs are served as stored and never resized server-side.
         private static readonly string[] ImageExtensions =
-            { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+            { ".jpg", ".jpeg", ".jfif", ".png", ".bmp", ".webp" };
 
         // IStorage is a scoped, tenant-aware service. ImageSharp.Web registers
         // IImageProvider as a singleton, so we cannot inject IStorage via the

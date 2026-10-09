@@ -128,15 +128,32 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(new { error = "email_host_not_allowed" });
             }
 
+            // Password rules are checked before the address is looked up, so a weak password gets the same
+            // 400 whether or not the address is registered (otherwise the difference would reveal it).
+            var passwordCheck = await ValidatePasswordAsync(model.Email, model.Password);
+            if (!passwordCheck.Succeeded)
+            {
+                return GetErrorResult(passwordCheck);
+            }
+
             var existing = await _userManager.FindByEmailAsync(model.Email);
             if (existing != null)
             {
-                // The caller has not proven ownership of this address, so the account is never modified.
-                // An unconfirmed internal account just gets its verification email again; a confirmed one
-                // gets nothing. Both answer 200 so the endpoint does not reveal which addresses exist.
+                // The caller has not proven ownership of this address. A confirmed account is never modified.
+                // An unconfirmed internal account takes the new password and gets a fresh verification email:
+                // setting the password rotates the security stamp, which invalidates every earlier
+                // verification link, so only the latest registrant's password can ever be confirmed, and
+                // only by whoever reads the mailbox. Both cases answer 200 so the endpoint does not reveal
+                // which addresses exist.
                 if (!existing.EmailConfirmed
                     && await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
+                    if (await _userManager.HasPasswordAsync(existing))
+                    {
+                        await _userManager.RemovePasswordAsync(existing);
+                    }
+
+                    await _userManager.AddPasswordAsync(existing, model.Password);
                     await _administrationService.SendUserVerificationEmailAsync(existing, RequestedOrganization);
                 }
 
@@ -431,6 +448,15 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 var existing = await _userManager.FindByEmailAsync(email);
 
+                if (existing != null && !IsEmailVerifiedByProvider(provider, result.Principal))
+                {
+                    // Matching by email is only safe when the identity provider vouches for the address.
+                    // Microsoft accounts (and Google without email_verified) can carry an unverified, user-
+                    // chosen email, which would let anyone take over the account that owns it.
+                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                    return Redirect(AppendHash(returnUrl, "error=email_not_verified"));
+                }
+
                 if (existing != null)
                 {
                     // Email exists in this tenant: attach the social login to the existing user. If that account
@@ -506,6 +532,39 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             return await _schemeProvider.GetSchemeAsync(provider) != null;
+        }
+
+        private async Task<IdentityResult> ValidatePasswordAsync(string email, string password)
+        {
+            var probe = new ApplicationUser { UserName = email, Email = email };
+            var errors = new List<IdentityError>();
+            foreach (var validator in _userManager.PasswordValidators)
+            {
+                var result = await validator.ValidateAsync(_userManager, probe, password);
+                if (!result.Succeeded)
+                {
+                    errors.AddRange(result.Errors);
+                }
+            }
+
+            return errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray());
+        }
+
+        // Facebook only returns confirmed addresses; Google states it explicitly; Microsoft's email claim is
+        // not verified and must never be used to match an existing account.
+        private static bool IsEmailVerifiedByProvider(string provider, ClaimsPrincipal principal)
+        {
+            if (provider == AuthenticationConstants.FacebookLoginProvider)
+            {
+                return true;
+            }
+
+            if (provider == AuthenticationConstants.GoogleLoginProvider)
+            {
+                return string.Equals(principal.FindFirstValue("email_verified"), "true", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
 
         private async Task<bool> IsProviderEnabledForOrganizationAsync(string provider, string organizationName)

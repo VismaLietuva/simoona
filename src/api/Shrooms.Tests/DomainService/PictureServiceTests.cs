@@ -155,6 +155,61 @@ namespace Shrooms.Tests.DomainService
                 Throws.ArgumentException.With.Message.Contains("too large"));
         }
 
+        private static MemoryStream AnimatedGif(int frames, int size = 4)
+        {
+            using var image = new Image<Rgba32>(size, size);
+            for (var i = 1; i < frames; i++)
+            {
+                using var frame = new Image<Rgba32>(size, size);
+                image.Frames.AddFrame(frame.Frames.RootFrame);
+            }
+
+            var stream = new MemoryStream();
+            image.SaveAsGif(stream);
+            stream.Position = 0;
+            return stream;
+        }
+
+        [Test]
+        public void GifFrameCounter_CountsFramesWithoutDecoding()
+        {
+            using var stream = AnimatedGif(7);
+
+            Assert.That(GifFrameCounter.Count(stream, 1000), Is.EqualTo(7));
+            Assert.That(stream.Position, Is.EqualTo(0));
+            Assert.That(GifFrameCounter.Count(new MemoryStream(new byte[] { 1, 2, 3 }), 10), Is.EqualTo(-1));
+        }
+
+        [Test]
+        public async Task UploadOriginal_ShouldAcceptAGifWithinTheFrameBudget()
+        {
+            using var stream = AnimatedGif(10);
+
+            var result = await _pictureService.UploadOriginalAsync(stream, "image/gif", "anim.gif", 2);
+
+            Assert.That(result, Does.EndWith(".gif"));
+        }
+
+        [Test]
+        public void UploadOriginal_ShouldReject_WhenAGifHasTooManyFrames()
+        {
+            using var stream = AnimatedGif(PictureService.MaxGifFrames + 5);
+
+            Assert.That(
+                async () => await _pictureService.UploadOriginalAsync(stream, "image/gif", "bomb.gif", 2),
+                Throws.ArgumentException.With.Message.Contains("frames"));
+            _storage.DidNotReceiveWithAnyArgs().UploadPictureAsync(default, default, default, default);
+        }
+
+        [TestCase("noextension")]
+        [TestCase("victim.html")]
+        public async Task RemoveImage_ShouldNotTouchStorage_WhenKeyIsNotAnImageName(string key)
+        {
+            await _pictureService.RemoveImageAsync(key, 2);
+
+            await _storage.DidNotReceiveWithAnyArgs().RemovePictureAsync(default, default);
+        }
+
         [Test]
         public async Task RemoveImage_ShouldForwardToStorage_WhenKeyIsBareFileName()
         {

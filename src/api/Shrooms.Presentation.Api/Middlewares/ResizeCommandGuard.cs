@@ -50,11 +50,13 @@ namespace Shrooms.Presentation.Api.Middlewares
                 return;
             }
 
-            var snapped = Snap(value);
-            if (snapped != value)
+            // Always rewrite to the canonical form: the cache is keyed on the command values, so "0128",
+            // "+128" and "128" must collapse to one entry.
+            var canonical = Snap(value).ToString(CultureInfo.InvariantCulture);
+            if (!string.Equals(raw, canonical, System.StringComparison.Ordinal))
             {
                 commands.Remove(key);
-                commands.Add(key, snapped.ToString(CultureInfo.InvariantCulture));
+                commands.Add(key, canonical);
             }
         }
     }

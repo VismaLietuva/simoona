@@ -86,19 +86,46 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public async Task ExistingUnconfirmedInternalAccount_ResendsVerification_WithoutTouchingPassword()
+        public async Task ExistingUnconfirmedInternalAccount_TakesNewPasswordAndResendsVerification()
         {
+            // Setting the password rotates the security stamp, which invalidates every earlier verification
+            // link; whoever reads the mailbox then confirms only the latest registrant's password.
             var existing = new ApplicationUser { Id = "u1", Email = Email, EmailConfirmed = false };
             _userManager.FindByEmailAsync(Email).Returns(Task.FromResult(existing));
+            _userManager.HasPasswordAsync(existing).Returns(Task.FromResult(true));
+            _userManager.RemovePasswordAsync(existing).Returns(Task.FromResult(IdentityResult.Success));
+            _userManager.AddPasswordAsync(existing, "Str0ngPassw0rd").Returns(Task.FromResult(IdentityResult.Success));
             _administrationService.HasExistingExternalLoginAsync(Email, AuthenticationConstants.InternalLoginProvider).Returns(Task.FromResult(true));
 
             var result = await _controller.RegisterUser(Model());
 
             Assert.That(result, Is.InstanceOf<OkResult>());
+            await _userManager.Received(1).RemovePasswordAsync(existing);
+            await _userManager.Received(1).AddPasswordAsync(existing, "Str0ngPassw0rd");
             await _administrationService.Received(1).SendUserVerificationEmailAsync(existing, Tenant);
-            await _userManager.DidNotReceiveWithAnyArgs().RemovePasswordAsync(default);
-            await _userManager.DidNotReceiveWithAnyArgs().AddPasswordAsync(default, default);
             await _administrationService.DidNotReceiveWithAnyArgs().CreateNewUserAsync(default, default, default);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task WeakPassword_GetsTheSameResponse_WhetherOrNotTheAddressExists(bool addressExists)
+        {
+            var validator = Substitute.For<IPasswordValidator<ApplicationUser>>();
+            validator.ValidateAsync(_userManager, Arg.Any<ApplicationUser>(), "weak")
+                .Returns(Task.FromResult(IdentityResult.Failed(new IdentityErrorDescriber().PasswordRequiresDigit())));
+            _userManager.PasswordValidators.Add(validator);
+            _userManager.FindByEmailAsync(Email).Returns(Task.FromResult(addressExists ? new ApplicationUser { Id = "u1", Email = Email, EmailConfirmed = true } : null));
+
+            var model = Model();
+            model.Password = "weak";
+            model.ConfirmPassword = "weak";
+
+            var result = await _controller.RegisterUser(model);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _userManager.DidNotReceiveWithAnyArgs().FindByEmailAsync(default);
+            await _administrationService.DidNotReceiveWithAnyArgs().CreateNewUserAsync(default, default, default);
+            await _administrationService.DidNotReceiveWithAnyArgs().SendUserVerificationEmailAsync(default, default);
         }
 
         [Test]

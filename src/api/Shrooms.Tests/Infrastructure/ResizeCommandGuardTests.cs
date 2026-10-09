@@ -36,6 +36,18 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(commands["height"], Is.EqualTo(expected.ToString()));
         }
 
+        [TestCase("0128", "128")]
+        [TestCase("+128", "128")]
+        [TestCase("00640", "640")]
+        public void Clamp_CanonicalisesEquivalentSpellings_SoTheyShareOneCacheEntry(string raw, string expected)
+        {
+            var commands = new CommandCollection { { "width", raw } };
+
+            ResizeCommandGuard.Clamp(commands);
+
+            Assert.That(commands["width"], Is.EqualTo(expected));
+        }
+
         [TestCase("abc")]
         [TestCase("-5")]
         [TestCase("0")]

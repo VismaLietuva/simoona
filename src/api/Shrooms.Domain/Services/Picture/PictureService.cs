@@ -18,6 +18,9 @@ namespace Shrooms.Domain.Services.Picture
         /// </summary>
         public const long MaxPixels = 40_000_000;
 
+        /// <summary>Frame budget for animated GIFs; every frame decodes to a full canvas buffer.</summary>
+        public const int MaxGifFrames = 200;
+
         private readonly IStorage _storage;
         private readonly DbSet<Organization> _organizationsDbSet;
         private readonly IPictureReferenceService _pictureReferences;
@@ -72,7 +75,7 @@ namespace Shrooms.Domain.Services.Picture
             // Picture ids are stored from client input. A key that is not a bare file name can never have been
             // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
             // profile with a tampered picture id editable while the storage layer stays a hard boundary.
-            if (!BlobKeyGuard.IsSafeBlobKey(blobKey))
+            if (!BlobKeyGuard.IsSafeBlobKey(blobKey) || !BlobKeyGuard.HasAllowedImageExtension(blobKey))
             {
                 return;
             }
@@ -128,6 +131,17 @@ namespace Shrooms.Domain.Services.Picture
             if ((long)info.Width * info.Height > MaxPixels)
             {
                 throw new ArgumentException($"Image is too large: at most {MaxPixels / 1_000_000} megapixels are allowed.");
+            }
+
+            // Identify sees one frame. An animated GIF decodes to frames x canvas, so the frame count and
+            // the total pixel volume are bounded separately.
+            if (string.Equals(format?.DefaultMimeType, "image/gif", StringComparison.OrdinalIgnoreCase))
+            {
+                var frames = GifFrameCounter.Count(stream, MaxGifFrames);
+                if (frames > MaxGifFrames || (long)frames * info.Width * info.Height > MaxPixels * 2)
+                {
+                    throw new ArgumentException($"Animated GIF is too large: at most {MaxGifFrames} frames are allowed.");
+                }
             }
 
             return (info, format);

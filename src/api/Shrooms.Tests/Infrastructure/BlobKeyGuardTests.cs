@@ -32,6 +32,8 @@ namespace Shrooms.Tests.Infrastructure
         [TestCase("file name.jpg")]
         [TestCase("file\0.jpg")]
         [TestCase("file%2F.jpg")]
+        [TestCase("victim.jpg.")]
+        [TestCase("victim.jpg ")]
         public void IsSafeBlobKey_RejectsTraversalAndUnsafeCharacters(string key)
         {
             Assert.That(BlobKeyGuard.IsSafeBlobKey(key), Is.False);

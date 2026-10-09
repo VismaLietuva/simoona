@@ -1,6 +1,7 @@
 using Hangfire;
 using Hangfire.SqlServer;
 using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -198,6 +199,9 @@ if (!string.IsNullOrEmpty(builder.Configuration["GoogleAccountClientId"]))
         opts.ClientId = builder.Configuration["GoogleAccountClientId"];
         opts.ClientSecret = builder.Configuration["GoogleAccountClientSecret"];
         opts.SignInScheme = IdentityConstants.ExternalScheme;
+        // Needed by the external-login callback: only a provider-verified email may be linked to an
+        // existing account.
+        opts.ClaimActions.MapJsonKey("email_verified", "email_verified");
     });
 }
 if (!string.IsNullOrEmpty(builder.Configuration["FacebookAccountAppId"]))
