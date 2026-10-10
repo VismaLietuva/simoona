@@ -15,11 +15,7 @@ using Shrooms.Presentation.Common.Filters;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
 {
-    /// <summary>
-    /// Guards the authorization surface of every API controller. The app registers a deny-by-default
-    /// fallback policy, so these tests exist to keep the explicit attributes honest: every action must
-    /// declare how it is protected, and admin-only actions must carry the matching permission.
-    /// </summary>
+    /// <summary>Every action must declare how it is protected; admin actions must carry the matching permission.</summary>
     [TestFixture]
     public class ControllerAuthorizationTests
     {
@@ -35,8 +31,6 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract && t.IsPublic)
             .OrderBy(t => t.FullName);
 
-        // Public instance methods declared on the application's own controller classes (including abstract
-        // bases such as AbstractWebApiController), excluding the framework's ControllerBase/Controller members.
         private static IEnumerable<MethodInfo> ActionsOf(Type controller) => controller
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(m => typeof(ControllerBase).IsAssignableFrom(m.DeclaringType)

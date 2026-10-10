@@ -47,11 +47,8 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             foreach (var user in usersToAnonymize)
             {
-                // The photo is the user's personal data: it goes even if someone else pointed their own record at
-                // the key. The converse (this user having adopted a colleague's key so that the colleague's
-                // avatar is deleted here) is prevented where the key is written: PutPersonalInfo refuses a key
-                // that is already in use. Deleting before the save means a storage failure throws here and
-                // leaves the user un-anonymized, so the next run retries instead of marking the photo as handled.
+                // The photo is the user's own data: delete even if referenced (PutPersonalInfo stops users adopting foreign keys).
+                // Delete before the save so a storage failure leaves the user for the next run.
                 if (!string.IsNullOrEmpty(user.PictureId))
                 {
                     await _pictureService.RemoveImageIgnoringReferencesAsync(user.PictureId, organization.Id);

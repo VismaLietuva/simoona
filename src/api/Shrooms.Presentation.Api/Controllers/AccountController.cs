@@ -118,8 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Internal (password) accounts must be enabled for the organisation, and when it restricts
-            // sign-ups to its own email domain that applies to internal registration too, not only social.
+            // Internal accounts must be enabled; the email-domain restriction applies to internal registration too.
             var organization = await _organizationService.GetOrganizationByNameAsync(RequestedOrganization);
             if (!ContainsProvider(organization.AuthenticationProviders ?? string.Empty, AuthenticationConstants.InternalLoginProvider))
             {
@@ -131,8 +130,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(new { error = "email_host_not_allowed" });
             }
 
-            // Password rules are checked before the address is looked up, so a weak password gets the same
-            // 400 whether or not the address is registered (otherwise the difference would reveal it).
+            // Password rules first: a weak password gets the same 400 whether or not the address exists.
             var passwordCheck = await ValidatePasswordAsync(model.Email, model.Password);
             if (!passwordCheck.Succeeded)
             {
@@ -142,13 +140,8 @@ namespace Shrooms.Presentation.Api.Controllers
             var existing = await _userManager.FindByEmailAsync(model.Email);
             if (existing != null)
             {
-                // The caller has not proven ownership of this address. A confirmed account is never modified.
-                // An unconfirmed internal account takes the new password and gets a fresh verification email:
-                // setting the password rotates the security stamp (invalidating every earlier link), and
-                // VerifyEmail requires that same password, so only someone holding both the mailbox and the
-                // credential can ever confirm. Repeated re-registration by a stranger is a nuisance (the
-                // pending user re-registers again) but never a takeover. Both cases answer 200 so the
-                // endpoint does not reveal which addresses exist.
+                // Ownership of the address is unproven: a confirmed account is never modified. An unconfirmed one takes the
+                // new password (rotating the stamp kills older links) and VerifyEmail needs that password. Both answer 200.
                 if (!existing.EmailConfirmed
                     && await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
@@ -224,10 +217,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
 
-            // Mailbox plus credential: whoever registered the address must also know its password to
-            // confirm it. This is what makes anonymous re-registration safe: an attacker can set a
-            // password on a pending account but can never confirm it, and the real owner can never be
-            // tricked into confirming a password they did not choose. Same response as a bad code.
+            // Mailbox plus credential: a stranger's re-registration can never be confirmed. Same response as a bad code.
             if (!await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 return InvalidTokenResult();
@@ -336,8 +326,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
             foreach (var provider in ExternalProviders)
             {
-                // Only providers the organisation enabled AND whose scheme is actually registered (i.e. the
-                // credentials are configured); otherwise the button would lead to a 400 from ExternalLogin.
                 if (!ContainsProvider(organizationProviders, provider) || !await IsKnownExternalProviderAsync(provider))
                 {
                     continue;
@@ -373,9 +361,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            // The callback appends the access token to returnUrl as a fragment, so only origins we
-            // configured may ever receive it. Checked here, before the IdP round-trip, and again in the
-            // callback because both parameters travel through the IdP redirect.
+            // The token is appended to returnUrl, so only configured origins may receive it; checked again in the callback.
             if (!_returnUrlValidator.IsAllowed(returnUrl))
             {
                 return BadRequest("returnUrl must point to a configured client origin.");
@@ -394,9 +380,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 isRegistration
             });
 
-            // The provider and organisation ride inside the authentication properties, which the remote
-            // handler carries through its state parameter and into the external cookie, so the callback can
-            // check that the principal really came from this provider for this tenant.
+            // Provider and organisation ride in the auth properties so the callback can verify them.
             var props = new AuthenticationProperties { RedirectUri = callback };
             props.Items[ChallengeProviderKey] = provider;
             props.Items[ChallengeOrganizationKey] = organization;
@@ -427,10 +411,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Redirect(AppendHash(returnUrl, "error=external_auth_failed"));
             }
 
-            // All social handlers sign into the same external cookie. The query string names a provider and
-            // tenant, but the cookie records which scheme actually authenticated and for which tenant the
-            // challenge was issued; they must match, otherwise a Google principal could be attached as a
-            // Facebook login, or a login issued for one tenant replayed against another.
+            // All handlers share one external cookie: the scheme and tenant it records must match the query.
             var items = result.Properties?.Items;
             if (items == null
                 || !items.TryGetValue(".AuthScheme", out var authenticatedScheme) || !string.Equals(authenticatedScheme, provider, StringComparison.Ordinal)
@@ -460,11 +441,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                // From here on the email decides which account this login becomes, so it must be one the identity
-                // provider vouches for. Microsoft outside the trusted tenants, or Google without email_verified,
-                // can carry an address chosen by whoever controls the account: matching it would hand over the
-                // account that owns the address, and registering with it would plant a member with a company
-                // address nobody at the company owns (ready to be "linked" by the real owner later).
+                // The email decides which account this becomes, so the provider must vouch for it (Microsoft only from trusted tenants).
                 if (!_externalEmailTrust.IsEmailVerified(provider, result.Principal))
                 {
                     await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -475,9 +452,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
                 if (existing != null)
                 {
-                    // Email exists in this tenant: attach the social login to the existing user. If that account
-                    // was never confirmed, whoever registered it could not prove they own the address, so its
-                    // password is discarded; the identity provider has just verified the email, so confirm it.
+                    // An unconfirmed account's password was never proven; drop it, the provider just verified the email.
                     if (!existing.EmailConfirmed)
                     {
                         if (await _userManager.HasPasswordAsync(existing))
@@ -538,8 +513,6 @@ namespace Shrooms.Presentation.Api.Controllers
             return QueryHelpers.AddQueryString("/Account/ExternalLogin", qs);
         }
 
-        // Only the social providers Simoona knows, and only when the scheme is actually registered
-        // (a provider without configured credentials is not added at startup).
         private async Task<bool> IsKnownExternalProviderAsync(string provider)
         {
             if (!ExternalProviders.Contains(provider, StringComparer.Ordinal))
@@ -594,8 +567,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return url + sep + hash;
         }
 
-        // The setting is a delimited list ("internal;google;facebook"); compare whole tokens so that a value
-        // such as "notgoogle" cannot enable Google.
+        // Whole-token comparison: "notgoogle" must not enable Google.
         private static bool ContainsProvider(string providerList, string providerName)
         {
             if (string.IsNullOrWhiteSpace(providerList) || string.IsNullOrWhiteSpace(providerName))
@@ -641,8 +613,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return userInfo;
         }
 
-        // Same shape as a failed ConfirmEmailAsync/ResetPasswordAsync, so an unknown address cannot be
-        // told apart from a bad code.
+        // Same shape as a failed confirm/reset, so an unknown address is not distinguishable.
         private IActionResult InvalidTokenResult()
         {
             return GetErrorResult(IdentityResult.Failed((_userManager.ErrorDescriber ?? new IdentityErrorDescriber()).InvalidToken()));

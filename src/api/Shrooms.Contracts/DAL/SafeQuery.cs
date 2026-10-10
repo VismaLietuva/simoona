@@ -7,14 +7,7 @@ using System.Reflection;
 
 namespace Shrooms.Contracts.DAL
 {
-    /// <summary>
-    /// Replaces System.Linq.Dynamic.Core for caller-supplied sort and include strings. Dynamic LINQ parsed
-    /// the whole string as an expression, so a request could sort by arbitrary computed expressions, crash
-    /// the query, or probe hidden members. Here the grammar is fixed: comma-separated clauses of
-    /// "Property[.Nested] [asc|desc]", every segment resolved by reflection against the element type and
-    /// turned into a plain member-access lambda. Anything that does not parse is ignored rather than
-    /// thrown, so a bad parameter degrades to the default order instead of a 500 or an oracle.
-    /// </summary>
+    /// <summary>Fixed-grammar replacement for Dynamic LINQ sort/include strings: "Prop[.Nested] [asc|desc]" resolved by reflection; unparsable input is ignored, never thrown.</summary>
     public static class SafeQuery
     {
         private const int MaxClauses = 5;
@@ -23,11 +16,7 @@ namespace Shrooms.Contracts.DAL
         // Members that must never be usable as a sort key or include path, whichever entity exposes them.
         private static readonly string[] BlockedFragments = { "password", "securitystamp", "concurrencystamp", "token", "secret", "authorizationguid", "phonenumber" };
 
-        /// <param name="isQueryable">
-        /// Optional extra filter, e.g. the EF model: a property that exists on the CLR type but is not mapped
-        /// ([NotMapped] members are always excluded; fluent-ignored ones need this hook) would otherwise
-        /// still fail at translation time.
-        /// </param>
+        /// <param name="isQueryable">Extra filter, e.g. the EF model, for CLR properties that are not mapped.</param>
         public static IQueryable<T> OrderBy<T>(IQueryable<T> query, string orderBy, Func<PropertyInfo, bool> isQueryable = null)
         {
             if (query == null)
@@ -48,7 +37,6 @@ namespace Shrooms.Contracts.DAL
 
                 if (countOfCollection)
                 {
-                    // "Skills.Count()" style keys: order by the number of related rows.
                     body = Expression.Call(typeof(Enumerable), nameof(Enumerable.Count), new[] { ElementType(body.Type) }, body);
                 }
 
@@ -70,10 +58,7 @@ namespace Shrooms.Contracts.DAL
             return ordered ?? query;
         }
 
-        /// <summary>
-        /// The subset of comma-separated include paths that name real navigation properties of
-        /// <typeparamref name="T"/>, in their canonical casing. Scalars and blocked members are dropped.
-        /// </summary>
+        /// <summary>Include paths that name real navigation properties of <typeparamref name="T"/>, canonically cased.</summary>
         public static IReadOnlyList<string> ValidIncludePaths<T>(string includeProperties, Func<PropertyInfo, bool> isQueryable = null)
         {
             var result = new List<string>();
@@ -191,8 +176,7 @@ namespace Shrooms.Contracts.DAL
                     return null;
                 }
 
-                // A CLR property that the data model does not map would pass reflection and then fail inside
-                // the query provider, which is exactly the 500 this parser exists to prevent.
+                // Unmapped CLR properties would fail inside the query provider.
                 if (property.IsDefined(typeof(System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute), inherit: true)
                     || (isQueryable != null && !isQueryable(property)))
                 {
@@ -212,9 +196,7 @@ namespace Shrooms.Contracts.DAL
 
                     var isCollection = IsCollectionType(property.PropertyType);
 
-                    // Sorting through a collection is not a thing (neither "Floors.Rooms.Id" nor
-                    // "Floors.Rooms.Count()"); an include path may continue into the collection's element
-                    // type (e.g. Floors.Rooms.ApplicationUsers).
+                    // Sort keys never pass through a collection; include paths may (Floors.Rooms.ApplicationUsers).
                     if (isCollection && !allowIntermediateCollections)
                     {
                         return null;

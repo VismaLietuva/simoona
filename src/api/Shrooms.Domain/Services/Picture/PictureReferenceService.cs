@@ -16,16 +16,10 @@ namespace Shrooms.Domain.Services.Picture
 {
     public interface IPictureReferenceService
     {
-        /// <summary>Whether any stored record points at the given picture key, across every table that holds pictures, including custom emoji.</summary>
         Task<bool> IsReferencedAsync(string blobKey);
     }
 
-    /// <summary>
-    /// Picture keys are public (every avatar URL shows one) and clients submit them freely, so "delete the
-    /// previous picture" must not trust the caller. Before a file is removed, the picture must not be in
-    /// use by anything other than the single record that is about to drop it. The checks stop at the first
-    /// hit; the cheapest and most likely tables come first, the substring scans of serialized lists last.
-    /// </summary>
+    /// <summary>Picture keys are public and client-submitted, so deletion must check every table that holds them. Stops at the first hit.</summary>
     public class PictureReferenceService : IPictureReferenceService
     {
         private readonly IUnitOfWork2 _uow;
@@ -57,9 +51,7 @@ namespace Shrooms.Domain.Services.Picture
                 || await _uow.GetDbSet<Project>().IgnoreQueryFilters().AnyAsync(p => p.Logo == blobKey)
                 || await _uow.GetDbSet<Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall>().IgnoreQueryFilters().AnyAsync(w => w.Logo == blobKey)
                 || await _uow.GetDbSet<CustomEmoji>().IgnoreQueryFilters().AnyAsync(e => e.BlobName == blobKey)
-                // Lottery.Images is mapped as a primitive collection (not an owned Serialized string).
                 || await _uow.GetDbSet<Lottery>().IgnoreQueryFilters().AnyAsync(l => l.Images.Contains(blobKey))
-                // Posts and comments store a serialized list of keys: substring scans, kept last.
                 || await _uow.GetDbSet<Post>().IgnoreQueryFilters().AnyAsync(p => p.Images.Serialized.Contains(blobKey))
                 || await _uow.GetDbSet<Comment>().IgnoreQueryFilters().AnyAsync(c => c.Images.Serialized.Contains(blobKey));
         }

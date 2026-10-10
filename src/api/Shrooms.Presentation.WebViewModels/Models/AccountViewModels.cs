@@ -103,10 +103,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
         [Required]
         public string Code { get; set; }
 
-        /// <summary>
-        /// The password chosen at registration. Confirming requires the mailbox AND the credential, so a
-        /// link can never activate a password that someone else set on the same address.
-        /// </summary>
+        /// <summary>Confirming needs the mailbox and the credential, so a link cannot activate a foreign password.</summary>
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }

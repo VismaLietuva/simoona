@@ -26,8 +26,7 @@ namespace Shrooms.Presentation.Api.Middlewares
             @"^/?(?:api/)?storage/(?<tenant>[^/]+)/(?<file>.+)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        // GIF is deliberately absent: an animated GIF decodes to frames x canvas in memory (a small file can
-        // declare thousands of frames), so GIFs are served as stored and never resized server-side.
+        // No GIF: an animated GIF decodes to frames x canvas, so GIFs are served as stored.
         private static readonly string[] ImageExtensions =
             { ".jpg", ".jpeg", ".jfif", ".png", ".bmp", ".webp" };
 
@@ -72,16 +71,12 @@ namespace Shrooms.Presentation.Api.Middlewares
             var tenant = match.Groups["tenant"].Value.ToLowerInvariant();
             var file = match.Groups["file"].Value;
 
-            // The "file" group is greedy and the path is already URL-decoded, so guard against
-            // traversal before handing the key to the storage provider.
             if (!BlobKeyGuard.IsSafeBlobKey(file) || !BlobKeyGuard.IsSafeContainer(tenant))
             {
                 return null;
             }
 
-            // ImageSharp runs before MultiTenancyMiddleware, so the container name has not been checked against
-            // the configured tenants yet. Without this, any syntactically valid container in the storage account
-            // could be read with the application's credentials through a resize URL.
+            // ImageSharp runs before MultiTenancyMiddleware: check the container against configured tenants here.
             if (!MultiTenancyMiddleware.IsConfiguredTenant(context.RequestServices.GetRequiredService<IConfiguration>(), tenant))
             {
                 return null;

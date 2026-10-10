@@ -17,8 +17,6 @@ namespace Shrooms.Domain.Services.Jwt
 {
     public class JwtTokenService : IJwtTokenService
     {
-        // Issuer/audience are validated by the API; override with JwtIssuer / JwtAudience when several
-        // Simoona instances must not accept each other's tokens even if they share a signing key.
         public const string DefaultIssuer = "Simoona";
         public const string DefaultAudience = "Simoona";
 

@@ -79,8 +79,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [TestCase("")]
         public async Task ExternalLoginCallback_WithoutOrganization_IsABadRequest_NotA500(string organization)
         {
-            // The tenant middleware accepts the tenant from the Organization header, so the query parameter
-            // can be missing; the organization lookup must not run with null.
+            // The tenant may come from the Organization header, so the query parameter can be missing.
             var result = await _controller.ExternalLoginCallback("Google", organization, "https://app.simoona.com/en/login/callback");
 
             Assert.That(result, Is.InstanceOf<BadRequestResult>());
@@ -101,8 +100,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task ExistingUnconfirmedInternalAccount_TakesNewPasswordAndResendsVerification()
         {
-            // Setting the password rotates the security stamp, which invalidates every earlier verification
-            // link; whoever reads the mailbox then confirms only the latest registrant's password.
+            // Setting the password rotates the security stamp, invalidating earlier links.
             var existing = new ApplicationUser { Id = "u1", Email = Email, EmailConfirmed = false };
             _userManager.FindByEmailAsync(Email).Returns(Task.FromResult(existing));
             _userManager.HasPasswordAsync(existing).Returns(Task.FromResult(true));

@@ -49,11 +49,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
             return Task.FromResult<Stream>(File.OpenRead(filePath));
         }
 
-        /// <summary>
-        /// Builds the on-disk path for a blob and guarantees it stays inside the storage root.
-        /// The key and container are validated syntactically first; the canonicalised path is then
-        /// checked as a second line of defence against any traversal the syntax check might miss.
-        /// </summary>
+        /// <summary>On-disk path for a blob, guaranteed to stay inside the storage root.</summary>
         private string ResolvePath(string blobKey, string tenantPicturesContainer)
         {
             BlobKeyGuard.EnsureSafeContainer(tenantPicturesContainer);

@@ -62,8 +62,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var lockoutSupported = _userManager.SupportsUserLockout;
 
-            // Locked accounts are refused before the password is checked, so a locked-out attacker
-            // learns nothing about the password and the failure counter keeps the lockout alive.
+            // Locked accounts are refused before the password check.
             if (lockoutSupported && await _userManager.IsLockedOutAsync(user))
             {
                 _logger.LogWarning("Login refused for locked-out user {UserId} from {Ip}", user.Id, HttpContext.Connection.RemoteIpAddress);
@@ -106,10 +105,7 @@ namespace Shrooms.Presentation.Api.Controllers
             });
         }
 
-        // Parallel wrong guesses race on the user's concurrency stamp and Identity reports the losers as
-        // ConcurrencyFailure, which would let a burst of attempts count as one. The entity is tracked by this
-        // request's context, so FindByIdAsync would hand back the same stale object; reload it from the
-        // database and retry so every attempt is recorded.
+        // Parallel wrong guesses race on the concurrency stamp; reload the tracked entity and retry so each is counted.
         private async Task RecordFailedAttemptAsync(ApplicationUser user)
         {
             for (var attempt = 0; attempt < 5; attempt++)

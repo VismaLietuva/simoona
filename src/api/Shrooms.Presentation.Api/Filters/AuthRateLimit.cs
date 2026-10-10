@@ -5,20 +5,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace Shrooms.Presentation.Api.Filters
 {
-    /// <summary>
-    /// Rate-limiting policy for the anonymous authentication endpoints and its partition key. The header names
-    /// are deliberately product-specific: Azure App Service sets its own X-Client-IP on every request.
-    /// </summary>
+    /// <summary>Rate-limit policy for the anonymous auth endpoints. Product-specific header names: App Service sets its own X-Client-IP.</summary>
     public static class AuthRateLimit
     {
         public const string PolicyName = "auth";
         public const string ClientIpHeader = "X-Simoona-Client-Ip";
         public const string ClientIpSecretHeader = "X-Simoona-Client-Ip-Secret";
 
-        /// <summary>
-        /// The browser address forwarded by the web client when it proves itself with the shared secret;
-        /// otherwise the TCP peer. A missing or wrong secret never widens trust, it only falls back.
-        /// </summary>
+        /// <summary>The forwarded browser address when the shared secret matches, otherwise the TCP peer.</summary>
         public static string PartitionKey(HttpContext httpContext, string trustedClientIpSecret)
         {
             if (!string.IsNullOrEmpty(trustedClientIpSecret)

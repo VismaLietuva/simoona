@@ -122,11 +122,7 @@ namespace Shrooms.Presentation.Api.Middlewares
             return false;
         }
 
-        /// <summary>
-        /// A tenant is only valid in the current environment if it is registered in the Organizations section
-        /// AND has a non-empty connection string. This prevents accepting requests for tenants whose DB isn't
-        /// provisioned here. Shared with the anonymous storage paths, which run before this middleware.
-        /// </summary>
+        /// <summary>Registered in Organizations and has a connection string. Also used by the anonymous storage paths.</summary>
         public static bool IsConfiguredTenant(IConfiguration configuration, string tenantKey)
         {
             if (string.IsNullOrEmpty(tenantKey))

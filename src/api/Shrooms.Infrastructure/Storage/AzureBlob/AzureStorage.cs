@@ -55,8 +55,7 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
 
         private BlobClient GetBlobClient(string blobKey, string containerName)
         {
-            // Blob names may legally contain "/" (virtual folders), but Simoona keys never do; reject anything
-            // that is not a bare file name so a client-supplied picture id cannot address another blob.
+            // Blob names may contain "/"; Simoona keys never do.
             BlobKeyGuard.EnsureSafeContainer(containerName);
             BlobKeyGuard.EnsureSafeBlobKey(blobKey);
 

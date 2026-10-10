@@ -7,11 +7,7 @@ namespace Shrooms.Presentation.Api.Helpers
 {
     public interface IReturnUrlValidator
     {
-        /// <summary>
-        /// True when <paramref name="returnUrl"/> is an absolute http(s) URL whose origin (scheme, host, port)
-        /// is one of the configured client origins. Used before redirecting a freshly issued access token
-        /// to it, so an attacker-supplied returnUrl cannot receive the token.
-        /// </summary>
+        /// <summary>True when the URL's origin is a configured client origin; the access token is redirected there.</summary>
         bool IsAllowed(string returnUrl);
     }
 
@@ -48,8 +44,6 @@ namespace Shrooms.Presentation.Api.Helpers
                 return false;
             }
 
-            // The token is appended as a fragment; a returnUrl that already carries one, or that embeds
-            // credentials, is never something the client sends.
             if (!string.IsNullOrEmpty(uri.Fragment) || !string.IsNullOrEmpty(uri.UserInfo))
             {
                 return false;
@@ -58,8 +52,7 @@ namespace Shrooms.Presentation.Api.Helpers
             return _allowedOrigins.Contains(uri.GetLeftPart(UriPartial.Authority));
         }
 
-        // ClientUrl is the primary client; CorsOrigins already lists every origin the API is meant to talk
-        // to; AllowedReturnUrlOrigins is an optional extra list. "*" contributes nothing on purpose.
+        // ClientUrl, CorsOrigins and AllowedReturnUrlOrigins; "*" contributes nothing.
         private static IEnumerable<string> CollectOrigins(string clientUrl, string corsOrigins, string extraOrigins)
         {
             yield return clientUrl;

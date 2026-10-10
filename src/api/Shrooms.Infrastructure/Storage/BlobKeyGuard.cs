@@ -4,22 +4,13 @@ using System.Linq;
 
 namespace Shrooms.Infrastructure.Storage
 {
-    /// <summary>
-    /// Validates the blob key (file name) and container (tenant) segments before they reach a storage provider.
-    /// Blob keys come from the client (picture ids on profiles, posts, comments) and from anonymous URLs, so
-    /// anything that is not a bare file name made of safe characters is rejected: no path separators, no
-    /// "." or ".." segments, no rooted paths. Legitimate keys are GUID + image extension.
-    /// </summary>
+    /// <summary>Validates client-supplied blob keys and tenant containers: bare file names of safe characters only.</summary>
     public static class BlobKeyGuard
     {
         public const int MaxBlobKeyLength = 255;
         public const int MaxContainerLength = 63;
 
-        /// <summary>
-        /// The only extensions a picture may be stored under, and the only ones the anonymous storage
-        /// endpoint will serve. Keeps client-controlled names like "x.html" or "x.svg" from ever becoming
-        /// a document that renders on the API origin.
-        /// </summary>
+        /// <summary>Only extensions ever stored or served; keeps "x.html" / "x.svg" off the API origin.</summary>
         public static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".jfif", ".png", ".gif", ".bmp", ".webp" };
 
         public static bool HasAllowedImageExtension(string blobKey)
@@ -34,7 +25,6 @@ namespace Shrooms.Infrastructure.Storage
                 && Array.Exists(AllowedImageExtensions, e => string.Equals(e, extension, StringComparison.OrdinalIgnoreCase));
         }
 
-        /// <summary>Maps an allowlisted image media type to the extension used for stored keys, or null.</summary>
         public static string ExtensionForMimeType(string mimeType)
         {
             return mimeType?.ToLowerInvariant() switch
@@ -55,8 +45,7 @@ namespace Shrooms.Infrastructure.Storage
                 return false;
             }
 
-            // Leading dot: hidden/relative names. Trailing dot or space: Windows silently strips them, so
-            // "victim.jpg." would address "victim.jpg" while passing every string comparison.
+            // Trailing dot or space: Windows strips them, so "victim.jpg." would address "victim.jpg".
             if (blobKey[0] == '.' || blobKey[^1] == '.' || blobKey[^1] == ' ' || blobKey.Contains("..", StringComparison.Ordinal))
             {
                 return false;

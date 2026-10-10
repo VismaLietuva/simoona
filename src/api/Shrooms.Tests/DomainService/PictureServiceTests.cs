@@ -40,8 +40,6 @@ namespace Shrooms.Tests.DomainService
             _pictureService = new PictureService(_storage, uow, _references);
         }
 
-        // Real, tiny encoded images: the service now reads the header with ImageSharp, so magic bytes alone
-        // are not enough.
         private static MemoryStream TinyImage(string format, int width = 2, int height = 2)
         {
             using var image = new Image<Rgba32>(width, height);
@@ -204,10 +202,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void UploadOriginal_ShouldReject_AnimatedWebp_BecauseThisImageSharpVersionCannotDecodeIt()
         {
-            // GIF has a frame budget because ImageSharp decodes every frame. WebP needs none today: ImageSharp
-            // 2.1 throws NotSupportedException ("Animated webp are not yet supported") on Identify and on Load,
-            // so the upload is refused and the anonymous resize path cannot decode such a file either. If an
-            // ImageSharp upgrade starts decoding animated WebP, this test fails and a frame budget is due.
+            // ImageSharp 2.1 refuses animated WebP on Identify and Load; if an upgrade decodes it, a frame budget is due.
             var stream = AnimatedWebp(frames: 50, width: 4, height: 4);
 
             Assert.That(() => _pictureService.UploadOriginalAsync(stream, "image/webp", "anim.webp", 2),
@@ -217,7 +212,6 @@ namespace Shrooms.Tests.DomainService
             Assert.That(() => Image.Load(stream), Throws.TypeOf<System.NotSupportedException>());
         }
 
-        /// <summary>A valid animated WebP: VP8X with the animation flag, ANIM, and one ANMF per frame wrapping a lossless bitstream.</summary>
         private static MemoryStream AnimatedWebp(int frames, int width, int height)
         {
             byte[] vp8l;

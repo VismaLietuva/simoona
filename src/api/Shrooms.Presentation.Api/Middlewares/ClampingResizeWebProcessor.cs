@@ -60,9 +60,7 @@ namespace Shrooms.Presentation.Api.Middlewares
             var srcW = image.Image.Width;
             var srcH = image.Image.Height;
 
-            // A single requested dimension leaves the other to the aspect ratio, so a very tall or very wide
-            // source could come out far beyond ResizeCommandGuard.MaxDimension on the unrequested side. When
-            // that would happen, the request becomes a "fit inside (requested, Max)" box instead.
+            // One dimension given: if the aspect-implied other side exceeds the cap, fit into (requested, Max) instead.
             var bounded = BoundImpliedDimension(srcW, srcH, reqW, reqH, ResizeCommandGuard.MaxDimension);
             if (bounded.HasValue)
             {
@@ -84,10 +82,6 @@ namespace Shrooms.Presentation.Api.Middlewares
             return _inner.Process(image, logger, commands, parser, culture);
         }
 
-        /// <summary>
-        /// For a request naming exactly one dimension: the (width, height) box to fit the image into when the
-        /// dimension implied by the aspect ratio would exceed <paramref name="maxDimension"/>; otherwise null.
-        /// </summary>
         public static (int Width, int Height)? BoundImpliedDimension(int srcW, int srcH, int? reqW, int? reqH, int maxDimension)
         {
             if (srcW <= 0 || srcH <= 0 || reqW.HasValue == reqH.HasValue)

@@ -125,8 +125,7 @@ namespace Shrooms.DataLayer.DAL
             return await Task.FromResult(queryableSet.ToPagedList(page.Value, pageSize));
         }
 
-        // Only members the EF model knows about (scalars, navigations, skip navigations) are queryable;
-        // [NotMapped] and fluent-ignored CLR properties would fail at translation time.
+        // Only EF-mapped members are queryable.
         private bool IsMapped(PropertyInfo property)
         {
             if (_context is not DbContext dbContext)
@@ -137,7 +136,6 @@ namespace Shrooms.DataLayer.DAL
             var entityType = dbContext.Model.FindEntityType(property.DeclaringType!);
             if (entityType == null)
             {
-                // Owned/complex types or non-entities: let the provider decide.
                 return true;
             }
 

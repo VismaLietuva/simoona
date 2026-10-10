@@ -11,20 +11,11 @@ namespace Shrooms.Presentation.Api.Helpers
 {
     public interface IExternalEmailTrust
     {
-        /// <summary>
-        /// True when the identity provider vouches for the principal's email address, so the address may be
-        /// used to match an existing account or to register a new one.
-        /// </summary>
         bool IsEmailVerified(string provider, ClaimsPrincipal principal);
     }
 
-    /// <summary>
-    /// Facebook only returns confirmed addresses. Google states verification explicitly (email_verified).
-    /// Microsoft's email comes from the Graph profile (mail / userPrincipalName), which the administrator of
-    /// whichever Entra tenant the account lives in sets freely, so it is trusted only for tenants this
-    /// deployment lists in MicrosoftTrustedTenantIds (the tenant id travels in the id_token "tid" claim, copied
-    /// onto the principal at sign-in). Anyone can create an Entra tenant and give a user any address.
-    /// </summary>
+    /// <summary>Facebook: always; Google: email_verified; Microsoft: only tenants in MicrosoftTrustedTenantIds, because
+    /// any Entra tenant's administrator can give a user any address.</summary>
     public class ExternalEmailTrust : IExternalEmailTrust
     {
         public const string MicrosoftTenantClaim = "tid";
@@ -72,11 +63,7 @@ namespace Shrooms.Presentation.Api.Helpers
             return false;
         }
 
-        /// <summary>
-        /// The "tid" claim of the id_token in an OAuth token response, or null. The response arrived over the
-        /// back channel in exchange for the client secret, the same trust the access token already gets, so the
-        /// signature is not re-validated here.
-        /// </summary>
+        /// <summary>The id_token "tid" claim, or null. Back-channel response: same trust as the access token, no re-validation.</summary>
         public static string ReadMicrosoftTenantId(JsonElement tokenResponse)
         {
             if (tokenResponse.ValueKind != JsonValueKind.Object

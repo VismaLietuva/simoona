@@ -2,11 +2,7 @@ using System.IO;
 
 namespace Shrooms.Domain.Services.Picture
 {
-    /// <summary>
-    /// Counts the image descriptors in a GIF by walking its block structure, without decoding any pixel
-    /// data. A GIF with thousands of frames is tiny on disk yet decodes to frames × canvas in memory, which
-    /// the dimension check (one frame) cannot see.
-    /// </summary>
+    /// <summary>Counts GIF frames by walking the block structure, without decoding pixels.</summary>
     public static class GifFrameCounter
     {
         /// <summary>Number of frames, stopping early once <paramref name="maxFrames"/> is exceeded. -1 when the data is not a GIF.</summary>
@@ -22,7 +18,6 @@ namespace Shrooms.Domain.Services.Picture
                     return -1;
                 }
 
-                // Logical screen descriptor: a global colour table follows when bit 7 of the packed byte is set.
                 var packed = header[10];
                 if ((packed & 0x80) != 0)
                 {
@@ -40,7 +35,6 @@ namespace Shrooms.Domain.Services.Picture
 
                     if (block == 0x21)
                     {
-                        // Extension: label byte, then data sub-blocks.
                         stream.ReadByte();
                         SkipSubBlocks(stream);
                     }
@@ -52,7 +46,6 @@ namespace Shrooms.Domain.Services.Picture
                             return frames;
                         }
 
-                        // Image descriptor: left, top, width, height (8 bytes) then a packed byte.
                         Skip(stream, 8);
                         var imagePacked = stream.ReadByte();
                         if (imagePacked < 0)
