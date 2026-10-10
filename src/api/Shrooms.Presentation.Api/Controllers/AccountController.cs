@@ -408,7 +408,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("ExternalLoginCallback")]
         public async Task<IActionResult> ExternalLoginCallback(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
-            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider))
+            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization))
             {
                 return BadRequest();
             }
@@ -568,7 +568,22 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task<bool> IsProviderEnabledForOrganizationAsync(string provider, string organizationName)
         {
-            var organization = await _organizationService.GetOrganizationByNameAsync(organizationName);
+            if (string.IsNullOrEmpty(organizationName))
+            {
+                return false;
+            }
+
+            Organization organization;
+            try
+            {
+                organization = await _organizationService.GetOrganizationByNameAsync(organizationName);
+            }
+            catch (InvalidOperationException)
+            {
+                // Configured tenant without a matching Organizations row: not enabled, not a 500.
+                return false;
+            }
+
             return organization != null && ContainsProvider(organization.AuthenticationProviders ?? string.Empty, provider);
         }
 

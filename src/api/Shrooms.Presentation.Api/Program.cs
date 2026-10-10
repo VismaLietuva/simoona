@@ -542,12 +542,22 @@ else if (trustForwardedHeaders)
     forwardedHeadersOptions.KnownNetworks.Clear();
     forwardedHeadersOptions.KnownProxies.Clear();
     foreach (var proxy in (builder.Configuration["ForwardedHeadersKnownProxies"] ?? string.Empty)
-                 .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                 .Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
     {
         if (System.Net.IPAddress.TryParse(proxy, out var proxyAddress))
         {
             forwardedHeadersOptions.KnownProxies.Add(proxyAddress);
         }
+    }
+
+    if (forwardedHeadersOptions.KnownProxies.Count == 0)
+    {
+        // With both lists empty every immediate peer is believed. That is the documented setup for App
+        // Service and containers, where Kestrel is reachable only through the platform front end, which
+        // appends the real client address as the right-most X-Forwarded-For entry (the only one read). On
+        // any host where Kestrel can be reached directly, a caller could rotate its rate-limit partition and
+        // spoof the scheme, so such a host must list its proxies.
+        app.Logger.LogWarning("TrustForwardedHeaders is on without ForwardedHeadersKnownProxies: X-Forwarded-* is trusted from every immediate peer. Safe only when the API is reachable solely through the platform's reverse proxy; otherwise set ForwardedHeadersKnownProxies.");
     }
 
     app.UseForwardedHeaders(forwardedHeadersOptions);

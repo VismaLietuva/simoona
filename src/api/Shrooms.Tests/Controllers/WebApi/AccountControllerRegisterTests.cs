@@ -75,6 +75,18 @@ namespace Shrooms.Tests.Controllers.WebApi
             _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
 
+        [TestCase(null)]
+        [TestCase("")]
+        public async Task ExternalLoginCallback_WithoutOrganization_IsABadRequest_NotA500(string organization)
+        {
+            // The tenant middleware accepts the tenant from the Organization header, so the query parameter
+            // can be missing; the organization lookup must not run with null.
+            var result = await _controller.ExternalLoginCallback("Google", organization, "https://app.simoona.com/en/login/callback");
+
+            Assert.That(result, Is.InstanceOf<BadRequestResult>());
+            await _organizationService.DidNotReceiveWithAnyArgs().GetOrganizationByNameAsync(default);
+        }
+
         [Test]
         public async Task NewAddress_CreatesUser()
         {
