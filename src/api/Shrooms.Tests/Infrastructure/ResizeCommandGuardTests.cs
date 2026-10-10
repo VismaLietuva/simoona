@@ -101,6 +101,7 @@ namespace Shrooms.Tests.Infrastructure
         [TestCase("foo")]
         [TestCase("")]
         [TestCase("max;drop")]
+        [TestCase("min")]
         public void Clamp_DropsUnknownResizeModes(string raw)
         {
             var commands = new CommandCollection { { "width", "128" }, { "rmode", raw } };

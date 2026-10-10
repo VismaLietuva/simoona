@@ -699,6 +699,15 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var previousPictureId = user.PictureId;
 
+            // The picture id is client input and picture keys are public (every avatar URL shows one). A profile
+            // may only take a fresh upload: adopting a key another record uses would let this user "own" a
+            // colleague's avatar, and the anonymization job deletes a user's own picture unconditionally.
+            if (!string.IsNullOrEmpty(model.PictureId) && model.PictureId != previousPictureId
+                && await _pictureService.IsInUseAsync(model.PictureId))
+            {
+                return BadRequest(new[] { "The picture is already used elsewhere; upload a new one." });
+            }
+
             _mapper.Map(model, user);
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();

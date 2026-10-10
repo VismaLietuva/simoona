@@ -19,8 +19,10 @@ namespace Shrooms.Presentation.Api.Middlewares
 
         public static readonly int[] AllowedSizes = { 32, 64, 96, 128, 192, 256, 384, 480, 640, 768, 1024, 1280, 1600, MaxDimension };
 
-        // ImageSharp.Web's ResizeMode names. The clients use "max" and "crop".
-        public static readonly string[] AllowedModes = { "max", "crop", "pad", "stretch", "min", "boxpad" };
+        // ImageSharp.Web's ResizeMode names whose output never exceeds the requested box. "min" is excluded:
+        // it scales until the shorter side reaches the request, so a wide source could come out far wider
+        // than MaxDimension. The clients use "max" and "crop".
+        public static readonly string[] AllowedModes = { "max", "crop", "pad", "stretch", "boxpad" };
 
         private static readonly string[] KeptCommands = { ResizeWebProcessor.Width, ResizeWebProcessor.Height, ResizeWebProcessor.Mode };
 

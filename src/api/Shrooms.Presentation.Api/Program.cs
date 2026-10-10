@@ -200,8 +200,11 @@ if (!string.IsNullOrEmpty(builder.Configuration["GoogleAccountClientId"]))
         opts.ClientId = builder.Configuration["GoogleAccountClientId"];
         opts.ClientSecret = builder.Configuration["GoogleAccountClientSecret"];
         opts.SignInScheme = IdentityConstants.ExternalScheme;
-        // Needed by the external-login callback: only a provider-verified email may be linked to an
-        // existing account.
+        // Needed by the external-login callback (ExternalEmailTrust): only a provider-verified email may be
+        // matched to an existing account or registered. The handler (10.x) reads oauth2/v3/userinfo, which
+        // names the flag "email_verified"; the older v2 endpoint named it "verified_email". Both are mapped
+        // onto one claim so the check survives an endpoint change in the package.
+        opts.ClaimActions.MapJsonKey("email_verified", "verified_email");
         opts.ClaimActions.MapJsonKey("email_verified", "email_verified");
     });
 }

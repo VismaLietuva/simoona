@@ -311,6 +311,16 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task IsInUse_ReflectsExistingReferences()
+        {
+            _references.CountReferencesAsync("taken.jpg").Returns(Task.FromResult(1));
+
+            Assert.That(await _pictureService.IsInUseAsync("taken.jpg"), Is.True);
+            Assert.That(await _pictureService.IsInUseAsync("fresh.jpg"), Is.False);
+            Assert.That(await _pictureService.IsInUseAsync(null), Is.False);
+        }
+
+        [Test]
         public async Task RemoveImageIgnoringReferences_DeletesEvenWhenAnotherRecordUsesThePicture()
         {
             _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(3));

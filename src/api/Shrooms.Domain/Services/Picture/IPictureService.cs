@@ -26,5 +26,11 @@ namespace Shrooms.Domain.Services.Picture
         /// anonymization): a stranger who pointed their own record at this key must not be able to keep it alive.
         /// </summary>
         Task RemoveImageIgnoringReferencesAsync(string blobKey, int orgId);
+
+        /// <summary>
+        /// True when some stored record already points at this key. Picture keys are public, so a record
+        /// taking a key as its own must take a fresh upload, never a key another record already uses.
+        /// </summary>
+        Task<bool> IsInUseAsync(string blobKey);
     }
 }

@@ -99,6 +99,11 @@ namespace Shrooms.Domain.Services.Picture
             await _storage.RemovePictureAsync(blobKey, await GetPictureContainerAsync(orgId));
         }
 
+        public async Task<bool> IsInUseAsync(string blobKey)
+        {
+            return !string.IsNullOrEmpty(blobKey) && await _pictureReferences.CountReferencesAsync(blobKey) > 0;
+        }
+
         // Picture ids are stored from client input. A key that is not a bare file name can never have been
         // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
         // profile with a tampered picture id editable while the storage layer stays a hard boundary.
