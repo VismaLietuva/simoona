@@ -43,6 +43,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IApplicationSettings _applicationSettings;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IReturnUrlValidator _returnUrlValidator;
+        private readonly IExternalEmailTrust _externalEmailTrust;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly ILogger<AccountController> _logger;
 
@@ -68,10 +69,12 @@ namespace Shrooms.Presentation.Api.Controllers
             IApplicationSettings applicationSettings,
             IJwtTokenService jwtTokenService,
             IReturnUrlValidator returnUrlValidator,
+            IExternalEmailTrust externalEmailTrust,
             IAuthenticationSchemeProvider schemeProvider,
             ILogger<AccountController> logger)
         {
             _returnUrlValidator = returnUrlValidator;
+            _externalEmailTrust = externalEmailTrust;
             _schemeProvider = schemeProvider;
             _logger = logger;
             _mapper = mapper;
@@ -457,16 +460,18 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                var existing = await _userManager.FindByEmailAsync(email);
-
-                if (existing != null && !IsEmailVerifiedByProvider(provider, result.Principal))
+                // From here on the email decides which account this login becomes, so it must be one the identity
+                // provider vouches for. Microsoft outside the trusted tenants, or Google without email_verified,
+                // can carry an address chosen by whoever controls the account: matching it would hand over the
+                // account that owns the address, and registering with it would plant a member with a company
+                // address nobody at the company owns (ready to be "linked" by the real owner later).
+                if (!_externalEmailTrust.IsEmailVerified(provider, result.Principal))
                 {
-                    // Matching by email is only safe when the identity provider vouches for the address.
-                    // Microsoft accounts (and Google without email_verified) can carry an unverified, user-
-                    // chosen email, which would let anyone take over the account that owns it.
                     await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
                     return Redirect(AppendHash(returnUrl, "error=email_not_verified"));
                 }
+
+                var existing = await _userManager.FindByEmailAsync(email);
 
                 if (existing != null)
                 {
@@ -559,23 +564,6 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             return errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray());
-        }
-
-        // Facebook only returns confirmed addresses; Google states it explicitly; Microsoft's email claim is
-        // not verified and must never be used to match an existing account.
-        private static bool IsEmailVerifiedByProvider(string provider, ClaimsPrincipal principal)
-        {
-            if (provider == AuthenticationConstants.FacebookLoginProvider)
-            {
-                return true;
-            }
-
-            if (provider == AuthenticationConstants.GoogleLoginProvider)
-            {
-                return string.Equals(principal.FindFirstValue("email_verified"), "true", StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
         }
 
         private async Task<bool> IsProviderEnabledForOrganizationAsync(string provider, string organizationName)

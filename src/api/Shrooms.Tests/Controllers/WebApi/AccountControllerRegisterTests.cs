@@ -66,6 +66,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Substitute.For<IApplicationSettings>(),
                 Substitute.For<IJwtTokenService>(),
                 Substitute.For<IReturnUrlValidator>(),
+                new ExternalEmailTrust(System.Array.Empty<string>()),
                 Substitute.For<IAuthenticationSchemeProvider>(),
                 Substitute.For<ILogger<AccountController>>());
 

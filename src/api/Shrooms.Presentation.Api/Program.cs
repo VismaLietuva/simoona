@@ -29,6 +29,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -222,8 +223,28 @@ if (!string.IsNullOrEmpty(builder.Configuration["MicrosoftAccountClientId"]))
         opts.ClientId = builder.Configuration["MicrosoftAccountClientId"];
         opts.ClientSecret = builder.Configuration["MicrosoftAccountClientSecret"];
         opts.SignInScheme = IdentityConstants.ExternalScheme;
+        // The Graph profile's email is set by the account's own Entra tenant, so the callback needs to know
+        // which tenant that is: request an id_token and copy its "tid" claim onto the principal.
+        opts.Scope.Add("openid");
+        opts.Events.OnCreatingTicket = context =>
+        {
+            var tenantId = ExternalEmailTrust.ReadMicrosoftTenantId(context.TokenResponse.Response.RootElement);
+            if (!string.IsNullOrEmpty(tenantId))
+            {
+                context.Identity.AddClaim(new System.Security.Claims.Claim(ExternalEmailTrust.MicrosoftTenantClaim, tenantId));
+            }
+
+            return Task.CompletedTask;
+        };
     });
+    if (string.IsNullOrWhiteSpace(builder.Configuration[ExternalEmailTrust.TrustedTenantsSetting]))
+    {
+        Console.WriteLine($"WARNING: Microsoft sign-in is configured but {ExternalEmailTrust.TrustedTenantsSetting} is empty. Microsoft emails are then never trusted, so Microsoft can neither register nor link accounts; set it to the Entra tenant id(s) whose addresses are administrator-controlled.");
+    }
 }
+
+// Which identity providers vouch for the email they return (see ExternalEmailTrust).
+builder.Services.AddSingleton<IExternalEmailTrust>(_ => ExternalEmailTrust.FromConfiguration(builder.Configuration));
 
 // CORS
 var corsOrigins = builder.Configuration["CorsOrigins"];
