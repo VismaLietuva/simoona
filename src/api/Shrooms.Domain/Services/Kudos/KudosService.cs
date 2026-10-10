@@ -810,7 +810,7 @@ namespace Shrooms.Domain.Services.Kudos
                             x.KudosBasketId == null)
                 .SumAsync(x => (decimal?)x.Points);
 
-            user.TotalKudos = kudosTotal ?? 0;
+            user.TotalKudos = Math.Round(kudosTotal ?? 0, MidpointRounding.AwayFromZero);
 
             var spentKudos = await allUserKudosLogs
                 .Where(x => x.KudosSystemType == KudosTypeEnum.Minus ||
@@ -824,7 +824,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             spentKudos -= refundedKudos;
 
-            user.SpentKudos = spentKudos ?? 0;
+            user.SpentKudos = Math.Round(spentKudos ?? 0, MidpointRounding.AwayFromZero);
             user.RemainingKudos = user.TotalKudos - user.SpentKudos;
         }
 
