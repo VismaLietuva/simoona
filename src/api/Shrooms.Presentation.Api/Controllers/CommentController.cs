@@ -15,10 +15,12 @@ using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
+    [Authorize]
     [Route("Comment")]
     public class CommentController : BaseController
     {

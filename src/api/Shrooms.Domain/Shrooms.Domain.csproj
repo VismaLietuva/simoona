@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" />
+    <PackageReference Include="SixLabors.ImageSharp" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="HtmlSanitizer" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" />

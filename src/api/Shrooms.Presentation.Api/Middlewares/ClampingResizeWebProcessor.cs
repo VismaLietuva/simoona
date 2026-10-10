@@ -60,6 +60,16 @@ namespace Shrooms.Presentation.Api.Middlewares
             var srcW = image.Image.Width;
             var srcH = image.Image.Height;
 
+            // One dimension given: if the aspect-implied other side exceeds the cap, fit into (requested, Max) instead.
+            var bounded = BoundImpliedDimension(srcW, srcH, reqW, reqH, ResizeCommandGuard.MaxDimension);
+            if (bounded.HasValue)
+            {
+                (reqW, reqH) = bounded.Value;
+                Replace(commands, ResizeWebProcessor.Width, reqW.Value.ToString(CultureInfo.InvariantCulture));
+                Replace(commands, ResizeWebProcessor.Height, reqH.Value.ToString(CultureInfo.InvariantCulture));
+                Replace(commands, ResizeWebProcessor.Mode, "max");
+            }
+
             var needsResize =
                 (reqW.HasValue && srcW > reqW.Value) ||
                 (reqH.HasValue && srcH > reqH.Value);
@@ -70,6 +80,33 @@ namespace Shrooms.Presentation.Api.Middlewares
             }
 
             return _inner.Process(image, logger, commands, parser, culture);
+        }
+
+        public static (int Width, int Height)? BoundImpliedDimension(int srcW, int srcH, int? reqW, int? reqH, int maxDimension)
+        {
+            if (srcW <= 0 || srcH <= 0 || reqW.HasValue == reqH.HasValue)
+            {
+                return null;
+            }
+
+            if (reqW.HasValue)
+            {
+                var impliedH = (long)srcH * reqW.Value / srcW;
+                return impliedH > maxDimension ? (reqW.Value, maxDimension) : null;
+            }
+
+            var impliedW = (long)srcW * reqH.Value / srcH;
+            return impliedW > maxDimension ? (maxDimension, reqH.Value) : null;
+        }
+
+        private static void Replace(CommandCollection commands, string key, string value)
+        {
+            if (commands.Contains(key))
+            {
+                commands.Remove(key);
+            }
+
+            commands.Add(key, value);
         }
 
         private static int? TryParseDimension(CommandCollection commands, string key)

@@ -697,14 +697,24 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
             }
 
-            if (user.PictureId != model.PictureId && !string.IsNullOrEmpty(user.PictureId))
+            var previousPictureId = user.PictureId;
+
+            // Picture keys are public: a profile may only take a fresh upload, never a key another record uses.
+            if (!string.IsNullOrEmpty(model.PictureId) && model.PictureId != previousPictureId
+                && await _pictureService.IsInUseAsync(model.PictureId))
             {
-                await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
+                return BadRequest(new[] { "The picture is already used elsewhere; upload a new one." });
             }
 
             _mapper.Map(model, user);
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
+
+            // After the save: the picture service deletes only pictures nothing references any more.
+            if (!string.IsNullOrEmpty(previousPictureId) && previousPictureId != model.PictureId)
+            {
+                await _pictureService.RemoveImageAsync(previousPictureId, userOrg.OrganizationId);
+            }
 
             if (!User.IsInRole(Roles.NewUser) || !await _userManager.IsInRoleAsync(user, Roles.FirstLogin))
             {

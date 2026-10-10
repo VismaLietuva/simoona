@@ -1,5 +1,7 @@
 using Hangfire;
 using Hangfire.SqlServer;
+using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +25,20 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = false;
+});
 
 // DbContext with per-request tenant-aware connection string
 builder.Services.AddHttpContextAccessor();
@@ -65,22 +77,42 @@ builder.Services.AddScoped<IDbContext>(sp => sp.GetRequiredService<ShroomsDbCont
 builder.Services.AddOutputCache();
 builder.Services.AddScoped<IWidgetCacheInvalidator, WidgetCacheInvalidator>();
 
+builder.Services.AddSingleton<Shrooms.Presentation.Api.Helpers.IReturnUrlValidator>(sp =>
+    new Shrooms.Presentation.Api.Helpers.ReturnUrlValidator(sp.GetRequiredService<IConfiguration>()));
+
 // ASP.NET Core Identity (provides UserManager, RoleManager infra)
 builder.Services.AddIdentityCore<ApplicationUser>(opts =>
 {
-    opts.Password.RequireDigit = false;
-    opts.Password.RequireLowercase = false;
+    // Mirrors the Next.js password schema (src/lib/password-schema.ts); the server is the authority.
+    opts.Password.RequireDigit = true;
+    opts.Password.RequireLowercase = true;
+    opts.Password.RequireUppercase = true;
     opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireUppercase = false;
-    opts.Password.RequiredLength = 6;
+    opts.Password.RequiredLength = 8;
     opts.SignIn.RequireConfirmedEmail = false;
+
+    // Five wrong passwords lock the account for fifteen minutes.
+    opts.Lockout.AllowedForNewUsers = true;
+    opts.Lockout.MaxFailedAccessAttempts = 5;
+    opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ShroomsDbContext>()
     .AddDefaultTokenProviders();
 
-// JWT Authentication
-var jwtKey = builder.Configuration["JwtSecret"] ?? "default-secret-key-change-in-production-min32chars!!";
+// No fallback key: a deployment without JwtSecret must fail to start. Issuer and audience are validated.
+var jwtKey = builder.Configuration["JwtSecret"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException("JwtSecret must be configured and at least 32 bytes long.");
+}
+var isLocalEnvironment = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Docker");
+if (!isLocalEnvironment && jwtKey.StartsWith("your-secret-key", StringComparison.OrdinalIgnoreCase))
+{
+    throw new InvalidOperationException("JwtSecret is still the sample value from appsettings.json; set a real secret outside local development.");
+}
+var jwtIssuer = builder.Configuration["JwtIssuer"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultIssuer;
+var jwtAudience = builder.Configuration["JwtAudience"] ?? Shrooms.Domain.Services.Jwt.JwtTokenService.DefaultAudience;
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -93,8 +125,10 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
         ClockSkew = TimeSpan.FromSeconds(30)
     };
     // Allow token from query string for SignalR
@@ -128,6 +162,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Deny by default: every endpoint needs an authenticated user unless it opts out with [AllowAnonymous].
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
 // External cookie used to round-trip the identity returned by social IdPs back to /Account/ExternalLoginCallback.
 // Required because every social handler below uses IdentityConstants.ExternalScheme as its SignInScheme.
 var externalSchemeRegistered = false;
@@ -151,6 +193,9 @@ if (!string.IsNullOrEmpty(builder.Configuration["GoogleAccountClientId"]))
         opts.ClientId = builder.Configuration["GoogleAccountClientId"];
         opts.ClientSecret = builder.Configuration["GoogleAccountClientSecret"];
         opts.SignInScheme = IdentityConstants.ExternalScheme;
+        // ExternalEmailTrust reads "email_verified" (v3 userinfo); v2 named it "verified_email". Both mapped.
+        opts.ClaimActions.MapJsonKey("email_verified", "verified_email");
+        opts.ClaimActions.MapJsonKey("email_verified", "email_verified");
     });
 }
 if (!string.IsNullOrEmpty(builder.Configuration["FacebookAccountAppId"]))
@@ -171,8 +216,26 @@ if (!string.IsNullOrEmpty(builder.Configuration["MicrosoftAccountClientId"]))
         opts.ClientId = builder.Configuration["MicrosoftAccountClientId"];
         opts.ClientSecret = builder.Configuration["MicrosoftAccountClientSecret"];
         opts.SignInScheme = IdentityConstants.ExternalScheme;
+        // The email is set by the account's own Entra tenant: request an id_token and keep its "tid".
+        opts.Scope.Add("openid");
+        opts.Events.OnCreatingTicket = context =>
+        {
+            var tenantId = ExternalEmailTrust.ReadMicrosoftTenantId(context.TokenResponse.Response.RootElement);
+            if (!string.IsNullOrEmpty(tenantId))
+            {
+                context.Identity.AddClaim(new System.Security.Claims.Claim(ExternalEmailTrust.MicrosoftTenantClaim, tenantId));
+            }
+
+            return Task.CompletedTask;
+        };
     });
+    if (string.IsNullOrWhiteSpace(builder.Configuration[ExternalEmailTrust.TrustedTenantsSetting]))
+    {
+        Console.WriteLine($"WARNING: Microsoft sign-in is configured but {ExternalEmailTrust.TrustedTenantsSetting} is empty. Microsoft emails are then never trusted, so Microsoft can neither register nor link accounts; set it to the Entra tenant id(s) whose addresses are administrator-controlled.");
+    }
 }
+
+builder.Services.AddSingleton<IExternalEmailTrust>(_ => ExternalEmailTrust.FromConfiguration(builder.Configuration));
 
 // CORS
 var corsOrigins = builder.Configuration["CorsOrigins"];
@@ -182,6 +245,13 @@ builder.Services.AddCors(options =>
     {
         if (string.IsNullOrEmpty(corsOrigins) || corsOrigins == "*")
         {
+            // Reflecting any origin with credentials is only acceptable in local development.
+            if (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Docker"))
+            {
+                throw new InvalidOperationException(
+                    "CorsOrigins must list the allowed client origins (semicolon-separated) outside Development; '*' is not permitted.");
+            }
+
             // AllowAnyOrigin() cannot be combined with AllowCredentials() per CORS spec.
             // SetIsOriginAllowed echoes the actual request origin, satisfying withCredentials.
             policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
@@ -189,13 +259,39 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins(corsOrigins.Split(';'))
+            policy.WithOrigins(corsOrigins.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials()
                   .WithExposedHeaders("Content-Disposition");
         }
     });
+});
+
+var authRequestsPerMinute = int.TryParse(builder.Configuration["AuthRateLimitPerMinute"], out var authLimit) && authLimit > 0
+    ? authLimit
+    : 10;
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsync(
+            "{\"error\":\"too_many_requests\",\"error_description\":\"Too many attempts. Try again in a minute.\"}",
+            cancellationToken);
+    };
+    // The Next.js server calls these for every browser: the forwarded address is used only with the shared secret.
+    var trustedClientIpSecret = builder.Configuration["TrustedClientIpSecret"];
+    options.AddPolicy(AuthRateLimit.PolicyName, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            AuthRateLimit.PartitionKey(httpContext, trustedClientIpSecret),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = authRequestsPerMinute,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 // SignalR (in-box with Sdk.Web)
@@ -299,6 +395,9 @@ builder.Services.AddImageSharp(options =>
             context.Commands.Remove("mode");
             context.Commands.Add("rmode", mode);
         }
+
+        // Anonymous endpoint: bound the requested dimensions and the number of cache variants.
+        ResizeCommandGuard.Clamp(context.Commands);
         if (defaultOnParse != null)
         {
             await defaultOnParse(context);
@@ -316,15 +415,44 @@ builder.Services.AddImageSharp(options =>
 })
 .ClearProviders()
 .AddProvider<StorageImageProvider>()
+// Only resizing is exposed; format/quality/background commands would multiply cache variants.
 .RemoveProcessor<ResizeWebProcessor>()
+.RemoveProcessor<FormatWebProcessor>()
+.RemoveProcessor<QualityWebProcessor>()
+.RemoveProcessor<BackgroundColorWebProcessor>()
 .AddProcessor<ClampingResizeWebProcessor>();
+
+// Bound a single decode (a small PNG can declare a 40000x40000 canvas); covers images stored before the upload check.
+SixLabors.ImageSharp.Configuration.Default.MemoryAllocator = SixLabors.ImageSharp.Memory.MemoryAllocator.Create(
+    new SixLabors.ImageSharp.Memory.MemoryAllocatorOptions { AllocationLimitMegabytes = 256 });
 
 if (builder.Configuration.GetValue<bool>("ImageSharp:DisableCache"))
 {
     builder.Services.AddSingleton<IImageCache, NullImageCache>();
 }
 
+// Refuse to start outside local development when Basic credentials are missing or still the sample values,
+// or when TrustedClientIpSecret is missing (every user would share one rate-limit budget).
+if (!isLocalEnvironment && string.IsNullOrWhiteSpace(builder.Configuration["TrustedClientIpSecret"]))
+{
+    throw new InvalidOperationException(
+        "TrustedClientIpSecret must be configured (and API_CLIENT_IP_SECRET on the web client) so sign-in rate limits are counted per browser, not per server.");
+}
+
+if (!isLocalEnvironment)
+{
+    var basicUsername = builder.Configuration["BasicUsername"];
+    var basicPassword = builder.Configuration["BasicPassword"];
+    if (string.IsNullOrWhiteSpace(basicUsername) || string.IsNullOrWhiteSpace(basicPassword)
+        || basicUsername == "basicUsername" || basicPassword == "basicPassword")
+    {
+        throw new InvalidOperationException(
+            "BasicUsername and BasicPassword must be set to non-default values outside local development. They protect the external job endpoints.");
+    }
+}
+
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -365,6 +493,73 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
+// Opt-in: trusting X-Forwarded-* from any peer lets a client that reaches Kestrel directly spoof its address.
+// Only the right-most entry is read (ForwardLimit = 1); list the proxies in ForwardedHeadersKnownProxies when known.
+var trustForwardedHeaders = builder.Configuration.GetValue<bool?>("TrustForwardedHeaders") ?? false;
+var platformForwardedHeaders = string.Equals(builder.Configuration["ASPNETCORE_FORWARDEDHEADERS_ENABLED"], "true", StringComparison.OrdinalIgnoreCase);
+if (trustForwardedHeaders && platformForwardedHeaders)
+{
+    // The platform already runs the forwarded-headers middleware; running it twice would read a client-controlled entry.
+    app.Logger.LogInformation("Forwarded headers are handled by the platform (ASPNETCORE_FORWARDEDHEADERS_ENABLED); skipping the application's own middleware.");
+}
+else if (trustForwardedHeaders)
+{
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        ForwardLimit = 1
+    };
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+    foreach (var proxy in (builder.Configuration["ForwardedHeadersKnownProxies"] ?? string.Empty)
+                 .Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        if (System.Net.IPAddress.TryParse(proxy, out var proxyAddress))
+        {
+            forwardedHeadersOptions.KnownProxies.Add(proxyAddress);
+        }
+    }
+
+    if (forwardedHeadersOptions.KnownProxies.Count == 0)
+    {
+        // Empty lists believe every immediate peer: fine on App Service (reachable only via the front end), not on a bare host.
+        app.Logger.LogWarning("TrustForwardedHeaders is on without ForwardedHeadersKnownProxies: X-Forwarded-* is trusted from every immediate peer. Safe only when the API is reachable solely through the platform's reverse proxy; otherwise set ForwardedHeadersKnownProxies.");
+    }
+
+    app.UseForwardedHeaders(forwardedHeadersOptions);
+}
+
+// Behind a TLS-terminating proxy this needs TrustForwardedHeaders too, or redirects loop.
+var enforceHttps = builder.Configuration.GetValue<bool?>("EnforceHttps") ?? false;
+if (enforceHttps)
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
+
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var headers = context.Response.Headers;
+        headers["X-Content-Type-Options"] = "nosniff";
+        headers["X-Frame-Options"] = "DENY";
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+
+        // Locked-down CSP for JSON and images; HTML documents (Swagger, Hangfire) keep their own scripts.
+        var contentType = context.Response.ContentType ?? string.Empty;
+        if (!contentType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase))
+        {
+            headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 // Normalize double-slash paths (e.g. //Account/Foo → /Account/Foo) sent by the SPA
 app.Use(async (context, next) =>
 {
@@ -412,6 +607,14 @@ app.UseImageSharp();
 
 app.UseRouting();
 app.UseCors();
+app.UseRateLimiter();
+
+// Development only; before UseAuthorization so the fallback policy does not block the UI.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication();
 app.UseMiddleware<MultiTenancyMiddleware>();
@@ -422,22 +625,35 @@ app.UseAuthorization();
 // placing this earlier would serve stored responses without running the endpoint.s authorization.
 app.UseOutputCache();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseHangfireDashboard();
+// Browser page without a usable bearer-token flow: Development only, local requests.
+if (app.Environment.IsDevelopment())
+{
+    app.MapHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new IDashboardAuthorizationFilter[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+    }).AllowAnonymous();
+}
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/signalr");
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz").AllowAnonymous();
 app.MapEmailPreview();
 
 // Serve uploaded pictures via the configured IStorage so the same provider that handles
 // uploads also handles reads (local FS in dev, Azure Blob in staging/prod). Browser <img>
 // tags don't send JWT, so this endpoint is anonymous — GUID filenames make URLs unguessable.
 var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage) =>
+app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename, Shrooms.Infrastructure.Storage.IStorage storage, HttpContext httpContext) =>
 {
+    // Route values are URL-decoded ("..%5C..%5Cappsettings.json" would be a traversal on Windows); only bare
+    // image file names are served, anything else is treated as missing.
+    if (!Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeBlobKey(filename)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.IsSafeContainer(tenant)
+        || !Shrooms.Infrastructure.Storage.BlobKeyGuard.HasAllowedImageExtension(filename))
+    {
+        return Results.NotFound();
+    }
+
     var stream = await storage.GetPictureAsync(filename, tenant.ToLowerInvariant());
     if (stream == null)
     {
@@ -449,6 +665,7 @@ app.MapGet("/storage/{tenant}/{filename}", async (string tenant, string filename
         contentType = "application/octet-stream";
     }
 
+    httpContext.Response.Headers["X-Content-Type-Options"] = "nosniff";
     return Results.File(stream, contentType);
 }).AllowAnonymous();
 

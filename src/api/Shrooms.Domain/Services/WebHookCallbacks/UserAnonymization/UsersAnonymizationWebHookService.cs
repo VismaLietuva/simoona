@@ -47,6 +47,13 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             foreach (var user in usersToAnonymize)
             {
+                // The photo is the user's own data: delete even if referenced (PutPersonalInfo stops users adopting foreign keys).
+                // Delete before the save so a storage failure leaves the user for the next run.
+                if (!string.IsNullOrEmpty(user.PictureId))
+                {
+                    await _pictureService.RemoveImageIgnoringReferencesAsync(user.PictureId, organization.Id);
+                }
+
                 await AnonymizeAsync(user, organization.Id);
 
                 await _uow.SaveChangesAsync();
@@ -55,11 +62,6 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
         private async Task AnonymizeAsync(ApplicationUser user, int organizationId)
         {
-            if (!string.IsNullOrEmpty(user.PictureId))
-            {
-                await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
-            }
-
             var randomString = Guid.NewGuid().ToString();
 
             user.Email = randomString;

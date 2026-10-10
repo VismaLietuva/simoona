@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Infrastructure.Storage;
 using SixLabors.ImageSharp.Web;
@@ -25,8 +26,9 @@ namespace Shrooms.Presentation.Api.Middlewares
             @"^/?(?:api/)?storage/(?<tenant>[^/]+)/(?<file>.+)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        // No GIF: an animated GIF decodes to frames x canvas, so GIFs are served as stored.
         private static readonly string[] ImageExtensions =
-            { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+            { ".jpg", ".jpeg", ".jfif", ".png", ".bmp", ".webp" };
 
         // IStorage is a scoped, tenant-aware service. ImageSharp.Web registers
         // IImageProvider as a singleton, so we cannot inject IStorage via the
@@ -68,6 +70,17 @@ namespace Shrooms.Presentation.Api.Middlewares
 
             var tenant = match.Groups["tenant"].Value.ToLowerInvariant();
             var file = match.Groups["file"].Value;
+
+            if (!BlobKeyGuard.IsSafeBlobKey(file) || !BlobKeyGuard.IsSafeContainer(tenant))
+            {
+                return null;
+            }
+
+            // ImageSharp runs before MultiTenancyMiddleware: check the container against configured tenants here.
+            if (!MultiTenancyMiddleware.IsConfiguredTenant(context.RequestServices.GetRequiredService<IConfiguration>(), tenant))
+            {
+                return null;
+            }
 
             // Per-request scoped resolution (see constructor comment).
             var storage = context.RequestServices.GetRequiredService<IStorage>();
