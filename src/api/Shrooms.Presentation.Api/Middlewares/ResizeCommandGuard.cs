@@ -1,14 +1,17 @@
+using System;
 using System.Globalization;
+using System.Linq;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Processors;
 
 namespace Shrooms.Presentation.Api.Middlewares
 {
     /// <summary>
-    /// Normalises the width/height commands of an anonymous resize request. Every distinct dimension pair is
-    /// a decode, a resize and a file in the on-disk cache, so requests are snapped up to a small set of
-    /// sizes: a browser asking for 100px gets the 128px variant, and an attacker cannot mint millions of
-    /// variants per image. Oversized or malformed values are capped or dropped.
+    /// Reduces an anonymous resize request to a small, canonical command set. The on-disk cache is keyed on
+    /// the command values, and every distinct combination is a decode, a resize and a file, so:
+    /// width/height are snapped up to a fixed list of sizes, the resize mode is restricted to known values
+    /// in canonical casing, every other command is dropped, and a request without any usable dimension is
+    /// emptied so the middleware does not process (or cache) it at all and the original is served instead.
     /// </summary>
     public static class ResizeCommandGuard
     {
@@ -16,10 +19,33 @@ namespace Shrooms.Presentation.Api.Middlewares
 
         public static readonly int[] AllowedSizes = { 32, 64, 96, 128, 192, 256, 384, 480, 640, 768, 1024, 1280, 1600, MaxDimension };
 
+        // ImageSharp.Web's ResizeMode names. The clients use "max" and "crop".
+        public static readonly string[] AllowedModes = { "max", "crop", "pad", "stretch", "min", "boxpad" };
+
+        private static readonly string[] KeptCommands = { ResizeWebProcessor.Width, ResizeWebProcessor.Height, ResizeWebProcessor.Mode };
+
         public static void Clamp(CommandCollection commands)
         {
-            NormaliseCommand(commands, ResizeWebProcessor.Width);
-            NormaliseCommand(commands, ResizeWebProcessor.Height);
+            NormaliseDimension(commands, ResizeWebProcessor.Width);
+            NormaliseDimension(commands, ResizeWebProcessor.Height);
+
+            // Without a dimension there is nothing to resize; letting the request through would re-encode
+            // and cache a full-size copy per distinct spelling of the remaining commands.
+            if (!commands.Contains(ResizeWebProcessor.Width) && !commands.Contains(ResizeWebProcessor.Height))
+            {
+                commands.Clear();
+                return;
+            }
+
+            NormaliseMode(commands);
+
+            // Sampler, anchor, centre coordinates, compand, orientation, the legacy "mode" alias once it has
+            // been copied to rmode: each would multiply the cacheable variants per image without limit, and
+            // some values make the processor throw.
+            foreach (var key in commands.Select(c => c.Key).Where(k => !KeptCommands.Contains(k, StringComparer.OrdinalIgnoreCase)).ToArray())
+            {
+                commands.Remove(key);
+            }
         }
 
         public static int Snap(int requested)
@@ -35,7 +61,7 @@ namespace Shrooms.Presentation.Api.Middlewares
             return MaxDimension;
         }
 
-        private static void NormaliseCommand(CommandCollection commands, string key)
+        private static void NormaliseDimension(CommandCollection commands, string key)
         {
             if (!commands.TryGetValue(key, out var raw))
             {
@@ -52,8 +78,29 @@ namespace Shrooms.Presentation.Api.Middlewares
 
             // Always rewrite to the canonical form: the cache is keyed on the command values, so "0128",
             // "+128" and "128" must collapse to one entry.
-            var canonical = Snap(value).ToString(CultureInfo.InvariantCulture);
-            if (!string.Equals(raw, canonical, System.StringComparison.Ordinal))
+            Replace(commands, key, raw, Snap(value).ToString(CultureInfo.InvariantCulture));
+        }
+
+        private static void NormaliseMode(CommandCollection commands)
+        {
+            if (!commands.TryGetValue(ResizeWebProcessor.Mode, out var raw))
+            {
+                return;
+            }
+
+            var canonical = AllowedModes.FirstOrDefault(m => string.Equals(m, raw?.Trim(), StringComparison.OrdinalIgnoreCase));
+            if (canonical == null)
+            {
+                commands.Remove(ResizeWebProcessor.Mode);
+                return;
+            }
+
+            Replace(commands, ResizeWebProcessor.Mode, raw, canonical);
+        }
+
+        private static void Replace(CommandCollection commands, string key, string raw, string canonical)
+        {
+            if (!string.Equals(raw, canonical, StringComparison.Ordinal))
             {
                 commands.Remove(key);
                 commands.Add(key, canonical);
