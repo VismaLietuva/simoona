@@ -72,10 +72,7 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task RemoveImageAsync(string blobKey, int orgId)
         {
-            // Picture ids are stored from client input. A key that is not a bare file name can never have been
-            // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
-            // profile with a tampered picture id editable while the storage layer stays a hard boundary.
-            if (!BlobKeyGuard.IsSafeBlobKey(blobKey) || !BlobKeyGuard.HasAllowedImageExtension(blobKey))
+            if (!IsRemovableKey(blobKey))
             {
                 return;
             }
@@ -89,9 +86,25 @@ namespace Shrooms.Domain.Services.Picture
                 return;
             }
 
-            var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
+            await _storage.RemovePictureAsync(blobKey, await GetPictureContainerAsync(orgId));
+        }
 
-            await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
+        public async Task RemoveImageIgnoringReferencesAsync(string blobKey, int orgId)
+        {
+            if (!IsRemovableKey(blobKey))
+            {
+                return;
+            }
+
+            await _storage.RemovePictureAsync(blobKey, await GetPictureContainerAsync(orgId));
+        }
+
+        // Picture ids are stored from client input. A key that is not a bare file name can never have been
+        // written by this service, so there is nothing to remove; skipping (rather than throwing) keeps a
+        // profile with a tampered picture id editable while the storage layer stays a hard boundary.
+        private static bool IsRemovableKey(string blobKey)
+        {
+            return BlobKeyGuard.IsSafeBlobKey(blobKey) && BlobKeyGuard.HasAllowedImageExtension(blobKey);
         }
 
         /// <summary>

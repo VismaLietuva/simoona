@@ -47,17 +47,17 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             foreach (var user in usersToAnonymize)
             {
-                var previousPictureId = user.PictureId;
+                // The photo is the user's personal data: it goes even if someone else pointed their own record at
+                // the key. Deleting before the save means a storage failure throws here and leaves the user
+                // un-anonymized, so the next run retries instead of marking the photo as handled.
+                if (!string.IsNullOrEmpty(user.PictureId))
+                {
+                    await _pictureService.RemoveImageIgnoringReferencesAsync(user.PictureId, organization.Id);
+                }
 
                 await AnonymizeAsync(user, organization.Id);
 
                 await _uow.SaveChangesAsync();
-
-                // After the save: the picture service deletes only pictures nothing references any more.
-                if (!string.IsNullOrEmpty(previousPictureId))
-                {
-                    await _pictureService.RemoveImageAsync(previousPictureId, organization.Id);
-                }
             }
         }
 

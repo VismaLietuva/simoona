@@ -112,13 +112,7 @@ namespace Shrooms.Presentation.Api.Middlewares
 
         private bool TryFindTenant(out string tenantName, string tenantKey)
         {
-            // A tenant is only valid in the current environment if both:
-            //   1. it's registered in the Organizations section, AND
-            //   2. it has a non-empty connection string.
-            // This prevents accepting requests for tenants whose DB isn't provisioned here.
-            var organizationsEntry = _configuration[$"Organizations:{tenantKey}"];
-            var connStr = _configuration.GetConnectionString(tenantKey);
-            if (organizationsEntry != null && !string.IsNullOrWhiteSpace(connStr))
+            if (IsConfiguredTenant(_configuration, tenantKey))
             {
                 tenantName = tenantKey;
                 return true;
@@ -126,6 +120,23 @@ namespace Shrooms.Presentation.Api.Middlewares
 
             tenantName = null;
             return false;
+        }
+
+        /// <summary>
+        /// A tenant is only valid in the current environment if it is registered in the Organizations section
+        /// AND has a non-empty connection string. This prevents accepting requests for tenants whose DB isn't
+        /// provisioned here. Shared with the anonymous storage paths, which run before this middleware.
+        /// </summary>
+        public static bool IsConfiguredTenant(IConfiguration configuration, string tenantKey)
+        {
+            if (string.IsNullOrEmpty(tenantKey))
+            {
+                return false;
+            }
+
+            var organizationsEntry = configuration[$"Organizations:{tenantKey}"];
+            var connStr = configuration.GetConnectionString(tenantKey);
+            return organizationsEntry != null && !string.IsNullOrWhiteSpace(connStr);
         }
     }
 }

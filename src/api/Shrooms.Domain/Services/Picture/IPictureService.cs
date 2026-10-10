@@ -15,6 +15,16 @@ namespace Shrooms.Domain.Services.Picture
         // next/image), where any server-side re-encode is a quality loss.
         Task<string> UploadOriginalAsync(Stream stream, string mimeType, string fileName, int orgId);
 
+        /// <summary>
+        /// Deletes the picture unless another stored record still references it. Callers save their own
+        /// change first and remove the previous picture afterwards.
+        /// </summary>
         Task RemoveImageAsync(string blobKey, int orgId);
+
+        /// <summary>
+        /// Deletes the picture even if other records reference it. For the owner's personal data (user
+        /// anonymization): a stranger who pointed their own record at this key must not be able to keep it alive.
+        /// </summary>
+        Task RemoveImageIgnoringReferencesAsync(string blobKey, int orgId);
     }
 }

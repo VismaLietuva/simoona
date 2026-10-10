@@ -32,9 +32,10 @@ namespace Shrooms.Authentification.BasicAuth
             var expectedPassword = _appSettings.BasicPassword;
 
             // Fail closed: unconfigured credentials must never match. Without this, an empty
-            // "Authorization: Basic Og==" header authenticated against a blank configuration.
-            if (string.IsNullOrEmpty(expectedUserName) || string.IsNullOrEmpty(expectedPassword)
-                || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+            // "Authorization: Basic Og==" header authenticated against a blank configuration. Whitespace counts
+            // as unconfigured too, matching the startup validation.
+            if (string.IsNullOrWhiteSpace(expectedUserName) || string.IsNullOrWhiteSpace(expectedPassword)
+                || string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
             {
                 return null;
             }

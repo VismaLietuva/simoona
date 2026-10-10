@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Infrastructure.Storage;
 using SixLabors.ImageSharp.Web;
@@ -74,6 +75,14 @@ namespace Shrooms.Presentation.Api.Middlewares
             // The "file" group is greedy and the path is already URL-decoded, so guard against
             // traversal before handing the key to the storage provider.
             if (!BlobKeyGuard.IsSafeBlobKey(file) || !BlobKeyGuard.IsSafeContainer(tenant))
+            {
+                return null;
+            }
+
+            // ImageSharp runs before MultiTenancyMiddleware, so the container name has not been checked against
+            // the configured tenants yet. Without this, any syntactically valid container in the storage account
+            // could be read with the application's credentials through a resize URL.
+            if (!MultiTenancyMiddleware.IsConfiguredTenant(context.RequestServices.GetRequiredService<IConfiguration>(), tenant))
             {
                 return null;
             }

@@ -75,6 +75,18 @@ namespace Shrooms.Tests.Infrastructure
             Assert.That(principal, Is.Null);
         }
 
+        [TestCase(" ", " ")]
+        [TestCase("\t", "\t")]
+        public void Validate_WhitespaceOnlyConfiguration_NeverMatchesWhitespaceCredentials(string configured, string supplied)
+        {
+            _settings.BasicUsername.Returns(configured);
+            _settings.BasicPassword.Returns(configured);
+
+            var principal = _validator.Validate(supplied, supplied, CancellationToken.None, ContextFor(Tenant));
+
+            Assert.That(principal, Is.Null);
+        }
+
         [Test]
         public void Validate_UnconfiguredPasswordOnly_ReturnsNull()
         {

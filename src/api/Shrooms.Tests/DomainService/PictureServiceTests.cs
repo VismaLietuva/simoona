@@ -201,6 +201,76 @@ namespace Shrooms.Tests.DomainService
             _storage.DidNotReceiveWithAnyArgs().UploadPictureAsync(default, default, default, default);
         }
 
+        [Test]
+        public void UploadOriginal_ShouldReject_AnimatedWebp_BecauseThisImageSharpVersionCannotDecodeIt()
+        {
+            // GIF has a frame budget because ImageSharp decodes every frame. WebP needs none today: ImageSharp
+            // 2.1 throws NotSupportedException ("Animated webp are not yet supported") on Identify and on Load,
+            // so the upload is refused and the anonymous resize path cannot decode such a file either. If an
+            // ImageSharp upgrade starts decoding animated WebP, this test fails and a frame budget is due.
+            var stream = AnimatedWebp(frames: 50, width: 4, height: 4);
+
+            Assert.That(() => _pictureService.UploadOriginalAsync(stream, "image/webp", "anim.webp", 2),
+                Throws.ArgumentException.With.Message.Contains("not recognized"));
+            _storage.DidNotReceiveWithAnyArgs().UploadPictureAsync(default, default, default, default);
+            stream.Position = 0;
+            Assert.That(() => Image.Load(stream), Throws.TypeOf<System.NotSupportedException>());
+        }
+
+        /// <summary>A valid animated WebP: VP8X with the animation flag, ANIM, and one ANMF per frame wrapping a lossless bitstream.</summary>
+        private static MemoryStream AnimatedWebp(int frames, int width, int height)
+        {
+            byte[] vp8l;
+            using (var image = new Image<Rgba32>(width, height))
+            using (var single = new MemoryStream())
+            {
+                image.SaveAsWebp(single, new SixLabors.ImageSharp.Formats.Webp.WebpEncoder { FileFormat = SixLabors.ImageSharp.Formats.Webp.WebpFileFormatType.Lossless });
+                vp8l = RiffChunk(single.ToArray(), "VP8L");
+            }
+
+            var body = new MemoryStream();
+            void Fourcc(string s) => body.Write(Encoding.ASCII.GetBytes(s));
+            void U32(uint v) => body.Write(System.BitConverter.GetBytes(v));
+            void U24(int v) { body.WriteByte((byte)(v & 0xFF)); body.WriteByte((byte)((v >> 8) & 0xFF)); body.WriteByte((byte)((v >> 16) & 0xFF)); }
+
+            Fourcc("WEBP");
+            Fourcc("VP8X"); U32(10); body.WriteByte(0x02); body.WriteByte(0); body.WriteByte(0); body.WriteByte(0); U24(width - 1); U24(height - 1);
+            Fourcc("ANIM"); U32(6); U32(0); body.WriteByte(0); body.WriteByte(0);
+            for (var i = 0; i < frames; i++)
+            {
+                Fourcc("ANMF"); U32((uint)(16 + vp8l.Length));
+                U24(0); U24(0); U24(width - 1); U24(height - 1); U24(50); body.WriteByte(0);
+                body.Write(vp8l);
+            }
+
+            var result = new MemoryStream();
+            result.Write(Encoding.ASCII.GetBytes("RIFF"));
+            result.Write(System.BitConverter.GetBytes((uint)body.Length));
+            body.Position = 0;
+            body.CopyTo(result);
+            result.Position = 0;
+            return result;
+        }
+
+        private static byte[] RiffChunk(byte[] file, string fourcc)
+        {
+            var pos = 12;
+            while (pos + 8 <= file.Length)
+            {
+                var name = Encoding.ASCII.GetString(file, pos, 4);
+                var size = System.BitConverter.ToUInt32(file, pos + 4);
+                var total = 8 + (int)size + (int)(size & 1);
+                if (name == fourcc)
+                {
+                    return file[pos..(pos + total)];
+                }
+
+                pos += total;
+            }
+
+            throw new System.InvalidOperationException(fourcc + " chunk not found");
+        }
+
         [TestCase("noextension")]
         [TestCase("victim.html")]
         public async Task RemoveImage_ShouldNotTouchStorage_WhenKeyIsNotAnImageName(string key)
@@ -236,6 +306,26 @@ namespace Shrooms.Tests.DomainService
         public async Task RemoveImage_ShouldNotTouchStorage_WhenKeyIsNotABareFileName(string key)
         {
             await _pictureService.RemoveImageAsync(key, 2);
+
+            await _storage.DidNotReceiveWithAnyArgs().RemovePictureAsync(default, default);
+        }
+
+        [Test]
+        public async Task RemoveImageIgnoringReferences_DeletesEvenWhenAnotherRecordUsesThePicture()
+        {
+            _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(3));
+
+            await _pictureService.RemoveImageIgnoringReferencesAsync("victim.jpg", 2);
+
+            await _storage.Received(1).RemovePictureAsync("victim.jpg", "pictures");
+        }
+
+        [TestCase("../../appsettings.json")]
+        [TestCase("victim.html")]
+        [TestCase("")]
+        public async Task RemoveImageIgnoringReferences_StillRefusesKeysThatAreNotStoredImages(string key)
+        {
+            await _pictureService.RemoveImageIgnoringReferencesAsync(key, 2);
 
             await _storage.DidNotReceiveWithAnyArgs().RemovePictureAsync(default, default);
         }
