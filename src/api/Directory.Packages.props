@@ -68,8 +68,8 @@
   <!-- Web API surface -->
   <ItemGroup>
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.3.1" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.3.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Newtonsoft" Version="10.2.3" />
   </ItemGroup>
 
   <!-- Azure and telemetry -->
