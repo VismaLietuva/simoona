@@ -36,7 +36,7 @@ namespace Shrooms.Tests.DomainService
 
             _storage = Substitute.For<IStorage>();
             _references = Substitute.For<IPictureReferenceService>();
-            _references.CountReferencesAsync(Arg.Any<string>()).Returns(Task.FromResult(0));
+            _references.IsReferencedAsync(Arg.Any<string>()).Returns(Task.FromResult(false));
             _pictureService = new PictureService(_storage, uow, _references);
         }
 
@@ -291,7 +291,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task RemoveImage_ShouldNotDelete_WhenAnotherRecordStillUsesThePicture()
         {
-            _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(1));
+            _references.IsReferencedAsync("victim.jpg").Returns(Task.FromResult(true));
 
             await _pictureService.RemoveImageAsync("victim.jpg", 2);
 
@@ -313,7 +313,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task IsInUse_ReflectsExistingReferences()
         {
-            _references.CountReferencesAsync("taken.jpg").Returns(Task.FromResult(1));
+            _references.IsReferencedAsync("taken.jpg").Returns(Task.FromResult(true));
 
             Assert.That(await _pictureService.IsInUseAsync("taken.jpg"), Is.True);
             Assert.That(await _pictureService.IsInUseAsync("fresh.jpg"), Is.False);
@@ -323,7 +323,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task RemoveImageIgnoringReferences_DeletesEvenWhenAnotherRecordUsesThePicture()
         {
-            _references.CountReferencesAsync("victim.jpg").Returns(Task.FromResult(3));
+            _references.IsReferencedAsync("victim.jpg").Returns(Task.FromResult(true));
 
             await _pictureService.RemoveImageIgnoringReferencesAsync("victim.jpg", 2);
 

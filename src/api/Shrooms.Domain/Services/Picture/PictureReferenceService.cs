@@ -16,14 +16,15 @@ namespace Shrooms.Domain.Services.Picture
 {
     public interface IPictureReferenceService
     {
-        /// <summary>How many stored records currently point at the given picture key, across every table that holds pictures, including custom emoji.</summary>
-        Task<int> CountReferencesAsync(string blobKey);
+        /// <summary>Whether any stored record points at the given picture key, across every table that holds pictures, including custom emoji.</summary>
+        Task<bool> IsReferencedAsync(string blobKey);
     }
 
     /// <summary>
     /// Picture keys are public (every avatar URL shows one) and clients submit them freely, so "delete the
     /// previous picture" must not trust the caller. Before a file is removed, the picture must not be in
-    /// use by anything other than the single record that is about to drop it.
+    /// use by anything other than the single record that is about to drop it. The checks stop at the first
+    /// hit; the cheapest and most likely tables come first, the substring scans of serialized lists last.
     /// </summary>
     public class PictureReferenceService : IPictureReferenceService
     {
@@ -34,37 +35,33 @@ namespace Shrooms.Domain.Services.Picture
             _uow = uow;
         }
 
-        public async Task<int> CountReferencesAsync(string blobKey)
+        public async Task<bool> IsReferencedAsync(string blobKey)
         {
             if (string.IsNullOrEmpty(blobKey))
             {
-                return 0;
+                return false;
             }
 
-            var count = 0;
-            count += await _uow.GetDbSet<ApplicationUser>().IgnoreQueryFilters().CountAsync(u => u.PictureId == blobKey);
-            count += await _uow.GetDbSet<Floor>().IgnoreQueryFilters().CountAsync(f => f.PictureId == blobKey);
-            count += await _uow.GetDbSet<Banner>().IgnoreQueryFilters().CountAsync(b => b.PictureId == blobKey);
-            count += await _uow.GetDbSet<Committee>().IgnoreQueryFilters().CountAsync(c => c.PictureId == blobKey);
-            count += await _uow.GetDbSet<Group>().IgnoreQueryFilters().CountAsync(g => g.PictureId == blobKey);
-            count += await _uow.GetDbSet<KudosLog>().IgnoreQueryFilters().CountAsync(k => k.PictureId == blobKey);
-            count += await _uow.GetDbSet<KudosShopItem>().IgnoreQueryFilters().CountAsync(k => k.PictureId == blobKey);
-            count += await _uow.GetDbSet<Notification>().IgnoreQueryFilters().CountAsync(n => n.PictureId == blobKey);
-            count += await _uow.GetDbSet<ServiceRequest>().IgnoreQueryFilters().CountAsync(s => s.PictureId == blobKey);
-            count += await _uow.GetDbSet<VideoLibraryItem>().IgnoreQueryFilters().CountAsync(v => v.PictureId == blobKey);
-            count += await _uow.GetDbSet<Event>().IgnoreQueryFilters().CountAsync(e => e.ImageName == blobKey);
-            count += await _uow.GetDbSet<Project>().IgnoreQueryFilters().CountAsync(p => p.Logo == blobKey);
-            count += await _uow.GetDbSet<Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall>().IgnoreQueryFilters().CountAsync(w => w.Logo == blobKey);
-            count += await _uow.GetDbSet<RoomType>().IgnoreQueryFilters().CountAsync(r => r.IconId == blobKey);
-
-            // Posts, comments and lotteries store a serialized list of keys.
-            count += await _uow.GetDbSet<Post>().IgnoreQueryFilters().CountAsync(p => p.Images.Serialized.Contains(blobKey));
-            count += await _uow.GetDbSet<Comment>().IgnoreQueryFilters().CountAsync(c => c.Images.Serialized.Contains(blobKey));
-            // Lottery.Images is mapped as a primitive collection (not an owned Serialized string).
-            count += await _uow.GetDbSet<Lottery>().IgnoreQueryFilters().CountAsync(l => l.Images.Contains(blobKey));
-            count += await _uow.GetDbSet<CustomEmoji>().IgnoreQueryFilters().CountAsync(e => e.BlobName == blobKey);
-
-            return count;
+            return await _uow.GetDbSet<ApplicationUser>().IgnoreQueryFilters().AnyAsync(u => u.PictureId == blobKey)
+                || await _uow.GetDbSet<Group>().IgnoreQueryFilters().AnyAsync(g => g.PictureId == blobKey)
+                || await _uow.GetDbSet<Committee>().IgnoreQueryFilters().AnyAsync(c => c.PictureId == blobKey)
+                || await _uow.GetDbSet<Floor>().IgnoreQueryFilters().AnyAsync(f => f.PictureId == blobKey)
+                || await _uow.GetDbSet<RoomType>().IgnoreQueryFilters().AnyAsync(r => r.IconId == blobKey)
+                || await _uow.GetDbSet<Banner>().IgnoreQueryFilters().AnyAsync(b => b.PictureId == blobKey)
+                || await _uow.GetDbSet<KudosLog>().IgnoreQueryFilters().AnyAsync(k => k.PictureId == blobKey)
+                || await _uow.GetDbSet<KudosShopItem>().IgnoreQueryFilters().AnyAsync(k => k.PictureId == blobKey)
+                || await _uow.GetDbSet<Notification>().IgnoreQueryFilters().AnyAsync(n => n.PictureId == blobKey)
+                || await _uow.GetDbSet<ServiceRequest>().IgnoreQueryFilters().AnyAsync(s => s.PictureId == blobKey)
+                || await _uow.GetDbSet<VideoLibraryItem>().IgnoreQueryFilters().AnyAsync(v => v.PictureId == blobKey)
+                || await _uow.GetDbSet<Event>().IgnoreQueryFilters().AnyAsync(e => e.ImageName == blobKey)
+                || await _uow.GetDbSet<Project>().IgnoreQueryFilters().AnyAsync(p => p.Logo == blobKey)
+                || await _uow.GetDbSet<Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall>().IgnoreQueryFilters().AnyAsync(w => w.Logo == blobKey)
+                || await _uow.GetDbSet<CustomEmoji>().IgnoreQueryFilters().AnyAsync(e => e.BlobName == blobKey)
+                // Lottery.Images is mapped as a primitive collection (not an owned Serialized string).
+                || await _uow.GetDbSet<Lottery>().IgnoreQueryFilters().AnyAsync(l => l.Images.Contains(blobKey))
+                // Posts and comments store a serialized list of keys: substring scans, kept last.
+                || await _uow.GetDbSet<Post>().IgnoreQueryFilters().AnyAsync(p => p.Images.Serialized.Contains(blobKey))
+                || await _uow.GetDbSet<Comment>().IgnoreQueryFilters().AnyAsync(c => c.Images.Serialized.Contains(blobKey));
         }
     }
 }

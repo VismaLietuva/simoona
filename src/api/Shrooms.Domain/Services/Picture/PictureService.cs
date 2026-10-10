@@ -81,7 +81,7 @@ namespace Shrooms.Domain.Services.Picture
             // their own change first and remove the previous picture afterwards. Picture keys are public
             // (every avatar URL shows one), so a user could otherwise set their PictureId to a colleague's
             // avatar and have it deleted on the next change.
-            if (await _pictureReferences.CountReferencesAsync(blobKey) > 0)
+            if (await _pictureReferences.IsReferencedAsync(blobKey))
             {
                 return;
             }
@@ -101,7 +101,7 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task<bool> IsInUseAsync(string blobKey)
         {
-            return !string.IsNullOrEmpty(blobKey) && await _pictureReferences.CountReferencesAsync(blobKey) > 0;
+            return !string.IsNullOrEmpty(blobKey) && await _pictureReferences.IsReferencedAsync(blobKey);
         }
 
         // Picture ids are stored from client input. A key that is not a bare file name can never have been

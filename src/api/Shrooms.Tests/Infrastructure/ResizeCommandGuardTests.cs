@@ -125,5 +125,24 @@ namespace Shrooms.Tests.Infrastructure
 
             Assert.That(commands.Select(c => c.Key).OrderBy(k => k), Is.EqualTo(new[] { "height", "rmode", "width" }));
         }
+
+        [TestCase(2000, 20000, 2048, null, 2048, 2048, Description = "tall source, width only: implied height 20480")]
+        [TestCase(20000, 2000, null, 2048, 2048, 2048, Description = "wide source, height only: implied width 20480")]
+        [TestCase(1000, 5000, 640, null, 640, 2048, Description = "feed width on a tall post image: implied height 3200")]
+        public void BoundImpliedDimension_FitsIntoTheCapWhenTheOtherSideWouldExceedIt(int srcW, int srcH, int? reqW, int? reqH, int expectedW, int expectedH)
+        {
+            var box = ClampingResizeWebProcessor.BoundImpliedDimension(srcW, srcH, reqW, reqH, ResizeCommandGuard.MaxDimension);
+
+            Assert.That(box, Is.EqualTo((expectedW, expectedH)));
+        }
+
+        [TestCase(4000, 3000, 640, null, Description = "implied height 480 is fine")]
+        [TestCase(4000, 3000, 640, 480, Description = "both given: already snapped by the guard")]
+        [TestCase(4000, 3000, null, null)]
+        [TestCase(0, 3000, 640, null)]
+        public void BoundImpliedDimension_LeavesOrdinaryRequestsAlone(int srcW, int srcH, int? reqW, int? reqH)
+        {
+            Assert.That(ClampingResizeWebProcessor.BoundImpliedDimension(srcW, srcH, reqW, reqH, ResizeCommandGuard.MaxDimension), Is.Null);
+        }
     }
 }
