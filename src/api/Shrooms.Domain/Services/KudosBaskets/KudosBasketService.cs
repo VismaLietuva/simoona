@@ -141,6 +141,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
                     .FirstAsync(b => b.OrganizationId == donation.OrganizationId);
 
                 _kudosBasketValidator.CheckIfBasketIsActive(basket);
+                _kudosBasketValidator.CheckIfDonationIsWhole(donation.DonationAmount);
                 _kudosBasketValidator.CheckIfUserHasEnoughKudos(user.RemainingKudos, donation.DonationAmount);
 
                 var otherType = await _kudosTypesDbSet.FirstAsync(type => type.Type == KudosTypeEnum.Other);

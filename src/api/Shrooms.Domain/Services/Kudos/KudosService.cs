@@ -115,6 +115,11 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (type.Type == KudosTypeEnum.Ordinary)
             {
+                if (dto.Value != decimal.Truncate(dto.Value))
+                {
+                    throw new ValidationException(ErrorCodes.KudosTypeValueNotWhole, "Kudos type value must be a whole number");
+                }
+
                 await ValidateKudosTypeNameIsUniqueAsync(dto.Name, dto.Id);
 
                 type.Name = dto.Name;
@@ -809,7 +814,7 @@ namespace Shrooms.Domain.Services.Kudos
                             x.KudosBasketId == null)
                 .SumAsync(x => (decimal?)x.Points);
 
-            user.TotalKudos = kudosTotal ?? 0;
+            user.TotalKudos = Math.Round(kudosTotal ?? 0, MidpointRounding.AwayFromZero);
 
             var spentKudos = await allUserKudosLogs
                 .Where(x => x.KudosSystemType == KudosTypeEnum.Minus ||
@@ -823,7 +828,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             spentKudos -= refundedKudos;
 
-            user.SpentKudos = spentKudos ?? 0;
+            user.SpentKudos = Math.Round(spentKudos ?? 0, MidpointRounding.AwayFromZero);
             user.RemainingKudos = user.TotalKudos - user.SpentKudos;
         }
 

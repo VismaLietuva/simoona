@@ -8,6 +8,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.KudosBaskets
         void CheckIfBasketAlreadyExists(bool basketIsActive);
         void CheckIfThereIsNoBasketYet(KudosBasketDto basket);
         void CheckIfUserHasEnoughKudos(decimal remainingKudos, decimal donationAmount);
+        void CheckIfDonationIsWhole(decimal donationAmount);
         void CheckIfBasketIsActive(KudosBasket basket);
     }
 }
