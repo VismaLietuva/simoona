@@ -23,6 +23,14 @@ namespace Shrooms.Domain.ServiceValidators.Validators.KudosBaskets
             }
         }
 
+        public void CheckIfDonationIsWhole(decimal donationAmount)
+        {
+            if (donationAmount != decimal.Truncate(donationAmount))
+            {
+                throw new KudosBasketException(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketWholeKudosOnly);
+            }
+        }
+
         public void CheckIfBasketIsActive(KudosBasket basket)
         {
             if (!basket.IsActive)

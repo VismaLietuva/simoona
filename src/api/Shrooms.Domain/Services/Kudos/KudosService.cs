@@ -116,6 +116,11 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (type.Type == KudosTypeEnum.Ordinary)
             {
+                if (dto.Value != decimal.Truncate(dto.Value))
+                {
+                    throw new ValidationException(ErrorCodes.KudosTypeValueNotWhole, "Kudos type value must be a whole number");
+                }
+
                 await ValidateKudosTypeNameIsUniqueAsync(dto.Name, dto.Id);
 
                 type.Name = dto.Name;

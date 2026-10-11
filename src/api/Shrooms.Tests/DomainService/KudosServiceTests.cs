@@ -1182,6 +1182,24 @@ namespace Shrooms.Tests.DomainService
             await _uow.Received(1).SaveChangesAsync(dto.UserId);
         }
 
+        [Test]
+        public void UpdateKudosType_WhenValueHasCents_ThrowsValidationException()
+        {
+            var dto = new KudosTypeDto
+            {
+                Id = 3,
+                Name = "AnythingElse",
+                Value = 2.5m,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _kudosService.UpdateKudosTypeAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.KudosTypeValueNotWhole));
+            _uow.DidNotReceive().SaveChangesAsync(Arg.Any<string>());
+        }
+
         #endregion
 
         #region MockData
