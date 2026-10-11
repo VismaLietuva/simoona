@@ -129,4 +129,7 @@
   <data name="KudosBasketInactive" xml:space="preserve">
     <value>Kudos basket is inactive</value>
   </data>
+  <data name="KudosBasketWholeKudosOnly" xml:space="preserve">
+    <value>Donations must be whole kudos</value>
+  </data>
 </root>

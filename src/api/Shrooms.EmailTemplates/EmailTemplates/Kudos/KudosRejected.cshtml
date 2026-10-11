@@ -1,7 +1,7 @@
 ﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.KudosRejectedEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    var amount = Model.KudosAmount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    var amount = Math.Round(Model.KudosAmount, MidpointRounding.AwayFromZero).ToString("0", System.Globalization.CultureInfo.InvariantCulture);
     ViewData["Preheader"] = $"Your {amount} kudos for {Model.KudosRecipientName} were not approved.";
 }
 
