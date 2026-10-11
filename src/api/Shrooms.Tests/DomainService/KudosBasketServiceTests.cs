@@ -133,6 +133,7 @@ namespace Shrooms.Tests.DomainService
                     Id = "testUserId",
                     FirstName = "Testas",
                     LastName = "Testauskas",
+                    PictureId = "testas.jpg",
                     RemainingKudos = 100,
                     SpentKudos = 0
                 }
@@ -175,6 +176,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.That(result.First().Donator.Id, Is.EqualTo("testUserId"));
             Assert.That(result.First().Donator.FullName, Is.EqualTo("Testas Testauskas"));
+            Assert.That(result.First().Donator.PictureId, Is.EqualTo("testas.jpg"));
         }
 
         [Test]
@@ -204,6 +206,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.That(result.First().Donator.FullName, Is.EqualTo("Deleted Account"));
+            Assert.That(result.First().Donator.PictureId, Is.Null);
         }
 
         [Test]

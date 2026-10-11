@@ -477,6 +477,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     UserId = v.ApplicationUserId,
                     LogId = v.Id,
                     FullName = v.ApplicationUser.FirstName + " " + v.ApplicationUser.LastName,
+                    PictureId = v.ApplicationUser.PictureId,
                     TakenFrom = v.TakenFrom,
                     Returned = v.Returned
                 })
@@ -498,7 +499,8 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Readers = bookOffice.BookLogs.Where(x => x.Returned == null).Select(x => new BasicBookUserDto
                 {
                     FullName = x.ApplicationUser.FirstName + " " + x.ApplicationUser.LastName,
-                    Id = x.ApplicationUser.Id
+                    Id = x.ApplicationUser.Id,
+                    PictureId = x.ApplicationUser.PictureId
                 }),
                 TakenByCurrentUser = bookOffice.BookLogs.Any(x => x.ApplicationUserId == userId && x.Returned == null)
             };
