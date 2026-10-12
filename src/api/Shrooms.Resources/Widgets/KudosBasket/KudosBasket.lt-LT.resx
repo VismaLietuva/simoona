@@ -129,4 +129,7 @@
   <data name="KudosBasketInactive" xml:space="preserve">
     <value>Kudos krepšelis neaktyvus</value>
   </data>
+  <data name="KudosBasketWholeKudosOnly" xml:space="preserve">
+    <value>Aukoti galima tik sveiką kudos skaičių</value>
+  </data>
 </root>

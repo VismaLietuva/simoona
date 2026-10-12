@@ -15,5 +15,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails
         public DateTime? Returned { get; set; }
 
         public string FullName { get; set; }
+
+        public string PictureId { get; set; }
     }
 }

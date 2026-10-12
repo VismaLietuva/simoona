@@ -162,12 +162,12 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         {
             if (balanceAsOf == null)
             {
-                return Math.Round(entitlement, 1);
+                return Math.Round(entitlement, 2);
             }
 
             var earned = AccruedBetween(balanceAsOf.Value, today, annualDays);
 
-            return Math.Round(entitlement + earned, 1);
+            return Math.Round(entitlement + earned, 2);
         }
 
         /// <summary>

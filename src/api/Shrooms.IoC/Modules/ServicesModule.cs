@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Picture;
+using Shrooms.Domain.Services.UserPreferences;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.VacationPages;
 
@@ -12,6 +13,7 @@ namespace Shrooms.IoC.Modules
         {
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISidebarFavoritesService, SidebarFavoritesService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IVacationPageService, VacationPageService>();
             return services;

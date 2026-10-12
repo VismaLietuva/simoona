@@ -210,4 +210,16 @@
   <data name="archiveTooLarge" xml:space="preserve">
     <value>Šiame laikotarpyje yra daugiau nei {0} įsakymai. Susiaukite laikotarpį ir atsisiųskite dar kartą</value>
   </data>
+  <data name="parentalNotEntitled" xml:space="preserve">
+    <value>Jums nepriskirta mamadienių / tėvadienių. Kreipkitės į buhalteriją.</value>
+  </data>
+  <data name="parentalLimit" xml:space="preserve">
+    <value>Laikotarpiu {2} – {3} jau suplanavote {0} iš {1} mamadienių / tėvadienių</value>
+  </data>
+  <data name="parentalHoursOnly" xml:space="preserve">
+    <value>Jūsų papildomas poilsio laikas suteikiamas trumpinant darbo laiką, todėl mamadienio / tėvadienio planuoti negalima</value>
+  </data>
+  <data name="parentalTypeInvalid" xml:space="preserve">
+    <value>Nežinomas mamadienių / tėvadienių tipas</value>
+  </data>
 </root>

@@ -189,8 +189,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public void ReceiveKudos(KudosLog log)
         {
-            RemainingKudos += log.Points;
-            TotalKudos += log.Points;
+            RemainingKudos = Math.Round(RemainingKudos + log.Points, MidpointRounding.AwayFromZero);
+            TotalKudos = Math.Round(TotalKudos + log.Points, MidpointRounding.AwayFromZero);
             Modified = DateTime.UtcNow;
         }
     }

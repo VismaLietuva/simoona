@@ -19,6 +19,7 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IVacationRequestListService, VacationRequestListService>();
             services.AddScoped<IVacationLogService, VacationLogService>();
             services.AddScoped<IVacationStatisticsService, VacationStatisticsService>();
+            services.AddScoped<IParentalEntitlementService, ParentalEntitlementService>();
             services.AddScoped<IVacationSettingsService, VacationSettingsService>();
             services.AddScoped<IVacationReportService, VacationReportService>();
             services.AddScoped<IVacationOrderService, VacationOrderService>();

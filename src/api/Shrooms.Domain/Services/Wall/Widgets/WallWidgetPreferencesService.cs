@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.UserPreferences;
 
 namespace Shrooms.Domain.Services.Wall.Widgets
 {
@@ -25,10 +26,12 @@ namespace Shrooms.Domain.Services.Wall.Widgets
 
         public async Task<string> GetAsync(UserAndOrganizationDto userOrg)
         {
-            return await _usersDbSet
+            var stored = await _usersDbSet
                 .Where(user => user.Id == userOrg.UserId && user.OrganizationId == userOrg.OrganizationId)
                 .Select(user => user.WallWidgetPreferences)
                 .FirstOrDefaultAsync();
+
+            return UserPreferencesDocument.GetSection(stored, UserPreferencesDocument.WidgetsSection);
         }
 
         public async Task SaveAsync(string preferences, UserAndOrganizationDto userOrg)
@@ -43,7 +46,12 @@ namespace Shrooms.Domain.Services.Wall.Widgets
                 throw new ValidationException(ErrorCodes.UserNotFound, "User not found");
             }
 
-            user.WallWidgetPreferences = preferences;
+            // The column is shared with other UI preferences (see
+            // UserPreferencesDocument), so replace only the widgets section.
+            user.WallWidgetPreferences = UserPreferencesDocument.SetSection(
+                user.WallWidgetPreferences,
+                UserPreferencesDocument.WidgetsSection,
+                preferences);
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }

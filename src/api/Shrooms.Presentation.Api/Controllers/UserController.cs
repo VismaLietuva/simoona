@@ -4,6 +4,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.UserPreferences;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Controllers.Kudos;
@@ -25,11 +26,59 @@ namespace Shrooms.Presentation.Api.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
+        private readonly ISidebarFavoritesService _sidebarFavoritesService;
 
-        public UserController(IMapper mapper, IUserService userService)
+        public UserController(IMapper mapper, IUserService userService, ISidebarFavoritesService sidebarFavoritesService)
         {
             _mapper = mapper;
             _userService = userService;
+            _sidebarFavoritesService = sidebarFavoritesService;
+        }
+
+        /// <summary>
+        /// Returns the sidebar items the current user has starred.
+        /// </summary>
+        /// <response code="200">A JSON array of navigation item keys in display order, or null when never saved</response>
+        [HttpGet]
+        [Route("SidebarFavorites")]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(typeof(SidebarFavoritesViewModel), StatusCodes.Status200OK)]
+        public async Task<SidebarFavoritesViewModel> GetSidebarFavorites()
+        {
+            return new SidebarFavoritesViewModel
+            {
+                Favorites = await _sidebarFavoritesService.GetAsync(GetUserAndOrganization())
+            };
+        }
+
+        /// <summary>
+        /// Replaces the sidebar items the current user has starred.
+        /// </summary>
+        /// <param name="favorites">A JSON array of navigation item keys in display order</param>
+        /// <response code="204">Favorites saved</response>
+        /// <response code="400">Favorites are not a JSON array of strings, or are too long</response>
+        [HttpPut]
+        [Route("SidebarFavorites")]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SaveSidebarFavorites([FromBody] SidebarFavoritesViewModel favorites)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _sidebarFavoritesService.SaveAsync(favorites.Favorites, GetUserAndOrganization());
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            return NoContent();
         }
 
         /// <summary>

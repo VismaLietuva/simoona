@@ -56,6 +56,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
 
         public RoomMiniViewModel Room { get; set; }
 
+        public PermanentSeatViewModel PermanentSeat { get; set; }
+
         public TimeSpan? DailyMailingHour { get; set; }
     }
 }

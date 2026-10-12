@@ -8,6 +8,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Polls
 
         public string Text { get; set; }
 
+        public string Url { get; set; }
+
         public int VoteCount { get; set; }
 
         public bool Picked { get; set; }

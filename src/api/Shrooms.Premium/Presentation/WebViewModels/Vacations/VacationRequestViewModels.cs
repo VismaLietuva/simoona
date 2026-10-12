@@ -102,6 +102,28 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Vacations
         }
     }
 
+    public class ParentalEntitlementListingViewModel
+    {
+        public string Search { get; set; }
+
+        public string Dir { get; set; }
+
+        public ParentalEntitlementListArgsDto ToArgs(UserAndOrganizationDto userOrg)
+        {
+            return new ParentalEntitlementListArgsDto
+            {
+                OrganizationId = userOrg.OrganizationId,
+                Search = Search,
+                Dir = Dir
+            };
+        }
+    }
+
+    public class ParentalEntitlementViewModel
+    {
+        public string Type { get; set; }
+    }
+
     public class VacationRequestDraftViewModel
     {
         public string Type { get; set; }

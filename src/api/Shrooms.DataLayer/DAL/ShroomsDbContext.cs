@@ -191,6 +191,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<Holiday> Holidays { get; set; }
 
+        public virtual DbSet<ParentalEntitlement> ParentalEntitlements { get; set; }
+
         public virtual DbSet<Poll> Polls { get; set; }
 
         public virtual DbSet<PollQuestion> PollQuestions { get; set; }
@@ -307,6 +309,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new VacationOrderEntityConfig());
             modelBuilder.ApplyConfiguration(new VacationOrderItemEntityConfig());
             modelBuilder.ApplyConfiguration(new HolidayEntityConfig());
+            modelBuilder.ApplyConfiguration(new ParentalEntitlementEntityConfig());
             modelBuilder.ApplyConfiguration(new PollEntityConfig());
             modelBuilder.ApplyConfiguration(new PollQuestionEntityConfig());
             modelBuilder.ApplyConfiguration(new PollOptionEntityConfig());

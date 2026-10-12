@@ -133,6 +133,7 @@ namespace Shrooms.Tests.DomainService
                     Id = "testUserId",
                     FirstName = "Testas",
                     LastName = "Testauskas",
+                    PictureId = "testas.jpg",
                     RemainingKudos = 100,
                     SpentKudos = 0
                 }
@@ -175,6 +176,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.That(result.First().Donator.Id, Is.EqualTo("testUserId"));
             Assert.That(result.First().Donator.FullName, Is.EqualTo("Testas Testauskas"));
+            Assert.That(result.First().Donator.PictureId, Is.EqualTo("testas.jpg"));
         }
 
         [Test]
@@ -204,6 +206,7 @@ namespace Shrooms.Tests.DomainService
 
             var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.That(result.First().Donator.FullName, Is.EqualTo("Deleted Account"));
+            Assert.That(result.First().Donator.PictureId, Is.Null);
         }
 
         [Test]
@@ -225,6 +228,19 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfBasketIsActive(basket));
+        }
+
+        [TestCase(0.5)]
+        [TestCase(10.01)]
+        public void Should_Throw_Kudos_Basket_Exception_If_Donation_Has_Cents(decimal amount)
+        {
+            Assert.Throws<KudosBasketException>(() => _kudosBasketValidator.CheckIfDonationIsWhole(amount));
+        }
+
+        [Test]
+        public void Should_Not_Throw_Kudos_Basket_Exception_If_Donation_Is_Whole()
+        {
+            Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfDonationIsWhole(10m));
         }
 
         [Test]
