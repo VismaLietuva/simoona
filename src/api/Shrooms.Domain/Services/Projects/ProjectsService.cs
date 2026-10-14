@@ -94,7 +94,8 @@ namespace Shrooms.Domain.Services.Projects
                         Id = x.Owner.Id,
                         FirstName = x.Owner.FirstName,
                         LastName = x.Owner.LastName,
-                        PictureId = x.Owner.PictureId
+                        PictureId = x.Owner.PictureId,
+                        JobPosition = x.Owner.JobPosition.Title
                     },
                     Attributes = x.Attributes.Select(t => t.Title),
                     Members = x.Members
@@ -103,7 +104,8 @@ namespace Shrooms.Domain.Services.Projects
                             Id = m.Id,
                             FirstName = m.FirstName,
                             LastName = m.LastName,
-                            PictureId = m.PictureId
+                            PictureId = m.PictureId,
+                            JobPosition = m.JobPosition.Title
                         })
                 })
                 .FirstOrDefaultAsync();
