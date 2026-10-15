@@ -227,7 +227,12 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         public static DateTime NowIn(string timeZoneId)
         {
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ResolveTimeZone(timeZoneId));
+            return NowIn(timeZoneId, DateTime.UtcNow);
+        }
+
+        public static DateTime NowIn(string timeZoneId, DateTime utcNow)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcNow, DateTimeKind.Utc), ResolveTimeZone(timeZoneId));
         }
 
         private static TimeZoneInfo ResolveTimeZone(string timeZoneId)

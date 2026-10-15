@@ -111,5 +111,14 @@ namespace Shrooms.Contracts.Constants
         public const int VacationParentalLimit = 1921;
         public const int VacationParentalHoursOnly = 1922;
         public const int VacationParentalTypeInvalid = 1923;
+
+        // Time registration, 20**
+        public const int TimeRegistrationNotFound = 2000;
+        public const int TimeRegistrationInvalid = 2001;
+        public const int TimeRegistrationDuplicate = 2002;
+        public const int TimeRegistrationNotEditable = 2003;
+        public const int TimeRegistrationLocked = 2004;
+        public const int TimeRegistrationWrongStatus = 2005;
+        public const int TimeRegistrationInUse = 2006;
     }
 }
