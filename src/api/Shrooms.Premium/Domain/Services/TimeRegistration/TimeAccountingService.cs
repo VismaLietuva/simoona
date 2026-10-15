@@ -280,6 +280,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             }
 
             var name = RequiredName(input.Name, TimeTask.MaxNameLength, "Task name is required");
+            ThrowIfCommentTooLong(input.Comment);
             var siblings = await _tasks.Where(task => task.ProjectId == input.ProjectId).ToListAsync();
             if (siblings.Any(task => task.Id != input.Id && TimeRegistrationRules.SameName(task.Name, name)))
             {
@@ -362,6 +363,12 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             foreach (var task in tasks)
             {
                 RequiredName(task.Name, TimeTask.MaxNameLength, "Task name is required");
+                ThrowIfCommentTooLong(task.Comment);
+            }
+
+            if (tasks.Where(task => task.Id.HasValue).GroupBy(task => task.Id).Any(group => group.Count() > 1))
+            {
+                throw new ValidationException(ErrorCodes.TimeRegistrationDuplicate, "The same task is listed twice");
             }
 
             if (tasks.Count(task => task.IsDefault) != 1)
@@ -375,6 +382,14 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 {
                     throw new ValidationException(ErrorCodes.TimeRegistrationDuplicate, $"Task \"{tasks[i].Name.Trim()}\" is listed twice");
                 }
+            }
+        }
+
+        private static void ThrowIfCommentTooLong(string comment)
+        {
+            if (comment?.Trim().Length > TimeTask.MaxCommentLength)
+            {
+                throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, $"Comment can't be longer than {TimeTask.MaxCommentLength} characters");
             }
         }
 

@@ -134,7 +134,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
             var employeeIds = await _support.ProjectMemberIdsAsync(userOrg.OrganizationId);
             var statuses = await _support.StatusesAsync(employeeIds.ToList(), first, userOrg.OrganizationId);
-            foreach (var employeeId in employeeIds.Where(id => statuses[id] == TimePeriodStatus.Open))
+            foreach (var employeeId in employeeIds.Where(id => statuses[id] != TimePeriodStatus.Approved))
             {
                 await _support.MaterializeAutoFillAsync(employeeId, first, userOrg.OrganizationId);
             }

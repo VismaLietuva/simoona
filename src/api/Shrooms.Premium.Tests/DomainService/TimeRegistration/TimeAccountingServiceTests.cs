@@ -100,6 +100,52 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
         }
 
         [Test]
+        public void SaveProjectAsync_RejectsTheSameTaskListedTwice()
+        {
+            var input = new TimeProjectInputDto
+            {
+                Id = ShopId,
+                CustomerId = 1,
+                Name = "Shop",
+                Tasks = new List<TimeTaskInputDto>
+                {
+                    new TimeTaskInputDto { Id = DevelopmentId, Name = "Development", IsDefault = true },
+                    new TimeTaskInputDto { Id = DevelopmentId, Name = "Coding" }
+                },
+                MemberIds = new List<string> { Ona }
+            };
+
+            var error = Assert.ThrowsAsync<ValidationException>(() => _service.SaveProjectAsync(input, AsBoss));
+
+            Assert.That(error.ErrorMessage, Is.EqualTo("The same task is listed twice"));
+        }
+
+        [Test]
+        public void SaveProjectAsync_RejectsATooLongTaskComment()
+        {
+            var input = new TimeProjectInputDto
+            {
+                CustomerId = 1,
+                Name = "Portal",
+                Tasks = new List<TimeTaskInputDto> { new TimeTaskInputDto { Name = "Build", Comment = new string('x', 501), IsDefault = true } },
+                MemberIds = new List<string>()
+            };
+
+            var error = Assert.ThrowsAsync<ValidationException>(() => _service.SaveProjectAsync(input, AsBoss));
+
+            Assert.That(error.ErrorCode, Is.EqualTo(ErrorCodes.TimeRegistrationInvalid));
+        }
+
+        [Test]
+        public void SaveTaskAsync_RejectsATooLongComment()
+        {
+            var error = Assert.ThrowsAsync<ValidationException>(() =>
+                _service.SaveTaskAsync(new TimeProjectTaskInputDto { ProjectId = ShopId, Name = "Planning", Comment = new string('x', 501) }, AsBoss));
+
+            Assert.That(error.ErrorMessage, Is.EqualTo("Comment can't be longer than 500 characters"));
+        }
+
+        [Test]
         public void DeleteProjectAsync_RefusesAProjectWithHours()
         {
             AddEntry(Ona, ShopId, DevelopmentId, new System.DateTime(2026, 10, 1), 60);

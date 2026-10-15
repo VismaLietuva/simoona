@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.TimeRegistration;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Premium.DataTransferObjects.Models.TimeRegistration;
 using Shrooms.Premium.Domain.Services.TimeRegistration;
 
 namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
@@ -129,6 +131,23 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
 
             await _service.UnlockAsync(PastMonth, AsBoss);
             Assert.That(await Db.Set<TimeMonthLock>().AnyAsync(), Is.False);
+        }
+
+        [Test]
+        public async Task LockAsync_FillsHoursAManagerRemovedFromASubmittedMonth()
+        {
+            MakeAccountant(AsBoss);
+            await _service.SubmitAsync(PastMonth, AsOna);
+            await new TimeTableService(Uow, Support).SaveEntriesAsync(PastMonth, Ona, new List<TimeEntryChangeDto>
+            {
+                new TimeEntryChangeDto { ProjectId = ShopId, TaskId = DevelopmentId, Date = "2026-09-01", Minutes = null }
+            }, AsBoss);
+            Assert.That(EntriesOf(Ona).Sum(entry => entry.Minutes), Is.EqualTo(21 * 480));
+
+            await _service.LockAsync(PastMonth, AsBoss);
+
+            Assert.That(EntriesOf(Ona).Sum(entry => entry.Minutes), Is.EqualTo(22 * 480));
+            Assert.That(await Support.StatusAsync(Ona, new DateTime(2026, 9, 1), 1), Is.EqualTo(TimePeriodStatus.Submitted));
         }
 
         [Test]
