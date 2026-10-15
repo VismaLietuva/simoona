@@ -4310,7 +4310,7 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("RecordedOn")
+                    b.Property<DateOnly>("RecordedOn")
                         .HasColumnType("date");
 
                     b.Property<string>("Title")

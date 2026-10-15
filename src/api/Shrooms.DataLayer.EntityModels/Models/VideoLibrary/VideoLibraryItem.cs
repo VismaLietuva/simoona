@@ -17,7 +17,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.VideoLibrary
 
         public string PictureId { get; set; }
 
-        public DateTime RecordedOn { get; set; }
+        public DateOnly RecordedOn { get; set; }
 
         public int? VideoTypeId { get; set; }
 

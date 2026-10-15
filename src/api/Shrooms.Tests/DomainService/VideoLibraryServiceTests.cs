@@ -24,6 +24,7 @@ namespace Shrooms.Tests.DomainService
         private const int OtherOrganizationId = 2;
 
         private static readonly DateTime Now = new(2026, 6, 10, 12, 0, 0);
+        private static readonly DateOnly Today = DateOnly.FromDateTime(Now);
 
         private IVideoLibraryService _videoLibraryService;
         private DbSet<VideoLibraryItem> _videosDbSet;
@@ -57,7 +58,7 @@ namespace Shrooms.Tests.DomainService
                     Title = "Older video",
                     Url = "https://drive.google.com/file/d/older/view",
                     Created = new DateTime(2026, 1, 1),
-                    RecordedOn = new DateTime(2026, 1, 1),
+                    RecordedOn = new DateOnly(2026, 1, 1),
                     VideoTypeId = allHands.Id,
                     VideoType = allHands,
                     OrganizationId = TestConstants.DefaultOrganizationId
@@ -70,7 +71,7 @@ namespace Shrooms.Tests.DomainService
                     Description = "Description",
                     PictureId = "picture.jpg",
                     Created = new DateTime(2026, 5, 1),
-                    RecordedOn = new DateTime(2026, 5, 1),
+                    RecordedOn = new DateOnly(2026, 5, 1),
                     OrganizationId = TestConstants.DefaultOrganizationId
                 },
                 new()
@@ -79,7 +80,7 @@ namespace Shrooms.Tests.DomainService
                     Title = "Video of another organization",
                     Url = "https://drive.google.com/file/d/foreign/view",
                     Created = new DateTime(2026, 6, 1),
-                    RecordedOn = new DateTime(2026, 6, 1),
+                    RecordedOn = new DateOnly(2026, 6, 1),
                     OrganizationId = OtherOrganizationId
                 }
             };
@@ -120,7 +121,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Place_An_Old_Recording_Added_Recently_By_Its_Recording_Date()
         {
-            _videos.First(v => v.Id == 2).RecordedOn = new DateTime(2025, 6, 1);
+            _videos.First(v => v.Id == 2).RecordedOn = new DateOnly(2025, 6, 1);
 
             var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
@@ -130,8 +131,8 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Order_Videos_Recorded_The_Same_Day_By_Added_Date()
         {
-            _videos.First(v => v.Id == 1).RecordedOn = new DateTime(2025, 6, 1);
-            _videos.First(v => v.Id == 2).RecordedOn = new DateTime(2025, 6, 1);
+            _videos.First(v => v.Id == 1).RecordedOn = new DateOnly(2025, 6, 1);
+            _videos.First(v => v.Id == 2).RecordedOn = new DateOnly(2025, 6, 1);
 
             var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
@@ -141,10 +142,10 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Filter_By_Recording_Date_Including_Both_Ends()
         {
-            _videos.First(v => v.Id == 2).RecordedOn = new DateTime(2025, 6, 1);
+            _videos.First(v => v.Id == 2).RecordedOn = new DateOnly(2025, 6, 1);
 
             var result = await _videoLibraryService.GetVideosAsync(
-                ListArgs(from: new DateTime(2025, 6, 1), to: new DateTime(2026, 1, 1)));
+                ListArgs(from: new DateOnly(2025, 6, 1), to: new DateOnly(2026, 1, 1)));
 
             Assert.That(result.Select(v => v.Id), Is.EquivalentTo(new[] { 1, 2 }));
             Assert.That(result.TotalItemCount, Is.EqualTo(2));
@@ -153,8 +154,8 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Filter_By_Recording_Date_With_Only_One_End()
         {
-            var since = await _videoLibraryService.GetVideosAsync(ListArgs(from: new DateTime(2026, 2, 1)));
-            var until = await _videoLibraryService.GetVideosAsync(ListArgs(to: new DateTime(2026, 2, 1)));
+            var since = await _videoLibraryService.GetVideosAsync(ListArgs(from: new DateOnly(2026, 2, 1)));
+            var until = await _videoLibraryService.GetVideosAsync(ListArgs(to: new DateOnly(2026, 2, 1)));
 
             Assert.That(since.Select(v => v.Id), Is.EqualTo(new[] { 2 }));
             Assert.That(until.Select(v => v.Id), Is.EqualTo(new[] { 1 }));
@@ -165,7 +166,7 @@ namespace Shrooms.Tests.DomainService
         {
             var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
 
-            Assert.That(result.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateTime(2026, 1, 1)));
+            Assert.That(result.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateOnly(2026, 1, 1)));
         }
 
         [Test]
@@ -279,7 +280,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Order_Recently_Added_Videos_By_When_They_Were_Added()
         {
             var old = _videos.First(v => v.Id == 1);
-            old.RecordedOn = new DateTime(2020, 1, 1);
+            old.RecordedOn = new DateOnly(2020, 1, 1);
             old.Created = Now.AddHours(-1);
             _videos.First(v => v.Id == 2).Created = Now.AddDays(-1);
 
@@ -350,14 +351,14 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Create_Video_With_The_Recording_Date_Without_Time()
+        public async Task Should_Create_Video_With_The_Recording_Date()
         {
             var dto = NewVideoDto();
-            dto.RecordedOn = new DateTime(2024, 3, 12, 14, 0, 0);
+            dto.RecordedOn = new DateOnly(2024, 3, 12);
 
             await _videoLibraryService.CreateVideoAsync(dto);
 
-            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v => v.RecordedOn == new DateTime(2024, 3, 12)));
+            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v => v.RecordedOn == new DateOnly(2024, 3, 12)));
         }
 
         [Test]
@@ -368,14 +369,14 @@ namespace Shrooms.Tests.DomainService
 
             await _videoLibraryService.CreateVideoAsync(dto);
 
-            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v => v.RecordedOn == Now.Date));
+            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v => v.RecordedOn == Today));
         }
 
         [Test]
         public void Should_Not_Create_Video_Recorded_In_The_Future()
         {
             var dto = NewVideoDto();
-            dto.RecordedOn = Now.Date.AddDays(2);
+            dto.RecordedOn = Today.AddDays(2);
 
             var exception = Assert.ThrowsAsync<ValidationException>(async () =>
                 await _videoLibraryService.CreateVideoAsync(dto));
@@ -388,7 +389,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Accept_Tomorrow_As_Recording_Date_For_Viewers_Ahead_Of_Utc()
         {
             var dto = NewVideoDto();
-            dto.RecordedOn = Now.Date.AddDays(1);
+            dto.RecordedOn = Today.AddDays(1);
 
             await _videoLibraryService.CreateVideoAsync(dto);
 
@@ -490,11 +491,11 @@ namespace Shrooms.Tests.DomainService
         {
             var dto = NewVideoDto();
             dto.Id = 1;
-            dto.RecordedOn = new DateTime(2023, 9, 1, 10, 0, 0);
+            dto.RecordedOn = new DateOnly(2023, 9, 1);
 
             await _videoLibraryService.UpdateVideoAsync(dto);
 
-            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateTime(2023, 9, 1)));
+            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateOnly(2023, 9, 1)));
         }
 
         [Test]
@@ -506,7 +507,7 @@ namespace Shrooms.Tests.DomainService
 
             await _videoLibraryService.UpdateVideoAsync(dto);
 
-            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateTime(2026, 1, 1)));
+            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateOnly(2026, 1, 1)));
         }
 
         [Test]
@@ -514,12 +515,12 @@ namespace Shrooms.Tests.DomainService
         {
             var dto = NewVideoDto();
             dto.Id = 1;
-            dto.RecordedOn = Now.Date.AddDays(2);
+            dto.RecordedOn = Today.AddDays(2);
 
             Assert.ThrowsAsync<ValidationException>(async () =>
                 await _videoLibraryService.UpdateVideoAsync(dto));
 
-            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateTime(2026, 1, 1)));
+            Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateOnly(2026, 1, 1)));
         }
 
         [Test]
@@ -631,8 +632,8 @@ namespace Shrooms.Tests.DomainService
             int page = 1,
             int pageSize = 24,
             bool recent = false,
-            DateTime? from = null,
-            DateTime? to = null)
+            DateOnly? from = null,
+            DateOnly? to = null)
         {
             return new VideoLibraryListArgsDto
             {

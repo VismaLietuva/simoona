@@ -11,12 +11,12 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "RecordedOn",
                 table: "VideoLibraryItems",
                 type: "date",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                defaultValue: new DateOnly(1, 1, 1));
 
             migrationBuilder.Sql("UPDATE [VideoLibraryItems] SET [RecordedOn] = CAST([Created] AS date)");
 

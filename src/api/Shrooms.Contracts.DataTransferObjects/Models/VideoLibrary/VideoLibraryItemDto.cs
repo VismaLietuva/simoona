@@ -14,7 +14,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
 
         public string PictureId { get; set; }
 
-        public DateTime? RecordedOn { get; set; }
+        public DateOnly? RecordedOn { get; set; }
 
         public int? VideoTypeId { get; set; }
 

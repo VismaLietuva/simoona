@@ -102,7 +102,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 Url = video.Url,
                 Description = video.Description,
                 PictureId = video.PictureId,
-                RecordedOn = video.RecordedOn?.Date ?? _systemClock.UtcNow.Date,
+                RecordedOn = video.RecordedOn ?? Today(),
                 VideoTypeId = video.VideoTypeId,
                 CreatedBy = video.UserId,
                 OrganizationId = video.OrganizationId
@@ -128,7 +128,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
             if (video.RecordedOn != null)
             {
-                entity.RecordedOn = video.RecordedOn.Value.Date;
+                entity.RecordedOn = video.RecordedOn.Value;
             }
 
             await _uow.SaveChangesAsync(video.UserId);
@@ -203,8 +203,8 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
         private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedOnFilter(VideoLibraryListArgsDto args)
         {
-            var from = args.From?.Date ?? DateTime.MinValue;
-            var to = args.To?.Date ?? DateTime.MaxValue.Date;
+            var from = args.From ?? DateOnly.MinValue;
+            var to = args.To ?? DateOnly.MaxValue;
 
             return video => video.RecordedOn >= from && video.RecordedOn <= to;
         }
@@ -238,9 +238,14 @@ namespace Shrooms.Domain.Services.VideoLibrary
             }
         }
 
-        private void ValidateRecordedOn(DateTime? recordedOn)
+        private DateOnly Today()
         {
-            if (recordedOn?.Date > _systemClock.UtcNow.Date.AddDays(1))
+            return DateOnly.FromDateTime(_systemClock.UtcNow);
+        }
+
+        private void ValidateRecordedOn(DateOnly? recordedOn)
+        {
+            if (recordedOn > Today().AddDays(1))
             {
                 throw new ValidationException(ErrorCodes.InvalidType, "Recording date cannot be in the future");
             }
