@@ -33,7 +33,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (From > To)
+            if (From?.Date > To?.Date)
             {
                 yield return new ValidationResult("From must not be after To", new[] { nameof(From), nameof(To) });
             }
