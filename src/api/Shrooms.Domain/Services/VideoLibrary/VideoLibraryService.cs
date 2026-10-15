@@ -264,7 +264,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
         {
             if (recordedOn > Today().AddDays(1))
             {
-                throw new ValidationException(ErrorCodes.InvalidType, "Recording date cannot be in the future");
+                throw new ValidationException(ErrorCodes.VideoRecordedInFuture, "Recording date cannot be in the future");
             }
         }
 
@@ -273,7 +273,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
                 (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             {
-                throw new ValidationException(ErrorCodes.InvalidType, "Video link must be an absolute http(s) URL");
+                throw new ValidationException(ErrorCodes.VideoLinkInvalid, "Video link must be an absolute http(s) URL");
             }
         }
 

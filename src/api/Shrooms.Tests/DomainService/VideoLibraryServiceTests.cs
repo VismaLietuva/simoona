@@ -381,7 +381,7 @@ namespace Shrooms.Tests.DomainService
             var exception = Assert.ThrowsAsync<ValidationException>(async () =>
                 await _videoLibraryService.CreateVideoAsync(dto));
 
-            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.InvalidType));
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoRecordedInFuture));
             _videosDbSet.DidNotReceive().Add(Arg.Any<VideoLibraryItem>());
         }
 
@@ -421,7 +421,7 @@ namespace Shrooms.Tests.DomainService
             var exception = Assert.ThrowsAsync<ValidationException>(async () =>
                 await _videoLibraryService.CreateVideoAsync(dto));
 
-            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.InvalidType));
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoLinkInvalid));
             _videosDbSet.DidNotReceive().Add(Arg.Any<VideoLibraryItem>());
         }
 
@@ -517,9 +517,10 @@ namespace Shrooms.Tests.DomainService
             dto.Id = 1;
             dto.RecordedOn = Today.AddDays(2);
 
-            Assert.ThrowsAsync<ValidationException>(async () =>
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
                 await _videoLibraryService.UpdateVideoAsync(dto));
 
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoRecordedInFuture));
             Assert.That(_videos.First(v => v.Id == 1).RecordedOn, Is.EqualTo(new DateOnly(2026, 1, 1)));
         }
 
