@@ -41,7 +41,8 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 .Where(v => v.OrganizationId == args.OrganizationId)
                 .Where(BuildTypeFilter(args))
                 .Where(BuildSearchFilter(args))
-                .Where(BuildRecordedOnFilter(args))
+                .Where(BuildRecordedFromFilter(args))
+                .Where(BuildRecordedToFilter(args))
                 .Where(BuildRecentFilter(args));
 
             var ordered = args.Recent
@@ -201,12 +202,28 @@ namespace Shrooms.Domain.Services.VideoLibrary
                             (video.VideoType != null && video.VideoType.Title.Contains(search));
         }
 
-        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedOnFilter(VideoLibraryListArgsDto args)
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedFromFilter(VideoLibraryListArgsDto args)
         {
-            var from = args.From ?? DateOnly.MinValue;
-            var to = args.To ?? DateOnly.MaxValue;
+            if (args.From == null)
+            {
+                return video => true;
+            }
 
-            return video => video.RecordedOn >= from && video.RecordedOn <= to;
+            var from = args.From.Value;
+
+            return video => video.RecordedOn >= from;
+        }
+
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedToFilter(VideoLibraryListArgsDto args)
+        {
+            if (args.To == null)
+            {
+                return video => true;
+            }
+
+            var to = args.To.Value;
+
+            return video => video.RecordedOn <= to;
         }
 
         private async Task<VideoLibraryItem> FindAsync(int id, int organizationId)
