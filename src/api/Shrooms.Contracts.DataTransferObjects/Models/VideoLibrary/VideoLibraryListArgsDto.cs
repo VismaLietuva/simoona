@@ -1,3 +1,4 @@
+using System;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
@@ -9,6 +10,12 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
         public int? VideoTypeId { get; set; }
 
         public bool Uncategorised { get; set; }
+
+        public bool Recent { get; set; }
+
+        public DateTime? From { get; set; }
+
+        public DateTime? To { get; set; }
 
         public int Page { get; set; }
 

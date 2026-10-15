@@ -8,6 +8,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
 
         public int UncategorisedCount { get; set; }
 
+        public int RecentCount { get; set; }
+
         public int TotalCount { get; set; }
     }
 }

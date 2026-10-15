@@ -9,6 +9,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using Shrooms.Domain.Services.Picture;
 using X.PagedList;
@@ -17,27 +18,42 @@ namespace Shrooms.Domain.Services.VideoLibrary
 {
     public class VideoLibraryService : IVideoLibraryService
     {
+        public const int RecentVideoDays = 14;
+
         private readonly DbSet<VideoLibraryItem> _videosDbSet;
         private readonly DbSet<VideoType> _videoTypesDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
+        private readonly ISystemClock _systemClock;
 
-        public VideoLibraryService(IUnitOfWork2 uow, IPictureService pictureService)
+        public VideoLibraryService(IUnitOfWork2 uow, IPictureService pictureService, ISystemClock systemClock)
         {
             _uow = uow;
             _pictureService = pictureService;
+            _systemClock = systemClock;
             _videosDbSet = uow.GetDbSet<VideoLibraryItem>();
             _videoTypesDbSet = uow.GetDbSet<VideoType>();
         }
 
         public async Task<IPagedList<VideoLibraryItemDto>> GetVideosAsync(VideoLibraryListArgsDto args)
         {
-            var query = _videosDbSet
+            var filtered = _videosDbSet
                 .Where(v => v.OrganizationId == args.OrganizationId)
                 .Where(BuildTypeFilter(args))
                 .Where(BuildSearchFilter(args))
-                .OrderByDescending(v => v.Created)
-                .Select(MapVideoToDto());
+                .Where(BuildRecordedOnFilter(args))
+                .Where(BuildRecentFilter(args));
+
+            var ordered = args.Recent
+                ? filtered
+                    .OrderByDescending(v => v.Created)
+                    .ThenByDescending(v => v.Id)
+                : filtered
+                    .OrderByDescending(v => v.RecordedOn)
+                    .ThenByDescending(v => v.Created)
+                    .ThenByDescending(v => v.Id);
+
+            var query = ordered.Select(MapVideoToDto());
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -51,6 +67,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
         public async Task<VideoLibraryFiltersDto> GetFiltersAsync(UserAndOrganizationDto userOrg)
         {
             var videos = _videosDbSet.Where(v => v.OrganizationId == userOrg.OrganizationId);
+            var since = RecentSince();
 
             var types = await _videoTypesDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId)
@@ -68,6 +85,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             {
                 Types = types,
                 UncategorisedCount = await videos.CountAsync(v => v.VideoTypeId == null),
+                RecentCount = await videos.CountAsync(v => v.Created >= since),
                 TotalCount = await videos.CountAsync()
             };
         }
@@ -75,6 +93,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
         public async Task CreateVideoAsync(VideoLibraryItemDto video)
         {
             ValidateUrl(video.Url);
+            ValidateRecordedOn(video.RecordedOn);
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
             _videosDbSet.Add(new VideoLibraryItem
@@ -83,6 +102,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 Url = video.Url,
                 Description = video.Description,
                 PictureId = video.PictureId,
+                RecordedOn = video.RecordedOn?.Date ?? _systemClock.UtcNow.Date,
                 VideoTypeId = video.VideoTypeId,
                 CreatedBy = video.UserId,
                 OrganizationId = video.OrganizationId
@@ -94,6 +114,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
         public async Task UpdateVideoAsync(VideoLibraryItemDto video)
         {
             ValidateUrl(video.Url);
+            ValidateRecordedOn(video.RecordedOn);
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
             var entity = await FindAsync(video.Id, video.OrganizationId);
@@ -104,6 +125,11 @@ namespace Shrooms.Domain.Services.VideoLibrary
             entity.Description = video.Description;
             entity.PictureId = video.PictureId;
             entity.VideoTypeId = video.VideoTypeId;
+
+            if (video.RecordedOn != null)
+            {
+                entity.RecordedOn = video.RecordedOn.Value.Date;
+            }
 
             await _uow.SaveChangesAsync(video.UserId);
 
@@ -117,6 +143,23 @@ namespace Shrooms.Domain.Services.VideoLibrary
             entity.IsDeleted = true;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        private DateTime RecentSince()
+        {
+            return _systemClock.UtcNow.AddDays(-RecentVideoDays);
+        }
+
+        private Expression<Func<VideoLibraryItem, bool>> BuildRecentFilter(VideoLibraryListArgsDto args)
+        {
+            if (!args.Recent)
+            {
+                return video => true;
+            }
+
+            var since = RecentSince();
+
+            return video => video.Created >= since;
         }
 
         private async Task RemoveReplacedPictureAsync(string previousPictureId, string currentPictureId, int organizationId)
@@ -158,6 +201,14 @@ namespace Shrooms.Domain.Services.VideoLibrary
                             (video.VideoType != null && video.VideoType.Title.Contains(search));
         }
 
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedOnFilter(VideoLibraryListArgsDto args)
+        {
+            var from = args.From?.Date ?? DateTime.MinValue;
+            var to = args.To?.Date ?? DateTime.MaxValue.Date;
+
+            return video => video.RecordedOn >= from && video.RecordedOn <= to;
+        }
+
         private async Task<VideoLibraryItem> FindAsync(int id, int organizationId)
         {
             var entity = await _videosDbSet
@@ -187,6 +238,14 @@ namespace Shrooms.Domain.Services.VideoLibrary
             }
         }
 
+        private void ValidateRecordedOn(DateTime? recordedOn)
+        {
+            if (recordedOn?.Date > _systemClock.UtcNow.Date.AddDays(1))
+            {
+                throw new ValidationException(ErrorCodes.InvalidType, "Recording date cannot be in the future");
+            }
+        }
+
         private static void ValidateUrl(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
@@ -205,6 +264,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 Url = video.Url,
                 Description = video.Description,
                 PictureId = video.PictureId,
+                RecordedOn = video.RecordedOn,
                 VideoTypeId = video.VideoTypeId,
                 VideoTypeTitle = video.VideoType == null ? null : video.VideoType.Title,
                 Created = video.Created

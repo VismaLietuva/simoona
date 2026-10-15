@@ -16,11 +16,15 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.VideoLibrary
             builder.Property(x => x.Url).IsRequired().HasMaxLength(VideoLibraryItem.MaxUrlLength);
             builder.Property(x => x.Description).HasMaxLength(VideoLibraryItem.MaxDescriptionLength);
             builder.Property(x => x.PictureId).HasMaxLength(VideoLibraryItem.MaxPictureIdLength);
+            builder.Property(x => x.RecordedOn).HasColumnType("date");
             builder.Property(x => x.Created).HasColumnType("datetime2");
             builder.Property(x => x.Modified).HasColumnType("datetime2");
 
             builder.HasIndex(x => new { x.OrganizationId, x.Created })
                 .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_Created");
+
+            builder.HasIndex(x => new { x.OrganizationId, x.RecordedOn })
+                .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_RecordedOn");
 
             builder.HasIndex(x => new { x.OrganizationId, x.VideoTypeId })
                 .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_VideoTypeId");
