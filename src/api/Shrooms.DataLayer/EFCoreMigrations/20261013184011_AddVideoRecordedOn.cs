@@ -15,10 +15,18 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                 name: "RecordedOn",
                 table: "VideoLibraryItems",
                 type: "date",
-                nullable: false,
-                defaultValue: new DateOnly(1, 1, 1));
+                nullable: true);
 
             migrationBuilder.Sql("UPDATE [VideoLibraryItems] SET [RecordedOn] = CAST([Created] AS date)");
+
+            migrationBuilder.AlterColumn<DateOnly>(
+                name: "RecordedOn",
+                table: "VideoLibraryItems",
+                type: "date",
+                nullable: false,
+                oldClrType: typeof(DateOnly),
+                oldType: "date",
+                oldNullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_VideoLibraryItems_OrganizationId_RecordedOn",
