@@ -300,6 +300,30 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Mark_Videos_Added_In_The_Last_Two_Weeks_As_New()
+        {
+            _videos.First(v => v.Id == 1).Created = Now.AddDays(-13);
+            _videos.First(v => v.Id == 2).Created = Now.AddDays(-15);
+
+            var result = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
+
+            Assert.That(result.First(v => v.Id == 1).IsNew, Is.True);
+            Assert.That(result.First(v => v.Id == 2).IsNew, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Mark_As_New_Exactly_The_Videos_The_Recent_Filter_Returns()
+        {
+            _videos.First(v => v.Id == 1).Created = Now.AddDays(-VideoLibraryService.RecentVideoDays).AddMinutes(1);
+            _videos.First(v => v.Id == 2).Created = Now.AddDays(-VideoLibraryService.RecentVideoDays).AddMinutes(-1);
+
+            var all = (await _videoLibraryService.GetVideosAsync(ListArgs())).ToList();
+            var recent = await _videoLibraryService.GetVideosAsync(ListArgs(recent: true));
+
+            Assert.That(all.Where(v => v.IsNew).Select(v => v.Id), Is.EquivalentTo(recent.Select(v => v.Id)));
+        }
+
+        [Test]
         public async Task Should_Count_Recently_Added_Videos_In_Filters()
         {
             _videos.First(v => v.Id == 1).Created = Now.AddDays(-1);

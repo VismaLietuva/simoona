@@ -31,5 +31,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
         public string VideoTypeTitle { get; set; }
 
         public DateTime Created { get; set; }
+
+        public bool IsNew { get; set; }
     }
 }

@@ -21,5 +21,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
         public string VideoTypeTitle { get; set; }
 
         public DateTime Created { get; set; }
+
+        public bool IsNew { get; set; }
     }
 }

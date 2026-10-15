@@ -54,7 +54,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                     .ThenByDescending(v => v.Created)
                     .ThenByDescending(v => v.Id);
 
-            var query = ordered.Select(MapVideoToDto());
+            var query = ordered.Select(MapVideoToDto(RecentSince()));
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -290,7 +290,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             }
         }
 
-        private static Expression<Func<VideoLibraryItem, VideoLibraryItemDto>> MapVideoToDto()
+        private static Expression<Func<VideoLibraryItem, VideoLibraryItemDto>> MapVideoToDto(DateTime recentSince)
         {
             return video => new VideoLibraryItemDto
             {
@@ -302,7 +302,8 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 RecordedOn = video.RecordedOn,
                 VideoTypeId = video.VideoTypeId,
                 VideoTypeTitle = video.VideoType == null ? null : video.VideoType.Title,
-                Created = video.Created
+                Created = video.Created,
+                IsNew = video.Created >= recentSince
             };
         }
     }
