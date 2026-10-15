@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Mapster;
 using NUnit.Framework;
@@ -45,6 +46,16 @@ namespace Shrooms.Tests.ModelMappings
             var source = new Source { UserId = 7 };
 
             Assert.That(new MapsterMapper.Mapper(new TypeAdapterConfig()).Map<Destination>(source).UserID, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void AdaptExtension_UsesTheSameDefaultsAsTheMapper()
+        {
+            // Adapt() reads TypeAdapterConfig.GlobalSettings; MapsterSettings.Create() (run in SetUp) applies the defaults there too.
+            var result = new Source { UserId = 7, Children = null }.Adapt<Destination>();
+
+            Assert.That(result.UserID, Is.EqualTo(7));
+            Assert.That(result.Children, Is.Not.Null.And.Empty);
         }
 
         [Test]
@@ -138,6 +149,22 @@ namespace Shrooms.Tests.ModelMappings
             Assert.That(mapsterResult.Next, Is.SameAs(mapsterResult));
         }
 
+        [Test]
+        public void CycleAcrossTwoTypes_KeepsTheBackReference()
+        {
+            // Room -> Floor -> Rooms -> Room, as EF hands it over. Needs PreserveReference on both maps and
+            // AvoidInlineMapping (in MapsterSettings): inlined nested mappings skip the reference tracking.
+            var config = MapsterSettings.Create();
+            config.NewConfig<Room, RoomDto>().PreserveReference(true);
+            config.NewConfig<Floor, FloorDto>().PreserveReference(true);
+            var room = new Room { Name = "A1", Floor = new Floor { Name = "1st" } };
+            room.Floor.Rooms.Add(room);
+
+            var result = new MapsterMapper.Mapper(config).Map<RoomDto>(room);
+
+            Assert.That(result.Floor.Rooms.Single(), Is.SameAs(result));
+        }
+
         private static Destination ExistingDestination()
         {
             return new Destination
@@ -215,6 +242,34 @@ namespace Shrooms.Tests.ModelMappings
             public string Name { get; set; }
 
             public NodeDto Next { get; set; }
+        }
+
+        public class Room
+        {
+            public string Name { get; set; }
+
+            public Floor Floor { get; set; }
+        }
+
+        public class Floor
+        {
+            public string Name { get; set; }
+
+            public List<Room> Rooms { get; set; } = new List<Room>();
+        }
+
+        public class RoomDto
+        {
+            public string Name { get; set; }
+
+            public FloorDto Floor { get; set; }
+        }
+
+        public class FloorDto
+        {
+            public string Name { get; set; }
+
+            public List<RoomDto> Rooms { get; set; }
         }
     }
 }
