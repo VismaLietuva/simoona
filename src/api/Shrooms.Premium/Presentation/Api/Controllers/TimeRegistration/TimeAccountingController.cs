@@ -73,19 +73,5 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
         {
             return GuardedAsync(() => _accountingService.DeleteProjectAsync(id, GetUserAndOrganization()));
         }
-
-        [HttpPost]
-        [Route("Tasks")]
-        public Task<IActionResult> SaveTask([FromBody] TimeProjectTaskInputDto input)
-        {
-            return GuardedAsync(async () => new { Id = await _accountingService.SaveTaskAsync(input, GetUserAndOrganization()) });
-        }
-
-        [HttpDelete]
-        [Route("Tasks/{id:int}")]
-        public Task<IActionResult> DeleteTask(int id)
-        {
-            return GuardedAsync(() => _accountingService.DeleteTaskAsync(id, GetUserAndOrganization()));
-        }
     }
 }

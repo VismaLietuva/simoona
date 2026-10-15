@@ -273,68 +273,6 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task<int> SaveTaskAsync(TimeProjectTaskInputDto input, UserAndOrganizationDto userOrg)
-        {
-            if (!await _projects.AnyAsync(project => project.OrganizationId == userOrg.OrganizationId && project.Id == input.ProjectId))
-            {
-                throw NotFound("Project");
-            }
-
-            var name = RequiredName(input.Name, TimeTask.MaxNameLength, "Task name is required");
-            ThrowIfCommentTooLong(input.Comment);
-            var siblings = await _tasks.Where(task => task.ProjectId == input.ProjectId).ToListAsync();
-            if (siblings.Any(task => task.Id != input.Id && TimeRegistrationRules.SameName(task.Name, name)))
-            {
-                throw new ValidationException(ErrorCodes.TimeRegistrationDuplicate, $"Task \"{name}\" already exists in this project");
-            }
-
-            var current = input.Id.HasValue
-                ? siblings.FirstOrDefault(task => task.Id == input.Id) ?? throw NotFound("Task")
-                : null;
-            if (current?.IsDefault == true && !input.IsDefault)
-            {
-                throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, "Make another task the default first");
-            }
-
-            var isDefault = input.IsDefault || siblings.Count == 0;
-            if (isDefault)
-            {
-                foreach (var task in siblings)
-                {
-                    task.IsDefault = false;
-                }
-            }
-
-            if (current == null)
-            {
-                current = new TimeTask { OrganizationId = userOrg.OrganizationId, ProjectId = input.ProjectId };
-                _tasks.Add(current);
-            }
-
-            current.Name = name;
-            current.Comment = input.Comment?.Trim() ?? string.Empty;
-            current.IsDefault = isDefault;
-
-            await SaveNamesAsync(userOrg.UserId);
-            return current.Id;
-        }
-
-        public async Task DeleteTaskAsync(int id, UserAndOrganizationDto userOrg)
-        {
-            var task = await _tasks
-                .FirstOrDefaultAsync(row => row.OrganizationId == userOrg.OrganizationId && row.Id == id) ?? throw NotFound("Task");
-
-            if (task.IsDefault)
-            {
-                throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, "The default task cannot be deleted");
-            }
-
-            await ThrowIfTasksHaveHoursAsync(new[] { task });
-
-            task.IsDeleted = true;
-            await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
         private async Task ThrowIfTasksHaveHoursAsync(IReadOnlyCollection<TimeTask> tasks)
         {
             var ids = tasks.Select(task => task.Id).ToList();

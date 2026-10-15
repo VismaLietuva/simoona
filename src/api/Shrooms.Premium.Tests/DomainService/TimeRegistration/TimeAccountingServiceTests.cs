@@ -137,15 +137,6 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
         }
 
         [Test]
-        public void SaveTaskAsync_RejectsATooLongComment()
-        {
-            var error = Assert.ThrowsAsync<ValidationException>(() =>
-                _service.SaveTaskAsync(new TimeProjectTaskInputDto { ProjectId = ShopId, Name = "Planning", Comment = new string('x', 501) }, AsBoss));
-
-            Assert.That(error.ErrorMessage, Is.EqualTo("Comment can't be longer than 500 characters"));
-        }
-
-        [Test]
         public void DeleteProjectAsync_RefusesAProjectWithHours()
         {
             AddEntry(Ona, ShopId, DevelopmentId, new System.DateTime(2026, 10, 1), 60);
@@ -162,32 +153,6 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
 
             Assert.That(await Db.Set<TimeProject>().AnyAsync(project => project.Id == ShopId), Is.False);
             Assert.That(await Db.Set<TimeProjectMember>().AnyAsync(member => member.ProjectId == ShopId), Is.False);
-        }
-
-        [Test]
-        public async Task SaveTaskAsync_MovesTheDefaultToTheNewTask()
-        {
-            await _service.SaveTaskAsync(new TimeProjectTaskInputDto { ProjectId = ShopId, Name = "Planning", IsDefault = true }, AsBoss);
-
-            var defaults = await Db.Set<TimeTask>().Where(task => task.ProjectId == ShopId && task.IsDefault).Select(task => task.Name).ToListAsync();
-            Assert.That(defaults, Is.EqualTo(new[] { "Planning" }));
-        }
-
-        [Test]
-        public void SaveTaskAsync_RefusesToUnsetTheOnlyDefault()
-        {
-            var error = Assert.ThrowsAsync<ValidationException>(() =>
-                _service.SaveTaskAsync(new TimeProjectTaskInputDto { Id = DevelopmentId, ProjectId = ShopId, Name = "Development" }, AsBoss));
-
-            Assert.That(error.ErrorMessage, Is.EqualTo("Make another task the default first"));
-        }
-
-        [Test]
-        public void DeleteTaskAsync_RefusesTheDefaultTask()
-        {
-            var error = Assert.ThrowsAsync<ValidationException>(() => _service.DeleteTaskAsync(DevelopmentId, AsBoss));
-
-            Assert.That(error.ErrorMessage, Is.EqualTo("The default task cannot be deleted"));
         }
 
         [Test]

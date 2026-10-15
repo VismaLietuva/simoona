@@ -20,9 +20,5 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         Task SetProjectArchivedAsync(int id, bool isArchived, UserAndOrganizationDto userOrg);
 
         Task DeleteProjectAsync(int id, UserAndOrganizationDto userOrg);
-
-        Task<int> SaveTaskAsync(TimeProjectTaskInputDto input, UserAndOrganizationDto userOrg);
-
-        Task DeleteTaskAsync(int id, UserAndOrganizationDto userOrg);
     }
 }
