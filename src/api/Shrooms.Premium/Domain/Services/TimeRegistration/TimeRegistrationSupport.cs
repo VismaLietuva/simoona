@@ -143,6 +143,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public async Task<TimeMonthLock> LockAsync(DateTime month, int organizationId)
         {
             return await _locks
+                .IgnoreQueryFilters()
                 .Include(monthLock => monthLock.LockedBy)
                 .FirstOrDefaultAsync(monthLock => monthLock.OrganizationId == organizationId && monthLock.Month == month);
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -78,13 +79,13 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             {
                 var existing = siblings.FirstOrDefault(customer => customer.Id == input.Id) ?? throw NotFound("Customer");
                 existing.Name = name;
-                await _uow.SaveChangesAsync(userOrg.UserId);
+                await SaveNamesAsync(userOrg.UserId);
                 return existing.Id;
             }
 
             var created = new TimeCustomer { OrganizationId = userOrg.OrganizationId, Name = name };
             _customers.Add(created);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await SaveNamesAsync(userOrg.UserId);
             return created.Id;
         }
 
@@ -235,7 +236,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 _members.Add(new TimeProjectMember { OrganizationId = userOrg.OrganizationId, Project = project, UserId = userId });
             }
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await SaveNamesAsync(userOrg.UserId);
             return project.Id;
         }
 
@@ -314,7 +315,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             current.Comment = input.Comment?.Trim() ?? string.Empty;
             current.IsDefault = isDefault;
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await SaveNamesAsync(userOrg.UserId);
             return current.Id;
         }
 
@@ -382,6 +383,18 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 {
                     throw new ValidationException(ErrorCodes.TimeRegistrationDuplicate, $"Task \"{tasks[i].Name.Trim()}\" is listed twice");
                 }
+            }
+        }
+
+        private async Task SaveNamesAsync(string userId)
+        {
+            try
+            {
+                await _uow.SaveChangesAsync(userId);
+            }
+            catch (DbUpdateException e) when (e.InnerException is SqlException sql && (sql.Number == 2601 || sql.Number == 2627))
+            {
+                throw new ValidationException(ErrorCodes.TimeRegistrationDuplicate, "A name is already taken. Save one rename at a time");
             }
         }
 

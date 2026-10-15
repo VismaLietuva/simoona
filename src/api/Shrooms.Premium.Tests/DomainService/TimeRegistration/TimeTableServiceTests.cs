@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.TimeRegistration;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using Shrooms.Domain.Exceptions.Exceptions;
@@ -140,6 +141,18 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
             var error = Assert.ThrowsAsync<ValidationException>(() => _service.SaveEntriesAsync(CurrentMonth, null, OneHour(), AsOna));
 
             Assert.That(error.ErrorCode, Is.EqualTo(ErrorCodes.TimeRegistrationLocked));
+        }
+
+        [Test]
+        public async Task GetTimeTableAsync_KeepsTheLockWhenItsAuthorIsDeleted()
+        {
+            Db.Set<TimeMonthLock>().Add(new TimeMonthLock { OrganizationId = 1, Month = new DateTime(2026, 10, 1), LockedById = Boss });
+            Db.Set<ApplicationUser>().Single(user => user.Id == Boss).IsDeleted = true;
+            Db.SaveChanges(false);
+
+            var table = await _service.GetTimeTableAsync(CurrentMonth, null, AsOna);
+
+            Assert.That(table.Lock?.LockedBy, Is.EqualTo("Bea Boss"));
         }
 
         [Test]
