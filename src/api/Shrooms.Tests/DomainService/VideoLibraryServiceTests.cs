@@ -306,7 +306,7 @@ namespace Shrooms.Tests.DomainService
             _videos.First(v => v.Id == 2).Created = Now.AddDays(-15);
             _videos.First(v => v.Id == 3).Created = Now.AddDays(-1);
 
-            var filters = await _videoLibraryService.GetFiltersAsync(UserOrg());
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());
 
             Assert.That(filters.RecentCount, Is.EqualTo(1));
         }
@@ -314,7 +314,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Count_Filters_Across_The_Whole_Library_Not_One_Page()
         {
-            var filters = await _videoLibraryService.GetFiltersAsync(UserOrg());
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());
 
             Assert.That(filters.TotalCount, Is.EqualTo(2));
             Assert.That(filters.UncategorisedCount, Is.EqualTo(1));
@@ -323,9 +323,62 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Narrow_Filter_Counts_To_The_Search()
+        {
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs(search: "Older"));
+
+            Assert.That(filters.TotalCount, Is.EqualTo(1));
+            Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(1));
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Should_Narrow_Filter_Counts_To_The_Recording_Period()
+        {
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs(from: new DateOnly(2026, 2, 1)));
+
+            Assert.That(filters.TotalCount, Is.EqualTo(1));
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(1));
+            Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Should_Keep_Offering_A_Type_The_Filters_Leave_Empty()
+        {
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs(to: new DateOnly(2025, 12, 31)));
+
+            Assert.That(filters.Types.Single().Title, Is.EqualTo("All-Hands meetings"));
+            Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Should_Say_Whether_The_Library_Has_Uncategorised_And_Recent_Videos_Whatever_The_Filters()
+        {
+            _videos.First(v => v.Id == 2).Created = Now.AddDays(-1);
+
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs(search: "Older"));
+
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(0));
+            Assert.That(filters.HasUncategorised, Is.True);
+            Assert.That(filters.RecentCount, Is.EqualTo(0));
+            Assert.That(filters.HasRecent, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Say_When_The_Library_Has_No_Uncategorised_Or_Recent_Videos()
+        {
+            _videos.First(v => v.Id == 2).VideoTypeId = 1;
+
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());
+
+            Assert.That(filters.HasUncategorised, Is.False);
+            Assert.That(filters.HasRecent, Is.False);
+        }
+
+        [Test]
         public async Task Should_Not_Offer_A_Filter_For_Another_Organizations_Type()
         {
-            var filters = await _videoLibraryService.GetFiltersAsync(UserOrg());
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());
 
             Assert.That(filters.Types.Select(t => t.Title), Does.Not.Contain("Foreign type"));
         }
@@ -646,6 +699,21 @@ namespace Shrooms.Tests.DomainService
                 To = to,
                 Page = page,
                 PageSize = pageSize,
+                UserId = "testUser",
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+        }
+
+        private static VideoLibraryFiltersArgsDto FiltersArgs(
+            string search = null,
+            DateOnly? from = null,
+            DateOnly? to = null)
+        {
+            return new VideoLibraryFiltersArgsDto
+            {
+                Search = search,
+                From = from,
+                To = to,
                 UserId = "testUser",
                 OrganizationId = TestConstants.DefaultOrganizationId
             };

@@ -9,7 +9,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
     {
         Task<IPagedList<VideoLibraryItemDto>> GetVideosAsync(VideoLibraryListArgsDto args);
 
-        Task<VideoLibraryFiltersDto> GetFiltersAsync(UserAndOrganizationDto userOrg);
+        Task<VideoLibraryFiltersDto> GetFiltersAsync(VideoLibraryFiltersArgsDto args);
 
         Task CreateVideoAsync(VideoLibraryItemDto video);
 

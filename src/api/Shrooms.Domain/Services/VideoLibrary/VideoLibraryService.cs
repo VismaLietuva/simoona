@@ -65,29 +65,42 @@ namespace Shrooms.Domain.Services.VideoLibrary
             return new StaticPagedList<VideoLibraryItemDto>(items, args.Page, args.PageSize, totalCount);
         }
 
-        public async Task<VideoLibraryFiltersDto> GetFiltersAsync(UserAndOrganizationDto userOrg)
+        public async Task<VideoLibraryFiltersDto> GetFiltersAsync(VideoLibraryFiltersArgsDto args)
         {
-            var videos = _videosDbSet.Where(v => v.OrganizationId == userOrg.OrganizationId);
+            var library = _videosDbSet.Where(v => v.OrganizationId == args.OrganizationId);
+            var matching = library
+                .Where(BuildSearchFilter(args))
+                .Where(BuildRecordedFromFilter(args))
+                .Where(BuildRecordedToFilter(args));
             var since = RecentSince();
 
-            var types = await _videoTypesDbSet
-                .Where(t => t.OrganizationId == userOrg.OrganizationId)
-                .Select(t => new VideoTypeDto
-                {
-                    Id = t.Id,
-                    Title = t.Title,
-                    VideoCount = t.Videos.Count(v => !v.IsDeleted)
-                })
-                .Where(t => t.VideoCount > 0)
+            var countsByType = await matching
+                .Where(v => v.VideoTypeId != null)
+                .GroupBy(v => v.VideoTypeId.Value)
+                .Select(g => new { TypeId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TypeId, x => x.Count);
+
+            var typesInUse = await _videoTypesDbSet
+                .Where(t => t.OrganizationId == args.OrganizationId && t.Videos.Any(v => !v.IsDeleted))
                 .OrderBy(t => t.Title)
+                .Select(t => new { t.Id, t.Title })
                 .ToListAsync();
 
             return new VideoLibraryFiltersDto
             {
-                Types = types,
-                UncategorisedCount = await videos.CountAsync(v => v.VideoTypeId == null),
-                RecentCount = await videos.CountAsync(v => v.Created >= since),
-                TotalCount = await videos.CountAsync()
+                Types = typesInUse
+                    .Select(t => new VideoTypeDto
+                    {
+                        Id = t.Id,
+                        Title = t.Title,
+                        VideoCount = countsByType.GetValueOrDefault(t.Id)
+                    })
+                    .ToList(),
+                UncategorisedCount = await matching.CountAsync(v => v.VideoTypeId == null),
+                HasUncategorised = await library.AnyAsync(v => v.VideoTypeId == null),
+                RecentCount = await matching.CountAsync(v => v.Created >= since),
+                HasRecent = await library.AnyAsync(v => v.Created >= since),
+                TotalCount = await matching.CountAsync()
             };
         }
 
@@ -188,7 +201,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             return video => video.VideoTypeId == args.VideoTypeId;
         }
 
-        private static Expression<Func<VideoLibraryItem, bool>> BuildSearchFilter(VideoLibraryListArgsDto args)
+        private static Expression<Func<VideoLibraryItem, bool>> BuildSearchFilter(VideoLibraryFiltersArgsDto args)
         {
             var search = args.Search?.Trim();
 
@@ -202,7 +215,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                             (video.VideoType != null && video.VideoType.Title.Contains(search));
         }
 
-        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedFromFilter(VideoLibraryListArgsDto args)
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedFromFilter(VideoLibraryFiltersArgsDto args)
         {
             if (args.From == null)
             {
@@ -214,7 +227,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
             return video => video.RecordedOn >= from;
         }
 
-        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedToFilter(VideoLibraryListArgsDto args)
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecordedToFilter(VideoLibraryFiltersArgsDto args)
         {
             if (args.To == null)
             {

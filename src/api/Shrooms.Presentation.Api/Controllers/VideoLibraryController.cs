@@ -55,9 +55,19 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Filters")]
         [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
         [ProducesResponseType(typeof(VideoLibraryFiltersViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Filters()
+        public async Task<IActionResult> Filters([FromQuery] VideoLibraryFiltersArgsViewModel argsViewModel)
         {
-            var filtersDto = await _videoLibraryService.GetFiltersAsync(GetUserAndOrganization());
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            argsViewModel ??= new VideoLibraryFiltersArgsViewModel();
+
+            var argsDto = _mapper.Map<VideoLibraryFiltersArgsViewModel, VideoLibraryFiltersArgsDto>(argsViewModel);
+            SetOrganizationAndUser(argsDto);
+
+            var filtersDto = await _videoLibraryService.GetFiltersAsync(argsDto);
             var viewModel = _mapper.Map<VideoLibraryFiltersDto, VideoLibraryFiltersViewModel>(filtersDto);
 
             return Ok(viewModel);

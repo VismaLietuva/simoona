@@ -8,7 +8,11 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
 
         public int UncategorisedCount { get; set; }
 
+        public bool HasUncategorised { get; set; }
+
         public int RecentCount { get; set; }
+
+        public bool HasRecent { get; set; }
 
         public int TotalCount { get; set; }
     }
