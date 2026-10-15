@@ -1,25 +1,25 @@
 using System;
 using System.Linq;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Shrooms.Presentation.Api.Helpers
 {
     public class StringEnumSchemaFilter : ISchemaFilter
     {
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             var type = Nullable.GetUnderlyingType(context.Type) ?? context.Type;
-            if (!type.IsEnum)
+            if (!type.IsEnum || schema is not OpenApiSchema concrete)
             {
                 return;
             }
 
-            schema.Type = "string";
-            schema.Format = null;
-            schema.Enum = Enum.GetNames(type)
-                .Select(name => (IOpenApiAny)new OpenApiString(name))
+            concrete.Type = JsonSchemaType.String;
+            concrete.Format = null;
+            concrete.Enum = Enum.GetNames(type)
+                .Select(name => (JsonNode)JsonValue.Create(name))
                 .ToList();
         }
     }

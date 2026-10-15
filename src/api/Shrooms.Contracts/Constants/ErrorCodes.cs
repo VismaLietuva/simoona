@@ -22,6 +22,7 @@ namespace Shrooms.Contracts.Constants
         public const int KudosAlreadyApproved = 306;
         public const int KudosTypeAlreadyDisabled = 307;
         public const int KudosTypeNameAlreadyExists = 308;
+        public const int KudosTypeValueNotWhole = 309;
 
         // Wall, 4**
         public const int WallPostNotFoundCode = 402;

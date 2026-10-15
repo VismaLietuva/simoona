@@ -230,6 +230,19 @@ namespace Shrooms.Tests.DomainService
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfBasketIsActive(basket));
         }
 
+        [TestCase(0.5)]
+        [TestCase(10.01)]
+        public void Should_Throw_Kudos_Basket_Exception_If_Donation_Has_Cents(decimal amount)
+        {
+            Assert.Throws<KudosBasketException>(() => _kudosBasketValidator.CheckIfDonationIsWhole(amount));
+        }
+
+        [Test]
+        public void Should_Not_Throw_Kudos_Basket_Exception_If_Donation_Is_Whole()
+        {
+            Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfDonationIsWhole(10m));
+        }
+
         [Test]
         public void Should_Throw_Exception_If_Basket_Exists()
         {

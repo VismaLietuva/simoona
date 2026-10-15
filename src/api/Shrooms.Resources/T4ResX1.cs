@@ -6162,6 +6162,30 @@ namespace Shrooms.Resources.Widgets.KudosBasket {
         ///<summary>
         ///    <list type='bullet'>
         ///        <item>
+        ///            <description>Donations must be whole kudos</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string KudosBasketWholeKudosOnly => GetResourceString(KudosBasketWholeKudosOnlyKey);
+
+        /// <summary>
+        /// Resource key for <see cref="KudosBasketWholeKudosOnly"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string KudosBasketWholeKudosOnlyKey = "KudosBasketWholeKudosOnly";
+    }
+}
+
+namespace Shrooms.Resources.Widgets.KudosBasket {
+    public partial class KudosBasket {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
         ///            <description>Requested kudos basket does not exist</description>
         ///        </item>
         ///        <item>

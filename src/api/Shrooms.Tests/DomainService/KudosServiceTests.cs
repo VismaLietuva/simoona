@@ -741,6 +741,51 @@ namespace Shrooms.Tests.DomainService
             Assert.That(user.SpentKudos, Is.EqualTo(2));
         }
 
+        [TestCase(2429.92, 2060.92, 2430, 2061, 369)]
+        [TestCase(20, 0.4, 20, 0, 20)]
+        [TestCase(20.5, 0, 21, 0, 21)]
+        public async Task Should_Round_User_Profile_Kudos_To_Whole_Numbers(
+            decimal received,
+            decimal spent,
+            decimal expectedTotal,
+            decimal expectedSpent,
+            decimal expectedRemaining)
+        {
+            var user = new ApplicationUser
+            {
+                Id = "Id",
+                EmploymentDate = DateTime.UtcNow.AddDays(-10)
+            };
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog>
+            {
+                ProfileLog(1, KudosTypeEnum.Ordinary, received),
+                ProfileLog(2, KudosTypeEnum.Minus, spent)
+            }.AsQueryable());
+
+            await _kudosService.UpdateProfileKudosAsync(user, new UserAndOrganizationDto { OrganizationId = 1, UserId = "userId" });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(user.TotalKudos, Is.EqualTo(expectedTotal));
+                Assert.That(user.SpentKudos, Is.EqualTo(expectedSpent));
+                Assert.That(user.RemainingKudos, Is.EqualTo(expectedRemaining));
+            });
+        }
+
+        private static KudosLog ProfileLog(int id, KudosTypeEnum type, decimal points) =>
+            new()
+            {
+                Status = KudosStatus.Approved,
+                Id = id,
+                EmployeeId = "Id",
+                KudosTypeName = type.ToString(),
+                KudosSystemType = type,
+                OrganizationId = 1,
+                Created = DateTime.UtcNow,
+                Points = points
+            };
+
         #endregion
 
         #region AddKudosLogs
@@ -1150,6 +1195,24 @@ namespace Shrooms.Tests.DomainService
             Assert.That(updatedType.Value, Is.EqualTo(dto.Value));
             Assert.That(updatedType.Description, Is.EqualTo(dto.Description));
             await _uow.Received(1).SaveChangesAsync(dto.UserId);
+        }
+
+        [Test]
+        public void UpdateKudosType_WhenValueHasCents_ThrowsValidationException()
+        {
+            var dto = new KudosTypeDto
+            {
+                Id = 3,
+                Name = "AnythingElse",
+                Value = 2.5m,
+                UserId = "testUserId2",
+                OrganizationId = 2
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _kudosService.UpdateKudosTypeAsync(dto));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.KudosTypeValueNotWhole));
+            _uow.DidNotReceive().SaveChangesAsync(Arg.Any<string>());
         }
 
         #endregion
