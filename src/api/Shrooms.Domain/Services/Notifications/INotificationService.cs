@@ -11,7 +11,7 @@ namespace Shrooms.Domain.Services.Notifications
 {
     public interface INotificationService
     {
-        Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg);
+        Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg, bool includeRead);
 
         Task MarkAsReadAsync(UserAndOrganizationDto userOrg, IEnumerable<int> notificationIds);
 
