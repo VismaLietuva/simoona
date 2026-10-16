@@ -59,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             var childrenList = new List<OrganizationalStructureDto>();
 
             userList
-                .Where(user => user.ManagerId == head.Id)
+                .Where(user => user.ManagerId == head.Id && !user.IsManagingDirector)
                 .ForEach(user => childrenList.Add(MapUsersToOrganizationalStructureDto(user, userList)));
 
             return childrenList;
