@@ -51,7 +51,9 @@ namespace Shrooms.Tests.ModelMappings
         [Test]
         public void AdaptExtension_UsesTheSameDefaultsAsTheMapper()
         {
-            // Adapt() reads TypeAdapterConfig.GlobalSettings; MapsterSettings.Create() (run in SetUp) applies the defaults there too.
+            // Adapt() reads TypeAdapterConfig.GlobalSettings, which only ApplyToGlobalSettings() changes; Create() leaves it alone.
+            MapsterSettings.ApplyToGlobalSettings();
+
             var result = new Source { UserId = 7, Children = null }.Adapt<Destination>();
 
             Assert.That(result.UserID, Is.EqualTo(7));
@@ -86,13 +88,31 @@ namespace Shrooms.Tests.ModelMappings
         }
 
         [Test]
-        public void SameTypeMembers_AreAssignedByReference()
+        public void SameTypeObjects_AreAssignedByReference()
         {
             var shared = new Child { FirstName = "same" };
             var source = new Source { Same = shared };
 
             Assert.That(_autoMapper.Map<Destination>(source).Same, Is.SameAs(shared));
             Assert.That(_mapster.Map<Destination>(source).Same, Is.SameAs(shared));
+        }
+
+        [Test]
+        public void SameTypeCollections_AreShared_UnlikeAutoMapper()
+        {
+            // Known difference: ShallowCopyForSameType also shares same-type collections. AutoMapper builds a new
+            // collection holding the same elements. Only a caller that mutates the result can tell; MapsterParitySweep
+            // lists the members concerned for the phase 3 call-site review.
+            var source = new Source { Tags = new List<string> { "a" }, Shared = new List<Child> { new Child { FirstName = "c" } } };
+
+            var autoMapperResult = _autoMapper.Map<Destination>(source);
+            var mapsterResult = _mapster.Map<Destination>(source);
+
+            Assert.That(autoMapperResult.Tags, Is.Not.SameAs(source.Tags).And.EqualTo(source.Tags));
+            Assert.That(autoMapperResult.Shared, Is.Not.SameAs(source.Shared));
+            Assert.That(autoMapperResult.Shared[0], Is.SameAs(source.Shared[0]));
+            Assert.That(mapsterResult.Tags, Is.SameAs(source.Tags));
+            Assert.That(mapsterResult.Shared, Is.SameAs(source.Shared));
         }
 
         [Test]
@@ -209,6 +229,10 @@ namespace Shrooms.Tests.ModelMappings
             public List<Child> List { get; set; }
 
             public Child Same { get; set; }
+
+            public List<string> Tags { get; set; }
+
+            public List<Child> Shared { get; set; }
         }
 
         public class Destination
@@ -228,6 +252,10 @@ namespace Shrooms.Tests.ModelMappings
             public string Untouched { get; set; }
 
             public Child Same { get; set; }
+
+            public List<string> Tags { get; set; }
+
+            public List<Child> Shared { get; set; }
         }
 
         public class Node

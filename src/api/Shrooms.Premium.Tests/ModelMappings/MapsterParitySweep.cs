@@ -65,6 +65,8 @@ namespace Shrooms.Premium.Tests.ModelMappings
             var cyclicMapper = new MapsterMapper.Mapper(cyclicConfig);
 
             var rows = new List<string>();
+            var sharingRows = new List<string>();
+            var sharedMembers = 0;
             var totals = variants.ToDictionary(v => v.Name, _ => new SortedDictionary<string, int>());
             foreach (var typeMap in typeMaps)
             {
@@ -84,13 +86,19 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 var customMembers = CustomMembers(typeMap);
                 var cells = variants.Select(v => Compare(v.Mapper, source, typeMap, expected, noisePaths, customMembers, totals[v.Name])).ToList();
                 rows.Add(Row(typeMap, autoMapperCell, cells[0], cells[1]));
+
+                var sharing = SharingDifferences(source, typeMap, autoMapper, variants[1].Mapper);
+                if (sharing.Count > 0)
+                {
+                    sharingRows.Add($"| {Name(typeMap)} | {string.Join(", ", sharing)} |");
+                    sharedMembers += sharing.Count;
+                }
             }
 
             var cyclicRows = new List<string>();
             var cyclicTotals = new SortedDictionary<string, int>();
             foreach (var typeMap in selfReferencingMaps)
             {
-                TestContext.Progress.WriteLine("cyclic: " + Name(typeMap));
                 var source = Fill(typeMap.SourceType, 0);
                 if (source == null || CloseCycles(source, typeMap.SourceType) == 0)
                 {
@@ -114,11 +122,23 @@ namespace Shrooms.Premium.Tests.ModelMappings
             report.AppendLine($"{typeMaps.Count} AutoMapper type maps. Mapster runs by convention only (no registrations). " +
                               "Paths that differ between two AutoMapper runs (constructor GUIDs and timestamps) are left out.");
             report.AppendLine();
+            report.AppendLine("The comparison is on JSON, so it sees values, not identity: \"same\" means equal values. " +
+                              "Members where one library hands over the source instance and the other a copy are listed under Shared instances.");
+            report.AppendLine();
             foreach (var variant in variants)
             {
                 report.AppendLine($"- **{variant.Name}:** " + Summary(totals[variant.Name]));
             }
 
+            report.AppendLine();
+            report.AppendLine($"## Shared instances (MapsterSettings): {sharedMembers} members in {sharingRows.Count} maps");
+            report.AppendLine();
+            report.AppendLine("Same-type members whose reference identity differs between AutoMapper and Mapster. Harmless unless a caller " +
+                              "mutates the result; review these with the phase 3 call sites.");
+            report.AppendLine();
+            report.AppendLine("| Map | Members |");
+            report.AppendLine("|---|---|");
+            sharingRows.ForEach(r => report.AppendLine(r));
             report.AppendLine();
             report.AppendLine($"## Cyclic samples ({selfReferencingMaps.Count} self-referencing maps, MapsterSettings + PreserveReference)");
             report.AppendLine();
@@ -138,6 +158,61 @@ namespace Shrooms.Premium.Tests.ModelMappings
             File.WriteAllText(path, report.ToString());
             TestContext.Out.WriteLine(report.ToString());
             TestContext.Out.WriteLine("Report written to " + path);
+        }
+
+        // Same-name, same-type reference members where only one library returns the source instance (e.g. Mapster shares a
+        // List<string> AutoMapper copies). JSON cannot show this, so it is checked on the objects themselves.
+        private static List<string> SharingDifferences(object source, TypeMap typeMap, IMapper autoMapper, MapsterMapper.IMapper mapster)
+        {
+            object autoMapperResult;
+            object mapsterResult;
+            try
+            {
+                autoMapperResult = autoMapper.Map(source, typeMap.SourceType, typeMap.DestinationType);
+                mapsterResult = mapster.Map(source, typeMap.SourceType, typeMap.DestinationType);
+            }
+            catch (Exception)
+            {
+                return new List<string>();
+            }
+
+            var differences = new List<string>();
+            if (autoMapperResult == null || mapsterResult == null)
+            {
+                return differences;
+            }
+
+            foreach (var destination in typeMap.DestinationType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var sourceProperty = typeMap.SourceType.GetProperty(destination.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (sourceProperty == null || sourceProperty.PropertyType != destination.PropertyType || destination.PropertyType.IsValueType
+                    || destination.PropertyType == typeof(string) || destination.GetIndexParameters().Length > 0 || destination.GetMethod == null)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var sourceValue = sourceProperty.GetValue(source);
+                    if (sourceValue == null)
+                    {
+                        continue;
+                    }
+
+                    var autoMapperShares = ReferenceEquals(sourceValue, destination.GetValue(autoMapperResult));
+                    var mapsterShares = ReferenceEquals(sourceValue, destination.GetValue(mapsterResult));
+                    if (autoMapperShares != mapsterShares)
+                    {
+                        differences.Add(mapsterShares ? $"{destination.Name} (Mapster shares, AutoMapper copies)" : $"{destination.Name} (AutoMapper shares, Mapster copies)");
+                    }
+                }
+                catch (TargetInvocationException)
+                {
+                    // Computed getter that throws on sample data: nothing to compare.
+                }
+            }
+
+            return differences;
         }
 
         private static bool TryMapWithAutoMapper(IMapper autoMapper, object source, TypeMap typeMap, out JToken expected, out List<string> noisePaths, out string cell)
