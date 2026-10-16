@@ -329,8 +329,15 @@ namespace Shrooms.Domain.Services.Projects
                 return true;
             }
 
+            if (user.IsManagingDirector)
+            {
+                return user.Id != manager.Id;
+            }
+
+            var visitedIds = new HashSet<string>();
+
             // ReSharper disable once PossibleNullReferenceException
-            while (manager.Id != user.Id && manager.ManagerId != null && manager.ManagerId != manager.Id)
+            while (manager.Id != user.Id && !manager.IsManagingDirector && manager.ManagerId != null && manager.ManagerId != manager.Id && visitedIds.Add(manager.Id))
             {
                 manager = await _usersDbSet.FindAsync(manager.ManagerId);
             }
@@ -340,7 +347,7 @@ namespace Shrooms.Domain.Services.Projects
                 return false;
             }
 
-            if (manager.ManagerId == null || (manager.Id == manager.ManagerId && manager.UserName == DataLayerConstants.OrganizationManagerUsername))
+            if (manager.IsManagingDirector || manager.ManagerId == null || (manager.Id == manager.ManagerId && manager.UserName == DataLayerConstants.OrganizationManagerUsername))
             {
                 return true;
             }
