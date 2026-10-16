@@ -3925,6 +3925,345 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("SyncTokens");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeCustomer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeCustomers_OrganizationId_Name")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("TimeCustomers", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Minutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("OrganizationId", "UserId", "Date")
+                        .HasDatabaseName("IX_TimeEntries_OrganizationId_UserId_Date");
+
+                    b.HasIndex("UserId", "TaskId", "Date")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeEntries_UserId_TaskId_Date");
+
+                    b.ToTable("TimeEntries", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeMonthLock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LockedById")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Month")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LockedById");
+
+                    b.HasIndex("OrganizationId", "Month")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeMonthLocks_OrganizationId_Month");
+
+                    b.ToTable("TimeMonthLocks", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimePeriod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Month")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PreviousStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Month")
+                        .HasDatabaseName("IX_TimePeriods_OrganizationId_Month");
+
+                    b.HasIndex("UserId", "Month")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimePeriods_UserId_Month");
+
+                    b.ToTable("TimePeriods", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeProjects_CustomerId_Name")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("OrganizationId", "IsArchived")
+                        .HasDatabaseName("IX_TimeProjects_OrganizationId_IsArchived");
+
+                    b.ToTable("TimeProjects", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProjectMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAutoFill")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("OrganizationId", "UserId")
+                        .HasDatabaseName("IX_TimeProjectMembers_OrganizationId_UserId");
+
+                    b.HasIndex("ProjectId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeProjectMembers_ProjectId_UserId");
+
+                    b.ToTable("TimeProjectMembers", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProjectId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TimeTasks_ProjectId_Name")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("TimeTasks", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VacationPage", b =>
                 {
                     b.Property<int>("Id")
@@ -5994,6 +6333,155 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeCustomer", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeEntry", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeTask", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeMonthLock", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "LockedBy")
+                        .WithMany()
+                        .HasForeignKey("LockedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LockedBy");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimePeriod", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeCustomer", "Customer")
+                        .WithMany("Projects")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProjectMember", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", "Project")
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeTask", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", "Project")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VacationPage", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
@@ -6335,6 +6823,18 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Releases");
 
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeCustomer", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeProject", b =>
+                {
+                    b.Navigation("Members");
+
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
