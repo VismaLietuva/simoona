@@ -55,6 +55,10 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
 
         private BlobClient GetBlobClient(string blobKey, string containerName)
         {
+            // Blob names may contain "/"; Simoona keys never do.
+            BlobKeyGuard.EnsureSafeContainer(containerName);
+            BlobKeyGuard.EnsureSafeBlobKey(blobKey);
+
             var blobServiceClient = new BlobServiceClient(_settings.StorageConnectionString);
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
             return containerClient.GetBlobClient(blobKey);

@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
@@ -45,7 +44,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(KudosServiceHelper.TypeFilter(filter.FilteringType))
                 .SelectMany(log => _userDbSet.Where(user => user.Id == log.CreatedBy).DefaultIfEmpty(), KudosServiceHelper.MapKudosLogsToDto());
 
-            var sortedLogs = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(
+            var sortedLogs = SafeQuery.OrderBy(
                 logsQuery.AsQueryable(),
                 string.Concat(filter.SortBy, " ", filter.SortOrder, ", Id ", filter.SortOrder));
 

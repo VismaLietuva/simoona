@@ -2,7 +2,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Infrastructure;
 using System;
 using System.Linq;
-using System.Linq.Dynamic.Core;
+using Shrooms.Contracts.DAL;
 using System.Reflection;
 
 namespace Shrooms.Domain.Extensions
@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Extensions
             // Removing last comma
             orderString = orderString.Substring(0, orderString.Length - 1);
 
-            return System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(query, orderString);
+            return SafeQuery.OrderBy(query, orderString);
         }
 
         private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query, string sortDirection)
@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Extensions
                     .GetProperties(Flags)
                     .FirstOrDefault();
 
-            return System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(query, $"{firstProperty.Name} {sortDirection}");
+            return SafeQuery.OrderBy(query, $"{firstProperty.Name} {sortDirection}");
         }
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
