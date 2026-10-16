@@ -27,5 +27,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 
         [ForeignKey(nameof(WallId))]
         public virtual Wall Wall { get; set; }
+
+        public Guid Version { get; set; }
     }
 }

@@ -28,6 +28,7 @@ namespace Shrooms.Tests.DomainService
 
         private static readonly DateTime _now = new DateTime(2026, 10, 16, 8, 0, 0, DateTimeKind.Utc);
 
+        private DbContextOptions<ShroomsDbContext> _options;
         private ShroomsDbContext _dbContext;
         private IPostService _postService;
         private IJobScheduler _jobScheduler;
@@ -38,10 +39,10 @@ namespace Shrooms.Tests.DomainService
         [SetUp]
         public void TestInitializer()
         {
-            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+            _options = new DbContextOptionsBuilder<ShroomsDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-            _dbContext = new ShroomsDbContext(options);
+            _dbContext = new ShroomsDbContext(_options);
 
             _wall = new Wall
             {
@@ -197,9 +198,9 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Skip_A_Post_That_Was_Rescheduled_Later()
+        public async Task Should_Wait_Again_For_A_Post_That_Is_Not_Due_Yet()
         {
-            var id = await AddDuePostAsync(_now.AddHours(1));
+            var id = await AddDuePostAsync(_now.AddSeconds(30));
 
             var published = await _service.PublishDueAsync(id);
 
@@ -209,6 +210,78 @@ namespace Shrooms.Tests.DomainService
                 Assert.That(_dbContext.Set<ScheduledPost>().Any(), Is.True);
             });
             await _postService.DidNotReceive().CreateNewPostAsync(Arg.Any<NewPostDto>());
+            _jobScheduler.Received(1).Schedule(
+                Arg.Any<Expression<Func<IScheduledPostPublisher, Task>>>(),
+                new DateTimeOffset(_now.AddSeconds(30), TimeSpan.Zero));
+        }
+
+        [Test]
+        public async Task Should_Not_Publish_A_Post_Edited_While_It_Was_Being_Published()
+        {
+            var id = await AddDuePostAsync(_now);
+            _postService.CreateNewPostAsync(Arg.Any<NewPostDto>()).Returns(async _ =>
+            {
+                await using (var editor = new ShroomsDbContext(_options))
+                {
+                    var row = await editor.Set<ScheduledPost>().SingleAsync();
+                    row.MessageBody = "Edited";
+                    row.Version = Guid.NewGuid();
+                    await editor.SaveChangesAsync(false);
+                }
+
+                await _dbContext.SaveChangesAsync(false);
+                return new NewlyCreatedPostDto { Id = 42 };
+            });
+
+            Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => _service.PublishDueAsync(id));
+        }
+
+        [Test]
+        public void Should_Not_Keep_A_Post_Whose_Job_Could_Not_Be_Scheduled()
+        {
+            _jobScheduler.Schedule(Arg.Any<Expression<Func<IScheduledPostPublisher, Task>>>(), Arg.Any<DateTimeOffset>())
+                .Throws(new InvalidOperationException("Hangfire is down"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(NewPost("Hello", _now.AddDays(1))));
+
+            Assert.That(_dbContext.Set<ScheduledPost>().Any(), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Old_Job_When_The_New_One_Cannot_Be_Scheduled()
+        {
+            var created = await _service.CreateAsync(NewPost("Hello", _now.AddDays(1)));
+            _jobScheduler.Schedule(Arg.Any<Expression<Func<IScheduledPostPublisher, Task>>>(), Arg.Any<DateTimeOffset>())
+                .Throws(new InvalidOperationException("Hangfire is down"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(() => _service.EditAsync(EditPost(created.Id, "Hello", _now.AddDays(3))));
+
+            _jobScheduler.DidNotReceive().Delete(Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Publish_Now_And_Leave_The_Old_Job_To_Find_Nothing()
+        {
+            var created = await _service.CreateAsync(NewPost("Hello", _now.AddDays(1)));
+
+            var published = await _service.PublishNowAsync(created.Id, UserOrg(Author));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(published.Id, Is.EqualTo(42));
+                Assert.That(_dbContext.Set<ScheduledPost>().Any(), Is.False);
+            });
+            _jobScheduler.DidNotReceive().Delete(Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Return_Stored_Times_As_Utc()
+        {
+            await AddDuePostAsync(DateTime.SpecifyKind(_now.AddDays(1), DateTimeKind.Unspecified));
+
+            var post = (await _service.GetScheduledPostsAsync(_wall.Id, UserOrg(Author))).Single();
+
+            Assert.That(post.ScheduledFor.Kind, Is.EqualTo(DateTimeKind.Utc));
         }
 
         [Test]

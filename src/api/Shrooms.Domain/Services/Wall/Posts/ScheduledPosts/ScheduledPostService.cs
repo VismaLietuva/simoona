@@ -17,8 +17,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
 {
     public class ScheduledPostService : IScheduledPostService
     {
-        private static readonly TimeSpan _dueTolerance = TimeSpan.FromMinutes(1);
-
         private readonly IUnitOfWork2 _uow;
         private readonly IPostService _postService;
         private readonly IJobScheduler _jobScheduler;
@@ -65,13 +63,24 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
                 WallId = wall.Id,
                 MessageBody = dto.MessageBody,
                 Images = new ImageCollection(dto.Images),
-                ScheduledFor = scheduledFor
+                ScheduledFor = scheduledFor,
+                Version = Guid.NewGuid()
             };
 
             _scheduledPostsDbSet.Add(scheduledPost);
             await _uow.SaveChangesAsync(dto.UserId);
 
-            scheduledPost.JobId = ScheduleJob(scheduledPost);
+            try
+            {
+                scheduledPost.JobId = ScheduleJob(scheduledPost);
+            }
+            catch
+            {
+                _scheduledPostsDbSet.Remove(scheduledPost);
+                await _uow.SaveChangesAsync(dto.UserId);
+                throw;
+            }
+
             await _uow.SaveChangesAsync(dto.UserId);
 
             return MapToDto(scheduledPost, wall.Name);
@@ -86,17 +95,25 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
 
             scheduledPost.MessageBody = dto.MessageBody;
             scheduledPost.Images = new ImageCollection(dto.Images);
+            scheduledPost.Version = Guid.NewGuid();
 
-            if (scheduledPost.ScheduledFor != scheduledFor)
+            var previousJobId = scheduledPost.JobId;
+            var isRescheduled = scheduledPost.ScheduledFor != scheduledFor;
+
+            if (isRescheduled)
             {
                 EnsureInFuture(scheduledFor);
 
-                _jobScheduler.Delete(scheduledPost.JobId);
                 scheduledPost.ScheduledFor = scheduledFor;
                 scheduledPost.JobId = ScheduleJob(scheduledPost);
             }
 
             await _uow.SaveChangesAsync(dto.UserId);
+
+            if (isRescheduled)
+            {
+                _jobScheduler.Delete(previousJobId);
+            }
 
             return MapToDto(scheduledPost, scheduledPost.Wall.Name);
         }
@@ -105,17 +122,15 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
         {
             var scheduledPost = await GetOwnScheduledPostAsync(id, userOrg);
 
-            _jobScheduler.Delete(scheduledPost.JobId);
             _scheduledPostsDbSet.Remove(scheduledPost);
-
             await _uow.SaveChangesAsync(userOrg.UserId);
+
+            _jobScheduler.Delete(scheduledPost.JobId);
         }
 
         public async Task<NewlyCreatedPostDto> PublishNowAsync(int id, UserAndOrganizationDto userOrg)
         {
             var scheduledPost = await GetOwnScheduledPostAsync(id, userOrg);
-
-            _jobScheduler.Delete(scheduledPost.JobId);
 
             return await PublishAsync(scheduledPost);
         }
@@ -124,8 +139,14 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
         {
             var scheduledPost = await _scheduledPostsDbSet.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (scheduledPost == null || scheduledPost.ScheduledFor > _systemClock.UtcNow.Add(_dueTolerance))
+            if (scheduledPost == null)
             {
+                return null;
+            }
+
+            if (scheduledPost.ScheduledFor > _systemClock.UtcNow)
+            {
+                ScheduleJob(scheduledPost);
                 return null;
             }
 
@@ -210,7 +231,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
                 WallName = wallName,
                 MessageBody = scheduledPost.MessageBody,
                 Images = scheduledPost.Images,
-                ScheduledFor = scheduledPost.ScheduledFor
+                ScheduledFor = DateTime.SpecifyKind(scheduledPost.ScheduledFor, DateTimeKind.Utc)
             };
         }
     }

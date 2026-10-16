@@ -14,6 +14,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             builder.Property(x => x.Created).HasColumnType("datetime2");
             builder.Property(x => x.Modified).HasColumnType("datetime2");
             builder.Property(x => x.ScheduledFor).HasColumnType("datetime2");
+            builder.Property(x => x.Version).IsConcurrencyToken();
 
             builder.OwnsOne(x => x.Images, b => b.Property(x => x.Serialized).HasColumnName("Images"));
 

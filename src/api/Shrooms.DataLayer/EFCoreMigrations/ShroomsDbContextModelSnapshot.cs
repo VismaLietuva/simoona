@@ -2507,6 +2507,10 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<DateTime>("ScheduledFor")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("WallId")
                         .HasColumnType("int");
 
