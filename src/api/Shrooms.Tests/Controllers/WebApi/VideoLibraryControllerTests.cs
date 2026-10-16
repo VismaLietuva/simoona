@@ -119,7 +119,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Filters_Should_Return_Whole_Library_Counts()
         {
-            _videoLibraryService.GetFiltersAsync(Arg.Any<UserAndOrganizationDto>())
+            _videoLibraryService.GetFiltersAsync(Arg.Any<VideoLibraryFiltersArgsDto>())
                 .Returns(new VideoLibraryFiltersDto
                 {
                     Types = new[] { new VideoTypeDto { Id = 3, Title = "All-Hands meetings", VideoCount = 7 } },
@@ -127,7 +127,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                     TotalCount = 9
                 });
 
-            var result = await _videoLibraryController.Filters();
+            var result = await _videoLibraryController.Filters(new VideoLibraryFiltersArgsViewModel());
 
             Assert.That(result, Is.InstanceOf<OkObjectResult>());
 
@@ -136,6 +136,41 @@ namespace Shrooms.Tests.Controllers.WebApi
             Assert.That(filters.TotalCount, Is.EqualTo(9));
             Assert.That(filters.UncategorisedCount, Is.EqualTo(2));
             Assert.That(filters.Types.Single().VideoCount, Is.EqualTo(7));
+        }
+
+        [Test]
+        public async Task Filters_Should_Pass_The_Search_And_Period_To_The_Service()
+        {
+            _videoLibraryService.GetFiltersAsync(Arg.Any<VideoLibraryFiltersArgsDto>())
+                .Returns(new VideoLibraryFiltersDto { Types = Array.Empty<VideoTypeDto>() });
+
+            await _videoLibraryController.Filters(new VideoLibraryFiltersArgsViewModel
+            {
+                Search = "hub",
+                From = new DateOnly(2024, 1, 1),
+                To = new DateOnly(2024, 12, 31)
+            });
+
+            await _videoLibraryService.Received(1).GetFiltersAsync(Arg.Is<VideoLibraryFiltersArgsDto>(a =>
+                a.Search == "hub" &&
+                a.From == new DateOnly(2024, 1, 1) &&
+                a.To == new DateOnly(2024, 12, 31)));
+        }
+
+        [Test]
+        public async Task Filters_Should_Reject_A_Period_That_Ends_Before_It_Starts()
+        {
+            var argsViewModel = new VideoLibraryFiltersArgsViewModel
+            {
+                From = new DateOnly(2024, 12, 31),
+                To = new DateOnly(2024, 1, 1)
+            };
+            _videoLibraryController.Validate(argsViewModel);
+
+            var result = await _videoLibraryController.Filters(argsViewModel);
+
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            await _videoLibraryService.DidNotReceive().GetFiltersAsync(Arg.Any<VideoLibraryFiltersArgsDto>());
         }
 
         private void StubPage(int totalItemCount, int pageSize)
