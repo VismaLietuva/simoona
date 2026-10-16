@@ -34,6 +34,8 @@ namespace Shrooms.Contracts.Constants
 
         // Post, 5**
         public const int UserIsNotAMemberOfWall = 501;
+        public const int ScheduledPostTimeInPast = 502;
+        public const int ScheduledPostContentInvalid = 503;
 
         // Know Your Speaker, 8**
         public const int GameAlreadyFinished = 801;
