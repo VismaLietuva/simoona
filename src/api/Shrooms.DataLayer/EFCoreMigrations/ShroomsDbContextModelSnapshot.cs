@@ -2469,6 +2469,63 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("PostWatchers", "dbo");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Multiwall.ScheduledPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MessageBody")
+                        .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ScheduledFor")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("WallId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("WallId");
+
+                    b.HasIndex("OrganizationId", "AuthorId", "WallId")
+                        .HasDatabaseName("IX_ScheduledPosts_OrganizationId_AuthorId_WallId");
+
+                    b.ToTable("ScheduledPosts", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall", b =>
                 {
                     b.Property<int>("Id")
@@ -5459,6 +5516,53 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Post");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Multiwall.ScheduledPost", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall", "Wall")
+                        .WithMany()
+                        .HasForeignKey("WallId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("Shrooms.DataLayer.EntityModels.Models.ImageCollection", "Images", b1 =>
+                        {
+                            b1.Property<int>("ScheduledPostId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Serialized")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Images");
+
+                            b1.HasKey("ScheduledPostId");
+
+                            b1.ToTable("ScheduledPosts");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ScheduledPostId");
+                        });
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Images")
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Wall");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall", b =>
