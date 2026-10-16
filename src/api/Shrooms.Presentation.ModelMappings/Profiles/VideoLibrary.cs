@@ -26,6 +26,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<VideoLibraryItemViewModel, VideoLibraryItemDto>(MemberList.None);
             CreateMap<NewVideoLibraryItemViewModel, VideoLibraryItemDto>(MemberList.None);
             CreateMap<VideoLibraryListArgsViewModel, VideoLibraryListArgsDto>(MemberList.None);
+            CreateMap<VideoLibraryFiltersArgsViewModel, VideoLibraryFiltersArgsDto>(MemberList.None);
         }
     }
 }

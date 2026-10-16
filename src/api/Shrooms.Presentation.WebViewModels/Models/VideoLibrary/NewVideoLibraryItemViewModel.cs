@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 
@@ -18,6 +19,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
 
         [StringLength(VideoLibraryItem.MaxPictureIdLength)]
         public string PictureId { get; set; }
+
+        public DateOnly? RecordedOn { get; set; }
 
         public int? VideoTypeId { get; set; }
     }

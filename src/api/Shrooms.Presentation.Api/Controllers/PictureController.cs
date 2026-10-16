@@ -41,13 +41,21 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             await using var stream = file.OpenReadStream();
-            var pictureName = await _pictureService.UploadFromStreamAsync(
-                stream,
-                file.ContentType,
-                file.FileName,
-                GetUserAndOrganization().OrganizationId);
 
-            return Ok(pictureName);
+            try
+            {
+                var pictureName = await _pictureService.UploadFromStreamAsync(
+                    stream,
+                    file.ContentType,
+                    file.FileName,
+                    GetUserAndOrganization().OrganizationId);
+
+                return Ok(pictureName);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // Stores the upload byte-for-byte after lightweight validation. For consumers

@@ -113,13 +113,17 @@ namespace Shrooms.Contracts.Constants
         public const int VacationParentalHoursOnly = 1922;
         public const int VacationParentalTypeInvalid = 1923;
 
-        // Time registration, 20**
-        public const int TimeRegistrationNotFound = 2000;
-        public const int TimeRegistrationInvalid = 2001;
-        public const int TimeRegistrationDuplicate = 2002;
-        public const int TimeRegistrationNotEditable = 2003;
-        public const int TimeRegistrationLocked = 2004;
-        public const int TimeRegistrationWrongStatus = 2005;
-        public const int TimeRegistrationInUse = 2006;
+        // Video library, 20**
+        public const int VideoLinkInvalid = 2000;
+        public const int VideoRecordedInFuture = 2001;
+
+        // Time registration, 21**
+        public const int TimeRegistrationNotFound = 2100;
+        public const int TimeRegistrationInvalid = 2101;
+        public const int TimeRegistrationDuplicate = 2102;
+        public const int TimeRegistrationNotEditable = 2103;
+        public const int TimeRegistrationLocked = 2104;
+        public const int TimeRegistrationWrongStatus = 2105;
+        public const int TimeRegistrationInUse = 2106;
     }
 }

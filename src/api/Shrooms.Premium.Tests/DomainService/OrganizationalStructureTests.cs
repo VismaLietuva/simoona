@@ -53,6 +53,19 @@ namespace Shrooms.Premium.Tests.DomainService
             ClassicAssert.AreEqual("Name6 Surname6", result.Children.ToArray()[1].Children.First().FullName);
         }
 
+        [Test]
+        public async Task Should_Keep_Managing_Director_On_Top_When_They_Report_To_Own_Subordinate()
+        {
+            var users = MockUsers().ToList();
+            users.First(user => user.IsManagingDirector).ManagerId = "2";
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
+
+            var result = await _organizationalStructureService.GetOrganizationalStructureAsync(new UserAndOrganizationDto { OrganizationId = 1, UserId = "0" });
+
+            ClassicAssert.AreEqual("1", result.Id);
+            CollectionAssert.AreEqual(new[] { "4" }, result.Children.First(child => child.Id == "2").Children.Select(child => child.Id));
+        }
+
         private static void MockRoleService(IRoleService roleService)
         {
             var newRoleId = Guid.NewGuid().ToString();

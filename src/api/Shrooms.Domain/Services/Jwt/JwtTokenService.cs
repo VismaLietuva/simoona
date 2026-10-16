@@ -17,6 +17,9 @@ namespace Shrooms.Domain.Services.Jwt
 {
     public class JwtTokenService : IJwtTokenService
     {
+        public const string DefaultIssuer = "Simoona";
+        public const string DefaultAudience = "Simoona";
+
         private readonly ShroomsUserManager _userManager;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork2 _uow;
@@ -64,7 +67,12 @@ namespace Shrooms.Domain.Services.Jwt
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.UtcNow.AddHours(hours);
 
+            var issuer = _configuration["JwtIssuer"] ?? DefaultIssuer;
+            var audience = _configuration["JwtAudience"] ?? DefaultAudience;
+
             var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
                 expires: expires,
                 signingCredentials: creds);

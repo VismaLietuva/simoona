@@ -97,6 +97,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPost]
         [Route("Create")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(typeof(CreateLotteryViewModel), StatusCodes.Status200OK)]
         [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> CreateLottery(CreateLotteryViewModel createViewModel)
@@ -122,6 +123,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Abort")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> Abort(int id)
@@ -166,6 +168,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Refund")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RefundParticipants(int id)
         {
@@ -186,6 +189,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPut]
         [Route("UpdateDrafted")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(typeof(EditDraftedLotteryViewModel), StatusCodes.Status200OK)]
         [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
@@ -211,6 +215,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("UpdateStarted")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(typeof(EditStartedLotteryViewModel), StatusCodes.Status200OK)]
         [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
@@ -236,6 +241,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Finish")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [InvalidatesWidgetCache(WidgetCacheTag.LotteryWidget)]
         public async Task<IActionResult> FinishLottery(int id)
