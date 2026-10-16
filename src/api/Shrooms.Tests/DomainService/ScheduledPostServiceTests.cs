@@ -52,6 +52,7 @@ namespace Shrooms.Tests.DomainService
                 Access = WallAccess.Public
             };
             _dbContext.Set<Wall>().Add(_wall);
+            _dbContext.Set<ApplicationUser>().Add(new ApplicationUser { Id = Author, UserName = Author, OrganizationId = 1 });
             _dbContext.SaveChanges(false);
 
             _postService = Substitute.For<IPostService>();
@@ -234,6 +235,24 @@ namespace Shrooms.Tests.DomainService
             });
 
             Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => _service.PublishDueAsync(id));
+        }
+
+        [Test]
+        public async Task Should_Drop_A_Due_Post_Whose_Author_Was_Deleted()
+        {
+            var id = await AddDuePostAsync(_now);
+            var author = await _dbContext.Set<ApplicationUser>().SingleAsync(user => user.Id == Author);
+            author.IsDeleted = true;
+            await _dbContext.SaveChangesAsync(false);
+
+            var published = await _service.PublishDueAsync(id);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(published, Is.Null);
+                Assert.That(_dbContext.Set<ScheduledPost>().Any(), Is.False);
+            });
+            await _postService.DidNotReceive().CreateNewPostAsync(Arg.Any<NewPostDto>());
         }
 
         [Test]

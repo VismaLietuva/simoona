@@ -23,6 +23,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
         private readonly ISystemClock _systemClock;
         private readonly DbSet<ScheduledPost> _scheduledPostsDbSet;
         private readonly DbSet<WallEntity> _wallsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         public ScheduledPostService(IUnitOfWork2 uow, IPostService postService, IJobScheduler jobScheduler, ISystemClock systemClock)
         {
@@ -32,6 +33,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
             _systemClock = systemClock;
             _scheduledPostsDbSet = uow.GetDbSet<ScheduledPost>();
             _wallsDbSet = uow.GetDbSet<WallEntity>();
+            _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
         public async Task<IEnumerable<ScheduledPostDto>> GetScheduledPostsAsync(int? wallId, UserAndOrganizationDto userOrg)
@@ -156,6 +158,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
         private async Task<NewlyCreatedPostDto> PublishAsync(ScheduledPost scheduledPost)
         {
             _scheduledPostsDbSet.Remove(scheduledPost);
+
+            if (!await _usersDbSet.AnyAsync(x => x.Id == scheduledPost.AuthorId && x.OrganizationId == scheduledPost.OrganizationId))
+            {
+                await _uow.SaveChangesAsync(scheduledPost.AuthorId);
+
+                return null;
+            }
 
             try
             {

@@ -132,7 +132,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 return true;
             }
 
-            var wall = await _wallService.GetWallAsync(wallId, userAndOrg);
+            var wall = await _wallService.GetWallAsync(wallId, userAndOrg)
+                ?? throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
 
             return wall.Type == WallType.Events || wall.Type == WallType.Polls;
         }
