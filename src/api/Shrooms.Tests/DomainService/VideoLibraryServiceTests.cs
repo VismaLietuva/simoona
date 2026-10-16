@@ -400,6 +400,32 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Count_Zero_When_Nothing_Matches_The_Filters()
+        {
+            _videos.First(v => v.Id == 2).Created = Now.AddDays(-1);
+
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs(search: "no such video"));
+
+            Assert.That(filters.TotalCount, Is.EqualTo(0));
+            Assert.That(filters.UncategorisedCount, Is.EqualTo(0));
+            Assert.That(filters.RecentCount, Is.EqualTo(0));
+            Assert.That(filters.HasUncategorised, Is.True);
+            Assert.That(filters.HasRecent, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Report_An_Empty_Library()
+        {
+            _videos.RemoveAll(v => v.OrganizationId == TestConstants.DefaultOrganizationId);
+
+            var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());
+
+            Assert.That(filters.TotalCount, Is.EqualTo(0));
+            Assert.That(filters.HasUncategorised, Is.False);
+            Assert.That(filters.HasRecent, Is.False);
+        }
+
+        [Test]
         public async Task Should_Not_Offer_A_Filter_For_Another_Organizations_Type()
         {
             var filters = await _videoLibraryService.GetFiltersAsync(FiltersArgs());

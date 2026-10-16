@@ -37,13 +37,16 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
         public async Task<IPagedList<VideoLibraryItemDto>> GetVideosAsync(VideoLibraryListArgsDto args)
         {
+            // One cutoff for both the "recently added" filter and each video's IsNew.
+            var since = RecentSince();
+
             var filtered = _videosDbSet
                 .Where(v => v.OrganizationId == args.OrganizationId)
                 .Where(BuildTypeFilter(args))
                 .Where(BuildSearchFilter(args))
                 .Where(BuildRecordedFromFilter(args))
                 .Where(BuildRecordedToFilter(args))
-                .Where(BuildRecentFilter(args));
+                .Where(BuildRecentFilter(args, since));
 
             var ordered = args.Recent
                 ? filtered
@@ -54,7 +57,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                     .ThenByDescending(v => v.Created)
                     .ThenByDescending(v => v.Id);
 
-            var query = ordered.Select(MapVideoToDto(RecentSince()));
+            var query = ordered.Select(MapVideoToDto(since));
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -86,6 +89,27 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 .Select(t => new { t.Id, t.Title })
                 .ToListAsync();
 
+            // One aggregate each for the filtered counts and the whole-library flags,
+            // rather than a round trip per number. No row comes back for an empty set.
+            var matchingCounts = await matching
+                .GroupBy(v => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Uncategorised = g.Count(v => v.VideoTypeId == null),
+                    Recent = g.Count(v => v.Created >= since)
+                })
+                .FirstOrDefaultAsync();
+
+            var libraryCounts = await library
+                .GroupBy(v => 1)
+                .Select(g => new
+                {
+                    Uncategorised = g.Count(v => v.VideoTypeId == null),
+                    Recent = g.Count(v => v.Created >= since)
+                })
+                .FirstOrDefaultAsync();
+
             return new VideoLibraryFiltersDto
             {
                 Types = typesInUse
@@ -96,11 +120,11 @@ namespace Shrooms.Domain.Services.VideoLibrary
                         VideoCount = countsByType.GetValueOrDefault(t.Id)
                     })
                     .ToList(),
-                UncategorisedCount = await matching.CountAsync(v => v.VideoTypeId == null),
-                HasUncategorised = await library.AnyAsync(v => v.VideoTypeId == null),
-                RecentCount = await matching.CountAsync(v => v.Created >= since),
-                HasRecent = await library.AnyAsync(v => v.Created >= since),
-                TotalCount = await matching.CountAsync()
+                UncategorisedCount = matchingCounts?.Uncategorised ?? 0,
+                HasUncategorised = libraryCounts?.Uncategorised > 0,
+                RecentCount = matchingCounts?.Recent ?? 0,
+                HasRecent = libraryCounts?.Recent > 0,
+                TotalCount = matchingCounts?.Total ?? 0
             };
         }
 
@@ -164,14 +188,12 @@ namespace Shrooms.Domain.Services.VideoLibrary
             return _systemClock.UtcNow.AddDays(-RecentVideoDays);
         }
 
-        private Expression<Func<VideoLibraryItem, bool>> BuildRecentFilter(VideoLibraryListArgsDto args)
+        private static Expression<Func<VideoLibraryItem, bool>> BuildRecentFilter(VideoLibraryListArgsDto args, DateTime since)
         {
             if (!args.Recent)
             {
                 return video => true;
             }
-
-            var since = RecentSince();
 
             return video => video.Created >= since;
         }
