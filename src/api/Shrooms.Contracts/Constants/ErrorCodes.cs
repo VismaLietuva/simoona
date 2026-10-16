@@ -112,5 +112,9 @@ namespace Shrooms.Contracts.Constants
         public const int VacationParentalLimit = 1921;
         public const int VacationParentalHoursOnly = 1922;
         public const int VacationParentalTypeInvalid = 1923;
+
+        // Video library, 20**
+        public const int VideoLinkInvalid = 2000;
+        public const int VideoRecordedInFuture = 2001;
     }
 }

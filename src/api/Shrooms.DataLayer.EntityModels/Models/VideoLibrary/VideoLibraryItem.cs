@@ -1,3 +1,5 @@
+using System;
+
 namespace Shrooms.DataLayer.EntityModels.Models.VideoLibrary
 {
     public class VideoLibraryItem : SoftDeletableModelWithOrg
@@ -14,6 +16,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.VideoLibrary
         public string Description { get; set; }
 
         public string PictureId { get; set; }
+
+        public DateOnly RecordedOn { get; set; }
 
         public int? VideoTypeId { get; set; }
 
