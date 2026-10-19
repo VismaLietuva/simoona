@@ -135,11 +135,12 @@ namespace Shrooms.Domain.Services.Notifications
                 .Where(w => w.UserId == userOrg.UserId);
 
             query = includeRead
-                ? query.Where(w => w.Notification.Created >= since)
+                ? query.Where(w => w.Notification.Created >= since || !w.IsAlreadySeen)
                 : query.Where(w => !w.IsAlreadySeen);
 
             var result = await query
-                             .OrderByDescending(o => o.Notification.Created)
+                             .OrderBy(o => o.IsAlreadySeen)
+                             .ThenByDescending(o => o.Notification.Created)
                              .Take(BusinessLayerConstants.MaxNotificationsToShow)
                              .ToListAsync();
 
