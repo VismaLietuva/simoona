@@ -11,6 +11,10 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
     {
         Task<bool> IsAccountantAsync(UserAndOrganizationDto viewer);
 
+        Task InUserMonthAsync(int organizationId, DateTime month, string userId, Func<Task> work);
+
+        Task InMonthAsync(int organizationId, DateTime month, Func<Task> work);
+
         Task<TimeActor> ResolveAsync(UserAndOrganizationDto viewer, string employeeId);
 
         Task<DateTime> TodayAsync(int organizationId);

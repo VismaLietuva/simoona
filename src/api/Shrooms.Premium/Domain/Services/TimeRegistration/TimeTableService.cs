@@ -126,8 +126,77 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public async Task SaveEntriesAsync(string month, string employeeId, IList<TimeEntryChangeDto> changes, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
-            var last = TimeMonth.LastDay(first);
             var actor = await _support.ResolveAsync(userOrg, employeeId);
+            await _support.InUserMonthAsync(actor.OrganizationId, first, actor.UserId, () => SaveEntriesAsync(first, actor, changes, userOrg));
+        }
+
+        public async Task SetAutoFillAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
+        {
+            var actor = await _support.ResolveAsync(userOrg, employeeId);
+            var members = await _members
+                .Include(member => member.Project)
+                .Where(member => member.OrganizationId == actor.OrganizationId && member.UserId == actor.UserId)
+                .ToListAsync();
+            var chosen = members.FirstOrDefault(member => member.ProjectId == projectId && member.Project != null && !member.Project.IsArchived && !member.Project.IsDeleted)
+                         ?? throw Invalid("Project is not assigned");
+
+            foreach (var member in members)
+            {
+                member.IsAutoFill = member == chosen;
+            }
+
+            await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        public async Task AddProjectAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
+        {
+            var actor = await _support.ResolveAsync(userOrg, employeeId);
+            var project = await _projects
+                .AsNoTracking()
+                .Where(row => row.OrganizationId == actor.OrganizationId && row.Id == projectId)
+                .Select(row => new { row.Id, row.Name, row.IsArchived })
+                .FirstOrDefaultAsync() ?? throw new ValidationException(ErrorCodes.TimeRegistrationNotFound, "Project not found");
+            if (project.IsArchived)
+            {
+                throw Invalid($"Project \"{project.Name}\" is archived");
+            }
+
+            if (await _members.AnyAsync(member => member.ProjectId == projectId && member.UserId == actor.UserId))
+            {
+                return;
+            }
+
+            _members.Add(new TimeProjectMember { OrganizationId = actor.OrganizationId, ProjectId = projectId, UserId = actor.UserId });
+            await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        public async Task RemoveProjectAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
+        {
+            var actor = await _support.ResolveAsync(userOrg, employeeId);
+            var member = await _members
+                .FirstOrDefaultAsync(row => row.OrganizationId == actor.OrganizationId && row.ProjectId == projectId && row.UserId == actor.UserId);
+            if (member == null)
+            {
+                return;
+            }
+
+            _members.Remove(member);
+            await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        internal static string Wire(TimePeriodStatus status)
+        {
+            return status.ToString().ToLowerInvariant();
+        }
+
+        internal static string FullName(string firstName, string lastName)
+        {
+            return $"{firstName} {lastName}".Trim();
+        }
+
+        private async Task SaveEntriesAsync(DateTime first, TimeActor actor, IList<TimeEntryChangeDto> changes, UserAndOrganizationDto userOrg)
+        {
+            var last = TimeMonth.LastDay(first);
             var organizationId = actor.OrganizationId;
             await ThrowIfNotEditableAsync(actor, first);
 
@@ -243,70 +312,6 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             }
 
             await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
-        public async Task SetAutoFillAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
-        {
-            var actor = await _support.ResolveAsync(userOrg, employeeId);
-            var members = await _members
-                .Include(member => member.Project)
-                .Where(member => member.OrganizationId == actor.OrganizationId && member.UserId == actor.UserId)
-                .ToListAsync();
-            var chosen = members.FirstOrDefault(member => member.ProjectId == projectId && member.Project != null && !member.Project.IsArchived && !member.Project.IsDeleted)
-                         ?? throw Invalid("Project is not assigned");
-
-            foreach (var member in members)
-            {
-                member.IsAutoFill = member == chosen;
-            }
-
-            await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
-        public async Task AddProjectAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
-        {
-            var actor = await _support.ResolveAsync(userOrg, employeeId);
-            var project = await _projects
-                .AsNoTracking()
-                .Where(row => row.OrganizationId == actor.OrganizationId && row.Id == projectId)
-                .Select(row => new { row.Id, row.Name, row.IsArchived })
-                .FirstOrDefaultAsync() ?? throw new ValidationException(ErrorCodes.TimeRegistrationNotFound, "Project not found");
-            if (project.IsArchived)
-            {
-                throw Invalid($"Project \"{project.Name}\" is archived");
-            }
-
-            if (await _members.AnyAsync(member => member.ProjectId == projectId && member.UserId == actor.UserId))
-            {
-                return;
-            }
-
-            _members.Add(new TimeProjectMember { OrganizationId = actor.OrganizationId, ProjectId = projectId, UserId = actor.UserId });
-            await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
-        public async Task RemoveProjectAsync(int projectId, string employeeId, UserAndOrganizationDto userOrg)
-        {
-            var actor = await _support.ResolveAsync(userOrg, employeeId);
-            var member = await _members
-                .FirstOrDefaultAsync(row => row.OrganizationId == actor.OrganizationId && row.ProjectId == projectId && row.UserId == actor.UserId);
-            if (member == null)
-            {
-                return;
-            }
-
-            _members.Remove(member);
-            await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
-        internal static string Wire(TimePeriodStatus status)
-        {
-            return status.ToString().ToLowerInvariant();
-        }
-
-        internal static string FullName(string firstName, string lastName)
-        {
-            return $"{firstName} {lastName}".Trim();
         }
 
         private async Task ThrowIfNotEditableAsync(TimeActor actor, DateTime month)

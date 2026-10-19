@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -58,6 +61,17 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public Task<bool> IsAccountantAsync(UserAndOrganizationDto viewer)
         {
             return _permissionService.UserHasPermissionAsync(viewer, AdministrationPermissions.TimeRegistration);
+        }
+
+        public Task InUserMonthAsync(int organizationId, DateTime month, string userId, Func<Task> work)
+        {
+            var monthKey = MonthKey(organizationId, month);
+            return SerializedAsync(work, (monthKey, "Shared"), ($"{monthKey}:{userId.ToLowerInvariant()}", "Exclusive"));
+        }
+
+        public Task InMonthAsync(int organizationId, DateTime month, Func<Task> work)
+        {
+            return SerializedAsync(work, (MonthKey(organizationId, month), "Exclusive"));
         }
 
         public async Task<TimeActor> ResolveAsync(UserAndOrganizationDto viewer, string employeeId)
@@ -136,8 +150,13 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             var holidays = await HolidaysAsync(month);
             var daily = (await DailyMinutesAsync(new[] { userId }))[userId];
             var absences = await AbsencesAsync(userId, month, holidays, organizationId);
+            var employedFrom = await _users
+                .AsNoTracking()
+                .Where(user => user.Id == userId)
+                .Select(user => user.EmploymentDate)
+                .FirstOrDefaultAsync();
 
-            return new TimeCalendar(month, holidays, absences, daily);
+            return new TimeCalendar(month, holidays, absences, daily, employedFrom);
         }
 
         public async Task<TimeMonthLock> LockAsync(DateTime month, int organizationId)
@@ -307,6 +326,40 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 .Where(user => user.OrganizationId == organizationId && members.Contains(user.Id))
                 .Select(user => user.Id)
                 .ToListAsync();
+        }
+
+        private static string MonthKey(int organizationId, DateTime month)
+        {
+            return $"TimeRegistration:{organizationId}:{TimeMonth.ToText(month)}";
+        }
+
+        private async Task SerializedAsync(Func<Task> work, params (string Resource, string Mode)[] appLocks)
+        {
+            var database = _entries.GetService<ICurrentDbContext>().Context.Database;
+            if (!database.IsRelational())
+            {
+                await work();
+                return;
+            }
+
+            await using var transaction = await database.BeginTransactionAsync();
+            foreach (var (resource, mode) in appLocks)
+            {
+                var result = new SqlParameter("@result", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                await database.ExecuteSqlRawAsync(
+                    "EXEC @result = sp_getapplock @Resource = @resource, @LockMode = @mode, @LockOwner = 'Transaction', @LockTimeout = 15000",
+                    result,
+                    new SqlParameter("@resource", resource),
+                    new SqlParameter("@mode", mode));
+
+                if ((int)result.Value < 0)
+                {
+                    throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, "Another change is in progress. Try again");
+                }
+            }
+
+            await work();
+            await transaction.CommitAsync();
         }
 
         private async Task<IReadOnlyDictionary<DateTime, TimeAbsence>> AbsencesAsync(

@@ -10,9 +10,11 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             DateTime month,
             IReadOnlyDictionary<DateTime, string> holidays,
             IReadOnlyDictionary<DateTime, TimeAbsence> absences,
-            int dailyMinutes)
+            int dailyMinutes,
+            DateTime? employedFrom = null)
         {
             Month = month;
+            EmployedFrom = employedFrom?.Date;
             Days = TimeMonth.Days(month);
             Holidays = holidays;
             Absences = absences;
@@ -29,9 +31,11 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
         public int DailyMinutes { get; }
 
+        public DateTime? EmployedFrom { get; }
+
         public bool IsWorkingDay(DateTime day)
         {
-            return !TimeMonth.IsWeekend(day) && !Holidays.ContainsKey(day);
+            return !TimeMonth.IsWeekend(day) && !Holidays.ContainsKey(day) && (EmployedFrom == null || day >= EmployedFrom);
         }
 
         public int ExpectedMinutes(DateTime day)

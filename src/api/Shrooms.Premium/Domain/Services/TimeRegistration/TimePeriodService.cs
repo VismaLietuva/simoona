@@ -40,120 +40,136 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public async Task SubmitAsync(string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
-            await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
-
-            if (await _support.StatusAsync(userOrg.UserId, first, userOrg.OrganizationId) != TimePeriodStatus.Open)
+            await _support.InUserMonthAsync(userOrg.OrganizationId, first, userOrg.UserId, async () =>
             {
-                throw WrongStatus("This month is already submitted");
-            }
+                await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
 
-            if (first > TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
-            {
-                throw WrongStatus("A future month cannot be submitted");
-            }
+                if (await _support.StatusAsync(userOrg.UserId, first, userOrg.OrganizationId) != TimePeriodStatus.Open)
+                {
+                    throw WrongStatus("This month is already submitted");
+                }
 
-            await _support.MaterializeAutoFillAsync(userOrg.UserId, first, userOrg.OrganizationId);
-            await _support.SetStatusAsync(userOrg.UserId, first, userOrg.OrganizationId, TimePeriodStatus.Submitted, null);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                if (first > TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
+                {
+                    throw WrongStatus("A future month cannot be submitted");
+                }
+
+                await _support.MaterializeAutoFillAsync(userOrg.UserId, first, userOrg.OrganizationId);
+                await _support.SetStatusAsync(userOrg.UserId, first, userOrg.OrganizationId, TimePeriodStatus.Submitted, null);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task WithdrawAsync(string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
-            await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
-
-            if (first < TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
+            await _support.InUserMonthAsync(userOrg.OrganizationId, first, userOrg.UserId, async () =>
             {
-                throw WrongStatus("A past month cannot be withdrawn");
-            }
+                await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
 
-            if (await _support.StatusAsync(userOrg.UserId, first, userOrg.OrganizationId) != TimePeriodStatus.Submitted)
-            {
-                throw WrongStatus("Only a submitted month can be withdrawn");
-            }
+                if (first < TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
+                {
+                    throw WrongStatus("A past month cannot be withdrawn");
+                }
 
-            await _support.SetStatusAsync(userOrg.UserId, first, userOrg.OrganizationId, TimePeriodStatus.Open, null);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                if (await _support.StatusAsync(userOrg.UserId, first, userOrg.OrganizationId) != TimePeriodStatus.Submitted)
+                {
+                    throw WrongStatus("Only a submitted month can be withdrawn");
+                }
+
+                await _support.SetStatusAsync(userOrg.UserId, first, userOrg.OrganizationId, TimePeriodStatus.Open, null);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task ApproveAsync(string employeeId, string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
             var actor = await ResolveOtherAsync(userOrg, employeeId, "You cannot approve your own month");
-            await _support.ThrowIfLockedAsync(first, actor.OrganizationId);
-
-            var status = await _support.StatusAsync(actor.UserId, first, actor.OrganizationId);
-            if (status == TimePeriodStatus.Approved)
+            await _support.InUserMonthAsync(actor.OrganizationId, first, actor.UserId, async () =>
             {
-                throw WrongStatus("This month is already approved");
-            }
+                await _support.ThrowIfLockedAsync(first, actor.OrganizationId);
 
-            if (first > TimeMonth.Of(await _support.TodayAsync(actor.OrganizationId)))
-            {
-                throw WrongStatus("A future month cannot be approved");
-            }
+                var status = await _support.StatusAsync(actor.UserId, first, actor.OrganizationId);
+                if (status == TimePeriodStatus.Approved)
+                {
+                    throw WrongStatus("This month is already approved");
+                }
 
-            await _support.MaterializeAutoFillAsync(actor.UserId, first, actor.OrganizationId);
-            await _support.SetStatusAsync(actor.UserId, first, actor.OrganizationId, TimePeriodStatus.Approved, status);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                if (first > TimeMonth.Of(await _support.TodayAsync(actor.OrganizationId)))
+                {
+                    throw WrongStatus("A future month cannot be approved");
+                }
+
+                await _support.MaterializeAutoFillAsync(actor.UserId, first, actor.OrganizationId);
+                await _support.SetStatusAsync(actor.UserId, first, actor.OrganizationId, TimePeriodStatus.Approved, status);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task UnapproveAsync(string employeeId, string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
             var actor = await ResolveOtherAsync(userOrg, employeeId, "You cannot unapprove your own month");
-            await _support.ThrowIfLockedAsync(first, actor.OrganizationId);
-
-            if (first < TimeMonth.Of(await _support.TodayAsync(actor.OrganizationId)) && !actor.IsAccountant)
+            await _support.InUserMonthAsync(actor.OrganizationId, first, actor.UserId, async () =>
             {
-                throw WrongStatus("Only an administrator can unapprove a past month");
-            }
+                await _support.ThrowIfLockedAsync(first, actor.OrganizationId);
 
-            var period = await _support.PeriodAsync(actor.UserId, first, actor.OrganizationId);
-            if (period?.Status != TimePeriodStatus.Approved)
-            {
-                throw WrongStatus("Only an approved month can be unapproved");
-            }
+                if (first < TimeMonth.Of(await _support.TodayAsync(actor.OrganizationId)) && !actor.IsAccountant)
+                {
+                    throw WrongStatus("Only an administrator can unapprove a past month");
+                }
 
-            period.Status = period.PreviousStatus ?? TimePeriodStatus.Submitted;
-            period.PreviousStatus = null;
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                var period = await _support.PeriodAsync(actor.UserId, first, actor.OrganizationId);
+                if (period?.Status != TimePeriodStatus.Approved)
+                {
+                    throw WrongStatus("Only an approved month can be unapproved");
+                }
+
+                period.Status = period.PreviousStatus ?? TimePeriodStatus.Submitted;
+                period.PreviousStatus = null;
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task LockAsync(string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
             await ThrowIfNotAccountantAsync(userOrg);
-
-            if (first > TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
+            await _support.InMonthAsync(userOrg.OrganizationId, first, async () =>
             {
-                throw WrongStatus("A future month cannot be locked");
-            }
+                if (first > TimeMonth.Of(await _support.TodayAsync(userOrg.OrganizationId)))
+                {
+                    throw WrongStatus("A future month cannot be locked");
+                }
 
-            await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
+                await _support.ThrowIfLockedAsync(first, userOrg.OrganizationId);
 
-            var employeeIds = await _support.ProjectMemberIdsAsync(userOrg.OrganizationId);
-            var statuses = await _support.StatusesAsync(employeeIds.ToList(), first, userOrg.OrganizationId);
-            foreach (var employeeId in employeeIds.Where(id => statuses[id] != TimePeriodStatus.Approved))
-            {
-                await _support.MaterializeAutoFillAsync(employeeId, first, userOrg.OrganizationId);
-            }
+                var employeeIds = await _support.ProjectMemberIdsAsync(userOrg.OrganizationId);
+                var statuses = await _support.StatusesAsync(employeeIds.ToList(), first, userOrg.OrganizationId);
+                foreach (var employeeId in employeeIds.Where(id => statuses[id] != TimePeriodStatus.Approved))
+                {
+                    await _support.MaterializeAutoFillAsync(employeeId, first, userOrg.OrganizationId);
+                }
 
-            _locks.Add(new TimeMonthLock { OrganizationId = userOrg.OrganizationId, Month = first, LockedById = userOrg.UserId });
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                _locks.Add(new TimeMonthLock { OrganizationId = userOrg.OrganizationId, Month = first, LockedById = userOrg.UserId });
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task UnlockAsync(string month, UserAndOrganizationDto userOrg)
         {
             var first = TimeMonth.Parse(month);
             await ThrowIfNotAccountantAsync(userOrg);
+            await _support.InMonthAsync(userOrg.OrganizationId, first, async () =>
+            {
+                var monthLock = await _locks
+                    .FirstOrDefaultAsync(row => row.OrganizationId == userOrg.OrganizationId && row.Month == first)
+                    ?? throw WrongStatus("This month is not locked");
 
-            var monthLock = await _locks
-                .FirstOrDefaultAsync(row => row.OrganizationId == userOrg.OrganizationId && row.Month == first)
-                ?? throw WrongStatus("This month is not locked");
-
-            _locks.Remove(monthLock);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+                _locks.Remove(monthLock);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            });
         }
 
         public async Task<IEnumerable<TimeTeamMemberDto>> GetTeamAsync(string month, UserAndOrganizationDto userOrg)
