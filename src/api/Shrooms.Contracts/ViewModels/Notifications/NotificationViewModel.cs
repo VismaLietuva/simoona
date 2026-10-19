@@ -1,27 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Contracts.ViewModels.Notifications
 {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class NotificationViewModel
     {
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-        public int id { get; set; }
+        public int Id { get; set; }
 
-        public string title { get; set; }
+        public string Title { get; set; }
 
-        public string description { get; set; }
+        public string Description { get; set; }
 
-        public string pictureId { get; set; }
+        public string PictureId { get; set; }
 
-        public SourcesViewModel sourceIds { get; set; }
+        public SourcesViewModel SourceIds { get; set; }
 
-        public int type { get; set; }
+        public int Type { get; set; }
 
-        public List<int> stackedIds { get; set; }
+        public List<int> StackedIds { get; set; }
 
-        public int? others { get; set; }
-#pragma warning restore SA1300 // Element should begin with upper-case letter
+        public int? Others { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public bool IsRead { get; set; }
     }
 }

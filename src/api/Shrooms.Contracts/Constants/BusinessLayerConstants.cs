@@ -76,5 +76,6 @@ namespace Shrooms.Contracts.Constants
         #endregion
 
         public const int MaxNotificationsToShow = 100;
+        public const int NotificationHistoryDays = 30;
     }
 }
