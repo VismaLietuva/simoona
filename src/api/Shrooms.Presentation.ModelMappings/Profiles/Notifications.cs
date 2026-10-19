@@ -14,8 +14,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<Notification, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.SourceIds, opt => opt.MapFrom(u => u.Sources));
             CreateMap<NotificationDto, NotificationViewModel>(MemberList.None)
-                .ForMember(dest => dest.stackedIds, opt => opt.MapFrom(src => new List<int>()))
-                .ForMember(dest => dest.others, opt => opt.MapFrom(src => 0));
+                .ForMember(dest => dest.StackedIds, opt => opt.MapFrom(src => new List<int>()))
+                .ForMember(dest => dest.Others, opt => opt.MapFrom(src => 0));
 
             CreateMap<WallPostViewModel, NotificationDto>(MemberList.None)
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(u => u.MessageBody))

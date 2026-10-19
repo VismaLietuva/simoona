@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
@@ -33,7 +34,9 @@ namespace Shrooms.Domain.Services.Notifications
 
         private readonly IUnitOfWork2 _uow;
 
-        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService)
+        private readonly ISystemClock _systemClock;
+
+        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService, ISystemClock systemClock)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _notificationUserDbSet = uow.GetDbSet<NotificationUser>();
@@ -46,6 +49,8 @@ namespace Shrooms.Domain.Services.Notifications
             _mapper = mapper;
 
             _wallService = wallService;
+
+            _systemClock = systemClock;
         }
 
         public async Task<NotificationDto> CreateForPostAsync(
@@ -126,17 +131,32 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg)
+        public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg, bool includeRead)
         {
-            var result = await _notificationUserDbSet
-                             .Include(x => x.Notification)
-                             .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
-                             .Select(s => s.Notification)
-                             .OrderByDescending(o => o.Created)
-                            .Take(BusinessLayerConstants.MaxNotificationsToShow)
+            var since = _systemClock.UtcNow.AddDays(-BusinessLayerConstants.NotificationHistoryDays);
+
+            var query = _notificationUserDbSet
+                .Include(x => x.Notification)
+                .Where(w => w.UserId == userOrg.UserId);
+
+            query = includeRead
+                ? query.Where(w => w.Notification.Created >= since || !w.IsAlreadySeen)
+                : query.Where(w => !w.IsAlreadySeen);
+
+            var result = await query
+                             .OrderBy(o => o.IsAlreadySeen)
+                             .ThenByDescending(o => o.Notification.Created)
+                             .Take(BusinessLayerConstants.MaxNotificationsToShow)
                              .ToListAsync();
 
-            return _mapper.Map<IEnumerable<NotificationDto>>(result);
+            return result
+                .OrderByDescending(o => o.Notification.Created)
+                .Select(notificationUser =>
+                {
+                    var notification = _mapper.Map<NotificationDto>(notificationUser.Notification);
+                    notification.IsRead = notificationUser.IsAlreadySeen;
+                    return notification;
+                });
         }
 
         public async Task MarkAsReadAsync(UserAndOrganizationDto userOrg, IEnumerable<int> notificationIds)
