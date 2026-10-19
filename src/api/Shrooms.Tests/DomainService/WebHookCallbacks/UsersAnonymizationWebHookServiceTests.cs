@@ -79,5 +79,35 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
             // Assert
             Assert.That(_usersDbSet.Any(user => !user.IsAnonymized), Is.False);
         }
+
+        [Test]
+        public async Task Should_Delete_The_Photo_Even_When_Other_Records_Reference_It()
+        {
+            var organization = _mockDbContext.Organizations.First();
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new() { Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), PictureId = "face.jpg" }
+            });
+
+            await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
+
+            await _pictureService.Received(1).RemoveImageIgnoringReferencesAsync("face.jpg", organization.Id);
+            await _pictureService.DidNotReceiveWithAnyArgs().RemoveImageAsync(default, default);
+        }
+
+        [Test]
+        public void Should_Leave_The_User_For_The_Next_Run_When_The_Photo_Cannot_Be_Deleted()
+        {
+            var organization = _mockDbContext.Organizations.First();
+            var user = new ApplicationUser { Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), PictureId = "face.jpg" };
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user });
+            _pictureService.RemoveImageIgnoringReferencesAsync("face.jpg", organization.Id).Returns(Task.FromException(new System.IO.IOException("storage down")));
+
+            Assert.ThrowsAsync<System.IO.IOException>(() => _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName));
+
+            Assert.That(user.IsAnonymized, Is.False);
+            Assert.That(user.PictureId, Is.EqualTo("face.jpg"));
+            _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync();
+        }
     }
 }

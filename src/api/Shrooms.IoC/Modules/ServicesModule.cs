@@ -12,6 +12,7 @@ namespace Shrooms.IoC.Modules
         public static IServiceCollection AddShroomsServices(this IServiceCollection services)
         {
             services.AddScoped<IPictureService, PictureService>();
+            services.AddScoped<IPictureReferenceService, PictureReferenceService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISidebarFavoritesService, SidebarFavoritesService>();
             services.AddScoped<INotificationService, NotificationService>();

@@ -2,11 +2,14 @@ using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
     [Route("ExternalJobs")]
+    // Authenticated by the Basic filter below, not by JWT: opt out of the fallback policy explicitly.
+    [AllowAnonymous]
     [IdentityBasicAuthentication]
     public class ExternalJobsController : BaseController
     {

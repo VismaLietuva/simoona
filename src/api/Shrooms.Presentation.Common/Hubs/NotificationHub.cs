@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
@@ -10,6 +11,7 @@ using Shrooms.Contracts.ViewModels.Notifications;
 
 namespace Shrooms.Presentation.Common.Hubs
 {
+    [Authorize]
     public class NotificationHub : BaseHub
     {
         private static readonly ConcurrentDictionary<UserAndOrganizationHubDto, HubUser> _notificationHubUsers =
