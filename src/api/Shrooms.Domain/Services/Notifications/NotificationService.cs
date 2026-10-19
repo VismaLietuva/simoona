@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
@@ -33,7 +34,9 @@ namespace Shrooms.Domain.Services.Notifications
 
         private readonly IUnitOfWork2 _uow;
 
-        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService)
+        private readonly ISystemClock _systemClock;
+
+        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService, ISystemClock systemClock)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _notificationUserDbSet = uow.GetDbSet<NotificationUser>();
@@ -46,6 +49,8 @@ namespace Shrooms.Domain.Services.Notifications
             _mapper = mapper;
 
             _wallService = wallService;
+
+            _systemClock = systemClock;
         }
 
         public async Task<NotificationDto> CreateForPostAsync(
@@ -128,7 +133,7 @@ namespace Shrooms.Domain.Services.Notifications
 
         public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg, bool includeRead)
         {
-            var since = DateTime.UtcNow.AddDays(-BusinessLayerConstants.NotificationHistoryDays);
+            var since = _systemClock.UtcNow.AddDays(-BusinessLayerConstants.NotificationHistoryDays);
 
             var query = _notificationUserDbSet
                 .Include(x => x.Notification)
