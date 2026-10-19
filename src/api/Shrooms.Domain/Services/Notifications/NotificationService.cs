@@ -149,12 +149,14 @@ namespace Shrooms.Domain.Services.Notifications
                              .Take(BusinessLayerConstants.MaxNotificationsToShow)
                              .ToListAsync();
 
-            return result.Select(notificationUser =>
-            {
-                var notification = _mapper.Map<NotificationDto>(notificationUser.Notification);
-                notification.IsRead = notificationUser.IsAlreadySeen;
-                return notification;
-            });
+            return result
+                .OrderByDescending(o => o.Notification.Created)
+                .Select(notificationUser =>
+                {
+                    var notification = _mapper.Map<NotificationDto>(notificationUser.Notification);
+                    notification.IsRead = notificationUser.IsAlreadySeen;
+                    return notification;
+                });
         }
 
         public async Task MarkAsReadAsync(UserAndOrganizationDto userOrg, IEnumerable<int> notificationIds)
