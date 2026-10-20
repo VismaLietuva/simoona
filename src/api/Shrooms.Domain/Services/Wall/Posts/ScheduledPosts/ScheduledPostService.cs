@@ -72,18 +72,21 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
             _scheduledPostsDbSet.Add(scheduledPost);
             await _uow.SaveChangesAsync(dto.UserId);
 
+            string jobId = null;
+
             try
             {
-                scheduledPost.JobId = ScheduleJob(scheduledPost);
+                jobId = ScheduleJob(scheduledPost);
+                scheduledPost.JobId = jobId;
+                await _uow.SaveChangesAsync(dto.UserId);
             }
             catch
             {
+                _jobScheduler.Delete(jobId);
                 _scheduledPostsDbSet.Remove(scheduledPost);
                 await _uow.SaveChangesAsync(dto.UserId);
                 throw;
             }
-
-            await _uow.SaveChangesAsync(dto.UserId);
 
             return MapToDto(scheduledPost, wall.Name);
         }
@@ -110,7 +113,19 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
                 scheduledPost.JobId = ScheduleJob(scheduledPost);
             }
 
-            await _uow.SaveChangesAsync(dto.UserId);
+            try
+            {
+                await _uow.SaveChangesAsync(dto.UserId);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (isRescheduled)
+                {
+                    _jobScheduler.Delete(scheduledPost.JobId);
+                }
+
+                throw ConcurrencyConflict();
+            }
 
             if (isRescheduled)
             {
@@ -125,7 +140,15 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
             var scheduledPost = await GetOwnScheduledPostAsync(id, userOrg);
 
             _scheduledPostsDbSet.Remove(scheduledPost);
-            await _uow.SaveChangesAsync(userOrg.UserId);
+
+            try
+            {
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw ConcurrencyConflict();
+            }
 
             _jobScheduler.Delete(scheduledPost.JobId);
         }
@@ -134,7 +157,14 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
         {
             var scheduledPost = await GetOwnScheduledPostAsync(id, userOrg);
 
-            return await PublishAsync(scheduledPost);
+            try
+            {
+                return await PublishAsync(scheduledPost, dropIfUnpublishable: false);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw ConcurrencyConflict();
+            }
         }
 
         public async Task<NewlyCreatedPostDto> PublishDueAsync(int id)
@@ -152,10 +182,10 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
                 return null;
             }
 
-            return await PublishAsync(scheduledPost);
+            return await PublishAsync(scheduledPost, dropIfUnpublishable: true);
         }
 
-        private async Task<NewlyCreatedPostDto> PublishAsync(ScheduledPost scheduledPost)
+        private async Task<NewlyCreatedPostDto> PublishAsync(ScheduledPost scheduledPost, bool dropIfUnpublishable)
         {
             _scheduledPostsDbSet.Remove(scheduledPost);
 
@@ -181,12 +211,17 @@ namespace Shrooms.Domain.Services.Wall.Posts.ScheduledPosts
 
                 return createdPost;
             }
-            catch (ValidationException)
+            catch (ValidationException) when (dropIfUnpublishable)
             {
                 await _uow.SaveChangesAsync(scheduledPost.AuthorId);
 
                 return null;
             }
+        }
+
+        private static ValidationException ConcurrencyConflict()
+        {
+            return new ValidationException(ErrorCodes.ConcurrencyError, "The scheduled post was changed or published in the meantime");
         }
 
         private async Task<ScheduledPost> GetOwnScheduledPostAsync(int id, UserAndOrganizationDto userOrg)
