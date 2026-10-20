@@ -47,7 +47,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     ProjectCount = customer.Projects.Count(project => !project.IsDeleted),
                     Members = customer.Projects
                         .Where(project => !project.IsDeleted)
-                        .SelectMany(project => project.Members.Select(member => member.UserId))
+                        .SelectMany(project => project.Members.Where(member => !member.User.IsDeleted).Select(member => member.UserId))
                 })
                 .ToListAsync();
 
