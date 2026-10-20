@@ -42,6 +42,7 @@
         public const string Lottery = "LOTTERY_BASIC";
         public const string CustomEmoji = "CUSTOMEMOJI_BASIC";
         public const string VideoLibrary = "VIDEOLIBRARY_BASIC";
+        public const string TimeRegistration = "TIMEREGISTRATION_BASIC";
         public const string Poll = "POLL_BASIC";
     }
 }

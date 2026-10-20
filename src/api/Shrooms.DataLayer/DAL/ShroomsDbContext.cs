@@ -14,6 +14,7 @@ using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Polls;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Seats;
+using Shrooms.DataLayer.DAL.EntityTypeConfigurations.TimeRegistration;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.Vacations;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations.VideoLibrary;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -30,6 +31,7 @@ using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Polls;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
+using Shrooms.DataLayer.EntityModels.Models.TimeRegistration;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
@@ -215,6 +217,20 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VideoLibraryItem> VideoLibraryItems { get; set; }
 
+        public virtual DbSet<TimeCustomer> TimeCustomers { get; set; }
+
+        public virtual DbSet<TimeProject> TimeProjects { get; set; }
+
+        public virtual DbSet<TimeTask> TimeTasks { get; set; }
+
+        public virtual DbSet<TimeProjectMember> TimeProjectMembers { get; set; }
+
+        public virtual DbSet<TimeEntry> TimeEntries { get; set; }
+
+        public virtual DbSet<TimePeriod> TimePeriods { get; set; }
+
+        public virtual DbSet<TimeMonthLock> TimeMonthLocks { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -323,6 +339,13 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoLibraryItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeCustomerEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeProjectEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeTaskEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeProjectMemberEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeEntryEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimePeriodEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeMonthLockEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
