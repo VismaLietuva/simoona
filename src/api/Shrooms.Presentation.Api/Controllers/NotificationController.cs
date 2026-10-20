@@ -25,9 +25,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<NotificationViewModel>> GetAll()
+        public async Task<IEnumerable<NotificationViewModel>> GetAll(bool includeRead = false)
         {
-            var result = await _notificationService.GetAllAsync(GetUserAndOrganization());
+            var result = await _notificationService.GetAllAsync(GetUserAndOrganization(), includeRead);
 
             return MakeCommentsStacked(result);
         }
@@ -57,7 +57,7 @@ namespace Shrooms.Presentation.Api.Controllers
             foreach (var item in comments)
             {
                 var parentComment = stackedList
-                    .FirstOrDefault(x => CompareSourcesIds(x.sourceIds, item.SourceIds) && item.Type != NotificationType.EventReminder);
+                    .FirstOrDefault(x => CompareSourcesIds(x.SourceIds, item.SourceIds) && item.Type != NotificationType.EventReminder);
 
                 if (parentComment == null)
                 {
@@ -65,10 +65,11 @@ namespace Shrooms.Presentation.Api.Controllers
                 }
                 else
                 {
-                    parentComment.stackedIds.Add(item.Id);
-                    if (parentComment.title.Equals(item.Title) == false)
+                    parentComment.StackedIds.Add(item.Id);
+                    parentComment.IsRead = parentComment.IsRead && item.IsRead;
+                    if (parentComment.Title.Equals(item.Title) == false)
                     {
-                        parentComment.others++;
+                        parentComment.Others++;
                     }
                 }
             }

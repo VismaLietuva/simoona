@@ -1,8 +1,12 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Logging;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Api.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
@@ -38,6 +42,20 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IAdministrationUsersService _administrationService;
         private readonly IApplicationSettings _applicationSettings;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IReturnUrlValidator _returnUrlValidator;
+        private readonly IExternalEmailTrust _externalEmailTrust;
+        private readonly IAuthenticationSchemeProvider _schemeProvider;
+        private readonly ILogger<AccountController> _logger;
+
+        private const string ChallengeProviderKey = "simoona.provider";
+        private const string ChallengeOrganizationKey = "simoona.organization";
+
+        private static readonly string[] ExternalProviders =
+        {
+            AuthenticationConstants.GoogleLoginProvider,
+            AuthenticationConstants.FacebookLoginProvider,
+            AuthenticationConstants.MicrosoftLoginProvider,
+        };
 
         private string RequestedOrganization => HttpContext.GetRequestedTenant();
 
@@ -49,8 +67,16 @@ namespace Shrooms.Presentation.Api.Controllers
             IRefreshTokenService refreshTokenService,
             IAdministrationUsersService administrationService,
             IApplicationSettings applicationSettings,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            IReturnUrlValidator returnUrlValidator,
+            IExternalEmailTrust externalEmailTrust,
+            IAuthenticationSchemeProvider schemeProvider,
+            ILogger<AccountController> logger)
         {
+            _returnUrlValidator = returnUrlValidator;
+            _externalEmailTrust = externalEmailTrust;
+            _schemeProvider = schemeProvider;
+            _logger = logger;
             _mapper = mapper;
             _userManager = userManager;
             _permissionService = permissionService;
@@ -82,6 +108,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [AllowAnonymous]
         [Route("Register")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
@@ -91,30 +118,53 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (await _administrationService.UserEmailExistsAsync(model.Email))
+            // Internal accounts must be enabled; the email-domain restriction applies to internal registration too.
+            var organization = await _organizationService.GetOrganizationByNameAsync(RequestedOrganization);
+            if (!ContainsProvider(organization.AuthenticationProviders ?? string.Empty, AuthenticationConstants.InternalLoginProvider))
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                return BadRequest(new { error = "internal_registration_disabled" });
+            }
 
-                if (user == null || user.EmailConfirmed || !await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
+            if (!await _organizationService.IsOrganizationHostValidAsync(model.Email, RequestedOrganization))
+            {
+                return BadRequest(new { error = "email_host_not_allowed" });
+            }
+
+            // Password rules first: a weak password gets the same 400 whether or not the address exists.
+            var passwordCheck = await ValidatePasswordAsync(model.Email, model.Password);
+            if (!passwordCheck.Succeeded)
+            {
+                return GetErrorResult(passwordCheck);
+            }
+
+            var existing = await _userManager.FindByEmailAsync(model.Email);
+            if (existing != null)
+            {
+                // Ownership of the address is unproven: a confirmed account is never modified. An unconfirmed one takes the
+                // new password (rotating the stamp kills older links) and VerifyEmail needs that password. Both answer 200.
+                if (!existing.EmailConfirmed
+                    && await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
-                    return BadRequest("User already exists");
-                }
+                    if (await _userManager.HasPasswordAsync(existing))
+                    {
+                        await _userManager.RemovePasswordAsync(existing);
+                    }
 
-                await _userManager.RemovePasswordAsync(user);
-                await _userManager.AddPasswordAsync(user, model.Password);
-                await _administrationService.SendUserVerificationEmailAsync(user, RequestedOrganization);
+                    await _userManager.AddPasswordAsync(existing, model.Password);
+                    await _administrationService.SendUserVerificationEmailAsync(existing, RequestedOrganization);
+                }
 
                 return Ok();
             }
 
             if (await _administrationService.UserIsSoftDeletedAsync(model.Email))
             {
-                await _administrationService.RestoreUserAsync(model.Email);
+                // Restoring a deleted account (with its previous roles) is an administrator action.
+                _logger.LogInformation("Registration attempted for a deleted account in {Organization}; not restoring.", RequestedOrganization);
                 return Ok();
             }
 
             var result = await _administrationService.CreateNewUserAsync(_mapper.Map<ApplicationUser>(model), model.Password, RequestedOrganization);
-
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -126,6 +176,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RequestPasswordReset")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RequestPasswordReset([FromBody] ForgotPasswordViewModel model)
         {
@@ -149,6 +200,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("VerifyEmail")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailViewModel model)
         {
@@ -161,7 +213,14 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return InvalidTokenResult();
+            }
+
+
+            // Mailbox plus credential: a stranger's re-registration can never be confirmed. Same response as a bad code.
+            if (!await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                return InvalidTokenResult();
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, model.Code);
@@ -177,6 +236,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("ResetPassword")]
+        [EnableRateLimiting(AuthRateLimit.PolicyName)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
         {
@@ -189,7 +249,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return InvalidTokenResult();
             }
 
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
@@ -197,6 +257,13 @@ namespace Shrooms.Presentation.Api.Controllers
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
+            }
+
+            // The owner proved control of the mailbox; a lockout caused by someone else's guesses ends here.
+            if (_userManager.SupportsUserLockout)
+            {
+                await _userManager.SetLockoutEndDateAsync(user, null);
+                await _userManager.ResetAccessFailedCountAsync(user);
             }
 
             return Ok();
@@ -244,6 +311,11 @@ namespace Shrooms.Presentation.Api.Controllers
         [ProducesResponseType(typeof(List<ExternalLoginViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
+            if (!_returnUrlValidator.IsAllowed(returnUrl))
+            {
+                return BadRequest("returnUrl must point to a configured client origin.");
+            }
+
             var logins = new List<ExternalLoginViewModel>();
             var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
 
@@ -252,16 +324,9 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Ok(logins);
             }
 
-            var externalProviders = new[]
+            foreach (var provider in ExternalProviders)
             {
-                AuthenticationConstants.GoogleLoginProvider,
-                AuthenticationConstants.FacebookLoginProvider,
-                AuthenticationConstants.MicrosoftLoginProvider,
-            };
-
-            foreach (var provider in externalProviders)
-            {
-                if (!ContainsProvider(organizationProviders, provider))
+                if (!ContainsProvider(organizationProviders, provider) || !await IsKnownExternalProviderAsync(provider))
                 {
                     continue;
                 }
@@ -289,11 +354,22 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("ExternalLogin")]
-        public IActionResult ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
+        public async Task<IActionResult> ExternalLogin(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
             if (string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(returnUrl))
             {
                 return BadRequest();
+            }
+
+            // The token is appended to returnUrl, so only configured origins may receive it; checked again in the callback.
+            if (!_returnUrlValidator.IsAllowed(returnUrl))
+            {
+                return BadRequest("returnUrl must point to a configured client origin.");
+            }
+
+            if (!await IsKnownExternalProviderAsync(provider) || !await IsProviderEnabledForOrganizationAsync(provider, organization))
+            {
+                return BadRequest("Unknown authentication provider.");
             }
 
             var callback = Url.Action(nameof(ExternalLoginCallback), "Account", new
@@ -304,7 +380,10 @@ namespace Shrooms.Presentation.Api.Controllers
                 isRegistration
             });
 
+            // Provider and organisation ride in the auth properties so the callback can verify them.
             var props = new AuthenticationProperties { RedirectUri = callback };
+            props.Items[ChallengeProviderKey] = provider;
+            props.Items[ChallengeOrganizationKey] = organization;
             return Challenge(props, provider);
         }
 
@@ -313,7 +392,14 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("ExternalLoginCallback")]
         public async Task<IActionResult> ExternalLoginCallback(string provider, string organization, string returnUrl, bool isRegistration = false)
         {
-            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider))
+            if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(organization))
+            {
+                return BadRequest();
+            }
+
+            if (!_returnUrlValidator.IsAllowed(returnUrl)
+                || !await IsKnownExternalProviderAsync(provider)
+                || !await IsProviderEnabledForOrganizationAsync(provider, organization))
             {
                 return BadRequest();
             }
@@ -323,6 +409,17 @@ namespace Shrooms.Presentation.Api.Controllers
             if (!result.Succeeded || result.Principal == null)
             {
                 return Redirect(AppendHash(returnUrl, "error=external_auth_failed"));
+            }
+
+            // All handlers share one external cookie: the scheme and tenant it records must match the query.
+            var items = result.Properties?.Items;
+            if (items == null
+                || !items.TryGetValue(".AuthScheme", out var authenticatedScheme) || !string.Equals(authenticatedScheme, provider, StringComparison.Ordinal)
+                || !items.TryGetValue(ChallengeProviderKey, out var challengedProvider) || !string.Equals(challengedProvider, provider, StringComparison.Ordinal)
+                || !items.TryGetValue(ChallengeOrganizationKey, out var challengedOrganization) || !string.Equals(challengedOrganization, organization, StringComparison.OrdinalIgnoreCase))
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                return BadRequest();
             }
 
             var providerKey = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -344,11 +441,29 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (user == null)
             {
+                // The email decides which account this becomes, so the provider must vouch for it (Microsoft only from trusted tenants).
+                if (!_externalEmailTrust.IsEmailVerified(provider, result.Principal))
+                {
+                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                    return Redirect(AppendHash(returnUrl, "error=email_not_verified"));
+                }
+
                 var existing = await _userManager.FindByEmailAsync(email);
 
                 if (existing != null)
                 {
-                    // Email exists in this tenant: attach the social login to the existing user.
+                    // An unconfirmed account's password was never proven; drop it, the provider just verified the email.
+                    if (!existing.EmailConfirmed)
+                    {
+                        if (await _userManager.HasPasswordAsync(existing))
+                        {
+                            await _userManager.RemovePasswordAsync(existing);
+                        }
+
+                        existing.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(existing);
+                    }
+
                     await _userManager.AddLoginAsync(existing, new UserLoginInfo(loginProvider, providerKey, loginProvider));
                     user = existing;
                 }
@@ -398,6 +513,53 @@ namespace Shrooms.Presentation.Api.Controllers
             return QueryHelpers.AddQueryString("/Account/ExternalLogin", qs);
         }
 
+        private async Task<bool> IsKnownExternalProviderAsync(string provider)
+        {
+            if (!ExternalProviders.Contains(provider, StringComparer.Ordinal))
+            {
+                return false;
+            }
+
+            return await _schemeProvider.GetSchemeAsync(provider) != null;
+        }
+
+        private async Task<IdentityResult> ValidatePasswordAsync(string email, string password)
+        {
+            var probe = new ApplicationUser { UserName = email, Email = email };
+            var errors = new List<IdentityError>();
+            foreach (var validator in _userManager.PasswordValidators)
+            {
+                var result = await validator.ValidateAsync(_userManager, probe, password);
+                if (!result.Succeeded)
+                {
+                    errors.AddRange(result.Errors);
+                }
+            }
+
+            return errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray());
+        }
+
+        private async Task<bool> IsProviderEnabledForOrganizationAsync(string provider, string organizationName)
+        {
+            if (string.IsNullOrEmpty(organizationName))
+            {
+                return false;
+            }
+
+            Organization organization;
+            try
+            {
+                organization = await _organizationService.GetOrganizationByNameAsync(organizationName);
+            }
+            catch (InvalidOperationException)
+            {
+                // Configured tenant without a matching Organizations row: not enabled, not a 500.
+                return false;
+            }
+
+            return organization != null && ContainsProvider(organization.AuthenticationProviders ?? string.Empty, provider);
+        }
+
         private static string AppendHash(string url, string hash)
         {
             if (string.IsNullOrEmpty(hash)) return url;
@@ -405,9 +567,17 @@ namespace Shrooms.Presentation.Api.Controllers
             return url + sep + hash;
         }
 
+        // Whole-token comparison: "notgoogle" must not enable Google.
         private static bool ContainsProvider(string providerList, string providerName)
         {
-            return providerList.ToLower().Contains(providerName.ToLower());
+            if (string.IsNullOrWhiteSpace(providerList) || string.IsNullOrWhiteSpace(providerName))
+            {
+                return false;
+            }
+
+            return providerList
+                .Split(new[] { ';', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Any(token => string.Equals(token, providerName, StringComparison.OrdinalIgnoreCase));
         }
 
         private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfoAsync()
@@ -441,6 +611,12 @@ namespace Shrooms.Presentation.Api.Controllers
             };
 
             return userInfo;
+        }
+
+        // Same shape as a failed confirm/reset, so an unknown address is not distinguishable.
+        private IActionResult InvalidTokenResult()
+        {
+            return GetErrorResult(IdentityResult.Failed((_userManager.ErrorDescriber ?? new IdentityErrorDescriber()).InvalidToken()));
         }
 
         private IActionResult GetErrorResult(IdentityResult result)

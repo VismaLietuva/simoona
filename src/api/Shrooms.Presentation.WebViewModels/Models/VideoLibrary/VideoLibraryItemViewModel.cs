@@ -24,10 +24,14 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
         [StringLength(VideoLibraryItem.MaxPictureIdLength)]
         public string PictureId { get; set; }
 
+        public DateOnly? RecordedOn { get; set; }
+
         public int? VideoTypeId { get; set; }
 
         public string VideoTypeTitle { get; set; }
 
         public DateTime Created { get; set; }
+
+        public bool IsNew { get; set; }
     }
 }
