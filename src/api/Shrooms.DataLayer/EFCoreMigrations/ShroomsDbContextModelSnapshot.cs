@@ -1645,6 +1645,85 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("ExternalLinks");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_FeatureFlags_OrganizationId_Name");
+
+                    b.ToTable("FeatureFlags", (string)null);
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlagUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FeatureFlagId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("FeatureFlagId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_FeatureFlagUsers_FeatureFlagId_UserId");
+
+                    b.ToTable("FeatureFlagUsers", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FilterPreset", b =>
                 {
                     b.Property<int>("Id")
@@ -5514,6 +5593,36 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlag", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlagUser", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlag", "FeatureFlag")
+                        .WithMany("Users")
+                        .HasForeignKey("FeatureFlagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeatureFlag");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FilterPreset", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
@@ -6842,6 +6951,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Events.EventType", b =>
                 {
                     b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.FeatureFlags.FeatureFlag", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Floor", b =>
