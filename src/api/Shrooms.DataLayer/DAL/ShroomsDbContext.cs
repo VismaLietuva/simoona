@@ -77,6 +77,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<Post> Posts { get; set; }
 
+        public virtual DbSet<ScheduledPost> ScheduledPosts { get; set; }
+
         public virtual DbSet<Comment> Comments { get; set; }
 
         public virtual DbSet<Certificate> Certificates { get; set; }
@@ -289,6 +291,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new WallMembersConfiguration());
             modelBuilder.ApplyConfiguration(new WallModeratorsConfiguration());
             modelBuilder.ApplyConfiguration(new PostEntityConfig());
+            modelBuilder.ApplyConfiguration(new ScheduledPostEntityConfig());
             modelBuilder.ApplyConfiguration(new ExternalLinkConfig());
             modelBuilder.ApplyConfiguration(new MonitorConfig());
             modelBuilder.ApplyConfiguration(new NotificationConfig());
