@@ -77,23 +77,28 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public async Task<TimeActor> ResolveAsync(UserAndOrganizationDto viewer, string employeeId)
         {
             var isAccountant = await IsAccountantAsync(viewer);
-            var userId = string.IsNullOrWhiteSpace(employeeId) ? viewer.UserId : employeeId;
-
-            if (!TimeRegistrationRules.SameUser(userId, viewer.UserId))
+            if (string.IsNullOrWhiteSpace(employeeId))
             {
-                var target = await _users
-                    .AsNoTracking()
-                    .Where(user => user.OrganizationId == viewer.OrganizationId && user.Id == userId)
-                    .Select(user => new { user.ManagerId })
-                    .FirstOrDefaultAsync();
-
-                if (target == null || (!isAccountant && !TimeRegistrationRules.SameUser(target.ManagerId, viewer.UserId)))
-                {
-                    throw new UnauthorizedException();
-                }
+                return new TimeActor(viewer, viewer.UserId, isAccountant);
             }
 
-            return new TimeActor(viewer, userId, isAccountant);
+            var target = await _users
+                .AsNoTracking()
+                .Where(user => user.OrganizationId == viewer.OrganizationId && user.Id == employeeId)
+                .Select(user => new { user.Id, user.ManagerId })
+                .FirstOrDefaultAsync() ?? throw new UnauthorizedException();
+
+            if (TimeRegistrationRules.SameUser(target.Id, viewer.UserId))
+            {
+                return new TimeActor(viewer, viewer.UserId, isAccountant);
+            }
+
+            if (!isAccountant && !TimeRegistrationRules.SameUser(target.ManagerId, viewer.UserId))
+            {
+                throw new UnauthorizedException();
+            }
+
+            return new TimeActor(viewer, target.Id, isAccountant);
         }
 
         public async Task<DateTime> TodayAsync(int organizationId)
@@ -155,6 +160,10 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 .Where(user => user.Id == userId)
                 .Select(user => user.EmploymentDate)
                 .FirstOrDefaultAsync();
+            if (employedFrom.HasValue)
+            {
+                employedFrom = VacationCalculator.NowIn(await _organizations.TimeZoneAsync(organizationId), employedFrom.Value);
+            }
 
             return new TimeCalendar(month, holidays, absences, daily, employedFrom);
         }

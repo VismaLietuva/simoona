@@ -4652,6 +4652,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateOnly>("RecordedOn")
+                        .HasColumnType("date");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -4671,6 +4674,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.HasIndex("OrganizationId", "Created")
                         .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_Created");
+
+                    b.HasIndex("OrganizationId", "RecordedOn")
+                        .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_RecordedOn");
 
                     b.HasIndex("OrganizationId", "VideoTypeId")
                         .HasDatabaseName("IX_VideoLibraryItems_OrganizationId_VideoTypeId");

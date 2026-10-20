@@ -37,6 +37,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.TimeRegistration
 
     public class TimeArchiveViewModel
     {
-        public bool IsArchived { get; set; }
+        [Required]
+        public bool? IsArchived { get; set; }
     }
 }

@@ -314,12 +314,18 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
         private async Task<TimeActor> ResolveOtherAsync(UserAndOrganizationDto userOrg, string employeeId, string selfMessage)
         {
-            if (string.IsNullOrWhiteSpace(employeeId) || TimeRegistrationRules.SameUser(employeeId, userOrg.UserId))
+            if (string.IsNullOrWhiteSpace(employeeId))
             {
                 throw WrongStatus(selfMessage);
             }
 
-            return await _support.ResolveAsync(userOrg, employeeId);
+            var actor = await _support.ResolveAsync(userOrg, employeeId);
+            if (actor.IsSelf)
+            {
+                throw WrongStatus(selfMessage);
+            }
+
+            return actor;
         }
 
         private async Task ThrowIfNotAccountantAsync(UserAndOrganizationDto userOrg)

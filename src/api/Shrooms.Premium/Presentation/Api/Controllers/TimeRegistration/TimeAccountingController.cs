@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
         [Route("Projects/{id:int}/Archive")]
         public Task<IActionResult> ArchiveProject(int id, [FromBody] TimeArchiveViewModel model)
         {
-            return GuardedAsync(() => _accountingService.SetProjectArchivedAsync(id, model.IsArchived, GetUserAndOrganization()));
+            return GuardedAsync(() => _accountingService.SetProjectArchivedAsync(id, model.IsArchived.Value, GetUserAndOrganization()));
         }
 
         [HttpDelete]
