@@ -34,6 +34,8 @@ namespace Shrooms.Contracts.Constants
 
         // Post, 5**
         public const int UserIsNotAMemberOfWall = 501;
+        public const int ScheduledPostTimeInPast = 502;
+        public const int ScheduledPostContentInvalid = 503;
 
         // Know Your Speaker, 8**
         public const int GameAlreadyFinished = 801;
@@ -116,5 +118,14 @@ namespace Shrooms.Contracts.Constants
         // Video library, 20**
         public const int VideoLinkInvalid = 2000;
         public const int VideoRecordedInFuture = 2001;
+
+        // Time registration, 21**
+        public const int TimeRegistrationNotFound = 2100;
+        public const int TimeRegistrationInvalid = 2101;
+        public const int TimeRegistrationDuplicate = 2102;
+        public const int TimeRegistrationNotEditable = 2103;
+        public const int TimeRegistrationLocked = 2104;
+        public const int TimeRegistrationWrongStatus = 2105;
+        public const int TimeRegistrationInUse = 2106;
     }
 }

@@ -16,6 +16,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC;
 using Shrooms.Presentation.Api.BackgroundWorkers;
+using Shrooms.Domain.Services.Wall.Posts.ScheduledPosts;
 using Shrooms.Presentation.Api.Endpoints;
 using Shrooms.Presentation.Api.Middlewares;
 using Shrooms.Presentation.Common.Filters;
@@ -365,6 +366,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 // Application services (IoC bootstrapper)
 builder.Services.AddShrooms();
 builder.Services.AddTransient<PostNotifier>();
+builder.Services.AddTransient<IScheduledPostPublisher, ScheduledPostPublisher>();
 builder.Services.AddTransient<CommentNotifier>();
 
 // ImageSharp.Web: on-the-fly image resizing for /storage/* URLs that carry

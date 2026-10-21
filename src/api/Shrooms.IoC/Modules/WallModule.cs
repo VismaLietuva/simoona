@@ -5,6 +5,7 @@ using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Widgets;
 using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
+using Shrooms.Domain.Services.Wall.Posts.ScheduledPosts;
 using Shrooms.Domain.ServiceValidators.Validators.Wall;
 
 namespace Shrooms.IoC.Modules
@@ -14,6 +15,7 @@ namespace Shrooms.IoC.Modules
         public static IServiceCollection AddWall(this IServiceCollection services)
         {
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IScheduledPostService, ScheduledPostService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IWallService, WallService>();
             services.AddScoped<IWallWidgetPreferencesService, WallWidgetPreferencesService>();
