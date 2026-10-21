@@ -94,6 +94,43 @@ namespace Shrooms.Premium.Tests.ModelMappings
         }
 
         [Test]
+        public void Check_ReportsACycleTheTranslationLoses()
+        {
+            // Right on the plain sample, wrong on the cyclic one. The JSON leaves out AutoMapper's preserved back-reference,
+            // so Mapster's explicit null in its place must count as a difference.
+            var mapster = MapsterSettings.Create();
+            mapster.NewConfig<Node, NodeDto>().PreserveReference(true).Map(d => d.Next, s => s.Next == s ? null : s.Next);
+
+            var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
+
+            Assert.That(result.Failures, Has.One.Contains("on the cyclic sample at Next"));
+        }
+
+        [Test]
+        public void Check_ReportsAResultAutoMapperCannotSerialize()
+        {
+            // Text throws on both sides, so comparing what did serialize would pass without ever looking at it.
+            var mapster = MapsterSettings.Create();
+            mapster.NewConfig<Reading, ReadingDto>();
+            var samples = new Dictionary<(Type Source, Type Destination), Func<object>> { [(typeof(Reading), typeof(ReadingDto))] = () => new Reading { Value = -1 } };
+
+            var result = MappingParity.Check(AutoMapperConfig(), mapster, samples);
+
+            Assert.That(result.Failures, Has.One.Contains("AutoMapper's result on the sample fails to serialize at Text; fix the hand-written sample"));
+        }
+
+        [Test]
+        public void Check_ReportsAResultMapsterCannotSerialize()
+        {
+            var mapster = MapsterSettings.Create();
+            mapster.NewConfig<Reading, ReadingDto>().Map(d => d.Value, s => -1);
+
+            var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
+
+            Assert.That(result.Failures, Has.One.Contains("Mapster's result on the sample fails to serialize at Text"));
+        }
+
+        [Test]
         public void Check_AsksForAHandWrittenSample_WhenNoneCanBeGenerated()
         {
             var mapster = MapsterSettings.Create();
@@ -115,6 +152,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                     .ForMember(d => d.FullName, o => o.MapFrom(s => s.FirstName + " " + s.LastName));
                 cfg.CreateMap<Node, NodeDto>(MemberList.None);
                 cfg.CreateMap<Shape, ShapeDto>(MemberList.None);
+                cfg.CreateMap<Reading, ReadingDto>(MemberList.None);
             });
         }
 
@@ -146,6 +184,18 @@ namespace Shrooms.Premium.Tests.ModelMappings
             public string Name { get; set; }
 
             public NodeDto Next { get; set; }
+        }
+
+        public class Reading
+        {
+            public int Value { get; set; }
+        }
+
+        public class ReadingDto
+        {
+            public int Value { get; set; }
+
+            public string Text => Value < 0 ? throw new InvalidOperationException("No reading.") : Value.ToString();
         }
 
         public abstract class Shape

@@ -1,4 +1,5 @@
-﻿using Shrooms.Contracts.Enums;
+﻿using System;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Contracts.DataTransferObjects.Notification
 {
@@ -15,5 +16,9 @@ namespace Shrooms.Contracts.DataTransferObjects.Notification
         public SourcesDto SourceIds { get; set; }
 
         public NotificationType Type { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public bool IsRead { get; set; }
     }
 }

@@ -83,6 +83,7 @@ namespace Shrooms.IoC
             services.AddPremiumServices();
             services.AddPremiumUserEvents();
             services.AddPremiumVacation();
+            services.AddPremiumTimeRegistration();
             services.AddPremiumWebHookCallbacks();
 
             // AutoMapper
