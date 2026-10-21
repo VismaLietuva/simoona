@@ -8,6 +8,8 @@ namespace Shrooms.Domain.Services.Emoji
     {
         Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName);
 
+        Task<CustomEmojiListDto> GetAllAsync(int organizationId, string tenantName);
+
         Task<CustomEmojiDto> CreateAsync(NewCustomEmojiDto emojiDto, UserAndOrganizationDto userOrg, string tenantName);
 
         Task DeleteAsync(int id, UserAndOrganizationDto userOrg);

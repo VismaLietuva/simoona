@@ -44,21 +44,26 @@ namespace Shrooms.Domain.Services.Emoji
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public async Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
+        public Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
         {
-            var generation = GetGeneration(userOrg.OrganizationId);
+            return GetAllAsync(userOrg.OrganizationId, tenantName);
+        }
 
-            if (_emojiListCache.TryGetValue(userOrg.OrganizationId, out var entry) && entry.Generation == generation)
+        public async Task<CustomEmojiListDto> GetAllAsync(int organizationId, string tenantName)
+        {
+            var generation = GetGeneration(organizationId);
+
+            if (_emojiListCache.TryGetValue(organizationId, out var entry) && entry.Generation == generation)
             {
                 return entry.List;
             }
 
-            _emojiListCache.TryRemoveEntry(userOrg.OrganizationId);
+            _emojiListCache.TryRemoveEntry(organizationId);
 
             var tenant = tenantName.ToLowerInvariant();
 
             var emojis = await _customEmojisDbSet
-                .Where(x => x.OrganizationId == userOrg.OrganizationId)
+                .Where(x => x.OrganizationId == organizationId)
                 .OrderBy(x => x.Name)
                 .Select(x => new
                 {
@@ -76,9 +81,9 @@ namespace Shrooms.Domain.Services.Emoji
                 ETag = Guid.NewGuid().ToString("N")
             };
 
-            if (GetGeneration(userOrg.OrganizationId) == generation)
+            if (GetGeneration(organizationId) == generation)
             {
-                _emojiListCache.TryAdd(userOrg.OrganizationId, new EmojiListCacheEntry { List = result, Generation = generation });
+                _emojiListCache.TryAdd(organizationId, new EmojiListCacheEntry { List = result, Generation = generation });
             }
 
             return result;
