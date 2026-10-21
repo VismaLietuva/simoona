@@ -2,11 +2,14 @@
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Emoji;
 using Shrooms.Domain.Services.Organizations;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using System;
@@ -20,6 +23,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
     {
         private IMailingService _mailingService;
         private IApplicationSettings _applicationSettings;
+        private IMarkdownConverter _markdownConverter;
+        private ICustomEmojiService _customEmojiService;
 
         private EventNotificationService _sut;
 
@@ -28,11 +33,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             _mailingService = Substitute.For<IMailingService>();
             _applicationSettings = Substitute.For<IApplicationSettings>();
+            _markdownConverter = Substitute.For<IMarkdownConverter>();
+            _customEmojiService = Substitute.For<ICustomEmojiService>();
 
             var uow = Substitute.For<IUnitOfWork2>();
             var mailTemplate = Substitute.For<IMailTemplate>();
             var organizationService = Substitute.For<IOrganizationService>();
-            var markdownConverter = Substitute.For<IMarkdownConverter>();
 
             _sut = new EventNotificationService(
                 uow,
@@ -40,7 +46,25 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _mailingService,
                 _applicationSettings,
                 organizationService,
-                markdownConverter);
+                _markdownConverter,
+                _customEmojiService);
+        }
+
+        [Test]
+        public async Task NotifyNewEventAsync_PassesTheOrganisationsEmojiToTheConverter()
+        {
+            var emojis = new CustomEmojiListDto
+            {
+                Emojis = new List<CustomEmojiDto> { new CustomEmojiDto { Name = "parrot", Url = "/storage/org/parrot.gif" } }
+            };
+            _customEmojiService.GetAllAsync(3, "org").Returns(emojis);
+            _applicationSettings.ApiUrl.Returns("https://api.example.com");
+            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
+            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = "bring :parrot:", StartDate = DateTime.UtcNow };
+
+            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
+
+            _markdownConverter.Received(1).ConvertToHtml("bring :parrot:", emojis.Emojis, "https://api.example.com");
         }
 
         [Test]

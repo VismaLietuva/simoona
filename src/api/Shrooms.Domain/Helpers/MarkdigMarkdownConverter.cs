@@ -23,7 +23,7 @@ namespace Shrooms.Domain.Helpers
             return Markdown.ToHtml(ExpandMentions(markdown), Pipeline);
         }
 
-        public string ConvertToHtml(string markdown, IReadOnlyCollection<CustomEmojiDto> customEmojis, string imageBaseUrl)
+        public string ConvertToHtml(string markdown, IEnumerable<CustomEmojiDto> customEmojis, string imageBaseUrl)
         {
             if (string.IsNullOrEmpty(markdown))
             {

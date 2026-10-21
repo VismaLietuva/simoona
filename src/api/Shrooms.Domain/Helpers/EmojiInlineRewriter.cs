@@ -15,7 +15,7 @@ namespace Shrooms.Domain.Helpers
 
         private static readonly Regex Tone = new(@"\G:skin-tone-([2-6]):", RegexOptions.Compiled);
 
-        public static void Apply(MarkdownDocument document, IReadOnlyCollection<CustomEmojiDto> customEmojis, string imageBaseUrl)
+        public static void Apply(MarkdownDocument document, IEnumerable<CustomEmojiDto> customEmojis, string imageBaseUrl)
         {
             var custom = (customEmojis ?? Array.Empty<CustomEmojiDto>())
                 .Where(emoji => !string.IsNullOrEmpty(emoji?.Name))
