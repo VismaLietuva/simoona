@@ -72,5 +72,26 @@ namespace Shrooms.EmailTemplates.Tests
 
             Assert.That(text, Is.EqualTo("Open the event (https://example.com/x)"));
         }
+
+        [Test]
+        public async Task Convert_OnTheNewPostEmail_KeepsEmojiNamesAndCharacters()
+        {
+            var html = await File.ReadAllTextAsync(Path.Combine(GoldenRoot, "Wall.NewPost.html"));
+
+            var text = HtmlToPlainTextConverter.Convert(html);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(text, Does.Contain("🎉"));
+                Assert.That(text, Does.Contain(":parrot:"));
+                Assert.That(text, Does.Not.Contain("<img"));
+            });
+        }
+
+        [Test]
+        public void Convert_OnImageWithoutAlt_DropsIt()
+        {
+            Assert.That(HtmlToPlainTextConverter.Convert("<p>a <img src=\"x.png\"> b</p>"), Is.EqualTo("a b"));
+        }
     }
 }

@@ -13,6 +13,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Emoji;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Mentions;
@@ -31,6 +32,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IMentionLinkExpander _mentionLinkExpander;
+        private readonly ICustomEmojiService _customEmojiService;
 
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
@@ -45,7 +47,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
             IMarkdownConverter markdownConverter,
-            IMentionLinkExpander mentionLinkExpander)
+            IMentionLinkExpander mentionLinkExpander,
+            ICustomEmojiService customEmojiService)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -55,6 +58,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
             _mentionLinkExpander = mentionLinkExpander;
+            _customEmojiService = customEmojiService;
 
             _wallsDbSet = uow.GetDbSet<MultiwallWall>();
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -81,7 +85,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             if (mentionedUsers.Any())
             {
-                await SendMentionerUserEmailsAsync(post.Id, postAuthor.FullName, mentionedUsers, organization.ShortName);
+                await SendMentionerUserEmailsAsync(post.Id, postAuthor.FullName, mentionedUsers, organization);
             }
         }
 
@@ -104,13 +108,14 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = await _organizationService.GetOrganizationByIdAsync(editPostDto.OrganizationId);
             var postAuthor = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
 
-            await SendMentionerUserEmailsAsync(editPostDto.Id, postAuthor.FullName, mentionedUsers, organization.ShortName);
+            await SendMentionerUserEmailsAsync(editPostDto.Id, postAuthor.FullName, mentionedUsers, organization);
         }
 
-        private async Task SendMentionerUserEmailsAsync(int postId, string postAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionerUserEmailsAsync(int postId, string postAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, Organization organization)
         {
+            var organizationShortName = organization.ShortName;
             var postBody = await _postService.GetPostBodyAsync(postId);
-            var convertedPostBody = ConvertBodyToHtml(postBody, organizationShortName);
+            var convertedPostBody = await ConvertBodyToHtmlAsync(postBody, organization);
 
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
@@ -134,10 +139,14 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private string ConvertBodyToHtml(string messageBody, string organizationShortName)
+        private async Task<string> ConvertBodyToHtmlAsync(string messageBody, Organization organization)
         {
+            var emojis = await _customEmojiService.GetAllAsync(organization.Id, organization.ShortName);
+
             return _markdownConverter.ConvertToHtml(
-                _mentionLinkExpander.ExpandToMarkdown(messageBody, organizationShortName));
+                _mentionLinkExpander.ExpandToMarkdown(messageBody, organization.ShortName),
+                emojis.Emojis,
+                _appSettings.ApiUrl);
         }
 
         private async Task SendWallSubscriberEmailsAsync(
@@ -151,7 +160,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var subject = CreateSubject(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
-            var body = ConvertBodyToHtml(post.MessageBody, organization.ShortName);
+            var body = await ConvertBodyToHtmlAsync(post.MessageBody, organization);
 
             var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(WallEmailPresentation.GetPostTitle(wall),
                 wall.Name,

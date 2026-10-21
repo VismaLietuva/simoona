@@ -311,6 +311,22 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Share_Cache_Between_User_And_Organization_Lookups()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
+            {
+                new()
+                    { Id = 1, Name = "parrot", BlobName = "parrot.gif", OrganizationId = 2 }
+            }.AsQueryable());
+
+            var viaUser = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+            var viaOrganization = await _customEmojiService.GetAllAsync(2, "Visma");
+
+            Assert.That(viaOrganization.ETag, Is.EqualTo(viaUser.ETag));
+            Assert.That(viaOrganization.Emojis.Single().Url, Is.EqualTo("/storage/visma/parrot.gif"));
+        }
+
+        [Test]
         public async Task Should_Invalidate_Cache_On_Create()
         {
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
