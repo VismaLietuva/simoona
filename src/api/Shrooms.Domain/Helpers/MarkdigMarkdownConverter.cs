@@ -1,5 +1,6 @@
 using Markdig;
 using Markdig.Extensions.EmphasisExtras;
+using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Domain.Services.Wall.Mentions;
 
 namespace Shrooms.Domain.Helpers
@@ -19,9 +20,25 @@ namespace Shrooms.Domain.Helpers
                 return string.Empty;
             }
 
-            var withMentions = MentionTokenParser.Replace(markdown, token => $"**@{token.Label}**");
+            return Markdown.ToHtml(ExpandMentions(markdown), Pipeline);
+        }
 
-            return Markdown.ToHtml(withMentions, Pipeline);
+        public string ConvertToHtml(string markdown, IReadOnlyCollection<CustomEmojiDto> customEmojis, string imageBaseUrl)
+        {
+            if (string.IsNullOrEmpty(markdown))
+            {
+                return string.Empty;
+            }
+
+            var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
+            EmojiInlineRewriter.Apply(document, customEmojis, imageBaseUrl);
+
+            return Markdown.ToHtml(document, Pipeline);
+        }
+
+        private static string ExpandMentions(string markdown)
+        {
+            return MentionTokenParser.Replace(markdown, token => $"**@{token.Label}**");
         }
     }
 }
