@@ -26,12 +26,13 @@ namespace Shrooms.Premium.Tests.ModelMappings
         /// <summary>
         /// Maps the source with AutoMapper twice and returns the first result as JSON, with the paths that differ between
         /// the two runs blanked. Those come from the destination's constructor (new Guid, DateTime.UtcNow); they say nothing
-        /// about the mapper, so the caller blanks them on the Mapster side too.
+        /// about the mapper, so the caller blanks them on the Mapster side too. Serialization errors from both runs go to
+        /// errors.
         /// </summary>
         public static JToken MapWithAutoMapper(IMapper autoMapper, object source, Type sourceType, Type destinationType, List<string> errors, out List<string> noisePaths)
         {
             var expected = ToJson(autoMapper.Map(source, sourceType, destinationType), errors);
-            var again = ToJson(autoMapper.Map(source, sourceType, destinationType), new List<string>());
+            var again = ToJson(autoMapper.Map(source, sourceType, destinationType), errors);
             noisePaths = DifferingPaths(expected, again).Where(p => p != "(value)").ToList();
             Blank(expected, noisePaths);
             return expected;
@@ -50,15 +51,21 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Error = (_, args) =>
                 {
-                    errors.Add(args.ErrorContext.Path);
-                    args.ErrorContext.Handled = true;
+                    // Path is the parent's ("" at the root); Member names the property whose getter threw.
+                    var context = args.ErrorContext;
+                    errors.Add(context.Member is string member && !context.Path.EndsWith(member, StringComparison.Ordinal)
+                        ? (context.Path.Length == 0 ? member : $"{context.Path}.{member}")
+                        : context.Path);
+                    context.Handled = true;
                 }
             });
 
             return JToken.FromObject(value, serializer);
         }
 
-        // Leaf paths ("Projects[0].Name") where the two trees differ; "(value)" when the roots themselves differ.
+        // Leaf paths ("Projects[0].Name") where the two trees differ; "(value)" when the roots themselves differ. A property
+        // present on one side only differs even when the other side holds null: the JSON leaves out a preserved
+        // back-reference, so an explicit null in its place means the cycle was lost.
         public static List<string> DifferingPaths(JToken expected, JToken actual)
         {
             return DifferingPaths(expected, actual, string.Empty);
@@ -164,10 +171,13 @@ namespace Shrooms.Premium.Tests.ModelMappings
             {
                 return left.Properties().Select(p => p.Name)
                     .Union(right.Properties().Select(p => p.Name))
-                    .SelectMany(name => DifferingPaths(
-                        left[name] ?? JValue.CreateNull(),
-                        right[name] ?? JValue.CreateNull(),
-                        path.Length == 0 ? name : $"{path}.{name}"))
+                    .SelectMany(name =>
+                    {
+                        var memberPath = path.Length == 0 ? name : $"{path}.{name}";
+                        return left.ContainsKey(name) && right.ContainsKey(name)
+                            ? DifferingPaths(left[name], right[name], memberPath)
+                            : new List<string> { memberPath };
+                    })
                     .ToList();
             }
 

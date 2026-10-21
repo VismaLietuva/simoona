@@ -81,26 +81,39 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 return null;
             }
 
+            // A member whose getter throws is left out of the JSON, so it would go uncompared: both sides must serialize cleanly.
+            var fix = handWritten ? "fix the hand-written sample" : "add a hand-written sample";
+            var autoMapperErrors = new List<string>();
             JToken expected;
             List<string> noisePaths;
             try
             {
-                expected = MappingSamples.MapWithAutoMapper(autoMapper, source, sourceType, destinationType, new List<string>(), out noisePaths);
+                expected = MappingSamples.MapWithAutoMapper(autoMapper, source, sourceType, destinationType, autoMapperErrors, out noisePaths);
             }
             catch (Exception ex)
             {
-                var fix = handWritten ? "fix the hand-written sample" : "add a hand-written sample";
                 return $"AutoMapper throws {ex.GetBaseException().GetType().Name} on the {on}; {fix}.";
             }
 
+            if (autoMapperErrors.Count > 0)
+            {
+                return $"AutoMapper's result on the {on} fails to serialize at {Paths(autoMapperErrors.Distinct().ToList())}; {fix}.";
+            }
+
+            var mapsterErrors = new List<string>();
             JToken actual;
             try
             {
-                actual = MappingSamples.ToJson(mapster.Map(source, sourceType, destinationType), new List<string>());
+                actual = MappingSamples.ToJson(mapster.Map(source, sourceType, destinationType), mapsterErrors);
             }
             catch (Exception ex)
             {
                 return $"Mapster throws on the {on}: {ex.GetBaseException().Message}";
+            }
+
+            if (mapsterErrors.Count > 0)
+            {
+                return $"Mapster's result on the {on} fails to serialize at {Paths(mapsterErrors.Distinct().ToList())}.";
             }
 
             MappingSamples.Blank(actual, noisePaths);
@@ -110,8 +123,13 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 return null;
             }
 
-            var shown = string.Join(", ", differing.Take(MaxPathsShown));
-            return $"differs from AutoMapper on the {on} at {shown}" + (differing.Count > MaxPathsShown ? $" (+{differing.Count - MaxPathsShown} more)." : ".");
+            return $"differs from AutoMapper on the {on} at {Paths(differing)}.";
+        }
+
+        private static string Paths(List<string> paths)
+        {
+            var shown = string.Join(", ", paths.Take(MaxPathsShown));
+            return paths.Count > MaxPathsShown ? $"{shown} (+{paths.Count - MaxPathsShown} more)" : shown;
         }
     }
 
