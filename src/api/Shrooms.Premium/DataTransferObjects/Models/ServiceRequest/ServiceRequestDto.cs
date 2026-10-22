@@ -21,5 +21,7 @@
         public int? KudosShopItemId { get; set; }
 
         public string PictureId { get; set; }
+
+        public bool? IsKudosCommentHidden { get; set; }
     }
 }
