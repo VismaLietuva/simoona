@@ -55,6 +55,11 @@ namespace Shrooms.Presentation.ModelMappings.MapsterSetup
 
             // Not global: PreserveReference. AutoMapper turns it on by itself for self-referencing types, so the
             // translated maps for those types set it explicitly. A global switch would cost every other mapping.
+
+            // Not global: MaxDepth. Mapster applies it at compile time by unrolling nested mappings to that depth, so the
+            // generated code grows exponentially with the number of recursive members: on a type with three, depth 8 takes
+            // seconds to compile and depth 10 fails with InvalidProgramException. It also cuts deeper data off silently,
+            // where AutoMapper maps all of it. Cycles are handled by PreserveReference on the maps that need it instead.
         }
     }
 }
