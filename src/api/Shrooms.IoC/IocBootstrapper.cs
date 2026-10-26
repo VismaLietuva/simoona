@@ -6,6 +6,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Email.Posting;
+using Shrooms.Domain.Services.FeatureFlags;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Jwt;
 using Shrooms.Domain.Services.Organizations;
@@ -43,6 +44,7 @@ namespace Shrooms.IoC
             services.AddScoped<IUserAdministrationValidator, UserAdministrationValidator>();
             services.AddScoped<IOrganizationService, OrganizationService>();
             services.AddScoped<IProjectsService, ProjectsService>();
+            services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 
             // Modules
             services.AddIdentityRegistrations();
