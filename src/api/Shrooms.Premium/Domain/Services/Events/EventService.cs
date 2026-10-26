@@ -759,6 +759,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
+                HostUserImageName = e.ResponsibleUser.PictureId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 // Legacy flat options only; question-owned options reach the client under Questions.
