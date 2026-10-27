@@ -6,10 +6,13 @@ namespace Shrooms.Domain.Helpers
 {
     public class MarkdigMarkdownConverter : IMarkdownConverter
     {
+        // Bare URLs become links, as on the wall. The emoji rewriter leaves autolink labels alone,
+        // so a token inside a URL is never turned into an emoji.
         private static readonly MarkdownPipeline Pipeline =
             new MarkdownPipelineBuilder()
                 .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
                 .UseSoftlineBreakAsHardlineBreak()
+                .UseAutoLinks()
                 .Build();
 
         public string ConvertToHtml(string markdown)

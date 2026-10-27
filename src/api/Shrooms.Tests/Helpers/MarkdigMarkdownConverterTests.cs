@@ -231,6 +231,20 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
+        public void ConvertToHtml_BareUrlWithToken_BecomesALinkAndStaysLiteral()
+        {
+            Assert.That(
+                Convert("see https://x.y/:tada:/docs now"),
+                Is.EqualTo("<p>see <a href=\"https://x.y/:tada:/docs\">https://x.y/:tada:/docs</a> now</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_BareWwwAddress_BecomesALink()
+        {
+            Assert.That(_sut.ConvertToHtml("visit www.example.com today"), Does.Contain("<a href=\"http://www.example.com\">www.example.com</a>"));
+        }
+
+        [Test]
         public void ConvertToHtml_InsideLinkLabel_RenderedButNotInTheUrl()
         {
             Assert.That(Convert("[hi :tada:](https://x.y/:tada:)"), Is.EqualTo("<p><a href=\"https://x.y/:tada:\">hi 🎉</a></p>\n"));
