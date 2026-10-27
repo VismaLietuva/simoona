@@ -5,6 +5,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.DAL;
+using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Jwt;
@@ -36,6 +37,7 @@ namespace Shrooms.IoC
             services.AddScoped<IMailSendingService, SmtpService>();
             services.AddScoped<IPostNotificationService, PostNotificationService>();
             services.AddScoped<ICommentNotificationService, CommentNotificationService>();
+            services.AddScoped<IEmailMarkdownRenderer, EmailMarkdownRenderer>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ISyncTokenService, SyncTokenService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();

@@ -12,11 +12,8 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.Emoji;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Emails;
 using Shrooms.Resources.Models.Walls.Posts;
@@ -30,9 +27,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IPostService _postService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
-        private readonly IMarkdownConverter _markdownConverter;
-        private readonly IMentionLinkExpander _mentionLinkExpander;
-        private readonly ICustomEmojiService _customEmojiService;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
@@ -46,9 +41,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter,
-            IMentionLinkExpander mentionLinkExpander,
-            ICustomEmojiService customEmojiService)
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -56,9 +49,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _userService = userService;
             _postService = postService;
             _organizationService = organizationService;
-            _markdownConverter = markdownConverter;
-            _mentionLinkExpander = mentionLinkExpander;
-            _customEmojiService = customEmojiService;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _wallsDbSet = uow.GetDbSet<MultiwallWall>();
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -115,7 +106,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var organizationShortName = organization.ShortName;
             var postBody = await _postService.GetPostBodyAsync(postId);
-            var convertedPostBody = await ConvertBodyToHtmlAsync(postBody, organization);
+            var convertedPostBody = await _emailMarkdownRenderer.RenderAsync(postBody, organization.Id, organizationShortName);
 
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
@@ -139,16 +130,6 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private async Task<string> ConvertBodyToHtmlAsync(string messageBody, Organization organization)
-        {
-            var emojis = await _customEmojiService.GetAllAsync(organization.Id, organization.ShortName);
-
-            return _markdownConverter.ConvertToHtml(
-                _mentionLinkExpander.ExpandToMarkdown(messageBody, organization.ShortName),
-                emojis.Emojis,
-                _appSettings.ApiUrl);
-        }
-
         private async Task SendWallSubscriberEmailsAsync(
             NewlyCreatedPostDto post,
             IEnumerable<string> destinationEmails,
@@ -160,7 +141,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
             var subject = CreateSubject(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
-            var body = await ConvertBodyToHtmlAsync(post.MessageBody, organization);
+            var body = await _emailMarkdownRenderer.RenderAsync(post.MessageBody, organization.Id, organization.ShortName);
 
             var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(WallEmailPresentation.GetPostTitle(wall),
                 wall.Name,

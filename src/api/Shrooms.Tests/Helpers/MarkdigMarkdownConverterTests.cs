@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Domain.Helpers;
 
 namespace Shrooms.Tests.Helpers
@@ -10,7 +10,10 @@ namespace Shrooms.Tests.Helpers
         private const string ParrotImg =
             "<img src=\"https://api.example.com/storage/org/parrot.gif\" alt=\":parrot:\" title=\":parrot:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\">";
 
-        private static readonly CustomEmojiDto Parrot = new CustomEmojiDto { Id = 1, Name = "parrot", Url = "/storage/org/parrot.gif" };
+        private static readonly IReadOnlyDictionary<string, string> Parrot = new Dictionary<string, string>
+        {
+            ["parrot"] = "https://api.example.com/storage/org/parrot.gif"
+        };
 
         private MarkdigMarkdownConverter _sut;
 
@@ -103,9 +106,15 @@ namespace Shrooms.Tests.Helpers
             Assert.That(result, Is.EqualTo("<h1>Hello</h1>\n"));
         }
 
-        private string Convert(string markdown, params CustomEmojiDto[] emojis)
+        private string Convert(string markdown, IReadOnlyDictionary<string, string> customEmojiImages = null)
         {
-            return _sut.ConvertToHtml(markdown, emojis, "https://api.example.com/");
+            return _sut.ConvertToHtml(markdown, customEmojiImages ?? new Dictionary<string, string>());
+        }
+
+        [Test]
+        public void ConvertToHtml_TextWithoutColon_IsLeftToMarkdig()
+        {
+            Assert.That(Convert("plain **bold** text", Parrot), Is.EqualTo("<p>plain <strong>bold</strong> text</p>\n"));
         }
 
         [Test]
@@ -123,7 +132,7 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void ConvertToHtml_CustomWinsOverStandardName()
         {
-            var tada = new CustomEmojiDto { Name = "tada", Url = "/storage/org/t.png" };
+            var tada = new Dictionary<string, string> { ["tada"] = "https://api.example.com/storage/org/t.png" };
 
             Assert.That(
                 Convert(":tada:", tada),
@@ -209,17 +218,17 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_NullListAndNullBaseUrl_DoesNotThrow()
+        public void ConvertToHtml_NullCustomEmoji_RendersStandardOnly()
         {
-            Assert.That(_sut.ConvertToHtml(":tada: :partyparrot:", null, null), Is.EqualTo("<p>🎉 :partyparrot:</p>\n"));
+            Assert.That(_sut.ConvertToHtml(":tada: :partyparrot:", null), Is.EqualTo("<p>🎉 :partyparrot:</p>\n"));
         }
 
         [Test]
-        public void ConvertToHtml_NullBaseUrl_UsesRelativeUrl()
+        public void ConvertToHtml_ImageUrlWithAmpersand_IsAttributeEncoded()
         {
-            Assert.That(
-                _sut.ConvertToHtml(":parrot:", new[] { Parrot }, null),
-                Is.EqualTo("<p><img src=\"/storage/org/parrot.gif\" alt=\":parrot:\" title=\":parrot:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\"></p>\n"));
+            var signed = new Dictionary<string, string> { ["parrot"] = "https://cdn.example.com/p.gif?a=1&b=2" };
+
+            Assert.That(Convert(":parrot:", signed), Does.Contain("src=\"https://cdn.example.com/p.gif?a=1&amp;b=2\""));
         }
 
         [Test]

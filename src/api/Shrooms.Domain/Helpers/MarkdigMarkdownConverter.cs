@@ -1,6 +1,5 @@
 using Markdig;
 using Markdig.Extensions.EmphasisExtras;
-using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Domain.Services.Wall.Mentions;
 
 namespace Shrooms.Domain.Helpers
@@ -23,7 +22,7 @@ namespace Shrooms.Domain.Helpers
             return Markdown.ToHtml(ExpandMentions(markdown), Pipeline);
         }
 
-        public string ConvertToHtml(string markdown, IEnumerable<CustomEmojiDto> customEmojis, string imageBaseUrl)
+        public string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages)
         {
             if (string.IsNullOrEmpty(markdown))
             {
@@ -31,7 +30,7 @@ namespace Shrooms.Domain.Helpers
             }
 
             var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
-            EmojiInlineRewriter.Apply(document, customEmojis, imageBaseUrl);
+            EmojiInlineRewriter.Apply(document, customEmojiImages);
 
             return Markdown.ToHtml(document, Pipeline);
         }
