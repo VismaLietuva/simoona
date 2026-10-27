@@ -19,5 +19,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public string PictureId { get; set; }
 
         public string SentToId { get; set; }
+
+        public bool IsCommentHidden { get; set; }
     }
 }

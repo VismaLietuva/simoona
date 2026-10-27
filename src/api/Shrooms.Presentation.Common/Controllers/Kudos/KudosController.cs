@@ -79,7 +79,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
                 return BadRequest(ModelState);
             }
 
-            var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId, filteringType);
+            var canViewHiddenComments = await CanViewHiddenKudosCommentsAsync(userId);
+            var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId, canViewHiddenComments, filteringType);
             var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDto>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs).ToList();
             var pagedKudosLogs = new PagedViewModel<KudosUserLogViewModel>
             {
@@ -370,7 +371,8 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
 
             try
             {
-                var userKudosInformationDto = await _kudosService.GetApprovedKudosListAsync(id, GetUserAndOrganization().OrganizationId);
+                var canViewHiddenComments = await CanViewHiddenKudosCommentsAsync(id);
+                var userKudosInformationDto = await _kudosService.GetApprovedKudosListAsync(id, GetUserAndOrganization().OrganizationId, canViewHiddenComments);
                 var result = _mapper.Map<IEnumerable<UserKudosInformationDto>, IEnumerable<UserKudosInformationViewModel>>(userKudosInformationDto);
                 return Ok(result);
             }
@@ -485,6 +487,13 @@ namespace Shrooms.Presentation.Common.Controllers.Kudos
         private string GetUserIdIfNull(string userId)
         {
             return userId ?? User.Identity.GetUserId();
+        }
+
+        private async Task<bool> CanViewHiddenKudosCommentsAsync(string logOwnerId)
+        {
+            var viewer = GetUserAndOrganization();
+            return logOwnerId == viewer.UserId ||
+                   await _permissionService.UserHasPermissionAsync(viewer, AdministrationPermissions.Kudos);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public int? KudosBasketId { get; set; }
         public KudosLogTypeDto Type { get; set; }
         public string PictureId { get; set; }
+        public bool IsCommentHidden { get; set; }
         public IEnumerable<LikeDto> Likes { get; set; }
     }
 }

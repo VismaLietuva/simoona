@@ -24,5 +24,10 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
         public int? KudosShopItemId { get; set; }
 
         public string PictureId { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the kudos deduction's comment is hidden from other users. Null leaves the stored value unchanged.
+        /// </summary>
+        public bool? IsKudosCommentHidden { get; set; }
     }
 }
