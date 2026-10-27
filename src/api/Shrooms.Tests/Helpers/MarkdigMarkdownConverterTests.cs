@@ -8,11 +8,11 @@ namespace Shrooms.Tests.Helpers
     public class MarkdigMarkdownConverterTests
     {
         private const string ParrotImg =
-            "<img src=\"https://api.example.com/storage/org/parrot.gif\" alt=\":parrot:\" title=\":parrot:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\">";
+            "<img src=\"https://api.example.com/storage/org/shipit.gif\" alt=\":shipit:\" title=\":shipit:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\">";
 
         private static readonly IReadOnlyDictionary<string, string> Parrot = new Dictionary<string, string>
         {
-            ["parrot"] = "https://api.example.com/storage/org/parrot.gif"
+            ["shipit"] = "https://api.example.com/storage/org/shipit.gif"
         };
 
         private MarkdigMarkdownConverter _sut;
@@ -120,7 +120,7 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void ConvertToHtml_CustomEmoji_RendersImage()
         {
-            Assert.That(Convert("hi :parrot:", Parrot), Is.EqualTo($"<p>hi {ParrotImg}</p>\n"));
+            Assert.That(Convert("hi :shipit:", Parrot), Is.EqualTo($"<p>hi {ParrotImg}</p>\n"));
         }
 
         [Test]
@@ -130,13 +130,44 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_CustomWinsOverStandardName()
+        public void ConvertToHtml_StandardWinsOverCustomName_AsInTheAppAndSlack()
         {
             var tada = new Dictionary<string, string> { ["tada"] = "https://api.example.com/storage/org/t.png" };
 
-            Assert.That(
-                Convert(":tada:", tada),
-                Is.EqualTo("<p><img src=\"https://api.example.com/storage/org/t.png\" alt=\":tada:\" title=\":tada:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\"></p>\n"));
+            Assert.That(Convert(":tada:", tada), Is.EqualTo("<p>🎉</p>\n"));
+        }
+
+        [TestCase("done:tada::tada:")]
+        [TestCase("12:30::tada:")]
+        [TestCase("fe80::a:1")]
+        [TestCase("status:ok:200")]
+        public void ConvertToHtml_ColonChainGluedToAWord_StaysLiteral(string markdown)
+        {
+            Assert.That(Convert(markdown), Is.EqualTo($"<p>{markdown}</p>\n"));
+        }
+
+        [TestCase("**word**:tada:", "<p><strong>word</strong>:tada:</p>\n")]
+        [TestCase("`word`:tada:", "<p><code>word</code>:tada:</p>\n")]
+        [TestCase(":tada:**word**", "<p>:tada:<strong>word</strong></p>\n")]
+        [TestCase("[:tada:](https://x.y)word", "<p><a href=\"https://x.y\">:tada:</a>word</p>\n")]
+        public void ConvertToHtml_GluedToAWordInANeighbouringInline_StaysLiteral(string markdown, string html)
+        {
+            Assert.That(Convert(markdown), Is.EqualTo(html));
+        }
+
+        [TestCase("**word** :tada:", "<p><strong>word</strong> 🎉</p>\n")]
+        [TestCase("`word` :tada:", "<p><code>word</code> 🎉</p>\n")]
+        [TestCase(":tada:**:tada:**", "<p>🎉<strong>🎉</strong></p>\n")]
+        [TestCase("(:tada:)**!**", "<p>(🎉)<strong>!</strong></p>\n")]
+        public void ConvertToHtml_SeparatedFromTheNeighbouringInline_Rendered(string markdown, string html)
+        {
+            Assert.That(Convert(markdown), Is.EqualTo(html));
+        }
+
+        [Test]
+        public void ConvertToHtml_AfterALineBreak_Rendered()
+        {
+            Assert.That(Convert("word\n:tada:"), Does.Contain("🎉"));
         }
 
         [Test]
@@ -190,7 +221,7 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void ConvertToHtml_ToneOnCustom_KeepsToneText()
         {
-            Assert.That(Convert(":parrot::skin-tone-3:", Parrot), Is.EqualTo($"<p>{ParrotImg}:skin-tone-3:</p>\n"));
+            Assert.That(Convert(":shipit::skin-tone-3:", Parrot), Is.EqualTo($"<p>{ParrotImg}:skin-tone-3:</p>\n"));
         }
 
         [Test]
@@ -200,9 +231,15 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_InsideLinkLabel_Untouched()
+        public void ConvertToHtml_InsideLinkLabel_RenderedButNotInTheUrl()
         {
-            Assert.That(Convert("[:tada:](https://x.y)"), Is.EqualTo("<p><a href=\"https://x.y\">:tada:</a></p>\n"));
+            Assert.That(Convert("[hi :tada:](https://x.y/:tada:)"), Is.EqualTo("<p><a href=\"https://x.y/:tada:\">hi 🎉</a></p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_InsideAutolink_Untouched()
+        {
+            Assert.That(Convert("<https://x.y/:tada:>"), Is.EqualTo("<p><a href=\"https://x.y/:tada:\">https://x.y/:tada:</a></p>\n"));
         }
 
         [Test]
@@ -226,9 +263,9 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void ConvertToHtml_ImageUrlWithAmpersand_IsAttributeEncoded()
         {
-            var signed = new Dictionary<string, string> { ["parrot"] = "https://cdn.example.com/p.gif?a=1&b=2" };
+            var signed = new Dictionary<string, string> { ["shipit"] = "https://cdn.example.com/p.gif?a=1&b=2" };
 
-            Assert.That(Convert(":parrot:", signed), Does.Contain("src=\"https://cdn.example.com/p.gif?a=1&amp;b=2\""));
+            Assert.That(Convert(":shipit:", signed), Does.Contain("src=\"https://cdn.example.com/p.gif?a=1&amp;b=2\""));
         }
 
         [Test]
