@@ -8,6 +8,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public string Comments { get; set; }
 
+        public bool IsCommentHidden { get; set; }
+
         public decimal Points { get; set; }
 
         public int MultiplyBy { get; set; }

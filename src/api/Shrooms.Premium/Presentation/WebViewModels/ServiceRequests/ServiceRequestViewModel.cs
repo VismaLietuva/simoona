@@ -30,5 +30,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
         public bool IsCloseable { get; set; }
 
         public string PictureId { get; set; }
+
+        public bool IsKudosCommentHidden { get; set; }
     }
 }

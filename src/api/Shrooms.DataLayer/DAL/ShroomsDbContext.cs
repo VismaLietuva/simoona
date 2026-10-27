@@ -23,6 +23,7 @@ using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Emoji;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.FeatureFlags;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.DataLayer.EntityModels.Models.Monitors;
@@ -231,6 +232,10 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<TimeMonthLock> TimeMonthLocks { get; set; }
 
+        public virtual DbSet<FeatureFlag> FeatureFlags { get; set; }
+
+        public virtual DbSet<FeatureFlagUser> FeatureFlagUsers { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -346,6 +351,8 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new TimeEntryEntityConfig());
             modelBuilder.ApplyConfiguration(new TimePeriodEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeMonthLockEntityConfig());
+            modelBuilder.ApplyConfiguration(new FeatureFlagEntityConfig());
+            modelBuilder.ApplyConfiguration(new FeatureFlagUserEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
