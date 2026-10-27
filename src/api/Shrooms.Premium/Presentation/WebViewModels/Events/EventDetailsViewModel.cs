@@ -41,6 +41,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public string HostUserId { get; set; }
 
+        public string HostUserImageName { get; set; }
+
         public bool IsFull { get; set; }
 
         public AttendingStatus ParticipatingStatus { get; set; }

@@ -2073,6 +2073,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<DateTime?>("GroupKudosPeriod")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsCommentHidden")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("KudosBasketId")
                         .HasColumnType("int");
 
@@ -3806,6 +3809,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("nvarchar(128)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsKudosCommentHidden")
                         .HasColumnType("bit");
 
                     b.Property<int?>("KudosAmmount")
