@@ -184,7 +184,9 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDto userAndOrg)
         {
-            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
+            var applicationUser = await _usersDbSet
+                .Include(user => user.Settings)
+                .FirstAsync(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
             var hasRole = await _userManager.IsInRoleAsync(applicationUser, Contracts.Constants.Roles.FirstLogin);
@@ -223,8 +225,11 @@ namespace Shrooms.Domain.Services.Administration
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
                 OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id,
                 EmploymentDate = DateTime.UtcNow,
-                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
-                TimeZone = userSettings.TimeZone,
+                Settings = new UserSettings
+                {
+                    CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
+                    TimeZone = userSettings.TimeZone
+                },
                 NotificationsSettings = null
             };
 
@@ -254,8 +259,11 @@ namespace Shrooms.Domain.Services.Administration
 
             user.OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id;
             user.EmploymentDate = DateTime.UtcNow;
-            user.CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture;
-            user.TimeZone = userSettings.TimeZone;
+            user.Settings = new UserSettings
+            {
+                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
+                TimeZone = userSettings.TimeZone
+            };
             user.NotificationsSettings = null;
 
             var result = await _userManager.CreateAsync(user, password);
@@ -326,14 +334,19 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task SetUserTutorialStatusToCompleteAsync(string userId)
         {
-            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
+            var applicationUser = await _usersDbSet
+                .Include(user => user.Settings)
+                .FirstAsync(user => user.Id == userId);
             SetTutorialStatus(applicationUser, true);
             await _uow.SaveChangesAsync(userId);
         }
 
         public async Task<bool> GetUserTutorialStatusAsync(string userId)
         {
-            return (await _usersDbSet.FirstAsync(user => user.Id == userId)).IsTutorialComplete;
+            return await _usersDbSet
+                .Where(user => user.Id == userId)
+                .Select(user => user.Settings.IsTutorialComplete)
+                .FirstAsync();
         }
 
         public async Task AddProviderEmailAsync(string userId, string provider, string email)
@@ -472,7 +485,7 @@ namespace Shrooms.Domain.Services.Administration
 
         private static void SetTutorialStatus(ApplicationUser user, bool tutorialStatus)
         {
-            user.IsTutorialComplete = tutorialStatus;
+            user.GetOrCreateSettings().IsTutorialComplete = tutorialStatus;
         }
 
         private async Task AddNewUserRolesAsync(string id)

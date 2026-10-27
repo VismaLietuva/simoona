@@ -98,8 +98,24 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
             set => RegistrationDeadline = GetUtcDateFromLocalDate(value);
         }
 
-        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TZConvert.GetTimeZoneInfo(GetResponsibleUserTimeZone()));
 
-        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TZConvert.GetTimeZoneInfo(GetResponsibleUserTimeZone()));
+
+        private string GetResponsibleUserTimeZone()
+        {
+            if (ResponsibleUser == null)
+            {
+                return DataLayerConstants.DefaultTimeZone;
+            }
+
+            // Lazy loading is off: a query that reads the local dates must include ResponsibleUser.Settings.
+            if (ResponsibleUser.Settings == null)
+            {
+                throw new InvalidOperationException("ResponsibleUser.Settings must be loaded to convert the event's local dates.");
+            }
+
+            return ResponsibleUser.Settings.TimeZone;
+        }
     }
 }

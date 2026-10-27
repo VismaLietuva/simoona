@@ -38,6 +38,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             var cutoffDate = DateTime.UtcNow.AddDays(-_anonymizeUsersAfterDays);
             var usersToAnonymize = await _usersDbSet
+                .Include(u => u.Settings)
                 .Where(u => u.IsDeleted &&
                             u.OrganizationId == organization.Id &&
                             !u.IsAnonymized &&
@@ -76,6 +77,12 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
             user.PictureId = string.Empty;
             user.BirthDay = DateTime.UtcNow;
             user.IsAnonymized = true;
+
+            // UI preferences can hold names (e.g. favourite walls); culture and time zone identify no one.
+            if (user.Settings != null)
+            {
+                user.Settings.Preferences = null;
+            }
         }
     }
 }

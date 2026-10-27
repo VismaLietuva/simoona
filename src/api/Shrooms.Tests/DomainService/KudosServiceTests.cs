@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
@@ -523,13 +523,16 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Exclude_Pie_Chart_Logs_Created_Before_The_Employment_Date()
         {
             var employmentDate = DateTime.UtcNow.AddMonths(-1);
-            _usersDbSet.FindAsync("PieUserId").Returns(new ApplicationUser
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
             {
-                Id = "PieUserId",
-                OrganizationId = 2,
-                CultureCode = "en-US",
-                EmploymentDate = employmentDate
-            });
+                new ApplicationUser
+                {
+                    Id = "PieUserId",
+                    OrganizationId = 2,
+                    Settings = new UserSettings { CultureCode = "en-US" },
+                    EmploymentDate = employmentDate
+                }
+            }.AsQueryable());
 
             var before = PieChartLog(1, "Before", KudosTypeEnum.Ordinary, 7);
             before.EmployeeId = "PieUserId";
@@ -554,13 +557,16 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Not_Blank_The_Pie_Chart_When_The_Employment_Date_Is_Missing()
         {
-            _usersDbSet.FindAsync("NoDateUserId").Returns(new ApplicationUser
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
             {
-                Id = "NoDateUserId",
-                OrganizationId = 2,
-                CultureCode = "en-US",
-                EmploymentDate = null
-            });
+                new ApplicationUser
+                {
+                    Id = "NoDateUserId",
+                    OrganizationId = 2,
+                    Settings = new UserSettings { CultureCode = "en-US" },
+                    EmploymentDate = null
+                }
+            }.AsQueryable());
 
             var log = PieChartLog(1, "Other", KudosTypeEnum.Ordinary, 4);
             log.EmployeeId = "NoDateUserId";
@@ -1415,7 +1421,7 @@ namespace Shrooms.Tests.DomainService
                     FirstName = "name",
                     LastName = "surname",
                     OrganizationId = 2,
-                    CultureCode = "en-US"
+                    Settings = new UserSettings { CultureCode = "en-US" }
                 },
                 new()
                 {
@@ -1427,7 +1433,7 @@ namespace Shrooms.Tests.DomainService
                     SpentKudos = 0,
                     RemainingKudos = 4,
                     OrganizationId = 2,
-                    CultureCode = "en-US"
+                    Settings = new UserSettings { CultureCode = "en-US" }
                 },
                 new()
                 {
@@ -1435,7 +1441,8 @@ namespace Shrooms.Tests.DomainService
                     TotalKudos = 10,
                     SpentKudos = 2,
                     RemainingKudos = 8,
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Settings = new UserSettings()
                 },
                 new()
                 {
@@ -1443,7 +1450,8 @@ namespace Shrooms.Tests.DomainService
                     TotalKudos = 2,
                     SpentKudos = 0,
                     RemainingKudos = 2,
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Settings = new UserSettings()
                 },
                 new()
                 {
@@ -1451,12 +1459,14 @@ namespace Shrooms.Tests.DomainService
                     TotalKudos = 12,
                     SpentKudos = 2,
                     RemainingKudos = 10,
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Settings = new UserSettings()
                 },
                 new()
                 {
                     Id = "CreatedUserId",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Settings = new UserSettings()
                 }
             }.AsQueryable();
         }

@@ -593,7 +593,7 @@ namespace Shrooms.Domain.Services.Wall
                 {
                     Id = member.UserId,
                     Email = member.User.Email,
-                    TimeZoneKey = member.User.TimeZone
+                    TimeZoneKey = member.User.Settings.TimeZone
                 })
                 .ToListAsync();
         }

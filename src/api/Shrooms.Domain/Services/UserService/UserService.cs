@@ -54,6 +54,7 @@ namespace Shrooms.Domain.Services.UserService
         public async Task ChangeUserLocalizationSettingsAsync(ChangeUserLocalizationSettingsDto settingsDto)
         {
             var user = await _usersDbSet
+                .Include(u => u.Settings)
                 .FirstAsync(u => u.Id == settingsDto.UserId && u.OrganizationId == settingsDto.OrganizationId);
 
             var culture = CultureInfo
@@ -77,8 +78,9 @@ namespace Shrooms.Domain.Services.UserService
                 throw new ValidationException(ErrorCodes.TimezoneUnsupported, "Unsupported timezone");
             }
 
-            user.TimeZone = settingsDto.TimeZoneId;
-            user.CultureCode = culture.Name;
+            var settings = user.GetOrCreateSettings();
+            settings.TimeZone = settingsDto.TimeZoneId;
+            settings.CultureCode = culture.Name;
 
             await _uow.SaveChangesAsync(settingsDto.UserId);
         }
@@ -122,7 +124,7 @@ namespace Shrooms.Domain.Services.UserService
         {
             var userSettings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
-                .Select(u => new { u.CultureCode, u.TimeZone })
+                .Select(u => new { u.Settings.CultureCode, u.Settings.TimeZone })
                 .FirstAsync();
 
             var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode ?? "en-US");
@@ -421,7 +423,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(user => new UserEmailReceiverDto
                 {
                     Email = user.Email,
-                    TimeZoneKey = user.TimeZone
+                    TimeZoneKey = user.Settings.TimeZone
                 })
                 .ToListAsync();
         }

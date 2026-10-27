@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -122,6 +123,14 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             builder.HasOne(u => u.NotificationsSettings)
                 .WithOne(s => s.ApplicationUser)
                 .HasForeignKey<NotificationsSettings>("ApplicationUserId");
+
+            // Moved to UserSettings. The columns stay, unmapped to any CLR property,
+            // so a rollback still finds them; a later migration drops them.
+            builder.Property<string>("CultureCode");
+            builder.Property<string>("TimeZone");
+            builder.Property<TimeSpan?>("DailyMailingHour");
+            builder.Property<bool>("IsTutorialComplete");
+            builder.Property<string>("WallWidgetPreferences");
         }
     }
 }

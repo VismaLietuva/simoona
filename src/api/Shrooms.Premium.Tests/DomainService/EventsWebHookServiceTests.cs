@@ -110,7 +110,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     LocalEndDate = DateTime.Parse("2026-08-01"),
                     LocalRegistrationDeadline = DateTime.Parse("2026-07-30"),
                     ResponsibleUserId = "host1",
-                    ResponsibleUser = new ApplicationUser { Id = "host1", TimeZone = DataLayerConstants.DefaultTimeZone },
+                    ResponsibleUser = new ApplicationUser { Id = "host1", Settings = new UserSettings { TimeZone = DataLayerConstants.DefaultTimeZone } },
                     MaxChoices = 1,
                     EventOptions = new List<EventOption> { soup, pasta, pizzaOption, margherita },
                     EventQuestions = new List<EventQuestion>
