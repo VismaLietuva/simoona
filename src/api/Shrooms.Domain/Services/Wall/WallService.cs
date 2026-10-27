@@ -216,10 +216,17 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
-            var walls = await _wallsDbSet
-                .Where(BuildWallsListScope(userOrg, filter))
-                .OrderBy(x => x.Type)
-                .ThenBy(w => w.Name.ToLower())
+            var query = _wallsDbSet.Where(BuildWallsListScope(userOrg, filter));
+
+            // The followed list has always been returned unordered.
+            if (filter != WallsListFilter.Followed)
+            {
+                query = query
+                    .OrderBy(x => x.Type)
+                    .ThenBy(w => w.Name.ToLower());
+            }
+
+            var walls = await query
                 .Select(w => new WallDto
                 {
                     Id = w.Id,
