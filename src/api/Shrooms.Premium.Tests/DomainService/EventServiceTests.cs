@@ -186,6 +186,17 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_Host_Picture_In_Details_Even_When_Host_Is_Not_A_Participant()
+        {
+            var eventId = MockEventDetailsWithLegacyAndQuestionOptions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.HostUserImageName, Is.EqualTo("host-picture.png"));
+        }
+
+        [Test]
         public async Task Should_Return_The_Question_Tree_With_Its_Answers_In_Details()
         {
             var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: true);
@@ -333,7 +344,8 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = "responsibleUser1",
                 FirstName = "user1f",
-                LastName = "user1l"
+                LastName = "user1l",
+                PictureId = "host-picture.png"
             };
 
             var options = new List<EventOption>
