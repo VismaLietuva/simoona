@@ -37,6 +37,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IPermissionService _permissionService;
 
         private readonly DbSet<Post> _postsDbSet;
+        private readonly DbSet<Comment> _commentsDbSet;
         private readonly DbSet<WallMember> _wallUsersDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<WallModerator> _moderatorsDbSet;
@@ -51,6 +52,7 @@ namespace Shrooms.Domain.Services.Wall
             _permissionService = permissionService;
 
             _postsDbSet = uow.GetDbSet<Post>();
+            _commentsDbSet = uow.GetDbSet<Comment>();
             _wallUsersDbSet = uow.GetDbSet<WallMember>();
             _moderatorsDbSet = uow.GetDbSet<WallModerator>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -741,13 +743,10 @@ namespace Shrooms.Domain.Services.Wall
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
 
-            // Split query keeps each post's columns from repeating per comment; the Id tiebreak
-            // keeps the paged posts and their comments in step across the split queries.
+            // The Id tiebreak keeps pages stable when posts share a LastActivity.
             var posts = await _postsDbSet
                 .AsNoTracking()
-                .AsSplitQuery()
                 .Include(post => post.Wall)
-                .Include(post => post.Comments)
                 .Where(wallScope)
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
@@ -755,6 +754,8 @@ namespace Shrooms.Domain.Services.Wall
                 .Skip(entriesCountToSkip)
                 .Take(pageSize)
                 .ToListAsync();
+
+            await LoadCommentsAsync(posts);
 
             var moderatedWallIds = await GetModeratedWallIdsAsync(userOrg.UserId, posts);
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
@@ -814,6 +815,26 @@ namespace Shrooms.Domain.Services.Wall
                 : post => wallsListScope.Invoke(post.Wall);
 
             return scope.Expand();
+        }
+
+        // Comments are read by the ids of the posts already on the page, in their own query so post columns
+        // don't repeat per comment. A split query would repeat the paged selection instead, and activity in
+        // between could move a different post onto the page and leave a selected one without its comments.
+        private async Task LoadCommentsAsync(List<Post> posts)
+        {
+            var postIds = posts.Select(post => post.Id).ToList();
+
+            var commentsByPostId = (await _commentsDbSet
+                    .AsNoTracking()
+                    .Where(comment => postIds.Contains(comment.PostId))
+                    .OrderBy(comment => comment.Id)
+                    .ToListAsync())
+                .ToLookup(comment => comment.PostId);
+
+            foreach (var post in posts)
+            {
+                post.Comments = commentsByPostId[post.Id].ToList();
+            }
         }
 
         private async Task<HashSet<int>> GetModeratedWallIdsAsync(string userId, IReadOnlyCollection<Post> posts)

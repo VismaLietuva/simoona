@@ -43,6 +43,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<WallMember> _wallUsersDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<Post> _postsDbSet;
+        private DbSet<Comment> _commentsDbSet;
         private DbSet<PostWatcher> _postWatchersDbSet;
         private DbSet<Event> _eventsDbSet;
         private WallService _wallService;
@@ -59,6 +60,7 @@ namespace Shrooms.Tests.DomainService
             _wallUsersDbSet = _uow.MockDbSetForAsync<WallMember>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
             _postsDbSet = _uow.MockDbSetForAsync<Post>();
+            _commentsDbSet = _uow.MockDbSetForAsync<Comment>();
             _postWatchersDbSet = _uow.MockDbSetForAsync<PostWatcher>();
             _eventsDbSet = _uow.MockDbSetForAsync<Event>();
 
@@ -1375,6 +1377,7 @@ namespace Shrooms.Tests.DomainService
                 new() { Id = 2, UserId = OtherUserId, User = users[1], WallId = NotFollowedWallId }
             });
             _postsDbSet.SetDbSetDataForAsync(posts);
+            _commentsDbSet.SetDbSetDataForAsync(posts.SelectMany(p => p.Comments).ToList());
             _postWatchersDbSet.SetDbSetDataForAsync(new List<PostWatcher>());
             _eventsDbSet.SetDbSetDataForAsync(new List<Event>());
             _usersDbSet.SetDbSetDataForAsync(users);
