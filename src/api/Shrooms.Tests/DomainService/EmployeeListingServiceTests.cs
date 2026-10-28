@@ -7,6 +7,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Tests.Extensions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
@@ -43,6 +44,24 @@ namespace Shrooms.Tests.DomainService
                 uow,
                 _permissionService,
                 _roleService);
+        }
+
+        [Test]
+        public void GetPagedEmployeesAsync_CancelledToken_StopsTheQuery()
+        {
+            _permissionService
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(new List<string>());
+            _roleService
+                .ExcludeUsersWithRole(Arg.Any<string>())
+                .Returns(value => true);
+
+            var args = new EmployeeListingArgsDto { Page = 1, PageSize = 10 };
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = "user" };
+
+            Assert.That(
+                async () => await _employeeListingService.GetPagedEmployeesAsync(args, userOrg, new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]
@@ -105,7 +124,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
-                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(new List<string> { AdministrationPermissions.ApplicationUser, BasicPermissions.Blacklist });
 
             _roleService
@@ -141,7 +160,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
-                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(new List<string>());
 
             _roleService
@@ -251,7 +270,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(GetTestDataForGetPagedEmployeesAsync());
 
             _permissionService
-                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(new List<string> { BasicPermissions.Blacklist });
 
             _roleService
@@ -326,7 +345,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
-                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(new List<string> { AdministrationPermissions.ApplicationUser });
 
             _roleService
@@ -443,7 +462,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
-                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(new List<string>());
 
             _roleService

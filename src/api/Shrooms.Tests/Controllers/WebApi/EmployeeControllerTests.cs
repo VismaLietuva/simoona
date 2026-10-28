@@ -63,7 +63,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             // Arrange
             _employeeListingService
-                .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>())
+                .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<CancellationToken>())
                 .ThrowsAsync(new ValidationException(0));
 
             var args = new EmployeeListingArgsViewModel();

@@ -56,6 +56,17 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public void GetEventOptionsAsync_CancelledToken_StopsTheQuery()
+        {
+            Assert.That(
+                async () => await _eventListingService.GetEventOptionsAsync(
+                    System.Guid.NewGuid(),
+                    new UserAndOrganizationDto { OrganizationId = 2 },
+                    new System.Threading.CancellationToken(true)),
+                Throws.InstanceOf<System.OperationCanceledException>());
+        }
+
+        [Test]
         public async Task Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();
