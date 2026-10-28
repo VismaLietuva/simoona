@@ -155,7 +155,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
             // If user has permissions - show all participants, otherwise show only current user and his own event options
-            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers))
+            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers, cancellationToken))
             {
                 return @event;
             }

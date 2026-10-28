@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.Permissions
             return permissions.Contains(permissionName);
         }
 
-        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName)
+        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName, CancellationToken cancellationToken = default)
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
@@ -62,7 +62,7 @@ namespace Shrooms.Domain.Services.Permissions
                     .Where(FilterActiveModules(userAndOrg.OrganizationId))
                     .Select(x => x.Name)
                     .Distinct()
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
             }
