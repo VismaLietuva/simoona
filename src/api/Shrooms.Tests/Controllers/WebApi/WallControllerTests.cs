@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -188,6 +189,16 @@ namespace Shrooms.Tests.Controllers.WebApi
             var response = await _wallController.GetAllPagedWall(WallsListFilter.None, page);
 
             Assert.That(response, Is.InstanceOf<OkObjectResult>());
+        }
+
+        [Test]
+        public async Task Wall_GetAllPagedWall_Passes_CancellationToken_To_Service()
+        {
+            using var cancellationSource = new CancellationTokenSource();
+
+            await _wallController.GetAllPagedWall(WallsListFilter.Followed, 2, cancellationSource.Token);
+
+            await _wallService.Received(1).GetAllPostsAsync(2, WebApiConstants.DefaultPageSize, Arg.Any<UserAndOrganizationDto>(), WallsListFilter.Followed, cancellationSource.Token);
         }
 
         [Test]

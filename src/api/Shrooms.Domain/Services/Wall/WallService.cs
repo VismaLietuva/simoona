@@ -168,7 +168,7 @@ namespace Shrooms.Domain.Services.Wall
             await _uow.SaveChangesAsync(updateWallDto.UserId);
         }
 
-        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg)
+        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var wall = await _wallsDbSet
                 .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
@@ -180,7 +180,7 @@ namespace Shrooms.Domain.Services.Wall
                     Type = x.Type,
                     Logo = x.Logo
                 })
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             return wall;
         }
@@ -250,14 +250,14 @@ namespace Shrooms.Domain.Services.Wall
             return walls;
         }
 
-        public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId)
+        public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId, CancellationToken cancellationToken = default)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, WallsListFilter.None);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, WallsListFilter.None, cancellationToken: cancellationToken);
         }
 
-        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, WallsListFilter filter)
+        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, WallsListFilter filter, CancellationToken cancellationToken = default)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, filter);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, filter, cancellationToken: cancellationToken);
         }
 
         public async Task<PostDto> GetWallPostAsync(UserAndOrganizationDto userOrg, int postId)
@@ -286,7 +286,7 @@ namespace Shrooms.Domain.Services.Wall
             return posts.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize)
+        public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             Expression<Func<Post, bool>> exp = post =>
                 (!post.IsHidden && post.MessageBody.Contains(searchString)) ||
@@ -295,7 +295,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All, includeJoinedEventWalls: true);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All, includeJoinedEventWalls: true, cancellationToken);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
@@ -719,7 +719,7 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter, bool includeJoinedEventWalls = false)
+        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter, bool includeJoinedEventWalls = false, CancellationToken cancellationToken = default)
         {
             if (filter == null)
             {
@@ -730,7 +730,7 @@ namespace Shrooms.Domain.Services.Wall
 
             if (wallId.HasValue)
             {
-                await EnsureWallExistsAsync(userOrg, wallId.Value);
+                await EnsureWallExistsAsync(userOrg, wallId.Value, cancellationToken);
                 wallScope = post => post.WallId == wallId.Value;
             }
             else
@@ -753,24 +753,24 @@ namespace Shrooms.Domain.Services.Wall
                 .ThenByDescending(x => x.Id)
                 .Skip(entriesCountToSkip)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            await LoadCommentsAsync(posts);
+            await LoadCommentsAsync(posts, cancellationToken);
 
-            var moderatedWallIds = await GetModeratedWallIdsAsync(userOrg.UserId, posts);
-            var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
-            var users = await GetUsersAsync(posts);
+            var moderatedWallIds = await GetModeratedWallIdsAsync(userOrg.UserId, posts, cancellationToken);
+            var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts, cancellationToken);
+            var users = await GetUsersAsync(posts, cancellationToken);
 
             var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderatedWallIds, watchedPosts).ToList();
 
-            await AssignEventIdsAsync(mappedPosts, userOrg);
+            await AssignEventIdsAsync(mappedPosts, userOrg, cancellationToken);
 
             return mappedPosts;
         }
 
         // Event walls have no wall page, so posts from them carry the event id to
         // link to instead.
-        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg)
+        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var eventPosts = posts.Where(post => post.WallType == WallType.Events).ToList();
 
@@ -787,7 +787,7 @@ namespace Shrooms.Domain.Services.Wall
                     .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
                                      eventWallIds.Contains(@event.WallId))
                     .Select(@event => new { @event.WallId, @event.Id, @event.EndDate })
-                    .ToListAsync())
+                    .ToListAsync(cancellationToken))
                 .GroupBy(x => x.WallId)
                 .ToDictionary(
                     group => group.Key,
@@ -820,7 +820,7 @@ namespace Shrooms.Domain.Services.Wall
         // Comments are read by the ids of the posts already on the page, in their own query so post columns
         // don't repeat per comment. A split query would repeat the paged selection instead, and activity in
         // between could move a different post onto the page and leave a selected one without its comments.
-        private async Task LoadCommentsAsync(List<Post> posts)
+        private async Task LoadCommentsAsync(List<Post> posts, CancellationToken cancellationToken)
         {
             var postIds = posts.Select(post => post.Id).ToList();
 
@@ -828,7 +828,7 @@ namespace Shrooms.Domain.Services.Wall
                     .AsNoTracking()
                     .Where(comment => postIds.Contains(comment.PostId))
                     .OrderBy(comment => comment.Id)
-                    .ToListAsync())
+                    .ToListAsync(cancellationToken))
                 .ToLookup(comment => comment.PostId);
 
             foreach (var post in posts)
@@ -837,19 +837,19 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        private async Task<HashSet<int>> GetModeratedWallIdsAsync(string userId, IReadOnlyCollection<Post> posts)
+        private async Task<HashSet<int>> GetModeratedWallIdsAsync(string userId, IReadOnlyCollection<Post> posts, CancellationToken cancellationToken = default)
         {
             var postWallIds = posts.Select(post => post.WallId).Distinct().ToList();
 
             var moderatedWallIds = await _moderatorsDbSet
                 .Where(moderator => moderator.UserId == userId && postWallIds.Contains(moderator.WallId))
                 .Select(moderator => moderator.WallId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return new HashSet<int>(moderatedWallIds);
         }
 
-        private async Task<Dictionary<string, UserDto>> GetUsersAsync(IReadOnlyCollection<Post> posts)
+        private async Task<Dictionary<string, UserDto>> GetUsersAsync(IReadOnlyCollection<Post> posts, CancellationToken cancellationToken = default)
         {
             var comments = posts.SelectMany(s => s.Comments).ToList();
 
@@ -876,7 +876,7 @@ namespace Shrooms.Domain.Services.Wall
                     PictureId = user.PictureId,
                     UserName = user.UserName
                 })
-                .ToDictionaryAsync(user => user.UserId);
+                .ToDictionaryAsync(user => user.UserId, cancellationToken);
         }
 
         private IEnumerable<PostDto> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, Dictionary<string, UserDto> users, HashSet<int> moderatedWallIds, HashSet<int> watchedPosts)
@@ -922,10 +922,10 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        private async Task<HashSet<int>> RetrieveWatchedPostsAsync(string userId, List<Post> posts)
+        private async Task<HashSet<int>> RetrieveWatchedPostsAsync(string userId, List<Post> posts, CancellationToken cancellationToken = default)
         {
             var postIds = posts.Select(s => s.Id).ToList();
-            var watchedList = await _postWatchers.Where(w => w.UserId == userId && postIds.Contains(w.PostId)).Select(s => s.PostId).ToListAsync();
+            var watchedList = await _postWatchers.Where(w => w.UserId == userId && postIds.Contains(w.PostId)).Select(s => s.PostId).ToListAsync(cancellationToken);
 
             return new HashSet<int>(watchedList);
         }
@@ -956,9 +956,9 @@ namespace Shrooms.Domain.Services.Wall
                 .ToList();
         }
 
-        private async Task EnsureWallExistsAsync(UserAndOrganizationDto userOrg, int wallId)
+        private async Task EnsureWallExistsAsync(UserAndOrganizationDto userOrg, int wallId, CancellationToken cancellationToken)
         {
-            var wallExists = await _wallsDbSet.AnyAsync(w => w.Id == wallId && w.OrganizationId == userOrg.OrganizationId);
+            var wallExists = await _wallsDbSet.AnyAsync(w => w.Id == wallId && w.OrganizationId == userOrg.OrganizationId, cancellationToken);
             if (!wallExists)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
