@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
@@ -125,7 +126,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
+        public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
@@ -133,14 +134,14 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id, userOrg.UserId))
                 .AsSplitQuery()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
             _eventValidationService.CheckIfEventExists(@event);
 
             // ReSharper disable once PossibleNullReferenceException
             @event.Offices.OfficeNames = await _officeDbSet
                 .Where(p => @event.Offices.Value.Contains(p.Id.ToString()))
                 .Select(p => p.Name)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;

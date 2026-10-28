@@ -77,12 +77,12 @@ namespace Shrooms.Domain.Services.Roles
                          select role).AnyAsync();
         }
 
-        public async Task<string> GetRoleIdByNameAsync(string roleName)
+        public async Task<string> GetRoleIdByNameAsync(string roleName, CancellationToken cancellationToken = default)
         {
             return await _roleDbSet
                 .Where(x => x.Name == roleName)
                 .Select(x => x.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         private async Task<RoleDetailsDto> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)

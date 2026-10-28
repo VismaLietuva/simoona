@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 
@@ -12,6 +13,6 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
         Task<IEnumerable<string>> GetEmailsByFloorAsync(int floorId);
         Task<IEnumerable<string>> GetEmailsByRoomAsync(int roomId);
         Task<UserOfficeAndFloorDto> GetUserOfficeAndFloorAsync(string userId);
-        Task<int> GetOfficesCountAsync();
+        Task<int> GetOfficesCountAsync(CancellationToken cancellationToken = default);
     }
 }

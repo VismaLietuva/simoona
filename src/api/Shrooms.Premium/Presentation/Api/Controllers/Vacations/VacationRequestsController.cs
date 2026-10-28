@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -112,9 +113,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Vacations
         [HttpGet]
         [Route("TeamMembers")]
         [ProducesResponseType(typeof(IEnumerable<UserAutoCompleteDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> TeamMembers(string s)
+        public async Task<IActionResult> TeamMembers(string s, CancellationToken cancellationToken = default)
         {
-            return Ok(await _listService.GetTeamMembersForAutocompleteAsync(s, GetUserAndOrganization()));
+            return Ok(await _listService.GetTeamMembersForAutocompleteAsync(s, GetUserAndOrganization(), cancellationToken));
         }
 
         [HttpPost]

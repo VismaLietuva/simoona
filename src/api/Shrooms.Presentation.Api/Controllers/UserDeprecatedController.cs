@@ -857,7 +857,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetManagersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -882,7 +882,7 @@ namespace Shrooms.Presentation.Api.Controllers
                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                || (m.FirstName != null && m.LastName != null && (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
                     .OrderBy(u => u.Id)
-                    .ToPagedListAsync(1, pageSize);
+                    .ToPagedListAsync(1, pageSize, null, cancellationToken);
 
                 return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managersWithMantas);
             }
@@ -894,7 +894,7 @@ namespace Shrooms.Presentation.Api.Controllers
                                                                                                || (m.FirstName != null && m.LastName != null &&
                                                                                                    (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
                 .OrderBy(u => u.Id)
-                .ToPagedListAsync(1, pageSize);
+                .ToPagedListAsync(1, pageSize, null, cancellationToken);
 
             return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managers);
         }

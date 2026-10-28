@@ -22,6 +22,6 @@ namespace Shrooms.Domain.Services.Roles
 
         Task<bool> HasRoleAsync(string userId, string roleName);
 
-        Task<string> GetRoleIdByNameAsync(string roleName);
+        Task<string> GetRoleIdByNameAsync(string roleName, CancellationToken cancellationToken = default);
     }
 }

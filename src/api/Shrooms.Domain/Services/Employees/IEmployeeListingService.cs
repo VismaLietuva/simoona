@@ -7,6 +7,6 @@ namespace Shrooms.Domain.Services.Employees
 {
     public interface IEmployeeListingService
     {
-        Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg);
+        Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
     }
 }

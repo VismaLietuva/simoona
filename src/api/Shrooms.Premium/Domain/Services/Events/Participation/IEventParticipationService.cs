@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -31,7 +32,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task<IEnumerable<EventParticipantDto>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg);
 
-        Task<IEnumerable<EventUserSearchResultDto>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDto userOrg);
+        Task<IEnumerable<EventUserSearchResultDto>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
 
         Task<int> GetMaxParticipantsCountAsync(UserAndOrganizationDto userAndOrganizationDto);
 
