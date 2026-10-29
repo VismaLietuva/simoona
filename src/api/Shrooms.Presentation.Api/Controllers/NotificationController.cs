@@ -25,9 +25,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<NotificationViewModel>> GetAll(bool includeRead = false)
+        public async Task<IEnumerable<NotificationViewModel>> GetAll(bool includeRead = false, CancellationToken cancellationToken = default)
         {
-            var result = await _notificationService.GetAllAsync(GetUserAndOrganization(), includeRead);
+            var result = await _notificationService.GetAllAsync(GetUserAndOrganization(), includeRead, cancellationToken);
 
             return MakeCommentsStacked(result);
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
@@ -41,7 +42,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private static void MockRoleService(IRoleService roleService)
         {
             var newRoleId = Guid.NewGuid().ToString();
-            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.GetRoleIdByNameAsync(Roles.NewUser, Arg.Any<CancellationToken>()).Returns(newRoleId);
             roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
@@ -106,6 +107,18 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             }.AsQueryable();
+        }
+
+        [Test]
+        public void GetOfficesCountAsync_CancelledToken_StopsTheQuery()
+        {
+            var uow = Substitute.For<IUnitOfWork2>();
+            uow.MockDbSetForAsync<Office>();
+            var officeMapService = new OfficeMapService(Substitute.For<IMapper>(), Substitute.For<IUnitOfWork>(), uow, Substitute.For<IRoleService>());
+
+            Assert.That(
+                async () => await officeMapService.GetOfficesCountAsync(new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

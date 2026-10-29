@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService
@@ -80,7 +81,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Event_Report_Details(int organizationId)
         {
             // Arrange
-            _officeMapService.GetOfficesCountAsync()
+            _officeMapService.GetOfficesCountAsync(Arg.Any<CancellationToken>())
                 .Returns(1);
 
             var office = new Office
@@ -127,6 +128,17 @@ namespace Shrooms.Premium.Tests.DomainService
 
             ClassicAssert.AreEqual(result.Name, @event.Name);
             ClassicAssert.AreEqual(result.HostUserId, @event.ResponsibleUser.Id);
+        }
+
+        [Test]
+        public void GetEventDetailsAsync_CancelledToken_StopsTheQuery()
+        {
+            Assert.That(
+                async () => await _eventService.GetEventDetailsAsync(
+                    Guid.NewGuid(),
+                    new UserAndOrganizationDto { OrganizationId = 2 },
+                    new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

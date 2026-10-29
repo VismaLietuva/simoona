@@ -49,14 +49,14 @@ namespace Shrooms.Domain.Services.Employees
             _roleService = roleService;
         }
 
-        public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg)
+        public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
-            var permissions = (await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId)).ToList();
+            var permissions = (await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId, cancellationToken)).ToList();
 
             var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
             var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
 
-            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser);
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser, cancellationToken);
 
             var searchFilter = GetSearchStringFilter(employeeArgsDto);
             var blacklistFilter = GetBlacklistFilter(employeeArgsDto, hasBlacklistPermission);
@@ -73,11 +73,11 @@ namespace Shrooms.Domain.Services.Employees
                 .OrderByPropertyNames(GetSafeSortable(employeeArgsDto, hasBlacklistPermission));
 
             // X.PagedList doesn't have async support for IQueryable, need to materialize first
-            var totalCount = await employeesQuery.CountAsync();
+            var totalCount = await employeesQuery.CountAsync(cancellationToken);
             var items = await employeesQuery
                 .Skip((employeeArgsDto.Page - 1) * employeeArgsDto.PageSize)
                 .Take(employeeArgsDto.PageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return new StaticPagedList<EmployeeDto>(items, employeeArgsDto.Page, employeeArgsDto.PageSize, totalCount);
         }
