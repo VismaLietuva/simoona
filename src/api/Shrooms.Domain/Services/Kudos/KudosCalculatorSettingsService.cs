@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -80,7 +81,14 @@ namespace Shrooms.Domain.Services.Kudos
             settings.GuideUrl = NormalizeUrl(input.GuideUrl);
             settings.WhitelistUrl = NormalizeUrl(input.WhitelistUrl);
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            try
+            {
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            catch (DbUpdateException e) when (IsUniqueViolation(e))
+            {
+                throw new ValidationException(ErrorCodes.ConcurrencyError, "The Kudos calculator settings were just saved by someone else. Reload the page and try again.");
+            }
         }
 
         private static void Validate(KudosCalculatorSettingsDto input)
@@ -135,6 +143,12 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 throw Invalid($"{field} must be an http(s) address of at most {KudosCalculatorSettings.MaxUrlLength} characters");
             }
+        }
+
+        private static bool IsUniqueViolation(DbUpdateException e)
+        {
+            return e.InnerException is SqlException sql
+                   && (sql.Number == 2601 || sql.Number == 2627);
         }
 
         private static string NormalizeUrl(string value)
