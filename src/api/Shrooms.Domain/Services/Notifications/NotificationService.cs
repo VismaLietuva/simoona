@@ -131,7 +131,7 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg, bool includeRead)
+        public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg, bool includeRead, CancellationToken cancellationToken = default)
         {
             var since = _systemClock.UtcNow.AddDays(-BusinessLayerConstants.NotificationHistoryDays);
 
@@ -147,7 +147,7 @@ namespace Shrooms.Domain.Services.Notifications
                              .OrderBy(o => o.IsAlreadySeen)
                              .ThenByDescending(o => o.Notification.Created)
                              .Take(BusinessLayerConstants.MaxNotificationsToShow)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
             return result
                 .OrderByDescending(o => o.Notification.Created)

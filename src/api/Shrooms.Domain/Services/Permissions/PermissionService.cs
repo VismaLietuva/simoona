@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.Permissions
             return permissions.Contains(permissionName);
         }
 
-        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName)
+        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName, CancellationToken cancellationToken = default)
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
@@ -62,7 +62,7 @@ namespace Shrooms.Domain.Services.Permissions
                     .Where(FilterActiveModules(userAndOrg.OrganizationId))
                     .Select(x => x.Name)
                     .Distinct()
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
             }
@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Services.Permissions
                 .ToList();
         }
 
-        public async Task<IEnumerable<string>> GetUserPermissionsAsync(string userId, int organizationId)
+        public async Task<IEnumerable<string>> GetUserPermissionsAsync(string userId, int organizationId, CancellationToken cancellationToken = default)
         {
             if (_permissionsCache.TryGetValue(userId, out var permissions))
             {
@@ -100,7 +100,7 @@ namespace Shrooms.Domain.Services.Permissions
                                    select p)
                 .Where(FilterActiveModules(organizationId));
 
-            permissions = (await permissionsQuery.Distinct().ToListAsync()).Select(x => x.Name).ToList();
+            permissions = (await permissionsQuery.Distinct().ToListAsync(cancellationToken)).Select(x => x.Name).ToList();
 
             return permissions;
         }

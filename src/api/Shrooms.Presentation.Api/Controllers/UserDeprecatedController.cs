@@ -857,7 +857,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetManagersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -871,30 +871,33 @@ namespace Shrooms.Presentation.Api.Controllers
 
             s = s.ToLowerInvariant();
 
-            var managersInRole = await _userManager.GetUsersInRoleAsync(Roles.Manager);
-            var managerIds = managersInRole.Select(u => u.Id).ToHashSet();
+            // Filtered in SQL rather than through UserManager.GetUsersInRoleAsync, which loads
+            // every manager and cannot be cancelled.
+            var isManager = _roleService.OnlyUsersWithRoleName(Roles.Manager);
 
             if (WebApiConstants.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 var managersWithMantas = await _applicationUserRepository
-                    .Get(m => managerIds.Contains(m.Id) && (m.UserName.ToLower().StartsWith(s)
+                    .Get(m => m.UserName.ToLower().StartsWith(s)
                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
-                                                                               || (m.FirstName != null && m.LastName != null && (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
+                                                                               || (m.FirstName != null && m.LastName != null && (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s)))
+                    .Where(isManager)
                     .OrderBy(u => u.Id)
-                    .ToPagedListAsync(1, pageSize);
+                    .ToPagedListAsync(1, pageSize, null, cancellationToken);
 
                 return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managersWithMantas);
             }
 
             var managers = await _applicationUserRepository
-                .Get(m => managerIds.Contains(m.Id) && (m.Id != userId) && (m.UserName.ToLower().StartsWith(s)
+                .Get(m => m.Id != userId && (m.UserName.ToLower().StartsWith(s)
                                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                                || (m.FirstName != null && m.LastName != null &&
                                                                                                    (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
+                .Where(isManager)
                 .OrderBy(u => u.Id)
-                .ToPagedListAsync(1, pageSize);
+                .ToPagedListAsync(1, pageSize, null, cancellationToken);
 
             return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managers);
         }
