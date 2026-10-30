@@ -168,7 +168,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [Route("Posts")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
         [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPagedWall(int wallId, int page = 1)
+        public async Task<IActionResult> GetPagedWall(int wallId, int page = 1, CancellationToken cancellationToken = default)
         {
             if (wallId <= 0)
             {
@@ -178,14 +178,14 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                var wall = await _wallService.GetWallAsync(wallId, userAndOrg);
+                var wall = await _wallService.GetWallAsync(wallId, userAndOrg, cancellationToken);
 
-                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post, cancellationToken) && wall.Type != WallType.Events)
                 {
                     return Forbidden();
                 }
 
-                var wallPosts = await _wallService.GetWallPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, wallId);
+                var wallPosts = await _wallService.GetWallPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, wallId, cancellationToken);
 
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
                 var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -205,10 +205,10 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [Route("AllPosts")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllPagedWall(WallsListFilter filter, int page = 1)
+        public async Task<IActionResult> GetAllPagedWall(WallsListFilter filter, int page = 1, CancellationToken cancellationToken = default)
         {
             var userAndOrg = GetUserAndOrganization();
-            var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, filter);
+            var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, filter, cancellationToken);
 
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -223,16 +223,16 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [Route("AllPostsLegacy")]
         [ApiExplorerSettings(IgnoreApi = true)]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1)
+        public async Task<IActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1, CancellationToken cancellationToken = default)
         {
-            return await GetAllPagedWall((WallsListFilter)wallsType, page);
+            return await GetAllPagedWall((WallsListFilter)wallsType, page, cancellationToken);
         }
 
         [HttpGet]
         [Route("Search")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         [ProducesResponseType(typeof(PagedWallViewModel<WallPostViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> SearchWall(string searchString, int page = 1)
+        public async Task<IActionResult> SearchWall(string searchString, int page = 1, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -240,7 +240,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             }
 
             var userAndOrg = GetUserAndOrganization();
-            var foundWallPosts = await _wallService.SearchWallAsync(searchString, userAndOrg, page, WebApiConstants.DefaultPageSize);
+            var foundWallPosts = await _wallService.SearchWallAsync(searchString, userAndOrg, page, WebApiConstants.DefaultPageSize, cancellationToken);
 
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
