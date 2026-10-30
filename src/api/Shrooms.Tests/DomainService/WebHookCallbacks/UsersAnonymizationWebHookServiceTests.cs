@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
+using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization;
@@ -108,6 +109,37 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
             Assert.That(user.IsAnonymized, Is.False);
             Assert.That(user.PictureId, Is.EqualTo("face.jpg"));
             _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync();
+        }
+
+        // The mocked DbSets above ignore the soft-delete query filter; a real context applies it.
+        [Test]
+        public async Task Should_Anonymize_Soft_Deleted_Users_Despite_The_Soft_Delete_Query_Filter()
+        {
+            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            await using (var seed = new ShroomsDbContext(options))
+            {
+                seed.Set<Organization>().Add(new Organization { Id = 1, ShortName = "Test", Name = "TestOrg", WelcomeEmail = "Welcome" });
+                seed.Set<ApplicationUser>().AddRange(
+                    new ApplicationUser { Id = "deleted", UserName = "deleted", OrganizationId = 1, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30) },
+                    new ApplicationUser { Id = "active", UserName = "active", OrganizationId = 1, Modified = DateTime.UtcNow.AddDays(-30) });
+                await seed.SaveChangesAsync(false);
+            }
+
+            await using (var dbContext = new ShroomsDbContext(options))
+            {
+                var configuration = Substitute.For<Microsoft.Extensions.Configuration.IConfiguration>();
+                await new UsersAnonymizationWebHookService(new UnitOfWork2(dbContext), _pictureService, configuration).AnonymizeUsersAsync("Test");
+            }
+
+            await using var assertContext = new ShroomsDbContext(options);
+            var users = await assertContext.Set<ApplicationUser>().IgnoreQueryFilters().ToDictionaryAsync(u => u.Id);
+            Assert.That(users["deleted"].IsAnonymized, Is.True);
+            Assert.That(users["deleted"].IsDeleted, Is.True);
+            Assert.That(users["deleted"].UserName, Is.Not.EqualTo("deleted"));
+            Assert.That(users["active"].IsAnonymized, Is.False);
         }
     }
 }
