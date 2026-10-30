@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -308,6 +310,32 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(second.ETag, Is.EqualTo(first.ETag));
             Assert.That(second.Emojis.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Share_Cache_Between_User_And_Organization_Lookups()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>
+            {
+                new()
+                    { Id = 1, Name = "parrot", BlobName = "parrot.gif", OrganizationId = 2 }
+            }.AsQueryable());
+
+            var viaUser = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
+            var viaOrganization = await _customEmojiService.GetAllAsync(2, "Visma");
+
+            Assert.That(viaOrganization.ETag, Is.EqualTo(viaUser.ETag));
+            Assert.That(viaOrganization.Emojis.Single().Url, Is.EqualTo("/storage/visma/parrot.gif"));
+        }
+
+        [Test]
+        public void Should_Stop_Loading_When_Cancelled()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+
+            Assert.That(
+                async () => await _customEmojiService.GetAllAsync(2, "Visma", new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

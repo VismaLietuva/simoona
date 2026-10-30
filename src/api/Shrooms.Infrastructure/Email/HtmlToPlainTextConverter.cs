@@ -23,6 +23,10 @@ namespace Shrooms.Infrastructure.Email
             @"<br\s*/?>|</(p|tr|td|div|h1|h2|h3|li)\s*>",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static readonly Regex ImageAlt = new(
+            @"<img\b[^>]*?\balt\s*=\s*([""'])(.*?)\1[^>]*>",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         private static readonly Regex Tags = new("<[^>]+>", RegexOptions.Compiled);
 
         private static readonly Regex Whitespace = new(@"[^\S\u0000]+", RegexOptions.Compiled);
@@ -37,6 +41,7 @@ namespace Shrooms.Infrastructure.Email
             }
 
             var text = Dropped.Replace(html, string.Empty);
+            text = ImageAlt.Replace(text, "$2");
 
             // A bare URL is more use in a text part than an anchor's label alone.
             text = Links.Replace(text, match =>

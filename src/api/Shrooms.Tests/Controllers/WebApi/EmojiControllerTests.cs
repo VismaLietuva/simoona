@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,7 +60,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task List_ReturnsOk()
         {
             _customEmojiService
-                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
 
             var result = await _emojiController.List();
@@ -71,7 +72,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task List_SetsETagAndCacheControlHeaders()
         {
             _customEmojiService
-                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
 
             await _emojiController.List();
@@ -84,7 +85,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task List_WhenIfNoneMatchMatches_Returns304()
         {
             _customEmojiService
-                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .GetAllAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(new CustomEmojiListDto { Emojis = new List<CustomEmojiDto>(), ETag = "abc123" });
 
             _emojiController.Request.Headers.IfNoneMatch = "\"abc123\"";

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -10,7 +11,6 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
@@ -22,9 +22,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 {
     public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
+        private static readonly Regex PartialShortcode = new(@"(?<=^|[^\p{L}\p{N}\p{M}:]|:[a-z0-9_+-]{1,60}:):[a-z0-9_+-]*$", RegexOptions.Compiled);
+
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
-        private readonly IMarkdownConverter _markdownConverter;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<ApplicationUser> _usersDbSet;
 
@@ -34,13 +36,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter)
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
             _organizationService = organizationService;
-            _markdownConverter = markdownConverter;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
@@ -104,7 +106,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var postUrl = _appSettings.WallPostUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.Id);
             var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
             var subject = CreateSubject(Resources.Models.Events.Events.ShareEventEmailSubject, shareEventEmailDto.Details.Name, shareEventEmailDto.CreatedPost.WallName);
-            var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
+            var body = await RenderAsync(shareEventEmailDto.CreatedPost.MessageBody, userOrgHubDto);
+            var description = await RenderTruncatedAsync(shareEventEmailDto.Details.Description, userOrgHubDto);
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
                 eventUrl,
@@ -113,7 +116,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.CreatedPost.WallName,
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.Details.StartDate,
-                RemoveMarkdownTextOverflow(shareEventEmailDto.Details.Description),
+                description,
                 shareEventEmailDto.Details.Location,
                 GetNotificationSettingsUrl(userOrgHubDto));
 
@@ -127,7 +130,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var template = new NewEventEmailTemplateViewModel(
                 eventUrl,
                 eventArgsDto.Name,
-                RemoveMarkdownTextOverflow(eventArgsDto.Description),
+                await RenderTruncatedAsync(eventArgsDto.Description, userOrgHubDto),
                 eventArgsDto.Location,
                 eventArgsDto.StartDate,
                 GetNotificationSettingsUrl(userOrgHubDto));
@@ -214,19 +217,27 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await SendMultipleEmailsAsync(startEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
-        private string RemoveMarkdownTextOverflow(string text, int maxCharacterCount = 150)
+        private Task<string> RenderAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto)
         {
-            if (string.IsNullOrEmpty(text))
+            return _emailMarkdownRenderer.RenderAsync(markdown, userOrgHubDto.OrganizationId, userOrgHubDto.OrganizationName);
+        }
+
+        // The description is a teaser in these emails, so it is cut before rendering.
+        private Task<string> RenderTruncatedAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto, int maxCharacterCount = 150)
+        {
+            if (string.IsNullOrEmpty(markdown))
             {
-                return null;
+                return Task.FromResult<string>(null);
             }
 
-            if (text.Length <= maxCharacterCount)
+            if (markdown.Length > maxCharacterCount)
             {
-                return _markdownConverter.ConvertToHtml(text);
+                // Never cut between the two halves of a surrogate pair: a lone half renders as U+FFFD.
+                var cut = char.IsHighSurrogate(markdown[maxCharacterCount - 1]) ? maxCharacterCount - 1 : maxCharacterCount;
+                markdown = $"{PartialShortcode.Replace(markdown[..cut], string.Empty)}...";
             }
 
-            return _markdownConverter.ConvertToHtml($"{string.Join("", text.Take(maxCharacterCount))}...");
+            return RenderAsync(markdown, userOrgHubDto);
         }
     }
 }
