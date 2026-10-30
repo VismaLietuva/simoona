@@ -48,6 +48,9 @@ namespace Shrooms.Tests.Mocks
 
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
+            // Like EF, a cancelled token stops the query, so tests can check that services forward it.
+            cancellationToken.ThrowIfCancellationRequested();
+
             var expectedResultType = typeof(TResult).GetGenericArguments()[0];
             // IQueryProvider has two Execute overloads (generic and non-generic); GetMethod throws AmbiguousMatchException in .NET 10
             var executeMethod = typeof(IQueryProvider)
@@ -82,7 +85,7 @@ namespace Shrooms.Tests.Mocks
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            return new MockAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
+            return new MockAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator(), cancellationToken);
         }
 
         IQueryProvider IQueryable.Provider => new MockAsyncQueryProvider<T>(this);
@@ -91,16 +94,19 @@ namespace Shrooms.Tests.Mocks
     public class MockAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _inner;
+        private readonly CancellationToken _cancellationToken;
 
-        public MockAsyncEnumerator(IEnumerator<T> inner)
+        public MockAsyncEnumerator(IEnumerator<T> inner, CancellationToken cancellationToken = default)
         {
             _inner = inner;
+            _cancellationToken = cancellationToken;
         }
 
         public T Current => _inner.Current;
 
         public ValueTask<bool> MoveNextAsync()
         {
+            _cancellationToken.ThrowIfCancellationRequested();
             return new ValueTask<bool>(_inner.MoveNext());
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -275,11 +276,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(typeof(EventOptionsViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetEventOptions(Guid eventId)
+        public async Task<IActionResult> GetEventOptions(Guid eventId, CancellationToken cancellationToken = default)
         {
             try
             {
-                var eventOptionsDto = await _eventListingService.GetEventOptionsAsync(eventId, GetUserAndOrganization());
+                var eventOptionsDto = await _eventListingService.GetEventOptionsAsync(eventId, GetUserAndOrganization(), cancellationToken);
                 var result = _mapper.Map<EventOptionsDto, EventOptionsViewModel>(eventOptionsDto);
                 return Ok(result);
             }
@@ -413,14 +414,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(typeof(EventDetailsViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetEventDetails(Guid eventId)
+        public async Task<IActionResult> GetEventDetails(Guid eventId, CancellationToken cancellationToken = default)
         {
             try
             {
-                var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization());
+                var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization(), cancellationToken);
                 var result = _mapper.Map<EventDetailsDto, EventDetailsViewModel>(eventDto);
 
-                var officesCount = await _officeMapService.GetOfficesCountAsync();
+                var officesCount = await _officeMapService.GetOfficesCountAsync(cancellationToken);
                 result.IsForAllOffices = result.OfficesName.Count() == officesCount;
 
                 return Ok(result);
@@ -563,9 +564,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("GetUsersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [ProducesResponseType(typeof(IEnumerable<EventUserSearchResultViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> SearchUser(string s, Guid eventId)
+        public async Task<IActionResult> SearchUser(string s, Guid eventId, CancellationToken cancellationToken = default)
         {
-            var searchResultDto = await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, s, GetUserAndOrganization());
+            var searchResultDto = await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, s, GetUserAndOrganization(), cancellationToken);
             var searchResult = _mapper.Map<IEnumerable<EventUserSearchResultDto>, IEnumerable<EventUserSearchResultViewModel>>(searchResultDto);
             return Ok(searchResult);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -13,7 +14,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         Task<IPagedList<EventListItemDto>> SearchEventsAsync(EventSearchOptionsDto options, UserAndOrganizationDto userOrg);
 
-        Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg);
+        Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventFilteredArgsDto filteredArgsDto, UserAndOrganizationDto userOrganization);
 

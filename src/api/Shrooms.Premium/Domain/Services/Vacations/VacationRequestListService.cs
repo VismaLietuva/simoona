@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Shrooms.Contracts.DAL;
@@ -73,7 +74,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                                   && user.ManagerId == userOrg.UserId);
         }
 
-        public async Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
+        public async Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var query = _userDbSet
                 .AsNoTracking()
@@ -104,7 +105,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                     PictureId = user.PictureId,
                     Email = user.Email
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         [Flags]

@@ -32,7 +32,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
         [ProducesResponseType(typeof(PagedViewModel<EmployeeViewModel>), StatusCodes.Status200OK)]
-        public virtual async Task<IActionResult> GetPagedEmployees([FromQuery] EmployeeListingArgsViewModel employeeArgsViewModel)
+        public virtual async Task<IActionResult> GetPagedEmployees([FromQuery] EmployeeListingArgsViewModel employeeArgsViewModel, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -44,7 +44,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 employeeArgsViewModel ??= new EmployeeListingArgsViewModel();
 
                 var employeeArgsDto = _mapper.Map<EmployeeListingArgsViewModel, EmployeeListingArgsDto>(employeeArgsViewModel);
-                var pagedEmployeeDtos = await _employeeListingService.GetPagedEmployeesAsync(employeeArgsDto, GetUserAndOrganization());
+                var pagedEmployeeDtos = await _employeeListingService.GetPagedEmployeesAsync(employeeArgsDto, GetUserAndOrganization(), cancellationToken);
                 var employeeViewModels = _mapper.Map<IEnumerable<EmployeeDto>, IEnumerable<EmployeeViewModel>>(pagedEmployeeDtos);
 
                 return Ok(pagedEmployeeDtos.ToPagedViewModel(employeeViewModels, employeeArgsViewModel));
