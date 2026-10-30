@@ -27,12 +27,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
     [Explicit("Report, not a check: run on demand during the migration.")]
     public class MapsterParitySweep
     {
-        // Backstop for the cyclic pass: a cycle Mapster does not track shows as a difference instead of a stack overflow.
-        // Kept small on purpose: an untracked cycle with several back-links grows exponentially with depth.
-        private const int CycleGuardDepth = 8;
-
-        private const int MaxPathsShown = 6;
-
         [Test]
         public void Sweep()
         {
@@ -52,7 +46,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
 
             // Reference tracking on the self-referencing maps, as the translated profiles will set it.
             var cyclicConfig = MapsterSettings.Create();
-            cyclicConfig.Default.MaxDepth(CycleGuardDepth);
+            cyclicConfig.Default.MaxDepth(MappingSamples.CycleGuardDepth);
             foreach (var typeMap in selfReferencingMaps)
             {
                 cyclicConfig.ForType(typeMap.SourceType, typeMap.DestinationType).PreserveReference(true);
@@ -246,8 +240,8 @@ namespace Shrooms.Premium.Tests.ModelMappings
                     : differing.Where(p => !customMembers.Contains(TopMember(p))).ToList();
 
                 (outcome, detail) = differing.Count == 0 ? ("same", string.Empty)
-                    : unexplained.Count == 0 ? ("differs only under configured members", Shorten(differing))
-                    : ("differs by convention", Shorten(unexplained));
+                    : unexplained.Count == 0 ? ("differs only under configured members", MappingSamples.Paths(differing))
+                    : ("differs by convention", MappingSamples.Paths(unexplained));
             }
             catch (Exception ex)
             {
@@ -304,12 +298,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
             return end < 0 ? path : path.Substring(0, end);
         }
 
-        private static string Shorten(List<string> paths)
-        {
-            var shown = string.Join(" ", paths.Take(MaxPathsShown));
-            return paths.Count > MaxPathsShown ? $"{shown} (+{paths.Count - MaxPathsShown} more)" : shown;
-        }
-
         private static void Count(IDictionary<string, int> totals, string key)
         {
             totals[key] = totals.TryGetValue(key, out var count) ? count + 1 : 1;
@@ -323,7 +311,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
         // A member whose getter throws is missing from the JSON on that side; say so rather than compare silently.
         private static string WithSerializationErrors(string cell, List<string> errors)
         {
-            return errors.Count == 0 ? cell : $"{cell} (serialization errors at {string.Join(", ", errors.Distinct().Take(MaxPathsShown))})";
+            return errors.Count == 0 ? cell : $"{cell} (serialization errors at {MappingSamples.Paths(errors.Distinct().ToList())})";
         }
 
         private static string Row(TypeMap typeMap, string autoMapper, string defaults, string tuned)
