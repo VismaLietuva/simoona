@@ -43,6 +43,12 @@ namespace Shrooms.Domain.Services.Roles
                                                   _roleDbSet.Any(role => role.Id == ur.RoleId && role.Name == roleName));
         }
 
+        public Expression<Func<ApplicationUser, bool>> OnlyUsersWithRoleName(string roleName)
+        {
+            return x => _userRolesDbSet.Any(ur => ur.UserId == x.Id &&
+                                                 _roleDbSet.Any(role => role.Id == ur.RoleId && role.Name == roleName));
+        }
+
         public async Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
         {
             return await _roleDbSet
@@ -77,12 +83,12 @@ namespace Shrooms.Domain.Services.Roles
                          select role).AnyAsync();
         }
 
-        public async Task<string> GetRoleIdByNameAsync(string roleName)
+        public async Task<string> GetRoleIdByNameAsync(string roleName, CancellationToken cancellationToken = default)
         {
             return await _roleDbSet
                 .Where(x => x.Name == roleName)
                 .Select(x => x.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         private async Task<RoleDetailsDto> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)

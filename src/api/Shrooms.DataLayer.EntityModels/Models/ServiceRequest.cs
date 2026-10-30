@@ -34,5 +34,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public KudosShopItem KudosShopItem { get; set; }
 
         public string PictureId { get; set; }
+
+        public bool IsKudosCommentHidden { get; set; }
     }
 }

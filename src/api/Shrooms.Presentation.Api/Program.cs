@@ -317,7 +317,7 @@ builder.Services.AddHangfire(config => config
 builder.Services.AddHangfireServer();
 
 // MVC + API controllers
-builder.Services.AddControllers()
+builder.Services.AddControllers(options => options.Filters.Add<Shrooms.Presentation.Api.Filters.RequestAbortedExceptionFilter>())
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();

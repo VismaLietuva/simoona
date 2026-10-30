@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
@@ -37,6 +38,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<KudosType> _kudosTypesDbSet;
         private DbSet<Organization> _organizationDbSet;
+        private DbSet<ServiceRequest> _serviceRequestsDbSet;
         private IFilterPresetService _filterPresetService;
         private IUnitOfWork2 _uow;
         private IMapper _mapper;
@@ -62,8 +64,12 @@ namespace Shrooms.Tests.DomainService
             _organizationDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IAsyncEnumerable<Organization>>();
             _organizationDbSet.SetDbSetDataForAsync(MockOrganization());
 
+            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IAsyncEnumerable<ServiceRequest>>();
+            _serviceRequestsDbSet.SetDbSetDataForAsync(new List<ServiceRequest>().AsQueryable());
+
             MockFindMethod();
 
+            _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
             _uow.GetDbSet<KudosLog>().Returns(_kudosLogsDbSet);
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             _uow.GetDbSet<KudosType>().Returns(_kudosTypesDbSet);
@@ -151,7 +157,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Specific_User_Kudos_Logs()
         {
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true);
 
             Assert.That(result.TotalKudosCount, Is.EqualTo(3));
         }
@@ -159,7 +165,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Name_The_User_A_Log_Sent_Points_To()
         {
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true);
 
             var withRecipient = result.KudosLogs.First(log => log.Id == 3);
             var withoutRecipient = result.KudosLogs.First(log => log.Id == 1);
@@ -185,7 +191,7 @@ namespace Shrooms.Tests.DomainService
             };
             _kudosLogsDbSet.SetDbSetDataForAsync(logs.AsQueryable());
 
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true);
 
             var liked = result.KudosLogs.First(log => log.Id == 3);
             var unliked = result.KudosLogs.First(log => log.Id == 1);
@@ -204,7 +210,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Only_Matching_Type_When_User_Kudos_Logs_Are_Filtered()
         {
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1" });
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true, new[] { "Type1" });
 
             Assert.Multiple(() =>
             {
@@ -217,7 +223,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Every_Selected_Type_When_User_Kudos_Logs_Are_Filtered_By_Several()
         {
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "Type1", "Type2" });
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true, new[] { "Type1", "Type2" });
 
             Assert.That(result.TotalKudosCount, Is.EqualTo(3));
         }
@@ -225,9 +231,9 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_All_Types_When_User_Kudos_Logs_Filter_Is_Not_Set()
         {
-            var unfiltered = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2);
-            var empty = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new string[0]);
-            var blank = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { "  " });
+            var unfiltered = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true);
+            var empty = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true, new string[0]);
+            var blank = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true, new[] { "  " });
 
             Assert.Multiple(() =>
             {
@@ -240,7 +246,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Treat_All_As_An_Ordinary_Type_Name_When_Filtering_User_Kudos_Logs()
         {
-            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, new[] { BusinessLayerConstants.KudosFilteringTypeAllFilter });
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true, new[] { BusinessLayerConstants.KudosFilteringTypeAllFilter });
 
             Assert.That(result.TotalKudosCount, Is.EqualTo(0));
         }
@@ -249,7 +255,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Specific_User_Kudos_Logs_With_Organization_Filter()
         {
             MockKudosLogsForOrganizationTest();
-            var result = await _kudosService.GetUserKudosLogsAsync("UserId", 1, 1);
+            var result = await _kudosService.GetUserKudosLogsAsync("UserId", 1, 1, true);
 
             Assert.That(result.KudosLogs.Count(), Is.EqualTo(1));
             Assert.That(result.KudosLogs.First().Id, Is.EqualTo(2));
@@ -593,7 +599,7 @@ namespace Shrooms.Tests.DomainService
             await _usersDbSet.FindAsync("CreatedUserId");
 
             MockKudosLogsForApprovedList();
-            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 1)).ToList();
+            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 1, true)).ToList();
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result.First().Comments, Is.EqualTo("Comment2"));
             Assert.That(result.First().Sender.Id, Is.EqualTo("CreatedUserId"));
@@ -603,11 +609,125 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Approved_Kudos_Logs_With_Organization_Filter_2()
         {
             MockKudosLogsForApprovedList();
-            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 2)).ToList();
+            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 2, true)).ToList();
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result.First().Comments, Is.EqualTo("Comment1"));
             Assert.That(result.First().Sender.Id, Is.EqualTo("CreatedUserId"));
             Assert.That(result.ToArray()[1].Comments, Is.EqualTo("Comment3"));
+        }
+
+        #endregion
+
+        #region Hidden comments
+
+        [Test]
+        public async Task Should_Blank_Hidden_Comment_In_User_Logs_For_A_Viewer_Without_Access()
+        {
+            MockMinusLogsWithOneHiddenComment();
+
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, false);
+
+            var hidden = result.KudosLogs.Single(log => log.Id == 1);
+            var visible = result.KudosLogs.Single(log => log.Id == 2);
+            Assert.That(hidden.Comment, Is.Empty);
+            Assert.That(hidden.IsCommentHidden, Is.True);
+            Assert.That(visible.Comment, Is.EqualTo("Public purchase"));
+            Assert.That(visible.IsCommentHidden, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Keep_Hidden_Comment_In_User_Logs_For_A_Viewer_With_Access()
+        {
+            MockMinusLogsWithOneHiddenComment();
+
+            var result = await _kudosService.GetUserKudosLogsAsync("testUserId", 1, 2, true);
+
+            var hidden = result.KudosLogs.Single(log => log.Id == 1);
+            Assert.That(hidden.Comment, Is.EqualTo("Secret purchase"));
+            Assert.That(hidden.IsCommentHidden, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Blank_Hidden_Comment_In_Approved_List_For_A_Viewer_Without_Access()
+        {
+            MockMinusLogsWithOneHiddenComment();
+
+            var result = (await _kudosService.GetApprovedKudosListAsync("testUserId", 2, false)).ToList();
+
+            Assert.That(result.Single(log => log.IsCommentHidden).Comments, Is.Empty);
+            Assert.That(result.Single(log => !log.IsCommentHidden).Comments, Is.EqualTo("Public purchase"));
+        }
+
+        [Test]
+        public async Task Should_Keep_Hidden_Comment_In_Approved_List_For_A_Viewer_With_Access()
+        {
+            MockMinusLogsWithOneHiddenComment();
+
+            var result = (await _kudosService.GetApprovedKudosListAsync("testUserId", 2, true)).ToList();
+
+            Assert.That(result.Single(log => log.IsCommentHidden).Comments, Is.EqualTo("Secret purchase"));
+        }
+
+        [Test]
+        public async Task Should_Hide_Minus_Comment_When_Its_Service_Request_Is_Hidden()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 2, EmployeeId = "testUserId3", IsKudosCommentHidden = true });
+
+            await _kudosService.AddKudosLogAsync(MinusDeduction(serviceRequestId: 7));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log => log.KudosSystemType == KudosTypeEnum.Minus && log.IsCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Not_Hide_Minus_Comment_When_Its_Service_Request_Is_Public()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 2, EmployeeId = "testUserId3", IsKudosCommentHidden = false });
+
+            await _kudosService.AddKudosLogAsync(MinusDeduction(serviceRequestId: 7));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log => log.KudosSystemType == KudosTypeEnum.Minus && !log.IsCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Not_Hide_Minus_Comment_When_No_Service_Request_Is_Given()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 2, EmployeeId = "testUserId3", IsKudosCommentHidden = true });
+
+            await _kudosService.AddKudosLogAsync(MinusDeduction(serviceRequestId: null));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log => log.KudosSystemType == KudosTypeEnum.Minus && !log.IsCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Not_Hide_Minus_Comment_When_Service_Request_Belongs_To_Another_User()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 2, EmployeeId = "testUserId4", IsKudosCommentHidden = true });
+
+            await _kudosService.AddKudosLogAsync(MinusDeduction(serviceRequestId: 7));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log => log.KudosSystemType == KudosTypeEnum.Minus && !log.IsCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Not_Hide_Minus_Comment_When_Service_Request_Is_From_Another_Organization()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 3, EmployeeId = "testUserId3", IsKudosCommentHidden = true });
+
+            await _kudosService.AddKudosLogAsync(MinusDeduction(serviceRequestId: 7));
+
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(log => log.KudosSystemType == KudosTypeEnum.Minus && !log.IsCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Never_Hide_The_Comment_Of_A_Log_That_Is_Not_A_Deduction()
+        {
+            MockServiceRequests(new ServiceRequest { Id = 7, OrganizationId = 2, EmployeeId = "testUserId3", IsKudosCommentHidden = true });
+            var kudosLog = MinusDeduction(serviceRequestId: 7);
+            kudosLog.PointsTypeId = 3;
+
+            await _kudosService.AddKudosLogAsync(kudosLog);
+
+            _kudosLogsDbSet.DidNotReceive().Add(Arg.Is<KudosLog>(log => log.IsCommentHidden));
         }
 
         #endregion
@@ -1222,7 +1342,7 @@ namespace Shrooms.Tests.DomainService
         private static void MockRoleService(IRoleService roleService)
         {
             var newRoleId = Guid.NewGuid().ToString();
-            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.GetRoleIdByNameAsync(Roles.NewUser, Arg.Any<CancellationToken>()).Returns(newRoleId);
             roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
@@ -1560,6 +1680,58 @@ namespace Shrooms.Tests.DomainService
                 }
             };
             _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+        }
+
+        private void MockMinusLogsWithOneHiddenComment()
+        {
+            var kudosLogs = new List<KudosLog>
+            {
+                new()
+                {
+                    Id = 1,
+                    EmployeeId = "testUserId",
+                    Comments = "Secret purchase",
+                    IsCommentHidden = true,
+                    KudosTypeName = "Minus",
+                    KudosSystemType = KudosTypeEnum.Minus,
+                    OrganizationId = 2,
+                    Status = KudosStatus.Approved,
+                    CreatedBy = "testUserId2"
+                },
+                new()
+                {
+                    Id = 2,
+                    EmployeeId = "testUserId",
+                    Comments = "Public purchase",
+                    KudosTypeName = "Minus",
+                    KudosSystemType = KudosTypeEnum.Minus,
+                    OrganizationId = 2,
+                    Status = KudosStatus.Approved,
+                    CreatedBy = "testUserId2"
+                }
+            };
+
+            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+        }
+
+        private void MockServiceRequests(params ServiceRequest[] serviceRequests)
+        {
+            _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests.AsQueryable());
+        }
+
+        private static AddKudosLogDto MinusDeduction(int? serviceRequestId)
+        {
+            return new AddKudosLogDto
+            {
+                OrganizationId = 2,
+                PointsTypeId = 1,
+                UserId = "testUserId2",
+                ReceivingUserIds = new List<string> { "testUserId3" },
+                MultiplyBy = 5,
+                Comment = "Sewing machine",
+                IsActive = true,
+                ServiceRequestId = serviceRequestId
+            };
         }
 
         private void MockKudosLogsForApprovedList()

@@ -84,7 +84,8 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 PriorityId = newServiceRequestDto.PriorityId,
                 Created = timestamp,
                 Modified = timestamp,
-                PictureId = newServiceRequestDto.PictureId
+                PictureId = newServiceRequestDto.PictureId,
+                IsKudosCommentHidden = serviceRequestCategory.Name == ServiceRequestCategoryKudos && newServiceRequestDto.IsKudosCommentHidden == true
             };
 
             _serviceRequestsDbSet.Add(serviceRequest);
@@ -191,6 +192,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             serviceRequest.PriorityId = serviceRequestDto.PriorityId;
             serviceRequest.Description = serviceRequestDto.Description;
             serviceRequest.PictureId = serviceRequestDto.PictureId;
+
+            if (isServiceRequestCreator && serviceRequest.CategoryName == ServiceRequestCategoryKudos && serviceRequestDto.IsKudosCommentHidden.HasValue)
+            {
+                serviceRequest.IsKudosCommentHidden = serviceRequestDto.IsKudosCommentHidden.Value;
+            }
+
             serviceRequest.UpdateMetadata(userAndOrganizationDto.UserId);
 
             await _uow.SaveChangesAsync(false);

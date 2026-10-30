@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.UserService
         Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUsersIds);
 
         Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id);
-        Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg);
+        Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<IEmailReceiver>> GetReceiversWithEventEmailNotificationAsync(int organizationId);
     }
