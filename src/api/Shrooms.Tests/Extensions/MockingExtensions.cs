@@ -99,7 +99,8 @@ namespace Shrooms.Tests.Extensions
 
             var queryableMockSet = (IQueryable<T>)mockedDbSet;
             var asyncEnumerableMockSet = (IAsyncEnumerable<T>)mockedDbSet;
-            asyncEnumerableMockSet.GetAsyncEnumerator(Arg.Any<CancellationToken>()).Returns(new MockAsyncEnumerator<T>(dataQueryable.GetEnumerator()));
+            asyncEnumerableMockSet.GetAsyncEnumerator(Arg.Any<CancellationToken>())
+                .Returns(callInfo => new MockAsyncEnumerator<T>(dataQueryable.GetEnumerator(), callInfo.Arg<CancellationToken>()));
             queryableMockSet.Provider.Returns(new MockAsyncQueryProvider<T>(dataQueryable.Provider));
 
             queryableMockSet.Expression.Returns(dataQueryable.Expression);

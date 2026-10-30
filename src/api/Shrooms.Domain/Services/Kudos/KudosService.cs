@@ -47,6 +47,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly DbSet<KudosLog> _kudosLogsDbSet;
         private readonly DbSet<KudosType> _kudosTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IApplicationSettings _settings;
@@ -79,6 +80,7 @@ namespace Shrooms.Domain.Services.Kudos
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
+            _serviceRequestsDbSet = uow.GetDbSet<ServiceRequest>();
             _kudosLogRepository = unitOfWork.GetRepository<KudosLog>();
             _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
 
@@ -232,7 +234,7 @@ namespace Shrooms.Domain.Services.Kudos
             };
         }
 
-        public async Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, IReadOnlyCollection<string> filteringTypes = null)
+        public async Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, bool canViewHiddenComments, IReadOnlyCollection<string> filteringTypes = null)
         {
             await ValidateUserAsync(organizationId, userId);
 
@@ -251,6 +253,7 @@ namespace Shrooms.Domain.Services.Kudos
                                  select new KudosUserLogDto
                                  {
                                      Comment = kudLog.Comments,
+                                     IsCommentHidden = kudLog.IsCommentHidden,
                                      Created = kudLog.Created,
                                      Id = kudLog.Id,
                                      Multiplier = kudLog.MultiplyBy,
@@ -299,6 +302,11 @@ namespace Shrooms.Domain.Services.Kudos
             foreach (var userLog in userLogs)
             {
                 userLog.Likes = MapLikesToDto(likesByLogId.GetValueOrDefault(userLog.Id), likersById);
+
+                if (userLog.IsCommentHidden && !canViewHiddenComments)
+                {
+                    userLog.Comment = string.Empty;
+                }
             }
 
             var user = await _usersDbSet.FindAsync(userId);
@@ -514,7 +522,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .FirstAsync();
         }
 
-        public async Task<IEnumerable<UserKudosInformationDto>> GetApprovedKudosListAsync(string id, int organizationId)
+        public async Task<IEnumerable<UserKudosInformationDto>> GetApprovedKudosListAsync(string id, int organizationId, bool canViewHiddenComments)
         {
             await ValidateUserAsync(organizationId, id);
 
@@ -525,6 +533,14 @@ namespace Shrooms.Domain.Services.Kudos
                     log.OrganizationId == organizationId)
                 .Select(MapKudosLogsToKudosInformationDto())
                 .ToListAsync();
+
+            if (!canViewHiddenComments)
+            {
+                foreach (var kudosLog in kudosLogs.Where(log => log.IsCommentHidden))
+                {
+                    kudosLog.Comments = string.Empty;
+                }
+            }
 
             return kudosLogs;
         }
@@ -664,6 +680,7 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 _kudosServiceValidator.ValidateUser(receivingUser);
                 kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDto>(receivingUser);
+                kudosDto.IsCommentHidden = await IsMinusCommentHiddenAsync(kudosLog, kudosDto.KudosType.Type, receivingUser.Id);
                 await ChooseKudosifyTypeAsync(kudosDto);
             }
 
@@ -864,6 +881,7 @@ namespace Shrooms.Domain.Services.Kudos
             return x => new UserKudosInformationDto
             {
                 Comments = x.Comments,
+                IsCommentHidden = x.IsCommentHidden,
                 Created = x.Created,
                 MultiplyBy = x.MultiplyBy,
                 Points = x.Points,
@@ -1058,6 +1076,24 @@ namespace Shrooms.Domain.Services.Kudos
             _kudosServiceValidator.ValidateUserAvailableKudosToSendPerMonth(totalKudosPointsInLog, availableToSendPerMonth - currentMonthSum);
         }
 
+        // The flag is read from the service request, never from the caller, so a log can only
+        // be hidden by the request's own privacy choice and only when it deducts for its author.
+        private async Task<bool> IsMinusCommentHiddenAsync(AddKudosLogDto kudosLog, KudosTypeEnum kudosType, string receivingUserId)
+        {
+            if (kudosType != KudosTypeEnum.Minus || !kudosLog.ServiceRequestId.HasValue)
+            {
+                return false;
+            }
+
+            return await _serviceRequestsDbSet
+                .AsNoTracking()
+                .AnyAsync(request =>
+                    request.Id == kudosLog.ServiceRequestId.Value &&
+                    request.OrganizationId == kudosLog.OrganizationId &&
+                    request.EmployeeId == receivingUserId &&
+                    request.IsKudosCommentHidden);
+        }
+
         private void InsertKudosLog(AddKudosDto kudos, KudosStatus status)
         {
             var log = new KudosLog
@@ -1076,7 +1112,8 @@ namespace Shrooms.Domain.Services.Kudos
                 OrganizationId = kudos.KudosLog.OrganizationId,
                 Points = kudos.TotalKudosPointsInLog,
                 PictureId = kudos.PictureId,
-                SentToId = kudos.SentToId
+                SentToId = kudos.SentToId,
+                IsCommentHidden = kudos.IsCommentHidden
             };
 
             _kudosLogsDbSet.Add(log);

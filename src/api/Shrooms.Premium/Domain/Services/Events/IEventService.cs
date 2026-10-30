@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Events;
@@ -12,7 +13,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto);
         Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg);
         Task ToggleEventPinAsync(Guid id);
-        Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
+        Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
         Task<EventReportDetailsDto> GetReportEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
         Task<EventEditDetailsDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);

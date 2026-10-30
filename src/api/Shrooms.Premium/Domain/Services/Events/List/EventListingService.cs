@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -56,14 +57,14 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             _officeDbSet = uow.GetDbSet<Office>();
         }
 
-        public async Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg)
+        public async Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var eventOptionsDto = await _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventQuestions).ThenInclude(q => q.Options)
                 .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapOptionsToDto())
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             _eventValidationService.CheckIfEventExists(eventOptionsDto);
 
@@ -72,7 +73,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             eventOptionsDto.MyChosenOptions = await _eventParticipantsDbSet
                 .Where(p => p.EventId == eventId && p.ApplicationUserId == userOrg.UserId)
                 .SelectMany(p => p.EventOptions.Select(o => o.Id))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return eventOptionsDto;
         }
