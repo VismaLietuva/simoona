@@ -126,11 +126,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public DateTime? VacationLastTimeUpdated { get; set; }
 
-        public TimeSpan? DailyMailingHour { get; set; }
-
         public bool IsManagingDirector { get; set; }
-
-        public string CultureCode { get; set; }
 
         public virtual ICollection<Project> Projects { get; set; }
 
@@ -153,15 +149,11 @@ namespace Shrooms.DataLayer.EntityModels.Models
             }
         }
 
-        public string TimeZone { get; set; }
-
         public virtual ICollection<NotificationUser> NotificationUsers { get; set; }
 
-        public bool IsTutorialComplete { get; set; }
-
-        public string WallWidgetPreferences { get; set; }
-
         public virtual NotificationsSettings NotificationsSettings { get; set; }
+
+        public virtual UserSettings Settings { get; set; }
 
         public string GoogleEmail { get; set; }
 
@@ -185,6 +177,16 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
                 return employmentYears;
             }
+        }
+
+        /// <summary>
+        /// Returns the user's settings, adding the row when there is none yet.
+        /// Include <see cref="Settings"/> when loading the user: an existing row that
+        /// was not loaded would be added a second time and fail on save.
+        /// </summary>
+        public UserSettings GetOrCreateSettings()
+        {
+            return Settings ??= new UserSettings();
         }
 
         public void ReceiveKudos(KudosLog log)

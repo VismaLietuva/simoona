@@ -4,10 +4,11 @@ using System.Text.Json.Nodes;
 namespace Shrooms.Domain.Services.UserPreferences
 {
     /// <summary>
-    /// ApplicationUser.WallWidgetPreferences holds every per-user UI preference
+    /// UserSettings.Preferences holds every per-user UI preference
     /// as one JSON object with a section per feature:
     /// <c>{"widgets":[...],"sidebarFavorites":[...]}</c>.
-    /// The column started out as the bare widget array, which is still read as
+    /// It started out as the bare widget array (in the old
+    /// AspNetUsers.WallWidgetPreferences column), which is still read as
     /// the widgets section. Each feature reads and writes only its own section,
     /// so saving one never overwrites another.
     /// </summary>
