@@ -110,6 +110,8 @@ namespace Shrooms.Tests.DomainService
         [TestCase(21, 201, 1.5, 36)]
         [TestCase(21, 43, 0.5, 36)]
         [TestCase(21, 43, 1.5, 0)]
+        [TestCase(21.555, 43, 1.5, 36)]
+        [TestCase(21, 43, 1.505, 36)]
         public void Should_Reject_Rates_Out_Of_Range(decimal vat, decimal tax, decimal team, int techWear)
         {
             var input = ValidInput();
@@ -122,6 +124,18 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.KudosCalculatorSettingsInvalid));
             _settingsDbSet.DidNotReceive().Add(Arg.Any<KudosCalculatorSettings>());
+        }
+
+        [Test]
+        public async Task Should_Accept_Rates_With_Two_Decimal_Places()
+        {
+            var input = ValidInput();
+            input.VatPercent = 21.55m;
+            input.TeamMultiplier = 1.25m;
+
+            await _service.UpdateAsync(input, UserOrg());
+
+            _settingsDbSet.Received(1).Add(Arg.Is<KudosCalculatorSettings>(s => s.VatPercent == 21.55m && s.TeamMultiplier == 1.25m));
         }
 
         [TestCase("not a url")]

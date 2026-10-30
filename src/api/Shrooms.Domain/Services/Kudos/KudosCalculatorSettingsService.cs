@@ -90,15 +90,25 @@ namespace Shrooms.Domain.Services.Kudos
                 throw Invalid("Settings are required");
             }
 
-            RequireRange(input.VatPercent, 0, 100, nameof(input.VatPercent));
-            RequireRange(input.TaxPercent, 0, 200, nameof(input.TaxPercent));
-            RequireRange(input.TeamMultiplier, 1, 10, nameof(input.TeamMultiplier));
-            RequireRange(input.CreditPercent, 0, 100, nameof(input.CreditPercent));
+            RequireRate(input.VatPercent, 0, 100, nameof(input.VatPercent));
+            RequireRate(input.TaxPercent, 0, 200, nameof(input.TaxPercent));
+            RequireRate(input.TeamMultiplier, 1, 10, nameof(input.TeamMultiplier));
+            RequireRate(input.CreditPercent, 0, 100, nameof(input.CreditPercent));
             RequireRange(input.TechWearMonths, 1, 240, nameof(input.TechWearMonths));
             RequireRange(input.FurnitureWearMonths, 1, 240, nameof(input.FurnitureWearMonths));
             RequireRange(input.BuyoutMinimum, 0, 1000, nameof(input.BuyoutMinimum));
             RequireUrl(input.GuideUrl, nameof(input.GuideUrl));
             RequireUrl(input.WhitelistUrl, nameof(input.WhitelistUrl));
+        }
+
+        private static void RequireRate(decimal value, decimal min, decimal max, string field)
+        {
+            RequireRange(value, min, max, field);
+
+            if (decimal.Round(value, 2) != value)
+            {
+                throw Invalid($"{field} can have at most 2 decimal places");
+            }
         }
 
         private static void RequireRange(decimal value, decimal min, decimal max, string field)
