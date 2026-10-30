@@ -14,6 +14,8 @@ namespace Shrooms.Domain.Services.Roles
 
         Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRoleName(string roleName);
 
+        Expression<Func<ApplicationUser, bool>> OnlyUsersWithRoleName(string roleName);
+
         Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userAndOrg);
 
         Task<RoleDetailsDto> GetRoleByIdAsync(UserAndOrganizationDto userAndOrganizationDto, string roleId);
@@ -22,6 +24,6 @@ namespace Shrooms.Domain.Services.Roles
 
         Task<bool> HasRoleAsync(string userId, string roleName);
 
-        Task<string> GetRoleIdByNameAsync(string roleName);
+        Task<string> GetRoleIdByNameAsync(string roleName, CancellationToken cancellationToken = default);
     }
 }

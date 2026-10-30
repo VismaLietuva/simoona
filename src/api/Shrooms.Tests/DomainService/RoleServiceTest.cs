@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
@@ -9,6 +11,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
+using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
@@ -41,6 +44,47 @@ namespace Shrooms.Tests.DomainService
             _permissionService = Substitute.For<IPermissionService>();
 
             _roleService = new RoleService(uow, _permissionService);
+        }
+
+        [Test]
+        public async Task OnlyUsersWithRoleName_KeepsOnlyMembersOfThatRole()
+        {
+            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+            await using var dbContext = new ShroomsDbContext(options);
+            dbContext.Roles.AddRange(
+                new ApplicationRole { Id = "manager-role", Name = "Manager" },
+                new ApplicationRole { Id = "user-role", Name = "User" });
+            dbContext.Users.AddRange(
+                new ApplicationUser { Id = "manager", UserName = "manager" },
+                new ApplicationUser { Id = "employee", UserName = "employee" });
+            dbContext.UserRoles.AddRange(
+                new IdentityUserRole<string> { UserId = "manager", RoleId = "manager-role" },
+                new IdentityUserRole<string> { UserId = "employee", RoleId = "user-role" });
+            await dbContext.SaveChangesAsync(false);
+            var roleService = new RoleService(new UnitOfWork2(dbContext), _permissionService);
+
+            var userIds = await dbContext.Users
+                .Where(roleService.OnlyUsersWithRoleName("Manager"))
+                .Select(user => user.Id)
+                .ToListAsync();
+
+            Assert.That(userIds, Is.EqualTo(new[] { "manager" }));
+        }
+
+        [Test]
+        public void GetRoleIdByNameAsync_CancelledToken_StopsTheQuery()
+        {
+            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+            using var dbContext = new ShroomsDbContext(options);
+            var roleService = new RoleService(new UnitOfWork2(dbContext), _permissionService);
+
+            Assert.That(
+                async () => await roleService.GetRoleIdByNameAsync("NewUser", new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

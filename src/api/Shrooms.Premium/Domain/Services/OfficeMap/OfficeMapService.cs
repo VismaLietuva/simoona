@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -35,9 +36,9 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDto>>(offices);
         }
 
-        public async Task<int> GetOfficesCountAsync()
+        public async Task<int> GetOfficesCountAsync(CancellationToken cancellationToken = default)
         {
-            return await _officeDbSet.CountAsync();
+            return await _officeDbSet.CountAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<OfficeUserDto>> GetOfficeUsersAsync(int floorId, string includeProperties)

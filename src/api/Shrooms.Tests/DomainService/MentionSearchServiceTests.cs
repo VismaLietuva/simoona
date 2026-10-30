@@ -48,6 +48,17 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public void Should_Stop_The_Search_When_The_Token_Is_Cancelled()
+        {
+            Assert.That(
+                async () => await _searchService.SearchAsync(
+                    "Ann",
+                    new UserAndOrganizationDto { OrganizationId = OrganizationId },
+                    new System.Threading.CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
+        }
+
+        [Test]
         public async Task Should_List_Groups_With_Members_Before_Empty_Ones()
         {
             GivenGroups(

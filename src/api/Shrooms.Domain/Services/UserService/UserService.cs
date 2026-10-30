@@ -196,9 +196,9 @@ namespace Shrooms.Domain.Services.UserService
             return userAppNotificationEnabledIds;
         }
 
-        public async Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg)
+        public async Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
-            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser, cancellationToken);
 
             var users = await _usersDbSet
                 .Where(user => (user.UserName.StartsWith(s) ||
@@ -209,7 +209,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .Take(10)
                 .Select(MapUsersToAutocompleteDto())
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return users;
         }

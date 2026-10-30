@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
@@ -40,6 +42,19 @@ namespace Shrooms.Tests.DomainService
             _permissionCache = Substitute.For<ICustomCache<string, IEnumerable<string>>>();
 
             _permissionService = new PermissionService(uow, _permissionCache);
+        }
+
+        [Test]
+        public void UserHasPermissionAsync_CancelledTokenOnCacheMiss_StopsTheQueryAndCachesNothing()
+        {
+            _permissionsDbSet.SetDbSetDataForAsync(new List<Permission>());
+            _userRolesDbSet.SetDbSetDataForAsync(new List<IdentityUserRole<string>>());
+            var userOrg = new UserAndOrganizationDto { UserId = "user", OrganizationId = 1 };
+
+            Assert.That(
+                async () => await _permissionService.UserHasPermissionAsync(userOrg, "EVENT_BASIC", new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
+            _permissionCache.DidNotReceiveWithAnyArgs().TryAdd(default, default);
         }
 
         [Test]

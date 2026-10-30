@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Users;
@@ -23,6 +24,6 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         Task<bool> HasDirectReportsAsync(UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg);
+        Task<IEnumerable<UserAutoCompleteDto>> GetTeamMembersForAutocompleteAsync(string search, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
     }
 }
