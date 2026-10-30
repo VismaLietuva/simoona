@@ -737,7 +737,7 @@ namespace Shrooms.Domain.Services.Wall
             {
                 // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
                 var includeEventWalls = (wallsListFilter == WallsListFilter.Followed || includeJoinedEventWalls) &&
-                                        await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event);
+                                        await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event, cancellationToken);
                 wallScope = BuildFeedScope(userOrg, wallsListFilter, includeEventWalls);
             }
 

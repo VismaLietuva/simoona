@@ -36,7 +36,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _wallService = Substitute.For<IWallService>();
             _notificationService = Substitute.For<INotificationService>();
             var permissionService = Substitute.For<IPermissionService>();
-            permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>()).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(true);
 
             _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService, Substitute.For<Microsoft.AspNetCore.SignalR.IHubContext<Shrooms.Presentation.Common.Hubs.NotificationHub>>());
             _wallController.SetUpControllerForTesting();

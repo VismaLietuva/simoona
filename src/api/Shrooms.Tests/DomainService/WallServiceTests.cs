@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -1205,7 +1206,7 @@ namespace Shrooms.Tests.DomainService
 
         private void MockEventPermission(bool hasPermission)
         {
-            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.Event).Returns(hasPermission);
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.Event, Arg.Any<CancellationToken>()).Returns(hasPermission);
         }
 
         // Wall 1 is a user created wall the user follows, wall 2 is the wall of an event the user joined; each holds one post with the same id as its wall.

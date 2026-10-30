@@ -180,7 +180,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                 var userAndOrg = GetUserAndOrganization();
                 var wall = await _wallService.GetWallAsync(wallId, userAndOrg, cancellationToken);
 
-                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post, cancellationToken) && wall.Type != WallType.Events)
                 {
                     return Forbidden();
                 }
