@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
@@ -54,6 +55,20 @@ namespace Shrooms.Tests.DomainService
             _userManager = MockIdentity.MockUserManager(userStore, dbContext);
 
             _userService = new UserService(uow, _userManager, roleService);
+        }
+
+        [Test]
+        public void GetUsersForAutocompleteAsync_CancelledToken_StopsTheQuery()
+        {
+            var uow = Substitute.For<IUnitOfWork2>();
+            uow.MockDbSetForAsync(MockUsers());
+            var roleService = Substitute.For<IRoleService>();
+            roleService.ExcludeUsersWithRole(Arg.Any<string>()).Returns(user => true);
+            var userService = new UserService(uow, _userManager, roleService);
+
+            Assert.That(
+                async () => await userService.GetUsersForAutocompleteAsync("a", true, new UserAndOrganizationDto(), new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

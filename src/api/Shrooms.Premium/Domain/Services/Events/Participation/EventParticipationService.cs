@@ -194,7 +194,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             return result;
         }
 
-        public async Task<IEnumerable<EventUserSearchResultDto>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDto userOrg)
+        public async Task<IEnumerable<EventUserSearchResultDto>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var searchStringLowerCase = searchString.ToLowerInvariant();
             var participants = await _eventsDbSet
@@ -203,9 +203,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     e.Id == eventId &&
                     e.OrganizationId == userOrg.OrganizationId)
                 .SelectMany(e => e.EventParticipants.Select(p => p.ApplicationUserId))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser, cancellationToken);
 
 #pragma warning disable S1449
             var users = await _usersDbSet
@@ -224,7 +224,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     Id = u.Id,
                     FullName = u.FirstName + " " + u.LastName
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 #pragma warning restore S1449
 
             return users;

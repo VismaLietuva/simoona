@@ -227,9 +227,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [Route("GetUsersForAutocomplete")]
-        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetUsersForAutocomplete(string s, bool includeSelf = true)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetUsersForAutocomplete(string s, bool includeSelf = true, CancellationToken cancellationToken = default)
         {
-            var userAutoCompleteDto = await _userService.GetUsersForAutocompleteAsync(s, includeSelf, GetUserAndOrganization());
+            var userAutoCompleteDto = await _userService.GetUsersForAutocompleteAsync(s, includeSelf, GetUserAndOrganization(), cancellationToken);
             var result = _mapper.Map<IEnumerable<UserAutoCompleteDto>, IEnumerable<ApplicationUserAutoCompleteViewModel>>(userAutoCompleteDto);
             return result;
         }

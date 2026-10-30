@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
@@ -1347,7 +1348,7 @@ namespace Shrooms.Tests.DomainService
         private static void MockRoleService(IRoleService roleService)
         {
             var newRoleId = Guid.NewGuid().ToString();
-            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.GetRoleIdByNameAsync(Roles.NewUser, Arg.Any<CancellationToken>()).Returns(newRoleId);
             roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
