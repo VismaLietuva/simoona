@@ -63,7 +63,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
             "CreateWallViewModel → CreateWallDto",
             "EditCommentViewModel → EditCommentDto",
             "EditPostViewModel → EditPostDto",
-            "EmployeeDto → EmployeeViewModel",
             "Event → Event",
             "EventChangeOptionViewModel → EventChangeOptionsDto",
             "EventDetailsDto → EventDetailsViewModel",
@@ -87,7 +86,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
             "NotificationDto → NotificationViewModel",
             "Office → OfficeViewModel",
             "OfficePostViewModel → Office",
-            "OrganizationalStructureDto → OrganizationalStructureViewModel",
             "Post → PostDto",
             "PostDto → EventPostViewModel",
             "QualificationLevelPostViewModel → QualificationLevel",
@@ -103,9 +101,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
             "UpdateAttendStatusViewModel → UpdateAttendStatusDto",
             "UpdateEventViewModel → EditEventDto",
             "UpdateWallViewModel → UpdateWallDto",
-            "UserDto → ApplicationUserViewModel",
             "UserKudosInformationDto → UserKudosInformationViewModel",
-            "VacationDto → VacationViewModel",
             "WallPostViewModel → NotificationDto",
         };
 
