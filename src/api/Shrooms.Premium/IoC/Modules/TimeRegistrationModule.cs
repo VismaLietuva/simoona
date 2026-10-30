@@ -11,6 +11,7 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<ITimeAccountingService, TimeAccountingService>();
             services.AddScoped<ITimeTableService, TimeTableService>();
             services.AddScoped<ITimePeriodService, TimePeriodService>();
+            services.AddScoped<ITimeReportService, TimeReportService>();
             return services;
         }
     }

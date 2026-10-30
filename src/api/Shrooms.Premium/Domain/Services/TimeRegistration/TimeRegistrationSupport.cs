@@ -32,7 +32,6 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         private readonly DbSet<Organization> _organizations;
         private readonly DbSet<VacationRequest> _vacations;
         private readonly DbSet<TimeProjectMember> _members;
-        private readonly DbSet<TimeTask> _tasks;
         private readonly DbSet<TimeEntry> _entries;
         private readonly DbSet<TimePeriod> _periods;
         private readonly DbSet<TimeMonthLock> _locks;
@@ -52,7 +51,6 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             _organizations = uow.GetDbSet<Organization>();
             _vacations = uow.GetDbSet<VacationRequest>();
             _members = uow.GetDbSet<TimeProjectMember>();
-            _tasks = uow.GetDbSet<TimeTask>();
             _entries = uow.GetDbSet<TimeEntry>();
             _periods = uow.GetDbSet<TimePeriod>();
             _locks = uow.GetDbSet<TimeMonthLock>();
@@ -152,20 +150,31 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
         public async Task<TimeCalendar> CalendarAsync(string userId, DateTime month, int organizationId)
         {
-            var holidays = await HolidaysAsync(month);
-            var daily = (await DailyMinutesAsync(new[] { userId }))[userId];
-            var absences = await AbsencesAsync(userId, month, holidays, organizationId);
-            var employedFrom = await _users
-                .AsNoTracking()
-                .Where(user => user.Id == userId)
-                .Select(user => user.EmploymentDate)
-                .FirstOrDefaultAsync();
-            if (employedFrom.HasValue)
-            {
-                employedFrom = VacationCalculator.NowIn(await _organizations.TimeZoneAsync(organizationId), employedFrom.Value);
-            }
+            return (await CalendarsAsync(new[] { userId }, month, organizationId))[userId];
+        }
 
-            return new TimeCalendar(month, holidays, absences, daily, employedFrom);
+        public async Task<IDictionary<string, TimeCalendar>> CalendarsAsync(IReadOnlyCollection<string> userIds, DateTime month, int organizationId)
+        {
+            var holidays = await HolidaysAsync(month);
+            var daily = await DailyMinutesAsync(userIds);
+            var absences = await AbsencesAsync(userIds, month, holidays, organizationId);
+            var employment = (await _users
+                    .AsNoTracking()
+                    .Where(user => userIds.Contains(user.Id) && user.EmploymentDate != null)
+                    .Select(user => new { user.Id, user.EmploymentDate })
+                    .ToListAsync())
+                .ToDictionary(user => user.Id, user => user.EmploymentDate.Value, StringComparer.OrdinalIgnoreCase);
+            var timeZone = employment.Count > 0 ? await _organizations.TimeZoneAsync(organizationId) : null;
+
+            return userIds.Distinct(StringComparer.OrdinalIgnoreCase).ToDictionary(
+                id => id,
+                id => new TimeCalendar(
+                    month,
+                    holidays,
+                    absences.TryGetValue(id, out var own) ? own : new Dictionary<DateTime, TimeAbsence>(),
+                    daily[id],
+                    employment.TryGetValue(id, out var employedFrom) ? VacationCalculator.NowIn(timeZone, employedFrom) : null),
+                StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<TimeMonthLock> LockAsync(DateTime month, int organizationId)
@@ -231,45 +240,53 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
         public async Task<int?> AutoFillProjectIdAsync(string userId, int organizationId)
         {
+            return (await AutoFillsAsync(new[] { userId }, organizationId)).TryGetValue(userId, out var autoFill)
+                ? autoFill.ProjectId
+                : null;
+        }
+
+        public async Task<IDictionary<string, TimeAutoFill>> AutoFillsAsync(IReadOnlyCollection<string> userIds, int organizationId)
+        {
             var usable = await _members
                 .AsNoTracking()
                 .Where(member => member.OrganizationId == organizationId
-                                 && member.UserId == userId
+                                 && userIds.Contains(member.UserId)
                                  && !member.Project.IsDeleted
                                  && !member.Project.IsArchived
                                  && member.Project.Tasks.Any(task => task.IsDefault && !task.IsDeleted))
                 .Select(member => new
                 {
+                    member.UserId,
                     member.ProjectId,
                     member.IsAutoFill,
                     CustomerName = member.Project.Customer.Name,
-                    ProjectName = member.Project.Name
+                    ProjectName = member.Project.Name,
+                    Task = member.Project.Tasks
+                        .Where(task => task.IsDefault && !task.IsDeleted)
+                        .Select(task => new { task.Id, task.Name })
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
 
-            var chosen = usable.FirstOrDefault(member => member.IsAutoFill)
-                         ?? usable
-                             .OrderBy(member => member.CustomerName, StringComparer.CurrentCultureIgnoreCase)
-                             .ThenBy(member => member.ProjectName, StringComparer.CurrentCultureIgnoreCase)
-                             .FirstOrDefault();
-
-            return chosen?.ProjectId;
+            return usable
+                .GroupBy(member => member.UserId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    group => group.Key,
+                    group =>
+                    {
+                        var chosen = group.FirstOrDefault(member => member.IsAutoFill)
+                                     ?? group
+                                         .OrderBy(member => member.CustomerName, StringComparer.CurrentCultureIgnoreCase)
+                                         .ThenBy(member => member.ProjectName, StringComparer.CurrentCultureIgnoreCase)
+                                         .First();
+                        return new TimeAutoFill(chosen.ProjectId, chosen.Task.Id, chosen.CustomerName, chosen.ProjectName, chosen.Task.Name);
+                    },
+                    StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task MaterializeAutoFillAsync(string userId, DateTime month, int organizationId)
         {
-            var projectId = await AutoFillProjectIdAsync(userId, organizationId);
-            if (projectId == null)
-            {
-                return;
-            }
-
-            var taskId = await _tasks
-                .AsNoTracking()
-                .Where(task => task.ProjectId == projectId && task.IsDefault && !task.IsDeleted)
-                .Select(task => (int?)task.Id)
-                .FirstOrDefaultAsync();
-            if (taskId == null)
+            if (!(await AutoFillsAsync(new[] { userId }, organizationId)).TryGetValue(userId, out var autoFill))
             {
                 return;
             }
@@ -284,26 +301,16 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
             foreach (var day in calendar.Days)
             {
-                if (!calendar.IsWorkingDay(day) || calendar.Absences.ContainsKey(day))
-                {
-                    continue;
-                }
-
                 var onDay = logged.Where(entry => entry.Date.Date == day).ToList();
-                if (onDay.Any(entry => entry.TaskId == taskId))
-                {
-                    continue;
-                }
-
-                var rest = calendar.DailyMinutes - onDay.Sum(entry => entry.Minutes);
+                var rest = calendar.AutoFillMinutes(day, onDay.Sum(entry => entry.Minutes), onDay.Any(entry => entry.TaskId == autoFill.TaskId));
                 if (rest > 0)
                 {
                     _entries.Add(new TimeEntry
                     {
                         OrganizationId = organizationId,
                         UserId = userId,
-                        ProjectId = projectId.Value,
-                        TaskId = taskId.Value,
+                        ProjectId = autoFill.ProjectId,
+                        TaskId = autoFill.TaskId,
                         Date = day,
                         Minutes = rest
                     });
@@ -371,8 +378,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             await transaction.CommitAsync();
         }
 
-        private async Task<IReadOnlyDictionary<DateTime, TimeAbsence>> AbsencesAsync(
-            string userId,
+        private async Task<IDictionary<string, Dictionary<DateTime, TimeAbsence>>> AbsencesAsync(
+            IReadOnlyCollection<string> userIds,
             DateTime month,
             IReadOnlyDictionary<DateTime, string> holidays,
             int organizationId)
@@ -381,16 +388,22 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             var requests = await _vacations
                 .AsNoTracking()
                 .Where(request => request.OrganizationId == organizationId
-                                  && request.EmployeeId == userId
+                                  && userIds.Contains(request.EmployeeId)
                                   && (request.Status == VacationRequestStatus.Pending || request.Status == VacationRequestStatus.Approved)
                                   && request.DateFrom <= last
                                   && request.DateTo >= month)
-                .Select(request => new { request.Type, request.Status, request.DateFrom, request.DateTo })
+                .Select(request => new { request.EmployeeId, request.Type, request.Status, request.DateFrom, request.DateTo })
                 .ToListAsync();
 
-            var absences = new Dictionary<DateTime, TimeAbsence>();
+            var absences = new Dictionary<string, Dictionary<DateTime, TimeAbsence>>(StringComparer.OrdinalIgnoreCase);
             foreach (var request in requests)
             {
+                if (!absences.TryGetValue(request.EmployeeId, out var own))
+                {
+                    own = new Dictionary<DateTime, TimeAbsence>();
+                    absences[request.EmployeeId] = own;
+                }
+
                 for (var day = request.DateFrom.Date; day <= request.DateTo.Date; day = day.AddDays(1))
                 {
                     if (day < month || day > last || TimeMonth.IsWeekend(day) || holidays.ContainsKey(day))
@@ -398,9 +411,9 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                         continue;
                     }
 
-                    if (!absences.TryGetValue(day, out var current) || current.Status != VacationRequestStatus.Approved)
+                    if (!own.TryGetValue(day, out var current) || current.Status != VacationRequestStatus.Approved)
                     {
-                        absences[day] = new TimeAbsence(day, request.Type, request.Status);
+                        own[day] = new TimeAbsence(day, request.Type, request.Status);
                     }
                 }
             }
