@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService
@@ -80,7 +81,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Event_Report_Details(int organizationId)
         {
             // Arrange
-            _officeMapService.GetOfficesCountAsync()
+            _officeMapService.GetOfficesCountAsync(Arg.Any<CancellationToken>())
                 .Returns(1);
 
             var office = new Office
@@ -127,6 +128,17 @@ namespace Shrooms.Premium.Tests.DomainService
 
             ClassicAssert.AreEqual(result.Name, @event.Name);
             ClassicAssert.AreEqual(result.HostUserId, @event.ResponsibleUser.Id);
+        }
+
+        [Test]
+        public void GetEventDetailsAsync_CancelledToken_StopsTheQuery()
+        {
+            Assert.That(
+                async () => await _eventService.GetEventDetailsAsync(
+                    Guid.NewGuid(),
+                    new UserAndOrganizationDto { OrganizationId = 2 },
+                    new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]
@@ -183,6 +195,17 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.That(flatOptions, Has.Count.EqualTo(1));
             Assert.That(flatOptions[0].Id, Is.EqualTo(80));
             Assert.That(flatOptions[0].Name, Is.EqualTo("Legacy option"));
+        }
+
+        [Test]
+        public async Task Should_Return_Host_Picture_In_Details_Even_When_Host_Is_Not_A_Participant()
+        {
+            var eventId = MockEventDetailsWithLegacyAndQuestionOptions();
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.HostUserImageName, Is.EqualTo("host-picture.png"));
         }
 
         [Test]
@@ -333,7 +356,8 @@ namespace Shrooms.Premium.Tests.DomainService
             {
                 Id = "responsibleUser1",
                 FirstName = "user1f",
-                LastName = "user1l"
+                LastName = "user1l",
+                PictureId = "host-picture.png"
             };
 
             var options = new List<EventOption>

@@ -25,6 +25,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int MaxOptions { get; set; }
         public string HostUserFullName { get; set; }
         public string HostUserId { get; set; }
+        public string HostUserImageName { get; set; }
         public bool IsFull { get; set; }
         public AttendingStatus ParticipatingStatus { get; set; }
         public int WallId { get; set; }

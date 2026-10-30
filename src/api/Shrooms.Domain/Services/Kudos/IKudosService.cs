@@ -27,7 +27,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task<KudosTypeDto> GetKudosTypeAsync(int id, UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<UserKudosInformationDto>> GetApprovedKudosListAsync(string id, int organizationId);
+        Task<IEnumerable<UserKudosInformationDto>> GetApprovedKudosListAsync(string id, int organizationId, bool canViewHiddenComments);
 
         Task AddLotteryKudosLogAsync(AddKudosLogDto kudosLogDto, UserAndOrganizationDto userOrg);
 
@@ -55,7 +55,7 @@ namespace Shrooms.Domain.Services.Kudos
         Task UpdateProfilesFromUserIdsAsync(IEnumerable<string> usersId, UserAndOrganizationDto userOrg);
 
         Task<KudosLogsEntriesDto<MainKudosLogDto>> GetKudosLogsAsync(KudosLogsFilterDto options);
-        Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, IReadOnlyCollection<string> filteringTypes = null);
+        Task<KudosLogsEntriesDto<KudosUserLogDto>> GetUserKudosLogsAsync(string userId, int page, int organizationId, bool canViewHiddenComments, IReadOnlyCollection<string> filteringTypes = null);
 
         Task<int> GetKudosTypeIdAsync(string kudosTypeName);
 

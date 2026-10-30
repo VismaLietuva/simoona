@@ -128,6 +128,60 @@ namespace Shrooms.Premium.Tests.DomainService
             await _uow.Received(1).SaveChangesAsync(false);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        [TestCase(null)]
+        public async Task Should_Create_Kudos_Service_Request_Public_Unless_Hiding_Is_Requested(bool? requested)
+        {
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+
+            await _serviceRequestService.CreateNewServiceRequestAsync(
+                new ServiceRequestDto { PriorityId = 1, ServiceRequestCategoryId = 2, Title = "Sewing machine", IsKudosCommentHidden = requested },
+                new UserAndOrganizationDto { OrganizationId = 2, UserId = "UserId" });
+
+            _serviceRequestsDbSet.Received(1).Add(Arg.Is<ServiceRequest>(x => x.IsKudosCommentHidden == (requested == true)));
+        }
+
+        [Test]
+        public async Task Should_Ignore_Comment_Hiding_On_A_Service_Request_Outside_The_Kudos_Category()
+        {
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+
+            await _serviceRequestService.CreateNewServiceRequestAsync(
+                new ServiceRequestDto { PriorityId = 1, ServiceRequestCategoryId = 1, Title = "Chair", IsKudosCommentHidden = true },
+                new UserAndOrganizationDto { OrganizationId = 2, UserId = "UserId" });
+
+            _serviceRequestsDbSet.Received(1).Add(Arg.Is<ServiceRequest>(x => !x.IsKudosCommentHidden));
+        }
+
+        [Test]
+        public async Task Should_Let_The_Creator_Change_Comment_Hiding()
+        {
+            await UpdateHiddenKudosRequestAsync("UserId", hidden: false);
+
+            Assert.That((await _serviceRequestsDbSet.FirstAsync(x => x.Id == 4)).IsKudosCommentHidden, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Keep_Comment_Hiding_When_The_Update_Does_Not_Mention_It()
+        {
+            await UpdateHiddenKudosRequestAsync("UserId", hidden: null);
+
+            Assert.That((await _serviceRequestsDbSet.FirstAsync(x => x.Id == 4)).IsKudosCommentHidden, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Not_Let_An_Admin_Change_Comment_Hiding_Of_Someone_Elses_Request()
+        {
+            await UpdateHiddenKudosRequestAsync("AdminId", hidden: false);
+
+            Assert.That((await _serviceRequestsDbSet.FirstAsync(x => x.Id == 4)).IsKudosCommentHidden, Is.True);
+        }
+
         [Test]
         public void Should_Throw_When_Priority_Id_Does_Not_Exist()
         {
@@ -486,6 +540,27 @@ namespace Shrooms.Premium.Tests.DomainService
             _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
         }
 
+        private async Task UpdateHiddenKudosRequestAsync(string userId, bool? hidden)
+        {
+            MockServiceRequestForUpdate();
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+            MockPermissioService();
+
+            var serviceRequestDto = new ServiceRequestDto
+            {
+                Id = 4,
+                PriorityId = 1,
+                ServiceRequestCategoryId = 2,
+                Title = "Sewing machine",
+                StatusId = 1,
+                IsKudosCommentHidden = hidden
+            };
+
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, new UserAndOrganizationDto { OrganizationId = 1, UserId = userId });
+        }
+
         private void MockPermissioService()
         {
             _permissionService
@@ -542,6 +617,19 @@ namespace Shrooms.Premium.Tests.DomainService
                     CategoryName = "deletedType",
                     StatusId = 3,
                     EmployeeId = "UserId"
+                },
+                new ServiceRequest
+                {
+                    Id = 4,
+                    OrganizationId = 1,
+                    Status = new ServiceRequestStatus
+                    {
+                        Title = "Open"
+                    },
+                    CategoryName = "Kudos",
+                    StatusId = 1,
+                    EmployeeId = "UserId",
+                    IsKudosCommentHidden = true
                 }
             }.AsQueryable();
 

@@ -32,20 +32,20 @@ namespace Shrooms.Domain.Services.Wall.Mentions
             _groupsDbSet = uow.GetDbSet<Group>();
         }
 
-        public async Task<MentionSuggestionsDto> SearchAsync(string search, UserAndOrganizationDto userOrg)
+        public async Task<MentionSuggestionsDto> SearchAsync(string search, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var term = (search ?? string.Empty).Trim();
 
             return new MentionSuggestionsDto
             {
-                People = await SearchPeopleAsync(term, userOrg),
-                Groups = await SearchGroupsAsync(term, userOrg)
+                People = await SearchPeopleAsync(term, userOrg, cancellationToken),
+                Groups = await SearchGroupsAsync(term, userOrg, cancellationToken)
             };
         }
 
-        private async Task<MentionPersonDto[]> SearchPeopleAsync(string term, UserAndOrganizationDto userOrg)
+        private async Task<MentionPersonDto[]> SearchPeopleAsync(string term, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
         {
-            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser, cancellationToken);
             var hasTerm = term.Length > 0;
 
             var people = await _usersDbSet
@@ -68,12 +68,12 @@ namespace Shrooms.Domain.Services.Wall.Mentions
                     PictureId = user.PictureId,
                     JobTitle = user.JobPosition.Title
                 })
-                .ToArrayAsync();
+                .ToArrayAsync(cancellationToken);
 
             return people;
         }
 
-        private async Task<MentionGroupDto[]> SearchGroupsAsync(string term, UserAndOrganizationDto userOrg)
+        private async Task<MentionGroupDto[]> SearchGroupsAsync(string term, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
         {
             var today = _systemClock.UtcNow.Date;
             var hasTerm = term.Length > 0;
@@ -97,7 +97,7 @@ namespace Shrooms.Domain.Services.Wall.Mentions
                         (member.StartDate == null || member.StartDate <= today) &&
                         (member.EndDate == null || member.EndDate >= today))
                 })
-                .ToArrayAsync();
+                .ToArrayAsync(cancellationToken);
         }
     }
 }

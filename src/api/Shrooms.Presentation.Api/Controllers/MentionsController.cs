@@ -33,9 +33,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Search")]
         [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Comment, BasicPermissions.Event)]
         [ProducesResponseType(typeof(MentionSuggestionsViewModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Search(string s = null)
+        public async Task<IActionResult> Search(string s = null, CancellationToken cancellationToken = default)
         {
-            var suggestions = await _mentionSearchService.SearchAsync(s, GetUserAndOrganization());
+            var suggestions = await _mentionSearchService.SearchAsync(s, GetUserAndOrganization(), cancellationToken);
 
             return Ok(_mapper.Map<MentionSuggestionsDto, MentionSuggestionsViewModel>(suggestions));
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shrooms.Contracts.Constants;
@@ -125,7 +126,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
+        public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
@@ -133,14 +134,14 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id, userOrg.UserId))
                 .AsSplitQuery()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
             _eventValidationService.CheckIfEventExists(@event);
 
             // ReSharper disable once PossibleNullReferenceException
             @event.Offices.OfficeNames = await _officeDbSet
                 .Where(p => @event.Offices.Value.Contains(p.Id.ToString()))
                 .Select(p => p.Name)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
@@ -154,7 +155,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
             // If user has permissions - show all participants, otherwise show only current user and his own event options
-            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers))
+            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers, cancellationToken))
             {
                 return @event;
             }
@@ -759,6 +760,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
+                HostUserImageName = e.ResponsibleUser.PictureId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 // Legacy flat options only; question-owned options reach the client under Questions.
