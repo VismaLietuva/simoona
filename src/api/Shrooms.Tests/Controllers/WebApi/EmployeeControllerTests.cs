@@ -10,6 +10,7 @@ using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.Employees;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -44,11 +45,25 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
+        public async Task GetPagedEmployees_PassesCancellationTokenToService()
+        {
+            // Arrange
+            using var cancellationSource = new CancellationTokenSource();
+
+            // Act
+            await _employeeController.GetPagedEmployees(new EmployeeListingArgsViewModel(), cancellationSource.Token);
+
+            // Assert
+            await _employeeListingService.Received(1)
+                .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>(), cancellationSource.Token);
+        }
+
+        [Test]
         public async Task GetPagedEmployees_WhenMethodThrows_ReturnsBadRequest()
         {
             // Arrange
             _employeeListingService
-                .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>())
+                .GetPagedEmployeesAsync(Arg.Any<EmployeeListingArgsDto>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<CancellationToken>())
                 .ThrowsAsync(new ValidationException(0));
 
             var args = new EmployeeListingArgsViewModel();

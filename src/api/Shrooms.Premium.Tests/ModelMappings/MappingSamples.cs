@@ -15,24 +15,71 @@ namespace Shrooms.Premium.Tests.ModelMappings
     /// </summary>
     public static class MappingSamples
     {
+        // Backstop for cyclic samples: a cycle Mapster does not track shows as a difference instead of a stack overflow that
+        // takes the test host down. Kept small on purpose: Mapster unrolls MaxDepth at compile time.
+        public const int CycleGuardDepth = 8;
+
         private const int FillDepth = 3;
 
-        // Deterministic sample: each member gets a value derived from its name, so a value landing on the wrong member shows.
-        public static object Fill(Type type)
+        private const int MaxPathsShown = 6;
+
+        /// <summary>
+        /// Deterministic sample: each member gets a value derived from its name, so a value landing on the wrong member shows.
+        /// A salt gives another sample of the same type whose values differ, e.g. an existing destination to map onto.
+        /// </summary>
+        public static object Fill(Type type, string salt = "")
         {
-            return Fill(type, 0, "root");
+            return Fill(type, 0, salt, "root");
+        }
+
+        /// <summary>
+        /// A new instance with nothing filled in: members keep what the constructor gives them, mostly null. It takes the
+        /// branches a filled sample never does (ShowIf absent, an optional reference missing). Null if the type is not a
+        /// concrete class with a parameterless constructor.
+        /// </summary>
+        public static object Empty(Type type)
+        {
+            if (!type.IsClass || type.IsAbstract || type == typeof(string) || IsCollection(type))
+            {
+                return null;
+            }
+
+            try
+            {
+                return Activator.CreateInstance(type, nonPublic: true);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // True when some object in the graph reaches itself again through public properties or collection items.
+        public static bool HasCycle(object root)
+        {
+            return HasCycle(root, new HashSet<object>(ReferenceEqualityComparer.Instance), new HashSet<object>(ReferenceEqualityComparer.Instance));
+        }
+
+        public static string Paths(IReadOnlyCollection<string> paths)
+        {
+            var shown = string.Join(", ", paths.Take(MaxPathsShown));
+            return paths.Count > MaxPathsShown ? $"{shown} (+{paths.Count - MaxPathsShown} more)" : shown;
         }
 
         /// <summary>
         /// Maps the source with AutoMapper twice and returns the first result as JSON, with the paths that differ between
         /// the two runs blanked. Those come from the destination's constructor (new Guid, DateTime.UtcNow); they say nothing
         /// about the mapper, so the caller blanks them on the Mapster side too. Serialization errors from both runs go to
-        /// errors.
+        /// errors. With existing, each run maps onto a fresh destination from it instead of creating one.
         /// </summary>
-        public static JToken MapWithAutoMapper(IMapper autoMapper, object source, Type sourceType, Type destinationType, List<string> errors, out List<string> noisePaths)
+        public static JToken MapWithAutoMapper(IMapper autoMapper, object source, Type sourceType, Type destinationType, List<string> errors, out List<string> noisePaths, Func<object> existing = null)
         {
-            var expected = ToJson(autoMapper.Map(source, sourceType, destinationType), errors);
-            var again = ToJson(autoMapper.Map(source, sourceType, destinationType), errors);
+            object Map() => existing == null
+                ? autoMapper.Map(source, sourceType, destinationType)
+                : autoMapper.Map(source, existing(), sourceType, destinationType);
+
+            var expected = ToJson(Map(), errors);
+            var again = ToJson(Map(), errors);
             noisePaths = DifferingPaths(expected, again).Where(p => p != "(value)").ToList();
             Blank(expected, noisePaths);
             return expected;
@@ -53,9 +100,13 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 {
                     // Path is the parent's ("" at the root); Member names the property whose getter threw.
                     var context = args.ErrorContext;
-                    errors.Add(context.Member is string member && !context.Path.EndsWith(member, StringComparison.Ordinal)
-                        ? (context.Path.Length == 0 ? member : $"{context.Path}.{member}")
-                        : context.Path);
+                    var path = context.Path;
+                    if (context.Member is string member && path != member && !path.EndsWith("." + member, StringComparison.Ordinal))
+                    {
+                        path = path.Length == 0 ? member : $"{path}.{member}";
+                    }
+
+                    errors.Add(path);
                     context.Handled = true;
                 }
             });
@@ -194,8 +245,47 @@ namespace Shrooms.Premium.Tests.ModelMappings
             return new List<string> { path.Length == 0 ? "(value)" : path };
         }
 
-        private static object Fill(Type type, int depth, string seed)
+        private static bool HasCycle(object current, ISet<object> onPath, ISet<object> done)
         {
+            if (current == null || current is string || current.GetType().IsValueType || done.Contains(current))
+            {
+                return false;
+            }
+
+            if (!onPath.Add(current))
+            {
+                return true;
+            }
+
+            var children = current is IEnumerable items
+                ? items.Cast<object>()
+                : current.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.GetIndexParameters().Length == 0 && p.GetMethod != null && !p.PropertyType.IsValueType && p.PropertyType != typeof(string))
+                    .Select(p =>
+                    {
+                        try
+                        {
+                            return p.GetValue(current);
+                        }
+                        catch (TargetInvocationException)
+                        {
+                            return null;
+                        }
+                    });
+
+            if (children.Any(child => HasCycle(child, onPath, done)))
+            {
+                return true;
+            }
+
+            onPath.Remove(current);
+            done.Add(current);
+            return false;
+        }
+
+        private static object Fill(Type type, int depth, string salt, string seed)
+        {
+            seed = salt + seed;
             var underlying = Nullable.GetUnderlyingType(type) ?? type;
             var number = Math.Abs(StableHash(seed) % 1000) + 1;
 
@@ -253,7 +343,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
 
             if (IsCollection(underlying))
             {
-                return FillCollection(underlying, depth, seed);
+                return FillCollection(underlying, depth, salt, seed);
             }
 
             object instance;
@@ -270,19 +360,19 @@ namespace Shrooms.Premium.Tests.ModelMappings
             {
                 if (property.GetIndexParameters().Length == 0 && property.SetMethod?.IsPublic == true)
                 {
-                    TrySet(() => property.SetValue(instance, Fill(property.PropertyType, depth + 1, property.Name)));
+                    TrySet(() => property.SetValue(instance, Fill(property.PropertyType, depth + 1, salt, property.Name)));
                 }
             }
 
             foreach (var field in underlying.GetFields(BindingFlags.Public | BindingFlags.Instance).Where(f => !f.IsInitOnly))
             {
-                TrySet(() => field.SetValue(instance, Fill(field.FieldType, depth + 1, field.Name)));
+                TrySet(() => field.SetValue(instance, Fill(field.FieldType, depth + 1, salt, field.Name)));
             }
 
             return instance;
         }
 
-        private static object FillCollection(Type type, int depth, string seed)
+        private static object FillCollection(Type type, int depth, string salt, string seed)
         {
             var elementType = type.IsArray ? type.GetElementType() : ElementType(type);
 
@@ -291,7 +381,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 return null;
             }
 
-            var element = Fill(elementType, depth + 1, seed + "-item");
+            var element = Fill(elementType, depth + 1, salt, seed + "-item");
             if (type.IsArray)
             {
                 var array = Array.CreateInstance(elementType, element == null ? 0 : 1);

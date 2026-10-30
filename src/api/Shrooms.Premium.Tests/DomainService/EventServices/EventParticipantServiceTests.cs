@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -83,6 +84,20 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     _wallService,
                     _asyncRunner,
                     _eventAnswerValidator);
+        }
+
+        [Test]
+        public void SearchForEventJoinAutocompleteAsync_CancelledToken_StopsTheQuery()
+        {
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event>());
+
+            Assert.That(
+                async () => await _eventParticipationService.SearchForEventJoinAutocompleteAsync(
+                    Guid.NewGuid(),
+                    "a",
+                    new UserAndOrganizationDto { OrganizationId = 2 },
+                    new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]
@@ -1231,7 +1246,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private static void MockRoleService(IRoleService roleService)
         {
             var newRoleId = Guid.NewGuid().ToString();
-            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.GetRoleIdByNameAsync(Roles.NewUser, Arg.Any<CancellationToken>()).Returns(newRoleId);
 
             roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }

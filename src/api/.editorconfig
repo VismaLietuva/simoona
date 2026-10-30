@@ -1,0 +1,3 @@
+[*.cs]
+# Forward the CancellationToken parameter to methods that take one
+dotnet_diagnostic.CA2016.severity = warning

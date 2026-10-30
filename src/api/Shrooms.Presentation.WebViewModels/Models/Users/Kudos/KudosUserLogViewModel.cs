@@ -28,6 +28,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public string PictureId { get; set; }
 
+        public bool IsCommentHidden { get; set; }
+
         public IEnumerable<LikeViewModel> Likes { get; set; }
     }
 }

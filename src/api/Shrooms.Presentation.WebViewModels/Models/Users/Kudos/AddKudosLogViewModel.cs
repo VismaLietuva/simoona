@@ -27,5 +27,10 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public string PictureId { get; set; }
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Gets or sets the service request a minus log settles. Lets the server apply that request's comment privacy.
+        /// </summary>
+        public int? ServiceRequestId { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Email.Posting;
+using Shrooms.Domain.Services.FeatureFlags;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Jwt;
 using Shrooms.Domain.Services.Organizations;
@@ -17,7 +18,7 @@ using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC.Modules;
 using Shrooms.Premium.IoC.Modules;
-using System.Reflection;
+using Shrooms.Presentation.ModelMappings;
 
 namespace Shrooms.IoC
 {
@@ -43,6 +44,7 @@ namespace Shrooms.IoC
             services.AddScoped<IUserAdministrationValidator, UserAdministrationValidator>();
             services.AddScoped<IOrganizationService, OrganizationService>();
             services.AddScoped<IProjectsService, ProjectsService>();
+            services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 
             // Modules
             services.AddIdentityRegistrations();
@@ -87,9 +89,7 @@ namespace Shrooms.IoC
             services.AddPremiumWebHookCallbacks();
 
             // AutoMapper
-            services.AddAutoMapper(
-                Assembly.Load("Shrooms.Presentation.ModelMappings"),
-                Assembly.Load("Shrooms.Premium"));
+            services.AddAutoMapper(MappingAssemblies.Load());
 
             // Must come after every other registration so views can resolve injected services.
             services.AddRazorTemplating();

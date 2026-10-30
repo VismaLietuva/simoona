@@ -12,6 +12,6 @@ namespace Shrooms.Domain.Services.Wall.Mentions
         /// Only groups the resolver would accept are offered, so the picker can never
         /// suggest a tag that would then notify nobody.
         /// </summary>
-        Task<MentionSuggestionsDto> SearchAsync(string search, UserAndOrganizationDto userOrg);
+        Task<MentionSuggestionsDto> SearchAsync(string search, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
     }
 }
