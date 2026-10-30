@@ -68,6 +68,20 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await _emailMarkdownRenderer.Received(1).RenderAsync(head + "...", 3, "org");
         }
 
+        [TestCase(" :partypar", " ")]
+        [TestCase(" :tada::skin", " :tada:")]
+        [TestCase("ačiū:ta", "ačiū:ta")]
+        public async Task NotifyNewEventAsync_LongDescription_IsCutBeforeAHalfToken(string tail, string kept)
+        {
+            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
+            var head = new string('a', 150 - tail.Length);
+            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + tail + "rrot: more", StartDate = DateTime.UtcNow };
+
+            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
+
+            await _emailMarkdownRenderer.Received(1).RenderAsync(head + kept + "...", 3, "org");
+        }
+
         [Test]
         public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync_ValidValues_SendsEmails()
         {

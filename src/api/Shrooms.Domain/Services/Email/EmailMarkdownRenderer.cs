@@ -32,7 +32,7 @@ namespace Shrooms.Domain.Services.Email
                 return string.Empty;
             }
 
-            var emojis = await _customEmojiService.GetAllAsync(organizationId, organizationShortName);
+            var emojis = markdown.Contains(':') ? await _customEmojiService.GetAllAsync(organizationId, organizationShortName) : null;
             var withMentionLinks = _mentionLinkExpander.ExpandToMarkdown(markdown, organizationShortName);
 
             return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis?.Emojis));

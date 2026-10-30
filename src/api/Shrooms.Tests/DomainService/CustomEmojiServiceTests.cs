@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -324,6 +326,16 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(viaOrganization.ETag, Is.EqualTo(viaUser.ETag));
             Assert.That(viaOrganization.Emojis.Single().Url, Is.EqualTo("/storage/visma/parrot.gif"));
+        }
+
+        [Test]
+        public void Should_Stop_Loading_When_Cancelled()
+        {
+            _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji>().AsQueryable());
+
+            Assert.That(
+                async () => await _customEmojiService.GetAllAsync(2, "Visma", new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
         }
 
         [Test]

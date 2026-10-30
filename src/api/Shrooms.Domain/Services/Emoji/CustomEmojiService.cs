@@ -44,12 +44,12 @@ namespace Shrooms.Domain.Services.Emoji
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName)
+        public Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName, CancellationToken cancellationToken = default)
         {
-            return GetAllAsync(userOrg.OrganizationId, tenantName);
+            return GetAllAsync(userOrg.OrganizationId, tenantName, cancellationToken);
         }
 
-        public async Task<CustomEmojiListDto> GetAllAsync(int organizationId, string tenantName)
+        public async Task<CustomEmojiListDto> GetAllAsync(int organizationId, string tenantName, CancellationToken cancellationToken = default)
         {
             var generation = GetGeneration(organizationId);
 
@@ -73,7 +73,7 @@ namespace Shrooms.Domain.Services.Emoji
                         .Select(u => u.FirstName + " " + u.LastName)
                         .FirstOrDefault()
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var result = new CustomEmojiListDto
             {

@@ -130,11 +130,11 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_StandardWinsOverCustomName_AsInTheAppAndSlack()
+        public void ConvertToHtml_CustomWinsOverStandardName_AsOnTheWall()
         {
             var tada = new Dictionary<string, string> { ["tada"] = "https://api.example.com/storage/org/t.png" };
 
-            Assert.That(Convert(":tada:", tada), Is.EqualTo("<p>🎉</p>\n"));
+            Assert.That(Convert(":tada:", tada), Does.StartWith("<p><img src=\"https://api.example.com/storage/org/t.png\""));
         }
 
         [TestCase("done:tada::tada:")]
@@ -160,6 +160,13 @@ namespace Shrooms.Tests.Helpers
         [TestCase(":tada:**:tada:**", "<p>🎉<strong>🎉</strong></p>\n")]
         [TestCase("(:tada:)**!**", "<p>(🎉)<strong>!</strong></p>\n")]
         public void ConvertToHtml_SeparatedFromTheNeighbouringInline_Rendered(string markdown, string html)
+        {
+            Assert.That(Convert(markdown), Is.EqualTo(html));
+        }
+
+        [TestCase("**:heart:**:tada:", "<p><strong>❤️</strong>🎉</p>\n")]
+        [TestCase(":nope:*:tada:*", "<p>:nope:<em>🎉</em></p>\n")]
+        public void ConvertToHtml_RightAfterATokenInANeighbouringInline_Rendered(string markdown, string html)
         {
             Assert.That(Convert(markdown), Is.EqualTo(html));
         }
@@ -241,7 +248,7 @@ namespace Shrooms.Tests.Helpers
         [Test]
         public void ConvertToHtml_BareWwwAddress_BecomesALink()
         {
-            Assert.That(_sut.ConvertToHtml("visit www.example.com today"), Does.Contain("<a href=\"http://www.example.com\">www.example.com</a>"));
+            Assert.That(Convert("visit www.example.com today"), Does.Contain("<a href=\"http://www.example.com\">www.example.com</a>"));
         }
 
         [Test]
@@ -286,6 +293,12 @@ namespace Shrooms.Tests.Helpers
         public void ConvertToHtml_OneArgumentOverload_LeavesEmojiAlone()
         {
             Assert.That(_sut.ConvertToHtml(":tada:"), Is.EqualTo("<p>:tada:</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_OneArgumentOverload_LeavesBareUrlsAlone()
+        {
+            Assert.That(_sut.ConvertToHtml("see https://x.y"), Is.EqualTo("<p>see https://x.y</p>\n"));
         }
     }
 }

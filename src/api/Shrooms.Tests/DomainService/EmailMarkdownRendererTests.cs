@@ -57,8 +57,17 @@ namespace Shrooms.Tests.DomainService
         {
             _customEmojiService.GetAllAsync(3, "org").Returns(new CustomEmojiListDto { Emojis = null });
 
+            await _sut.RenderAsync("hi :parrot:", 3, "org");
+
+            _markdownConverter.Received(1).ConvertToHtml("hi :parrot: [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0));
+        }
+
+        [Test]
+        public async Task RenderAsync_NoColon_SkipsTheEmojiLookup()
+        {
             await _sut.RenderAsync("hi", 3, "org");
 
+            await _customEmojiService.DidNotReceiveWithAnyArgs().GetAllAsync(0, null);
             _markdownConverter.Received(1).ConvertToHtml("hi [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0));
         }
 

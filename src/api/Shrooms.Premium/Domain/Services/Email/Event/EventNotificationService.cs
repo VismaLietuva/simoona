@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -21,6 +22,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 {
     public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
+        private static readonly Regex PartialShortcode = new(@"(?<=^|[^\p{L}\p{N}\p{M}:]|:[a-z0-9_+-]{1,60}:):[a-z0-9_+-]*$", RegexOptions.Compiled);
+
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
@@ -231,7 +234,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             {
                 // Never cut between the two halves of a surrogate pair: a lone half renders as U+FFFD.
                 var cut = char.IsHighSurrogate(markdown[maxCharacterCount - 1]) ? maxCharacterCount - 1 : maxCharacterCount;
-                markdown = $"{markdown[..cut]}...";
+                markdown = $"{PartialShortcode.Replace(markdown[..cut], string.Empty)}...";
             }
 
             return RenderAsync(markdown, userOrgHubDto);

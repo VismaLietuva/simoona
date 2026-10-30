@@ -6,9 +6,15 @@ namespace Shrooms.Domain.Helpers
 {
     public class MarkdigMarkdownConverter : IMarkdownConverter
     {
+        private static readonly MarkdownPipeline Pipeline =
+            new MarkdownPipelineBuilder()
+                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
+                .UseSoftlineBreakAsHardlineBreak()
+                .Build();
+
         // Bare URLs become links, as on the wall. The emoji rewriter leaves autolink labels alone,
         // so a token inside a URL is never turned into an emoji.
-        private static readonly MarkdownPipeline Pipeline =
+        private static readonly MarkdownPipeline EmojiPipeline =
             new MarkdownPipelineBuilder()
                 .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
                 .UseSoftlineBreakAsHardlineBreak()
@@ -32,10 +38,10 @@ namespace Shrooms.Domain.Helpers
                 return string.Empty;
             }
 
-            var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
+            var document = Markdown.Parse(ExpandMentions(markdown), EmojiPipeline);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
 
-            return Markdown.ToHtml(document, Pipeline);
+            return Markdown.ToHtml(document, EmojiPipeline);
         }
 
         private static string ExpandMentions(string markdown)

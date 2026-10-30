@@ -93,5 +93,11 @@ namespace Shrooms.EmailTemplates.Tests
         {
             Assert.That(HtmlToPlainTextConverter.Convert("<p>a <img src=\"x.png\"> b</p>"), Is.EqualTo("a b"));
         }
+
+        [Test]
+        public void Convert_OnAltWithApostrophe_KeepsTheWholeAlt()
+        {
+            Assert.That(HtmlToPlainTextConverter.Convert("<p><img src=\"x.png\" alt=\"it's done\"></p>"), Is.EqualTo("it's done"));
+        }
     }
 }

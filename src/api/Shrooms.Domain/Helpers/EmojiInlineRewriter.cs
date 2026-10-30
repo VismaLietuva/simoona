@@ -10,7 +10,7 @@ namespace Shrooms.Domain.Helpers
     // Replaces :shortcode: tokens in a parsed document with the same rules as the web app's
     // scanner, so a post renders alike on the wall and in the email:
     //
-    // - a standard name wins over a custom one, as in Slack; an unknown name stays literal;
+    // - a custom name wins over a standard one, as on the wall; an unknown name stays literal;
     // - a token glued to a word does not count. Letters, digits, marks and colons glue, so a
     //   colon chain such as status:ok:200 or fe80::a:1 is one word. Glue is judged on the text
     //   the reader sees, across emphasis, code spans and links: **word**:tada: stays literal;
@@ -127,10 +127,10 @@ namespace Shrooms.Domain.Helpers
                     ? run[0].Content.ToString()
                     : string.Concat(run.Select(literal => literal.Content.ToString()));
 
-                var replacement = Scan(text, before, TextAfter(leaves, index), custom);
+                var replacement = Scan(text, before, TextAfter(leaves, index), custom, out var endsOnToken);
+                before = endsOnToken ? string.Empty : text;
                 if (replacement == null)
                 {
-                    before = text;
                     continue;
                 }
 
@@ -143,8 +143,6 @@ namespace Shrooms.Domain.Helpers
                 {
                     literal.Remove();
                 }
-
-                before = replacement[^1] is LiteralInline last ? last.Content.ToString() : string.Empty;
             }
         }
 
@@ -168,7 +166,7 @@ namespace Shrooms.Domain.Helpers
             return string.Empty;
         }
 
-        private static List<Inline> Scan(string text, string before, string after, IReadOnlyDictionary<string, string> custom)
+        private static List<Inline> Scan(string text, string before, string after, IReadOnlyDictionary<string, string> custom, out bool endsOnToken)
         {
             List<Inline> output = null;
             var last = 0;
@@ -221,6 +219,7 @@ namespace Shrooms.Domain.Helpers
                 output.Add(new LiteralInline(text[last..]));
             }
 
+            endsOnToken = boundary == text.Length;
             return output;
         }
 
@@ -228,6 +227,11 @@ namespace Shrooms.Domain.Helpers
         // tone-capable emoji also consumes a following :skin-tone-N: and moves end past it.
         private static Inline Resolve(string text, string name, IReadOnlyDictionary<string, string> custom, ref int end)
         {
+            if (custom.TryGetValue(name, out var imageUrl))
+            {
+                return new HtmlInline(ImageTag(name, imageUrl));
+            }
+
             if (StandardEmojiTable.TryGet(name, out var variants))
             {
                 var tone = 0;
@@ -244,7 +248,7 @@ namespace Shrooms.Domain.Helpers
                 return new LiteralInline(variants[tone > 0 ? tone - 1 : 0]);
             }
 
-            return custom.TryGetValue(name, out var imageUrl) ? new HtmlInline(ImageTag(name, imageUrl)) : null;
+            return null;
         }
 
         private static string ImageTag(string name, string imageUrl)
