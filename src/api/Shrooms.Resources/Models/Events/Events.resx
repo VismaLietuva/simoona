@@ -132,6 +132,9 @@
   <data name="People" xml:space="preserve">
     <value>People</value>
   </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
   <data name="WillEat" xml:space="preserve">
     <value>I will eat at this event</value>
   </data>

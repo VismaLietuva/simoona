@@ -24,5 +24,7 @@ namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
         IExcelWorksheetBuilder AddRowPadding(double padding);
 
         IExcelWorksheetBuilder AddColumnsPadding(double padding);
+
+        IExcelWorksheetBuilder AsTableWithTotals(string tableName, string totalsLabel, params string[] summedColumns);
     }
 }

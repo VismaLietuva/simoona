@@ -71,6 +71,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                         Resources.Models.Events.Events.Count,
                         Resources.Models.Events.Events.People)
                     .AddRows(MapCombinationsToExcelRows(combinations))
+                    .AsTableWithTotals(
+                        EventsConstants.EventOptionsExcelTableObjectName,
+                        Resources.Models.Events.Events.Total,
+                        Resources.Models.Events.Events.Count)
                     .AutoFitColumns();
             }
 
@@ -195,7 +199,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 rows.Add(new ExcelRow
                 {
                     new ExcelColumn { Value = combination.Labels },
-                    new ExcelColumn { Value = combination.People.Count.ToString() },
+                    new ExcelColumn { Value = combination.People.Count },
                     new ExcelColumn { Value = JoinPeople(combination.People) }
                 });
             }
