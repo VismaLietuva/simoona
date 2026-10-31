@@ -10,6 +10,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
@@ -345,15 +346,42 @@ namespace Shrooms.Tests.Controllers.WebApi
             Assert.That(create.GetCustomAttribute<PermissionAuthorizeAttribute>(), Is.Null);
         }
 
+        // Uploaders may edit and delete their own videos; the service decides whose video it is.
         [TestCase(nameof(VideoLibraryController.Update))]
         [TestCase(nameof(VideoLibraryController.Delete))]
-        public void Editing_Actions_Should_Require_The_Administration_Permission(string actionName)
+        public void Editing_Actions_Should_Not_Be_Restricted_To_Administrators(string actionName)
         {
             var action = typeof(VideoLibraryController).GetMethod(actionName);
-            var attribute = action.GetCustomAttribute<PermissionAuthorizeAttribute>();
 
-            Assert.That(attribute, Is.Not.Null);
-            Assert.That(attribute.Permission, Is.EqualTo(AdministrationPermissions.VideoLibrary));
+            Assert.That(action.GetCustomAttribute<PermissionAnyOfAuthorizeAttribute>(), Is.Not.Null);
+            Assert.That(action.GetCustomAttribute<PermissionAuthorizeAttribute>(), Is.Null);
+        }
+
+        [Test]
+        public async Task Update_Should_Return_Forbidden_For_Someone_Elses_Video()
+        {
+            _videoLibraryService.UpdateVideoAsync(Arg.Any<VideoLibraryItemDto>())
+                .Returns<Task>(_ => throw new UnauthorizedException());
+
+            var result = await _videoLibraryController.Update(new VideoLibraryItemViewModel
+            {
+                Id = 1,
+                Title = "Not mine",
+                Url = "https://drive.google.com/file/d/abc/view"
+            });
+
+            Assert.That(((StatusCodeResult)result).StatusCode, Is.EqualTo(403));
+        }
+
+        [Test]
+        public async Task Delete_Should_Return_Forbidden_For_Someone_Elses_Video()
+        {
+            _videoLibraryService.RemoveVideoAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns<Task>(_ => throw new UnauthorizedException());
+
+            var result = await _videoLibraryController.Delete(1);
+
+            Assert.That(((StatusCodeResult)result).StatusCode, Is.EqualTo(403));
         }
 
         private static void AssertBadRequestWithErrorCode(IActionResult result, int expectedErrorCode)

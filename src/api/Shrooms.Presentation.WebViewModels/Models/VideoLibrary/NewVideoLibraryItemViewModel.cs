@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 
@@ -23,5 +24,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
         public DateOnly? RecordedOn { get; set; }
 
         public int? VideoTypeId { get; set; }
+
+        [MaxLength(VideoLibraryMaterial.MaxPerVideo)]
+        public IList<VideoLibraryMaterialViewModel> Materials { get; set; }
     }
 }

@@ -12,6 +12,8 @@ using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
+using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Tests.Extensions;
@@ -30,6 +32,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<VideoLibraryItem> _videosDbSet;
         private IUnitOfWork2 _uow;
         private IPictureService _pictureService;
+        private IPermissionService _permissionService;
 
         private List<VideoLibraryItem> _videos;
 
@@ -61,7 +64,13 @@ namespace Shrooms.Tests.DomainService
                     RecordedOn = new DateOnly(2026, 1, 1),
                     VideoTypeId = allHands.Id,
                     VideoType = allHands,
-                    OrganizationId = TestConstants.DefaultOrganizationId
+                    CreatedBy = "someoneElse",
+                    OrganizationId = TestConstants.DefaultOrganizationId,
+                    Materials = new List<VideoLibraryMaterial>
+                    {
+                        new() { Id = 11, Title = "Q&A notes", Url = "https://docs.google.com/document/d/notes/edit", SortOrder = 1 },
+                        new() { Id = 10, Title = "Slides", Url = "https://docs.google.com/presentation/d/slides/edit", SortOrder = 0 }
+                    }
                 },
                 new()
                 {
@@ -70,6 +79,7 @@ namespace Shrooms.Tests.DomainService
                     Url = "https://drive.google.com/file/d/newer/view",
                     Description = "Description",
                     PictureId = "picture.jpg",
+                    CreatedBy = "testUser",
                     Created = new DateTime(2026, 5, 1),
                     RecordedOn = new DateOnly(2026, 5, 1),
                     OrganizationId = TestConstants.DefaultOrganizationId
@@ -97,7 +107,11 @@ namespace Shrooms.Tests.DomainService
             var systemClock = Substitute.For<ISystemClock>();
             systemClock.UtcNow.Returns(Now);
 
-            _videoLibraryService = new VideoLibraryService(_uow, _pictureService, systemClock);
+            // Administrator unless a test says otherwise, so the CRUD tests below are not about ownership.
+            _permissionService = Substitute.For<IPermissionService>();
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.VideoLibrary).Returns(true);
+
+            _videoLibraryService = new VideoLibraryService(_uow, _pictureService, systemClock, _permissionService);
         }
 
         [Test]
@@ -246,6 +260,33 @@ namespace Shrooms.Tests.DomainService
             Assert.That(byTitle.Single().Id, Is.EqualTo(1));
             Assert.That(byDescription.Single().Id, Is.EqualTo(2));
             Assert.That(byType.Single().Id, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Not_Search_Material_Titles()
+        {
+            var result = await _videoLibraryService.GetVideosAsync(ListArgs(search: "Q&A"));
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Return_Materials_In_Their_Order()
+        {
+            var result = await _videoLibraryService.GetVideosAsync(ListArgs());
+
+            var materials = result.First(v => v.Id == 1).Materials;
+
+            Assert.That(materials.Select(m => m.Title), Is.EqualTo(new[] { "Slides", "Q&A notes" }));
+            Assert.That(materials.First().Url, Is.EqualTo("https://docs.google.com/presentation/d/slides/edit"));
+        }
+
+        [Test]
+        public async Task Should_Return_An_Empty_Material_List_For_A_Video_Without_Any()
+        {
+            var result = await _videoLibraryService.GetVideosAsync(ListArgs());
+
+            Assert.That(result.First(v => v.Id == 2).Materials, Is.Empty);
         }
 
         [Test]
@@ -566,6 +607,220 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Create_Video_With_Trimmed_Materials_In_The_Given_Order()
+        {
+            var dto = NewVideoDto();
+            dto.Materials = new List<VideoLibraryMaterialDto>
+            {
+                new() { Title = " Slides ", Url = " https://docs.google.com/presentation/d/a/edit " },
+                new() { Title = "Report", Url = "https://drive.google.com/file/d/b/view" }
+            };
+
+            await _videoLibraryService.CreateVideoAsync(dto);
+
+            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v =>
+                v.Materials.Count == 2 &&
+                v.Materials.First().Title == "Slides" &&
+                v.Materials.First().Url == "https://docs.google.com/presentation/d/a/edit" &&
+                v.Materials.First().SortOrder == 0 &&
+                v.Materials.Last().Title == "Report" &&
+                v.Materials.Last().SortOrder == 1));
+        }
+
+        [Test]
+        public async Task Should_Create_Video_Without_Materials_When_None_Are_Sent()
+        {
+            var dto = NewVideoDto();
+            dto.Materials = null;
+
+            await _videoLibraryService.CreateVideoAsync(dto);
+
+            _videosDbSet.Received(1).Add(Arg.Is<VideoLibraryItem>(v => v.Materials.Count == 0));
+        }
+
+        [TestCase("not a url")]
+        [TestCase("/relative/path")]
+        [TestCase("ftp://example.com/slides.pdf")]
+        [TestCase("javascript:alert(1)")]
+        public void Should_Reject_Material_Links_That_Are_Not_Absolute_Http_Urls(string url)
+        {
+            var dto = NewVideoDto();
+            dto.Materials = new List<VideoLibraryMaterialDto> { new() { Title = "Slides", Url = url } };
+
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _videoLibraryService.CreateVideoAsync(dto));
+
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoMaterialLinkInvalid));
+            _videosDbSet.DidNotReceive().Add(Arg.Any<VideoLibraryItem>());
+        }
+
+        [Test]
+        public void Should_Reject_More_Than_Ten_Materials()
+        {
+            var dto = NewVideoDto();
+            dto.Materials = Enumerable.Range(1, VideoLibraryMaterial.MaxPerVideo + 1)
+                .Select(i => new VideoLibraryMaterialDto { Title = $"Material {i}", Url = $"https://example.com/{i}" })
+                .ToList();
+
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _videoLibraryService.CreateVideoAsync(dto));
+
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoMaterialsTooMany));
+        }
+
+        [Test]
+        public async Task Should_Keep_Materials_When_The_Update_Does_Not_Send_Them()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = null;
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            Assert.That(_videos.First(v => v.Id == 1).Materials.Select(m => m.Id), Is.EquivalentTo(new[] { 10, 11 }));
+        }
+
+        [Test]
+        public async Task Should_Clear_Materials_When_The_Update_Sends_An_Empty_List()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = new List<VideoLibraryMaterialDto>();
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            Assert.That(_videos.First(v => v.Id == 1).Materials, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Replace_Materials_Reusing_Existing_Rows_By_Position()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = new List<VideoLibraryMaterialDto>
+            {
+                new() { Title = "Recording notes", Url = "https://docs.google.com/document/d/notes/edit" }
+            };
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            var material = _videos.First(v => v.Id == 1).Materials.Single();
+
+            Assert.That(material.Id, Is.EqualTo(10));
+            Assert.That(material.Title, Is.EqualTo("Recording notes"));
+            Assert.That(material.Url, Is.EqualTo("https://docs.google.com/document/d/notes/edit"));
+            Assert.That(material.SortOrder, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Should_Add_Materials_Beyond_The_Stored_Ones_On_Update()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = new List<VideoLibraryMaterialDto>
+            {
+                new() { Title = "Slides", Url = "https://docs.google.com/presentation/d/slides/edit" },
+                new() { Title = "Q&A notes", Url = "https://docs.google.com/document/d/notes/edit" },
+                new() { Title = "Demo repo", Url = "https://github.com/example/demo" }
+            };
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            var materials = _videos.First(v => v.Id == 1).Materials.OrderBy(m => m.SortOrder).ToList();
+
+            Assert.That(materials.Select(m => m.Title), Is.EqualTo(new[] { "Slides", "Q&A notes", "Demo repo" }));
+            Assert.That(materials.Take(2).Select(m => m.Id), Is.EqualTo(new[] { 10, 11 }));
+        }
+
+        [Test]
+        public void Should_Not_Update_Materials_With_An_Invalid_Link()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = new List<VideoLibraryMaterialDto> { new() { Title = "Slides", Url = "not a url" } };
+
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _videoLibraryService.UpdateVideoAsync(dto));
+
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoMaterialLinkInvalid));
+            Assert.That(_videos.First(v => v.Id == 1).Materials.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Let_The_Uploader_Update_Their_Own_Video()
+        {
+            NotAnAdministrator();
+            var dto = NewVideoDto();
+            dto.Id = 2;
+            dto.Title = "Fixed by the uploader";
+
+            await _videoLibraryService.UpdateVideoAsync(dto);
+
+            Assert.That(_videos.First(v => v.Id == 2).Title, Is.EqualTo("Fixed by the uploader"));
+        }
+
+        [Test]
+        public void Should_Not_Let_A_User_Update_Someone_Elses_Video()
+        {
+            NotAnAdministrator();
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Title = "Not mine";
+
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _videoLibraryService.UpdateVideoAsync(dto));
+
+            Assert.That(_videos.First(v => v.Id == 1).Title, Is.EqualTo("Older video"));
+            Assert.That(_videos.First(v => v.Id == 1).Materials.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Let_The_Uploader_Delete_Their_Own_Video()
+        {
+            NotAnAdministrator();
+
+            await _videoLibraryService.RemoveVideoAsync(2, UserOrg());
+
+            Assert.That(_videos.First(v => v.Id == 2).IsDeleted, Is.True);
+        }
+
+        [Test]
+        public void Should_Not_Let_A_User_Delete_Someone_Elses_Video()
+        {
+            NotAnAdministrator();
+
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _videoLibraryService.RemoveVideoAsync(1, UserOrg()));
+
+            Assert.That(_videos.First(v => v.Id == 1).IsDeleted, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Let_An_Administrator_Delete_Any_Video()
+        {
+            await _videoLibraryService.RemoveVideoAsync(1, UserOrg());
+
+            Assert.That(_videos.First(v => v.Id == 1).IsDeleted, Is.True);
+        }
+
+        [Test]
+        public async Task Should_Mark_Only_The_Users_Own_Videos_As_Editable()
+        {
+            NotAnAdministrator();
+
+            var result = await _videoLibraryService.GetVideosAsync(ListArgs());
+
+            Assert.That(result.First(v => v.Id == 2).CanEdit, Is.True);
+            Assert.That(result.First(v => v.Id == 1).CanEdit, Is.False);
+        }
+
+        [Test]
+        public async Task Should_Mark_Every_Video_As_Editable_For_An_Administrator()
+        {
+            var result = await _videoLibraryService.GetVideosAsync(ListArgs());
+
+            Assert.That(result.All(v => v.CanEdit), Is.True);
+        }
+
+        [Test]
         public async Task Should_Update_Video_Fields()
         {
             var dto = NewVideoDto();
@@ -727,6 +982,11 @@ namespace Shrooms.Tests.DomainService
 
             Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
             Assert.That(_videos.First(v => v.Id == 3).IsDeleted, Is.False);
+        }
+
+        private void NotAnAdministrator()
+        {
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.VideoLibrary).Returns(false);
         }
 
         private static VideoLibraryListArgsDto ListArgs(
