@@ -52,6 +52,12 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         public IExcelWorksheetBuilder AsTableWithTotals(string tableName, string totalsLabel, params string[] summedColumns)
         {
             var dimension = _worksheet.Dimension;
+
+            if (dimension == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddHeader)} or {nameof(AddRows)} has to be called before {nameof(AsTableWithTotals)}");
+            }
+
             var range = _worksheet.Cells[dimension.Start.Row, dimension.Start.Column, dimension.End.Row, dimension.End.Column];
 
             range.AutoFilter = false;
@@ -63,7 +69,8 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
             foreach (var column in summedColumns)
             {
-                table.Columns[column].TotalsRowFunction = RowFunctions.Sum;
+                var tableColumn = table.Columns[column] ?? throw new ArgumentException($"Table '{tableName}' has no column named '{column}'.", nameof(summedColumns));
+                tableColumn.TotalsRowFunction = RowFunctions.Sum;
             }
 
             var totalsRow = _worksheet.Cells[table.Address.End.Row, table.Address.Start.Column, table.Address.End.Row, table.Address.End.Column];

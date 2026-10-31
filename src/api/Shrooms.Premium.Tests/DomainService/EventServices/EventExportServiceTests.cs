@@ -117,6 +117,14 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Left.Style, cell.Address);
                 ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Right.Style, cell.Address);
             }
+
+            foreach (var cell in new[] { worksheet.Cells["D1"], worksheet.Cells["D4"], worksheet.Cells["A5"], worksheet.Cells["C5"] })
+            {
+                ClassicAssert.AreEqual(ExcelBorderStyle.None, cell.Style.Border.Top.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.None, cell.Style.Border.Bottom.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.None, cell.Style.Border.Left.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.None, cell.Style.Border.Right.Style, cell.Address);
+            }
         }
 
         [Test]
