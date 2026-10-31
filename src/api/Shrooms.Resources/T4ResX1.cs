@@ -2940,6 +2940,30 @@ namespace Shrooms.Resources.Models.Events {
         ///<summary>
         ///    <list type='bullet'>
         ///        <item>
+        ///            <description>Total</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string Total => GetResourceString(TotalKey);
+
+        /// <summary>
+        /// Resource key for <see cref="Total"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string TotalKey = "Total";
+    }
+}
+
+namespace Shrooms.Resources.Models.Events {
+    public partial class Events {
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
         ///            <description>I will eat at this event</description>
         ///        </item>
         ///        <item>

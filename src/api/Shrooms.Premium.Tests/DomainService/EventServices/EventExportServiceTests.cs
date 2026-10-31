@@ -8,6 +8,8 @@ using ExcelDataReader;
 using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
@@ -67,15 +69,54 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             ClassicAssert.AreEqual("Count", options.Columns[1].ColumnName);
             ClassicAssert.AreEqual("People", options.Columns[2].ColumnName);
 
-            ClassicAssert.AreEqual(2, options.Rows.Count);
+            ClassicAssert.AreEqual(3, options.Rows.Count);
 
             ClassicAssert.AreEqual("Pizza + Vegan + M", options.Rows[0].ItemArray[0]);
-            ClassicAssert.AreEqual("2", options.Rows[0].ItemArray[1]);
+            ClassicAssert.AreEqual(2d, options.Rows[0].ItemArray[1]);
             ClassicAssert.AreEqual("Ada Lovelace, Grace Hopper", options.Rows[0].ItemArray[2]);
 
             ClassicAssert.AreEqual("Pizza + M + L", options.Rows[1].ItemArray[0]);
-            ClassicAssert.AreEqual("1", options.Rows[1].ItemArray[1]);
+            ClassicAssert.AreEqual(1d, options.Rows[1].ItemArray[1]);
             ClassicAssert.AreEqual("Alan Turing", options.Rows[1].ItemArray[2]);
+        }
+
+        [Test]
+        public async Task Should_Sum_The_Counts_In_A_Totals_Row()
+        {
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
+
+            var tables = await ExportTablesAsync(eventId, userAndOrg);
+            var totals = tables[1].Rows[2];
+
+            ClassicAssert.AreEqual("Total", totals.ItemArray[0]);
+            ClassicAssert.AreEqual(3d, totals.ItemArray[1]);
+        }
+
+        [Test]
+        public async Task Should_Write_The_Options_As_A_Bordered_Excel_Table()
+        {
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 2 };
+            var eventId = MockParticipantsWithQuestions(userAndOrg);
+
+            var export = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, userAndOrg);
+
+            using var package = new ExcelPackage(new MemoryStream(export.Content));
+            var worksheet = package.Workbook.Worksheets[1];
+            var table = worksheet.Tables.Single();
+
+            ClassicAssert.AreEqual("A1:C4", table.Address.Address);
+            ClassicAssert.IsTrue(table.ShowTotal);
+            ClassicAssert.IsNull(worksheet.AutoFilter.Address);
+            ClassicAssert.AreEqual("SUBTOTAL(109,EventOptions[Count])", worksheet.Cells["B4"].Formula);
+
+            foreach (var cell in worksheet.Cells["A1:C4"])
+            {
+                ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Top.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Bottom.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Left.Style, cell.Address);
+                ClassicAssert.AreEqual(ExcelBorderStyle.Thin, cell.Style.Border.Right.Style, cell.Address);
+            }
         }
 
         [Test]
@@ -103,14 +144,14 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var tables = await ExportTablesAsync(eventId, userAndOrg);
             var options = tables[1];
 
-            ClassicAssert.AreEqual(2, options.Rows.Count);
+            ClassicAssert.AreEqual(3, options.Rows.Count);
 
             ClassicAssert.AreEqual("Pizza", options.Rows[0].ItemArray[0]);
-            ClassicAssert.AreEqual("2", options.Rows[0].ItemArray[1]);
+            ClassicAssert.AreEqual(2d, options.Rows[0].ItemArray[1]);
             ClassicAssert.AreEqual("Ada Lovelace, Grace Hopper", options.Rows[0].ItemArray[2]);
 
             ClassicAssert.AreEqual("Salad", options.Rows[1].ItemArray[0]);
-            ClassicAssert.AreEqual("1", options.Rows[1].ItemArray[1]);
+            ClassicAssert.AreEqual(1d, options.Rows[1].ItemArray[1]);
             ClassicAssert.AreEqual("Alan Turing", options.Rows[1].ItemArray[2]);
         }
 
@@ -151,7 +192,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             ClassicAssert.LessOrEqual(cell.Length, 32767);
             StringAssert.Contains("more)", cell);
-            ClassicAssert.AreEqual("2600", tables[1].Rows[0].ItemArray[1]);
+            ClassicAssert.AreEqual(2600d, tables[1].Rows[0].ItemArray[1]);
             StringAssert.DoesNotContain("Person1000,", cell.Substring(cell.Length - 20));
         }
 
@@ -194,7 +235,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var tables = await ExportTablesAsync(eventId, userAndOrg);
 
             ClassicAssert.AreEqual(2, tables[0].Rows.Count);
-            ClassicAssert.AreEqual(1, tables[1].Rows.Count);
+            ClassicAssert.AreEqual(2, tables[1].Rows.Count);
             ClassicAssert.AreEqual("Ada Lovelace", tables[1].Rows[0].ItemArray[2]);
         }
 

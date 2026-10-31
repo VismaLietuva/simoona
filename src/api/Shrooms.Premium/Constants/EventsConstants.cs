@@ -26,6 +26,7 @@
 
         public const string EventParticipantsExcelTableName = "Event Participants";
         public const string EventOptionsExcelTableName = "Event Options";
+        public const string EventOptionsExcelTableObjectName = "EventOptions";
 
         public const int EventReportVisitedEventPreviewCount = 3;
     }
