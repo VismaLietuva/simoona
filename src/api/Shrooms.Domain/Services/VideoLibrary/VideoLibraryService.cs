@@ -354,7 +354,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 throw new ValidationException(ErrorCodes.VideoMaterialsTooMany, $"A video can have at most {VideoLibraryMaterial.MaxPerVideo} materials");
             }
 
-            if (materials.Any(m => !IsAbsoluteHttpUrl(m.Url)))
+            if (materials.Any(m => m == null || !IsAbsoluteHttpUrl(m.Url)))
             {
                 throw new ValidationException(ErrorCodes.VideoMaterialLinkInvalid, "Material link must be an absolute http(s) URL");
             }

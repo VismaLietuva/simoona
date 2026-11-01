@@ -747,6 +747,33 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public void Should_Reject_A_Null_Material_On_Create()
+        {
+            var dto = NewVideoDto();
+            dto.Materials = new List<VideoLibraryMaterialDto> { null };
+
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _videoLibraryService.CreateVideoAsync(dto));
+
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoMaterialLinkInvalid));
+            _videosDbSet.DidNotReceive().Add(Arg.Any<VideoLibraryItem>());
+        }
+
+        [Test]
+        public void Should_Reject_A_Null_Material_On_Update()
+        {
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Materials = new List<VideoLibraryMaterialDto> { new() { Title = "Slides", Url = "https://example.com/s" }, null };
+
+            var exception = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _videoLibraryService.UpdateVideoAsync(dto));
+
+            Assert.That(exception.ErrorCode, Is.EqualTo(ErrorCodes.VideoMaterialLinkInvalid));
+            Assert.That(_videos.First(v => v.Id == 1).Materials.Count, Is.EqualTo(2));
+        }
+
+        [Test]
         public async Task Should_Let_The_Uploader_Update_Their_Own_Video()
         {
             NotAnAdministrator();
