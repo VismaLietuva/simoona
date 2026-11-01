@@ -374,6 +374,43 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
+        public async Task Create_Should_Leave_The_Materials_Limit_To_The_Service()
+        {
+            _videoLibraryService.CreateVideoAsync(Arg.Any<VideoLibraryItemDto>())
+                .Returns<Task>(_ => throw new ValidationException(ErrorCodes.VideoMaterialsTooMany, "too many"));
+            var viewModel = new NewVideoLibraryItemViewModel
+            {
+                Title = "New video",
+                Url = "https://drive.google.com/file/d/abc/view",
+                Materials = ElevenMaterials()
+            };
+            _videoLibraryController.Validate(viewModel);
+
+            var result = await _videoLibraryController.Create(viewModel);
+
+            AssertBadRequestWithErrorCode(result, ErrorCodes.VideoMaterialsTooMany);
+        }
+
+        [Test]
+        public async Task Update_Should_Leave_The_Materials_Limit_To_The_Service()
+        {
+            _videoLibraryService.UpdateVideoAsync(Arg.Any<VideoLibraryItemDto>())
+                .Returns<Task>(_ => throw new ValidationException(ErrorCodes.VideoMaterialsTooMany, "too many"));
+            var viewModel = new VideoLibraryItemViewModel
+            {
+                Id = 1,
+                Title = "Updated",
+                Url = "https://drive.google.com/file/d/abc/view",
+                Materials = ElevenMaterials()
+            };
+            _videoLibraryController.Validate(viewModel);
+
+            var result = await _videoLibraryController.Update(viewModel);
+
+            AssertBadRequestWithErrorCode(result, ErrorCodes.VideoMaterialsTooMany);
+        }
+
+        [Test]
         public async Task Delete_Should_Return_Forbidden_For_Someone_Elses_Video()
         {
             _videoLibraryService.RemoveVideoAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
@@ -382,6 +419,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             var result = await _videoLibraryController.Delete(1);
 
             Assert.That(((StatusCodeResult)result).StatusCode, Is.EqualTo(403));
+        }
+
+        private static List<VideoLibraryMaterialViewModel> ElevenMaterials()
+        {
+            return Enumerable.Range(1, 11)
+                .Select(i => new VideoLibraryMaterialViewModel { Title = $"Link {i}", Url = $"https://example.com/{i}" })
+                .ToList();
         }
 
         private static void AssertBadRequestWithErrorCode(IActionResult result, int expectedErrorCode)

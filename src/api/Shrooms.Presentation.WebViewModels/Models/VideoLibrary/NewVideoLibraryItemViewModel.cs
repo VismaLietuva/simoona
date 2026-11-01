@@ -25,7 +25,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
 
         public int? VideoTypeId { get; set; }
 
-        [MaxLength(VideoLibraryMaterial.MaxPerVideo)]
         public IList<VideoLibraryMaterialViewModel> Materials { get; set; }
     }
 }
