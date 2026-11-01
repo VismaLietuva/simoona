@@ -801,6 +801,18 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public void Should_Refuse_Someone_Elses_Video_Before_Validating_The_Update()
+        {
+            NotAnAdministrator();
+            var dto = NewVideoDto();
+            dto.Id = 1;
+            dto.Url = "not a url";
+            dto.Materials = new List<VideoLibraryMaterialDto> { null };
+
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _videoLibraryService.UpdateVideoAsync(dto));
+        }
+
+        [Test]
         public async Task Should_Let_The_Uploader_Delete_Their_Own_Video()
         {
             NotAnAdministrator();

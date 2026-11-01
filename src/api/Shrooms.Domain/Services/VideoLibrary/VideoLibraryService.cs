@@ -160,13 +160,14 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
         public async Task UpdateVideoAsync(VideoLibraryItemDto video)
         {
+            var entity = await FindAsync(_videosDbSet.Include(v => v.Materials), video.Id, video.OrganizationId);
+            await EnsureCanEditAsync(entity, video);
+
             ValidateUrl(video.Url);
             ValidateMaterials(video.Materials);
             ValidateRecordedOn(video.RecordedOn);
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
-            var entity = await FindAsync(_videosDbSet.Include(v => v.Materials), video.Id, video.OrganizationId);
-            await EnsureCanEditAsync(entity, video);
             var replacedPictureId = entity.PictureId;
 
             entity.Title = video.Title;
