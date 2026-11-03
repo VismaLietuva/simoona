@@ -25,7 +25,7 @@ namespace Shrooms.Domain.Services.Email
             _appSettings = appSettings;
         }
 
-        public async Task<string> RenderAsync(string markdown, int organizationId, string organizationShortName)
+        public async Task<string> RenderAsync(string markdown, int organizationId, string organizationShortName, int? maxTextLength = null)
         {
             if (string.IsNullOrEmpty(markdown))
             {
@@ -35,7 +35,7 @@ namespace Shrooms.Domain.Services.Email
             var emojis = markdown.Contains(':') ? await _customEmojiService.GetAllAsync(organizationId, organizationShortName) : null;
             var withMentionLinks = _mentionLinkExpander.ExpandToMarkdown(markdown, organizationShortName);
 
-            return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis?.Emojis));
+            return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis?.Emojis), maxTextLength);
         }
 
         private IReadOnlyDictionary<string, string> ToImageUrls(IEnumerable<CustomEmojiDto> emojis)

@@ -321,5 +321,107 @@ namespace Shrooms.Tests.Helpers
         {
             Assert.That(Convert(markdown, Parrot), Is.EqualTo(_sut.ConvertToHtml(markdown)));
         }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_TextWithinTheLimit_IsUnchanged()
+        {
+            var text = new string('a', 150);
+
+            Assert.That(Cut(text, 150), Is.EqualTo($"<p>{text}</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_LongerText_IsCutWithAnEllipsis()
+        {
+            var head = new string('a', 150);
+
+            Assert.That(Cut(head + new string('b', 10), 150), Is.EqualTo($"<p>{head}...</p>\n"));
+        }
+
+        [TestCase("👍🏽")]
+        [TestCase("👨‍👩‍👧")]
+        [TestCase("🇱🇹")]
+        [TestCase("1️⃣")]
+        public void ConvertToHtml_MaxTextLength_CountsAnEmojiSequenceAsOneCharacterAndNeverSplitsIt(string emoji)
+        {
+            var head = new string('a', 149);
+
+            Assert.That(Cut(head + emoji + new string('b', 20), 150), Is.EqualTo($"<p>{head}{emoji}...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CountsVisibleTextNotMarkup()
+        {
+            var text = new string('a', 150);
+
+            Assert.That(Cut($"**{text}** more", 150), Is.EqualTo($"<p><strong>{text}</strong>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutInsideALinkLabel_KeepsTheWholeHref()
+        {
+            Assert.That(Cut("Join [call it now](https://zoom.us/j/1)", 9), Is.EqualTo("<p>Join <a href=\"https://zoom.us/j/1\">call</a>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_BareUrlLongerThanTheLimit_KeepsTheHrefAndCutsTheLabel()
+        {
+            var url = "https://zoom.us/j/" + new string('1', 200);
+
+            Assert.That(Cut(url + " see you", 150), Is.EqualTo($"<p><a href=\"{url}\">{url[..150]}</a>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutInsideAMention_KeepsTheLabelNotTheToken()
+        {
+            var head = new string('a', 145);
+
+            Assert.That(Cut(head + " @[Jonas Jonaitis](user:3f2a9c1e-0000-4000-8000-000000000000)", 150), Is.EqualTo($"<p>{head} <strong>@Jon</strong>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CustomEmojiCountsAsOneCharacter()
+        {
+            var head = new string('a', 148) + " ";
+
+            Assert.That(Cut(head + ":shipit: more", 150), Is.EqualTo($"<p>{head}{ParrotImg}...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_StandardEmojiCountsAsOneCharacter()
+        {
+            var head = new string('a', 148) + " ";
+
+            Assert.That(Cut(head + ":tada: more", 150), Is.EqualTo($"<p>{head}🎉...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutAtAParagraphBoundary_EndsThePreviousParagraphWithTheEllipsis()
+        {
+            Assert.That(Cut("para one\n\npara two", 8), Is.EqualTo("<p>para one...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutBeforeACodeBlock_DropsIt()
+        {
+            Assert.That(Cut("intro\n\n```\n" + new string('x', 200) + "\n```", 10), Is.EqualTo("<p>intro...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutInsideAList_DropsTheEmptiedItems()
+        {
+            Assert.That(Cut("- one\n- two\n- three", 6), Is.EqualTo("<ul>\n<li>one</li>\n<li>two...</li>\n</ul>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutAfterALineBreak_DropsTheBreak()
+        {
+            Assert.That(Cut("abc\ndef", 4), Is.EqualTo("<p>abc...</p>\n"));
+        }
+
+        private string Cut(string markdown, int maxTextLength)
+        {
+            return _sut.ConvertToHtml(markdown, Parrot, maxTextLength);
+        }
     }
 }

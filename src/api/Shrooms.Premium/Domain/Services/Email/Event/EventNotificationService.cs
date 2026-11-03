@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -23,9 +21,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 {
     public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
-        private static readonly Regex PartialShortcode = new(@"(?<=^|[^\p{L}\p{N}\p{M}:]|:[a-z0-9_+-]{1,60}:):[a-z0-9_+-]*$", RegexOptions.Compiled);
-
-        private static readonly Regex UrlStart = new(@"(?:https?|ftp)://|mailto:|tel:|www\.", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private const int DescriptionTeaserLength = 150;
 
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
@@ -110,7 +106,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
             var subject = CreateSubject(Resources.Models.Events.Events.ShareEventEmailSubject, shareEventEmailDto.Details.Name, shareEventEmailDto.CreatedPost.WallName);
             var body = await RenderAsync(shareEventEmailDto.CreatedPost.MessageBody, userOrgHubDto);
-            var description = await RenderTruncatedAsync(shareEventEmailDto.Details.Description, userOrgHubDto);
+            var description = await RenderAsync(shareEventEmailDto.Details.Description, userOrgHubDto, DescriptionTeaserLength);
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
                 eventUrl,
@@ -133,7 +129,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var template = new NewEventEmailTemplateViewModel(
                 eventUrl,
                 eventArgsDto.Name,
-                await RenderTruncatedAsync(eventArgsDto.Description, userOrgHubDto),
+                await RenderAsync(eventArgsDto.Description, userOrgHubDto, DescriptionTeaserLength),
                 eventArgsDto.Location,
                 eventArgsDto.StartDate,
                 GetNotificationSettingsUrl(userOrgHubDto));
@@ -220,76 +216,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await SendMultipleEmailsAsync(startEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
-        private Task<string> RenderAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto)
+        private Task<string> RenderAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto, int? maxTextLength = null)
         {
-            return _emailMarkdownRenderer.RenderAsync(markdown, userOrgHubDto.OrganizationId, userOrgHubDto.OrganizationName);
-        }
-
-        private Task<string> RenderTruncatedAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto, int maxCharacterCount = 150)
-        {
-            if (string.IsNullOrEmpty(markdown))
-            {
-                return Task.FromResult<string>(null);
-            }
-
-            return RenderAsync(Truncate(markdown, maxCharacterCount), userOrgHubDto);
-        }
-
-        private static string Truncate(string markdown, int maxCharacterCount)
-        {
-            if (markdown.Length <= maxCharacterCount)
-            {
-                return markdown;
-            }
-
-            var cut = KeepUrlWhole(markdown, LastTextElementBoundary(markdown, maxCharacterCount));
-
-            return $"{PartialShortcode.Replace(markdown[..cut], string.Empty)}...";
-        }
-
-        private static int LastTextElementBoundary(string text, int maxLength)
-        {
-            var boundary = 0;
-            while (boundary < text.Length)
-            {
-                var next = boundary + StringInfo.GetNextTextElementLength(text, boundary);
-                if (next > maxLength)
-                {
-                    break;
-                }
-
-                boundary = next;
-            }
-
-            return boundary;
-        }
-
-        private static int KeepUrlWhole(string text, int cut)
-        {
-            if (cut == 0 || cut >= text.Length || char.IsWhiteSpace(text[cut - 1]) || char.IsWhiteSpace(text[cut]))
-            {
-                return cut;
-            }
-
-            var wordStart = cut;
-            while (wordStart > 0 && !char.IsWhiteSpace(text[wordStart - 1]))
-            {
-                wordStart--;
-            }
-
-            var wordEnd = cut;
-            while (wordEnd < text.Length && !char.IsWhiteSpace(text[wordEnd]))
-            {
-                wordEnd++;
-            }
-
-            var url = UrlStart.Match(text[wordStart..wordEnd]);
-            if (!url.Success || wordStart + url.Index >= cut)
-            {
-                return cut;
-            }
-
-            return wordStart > 0 ? wordStart : wordEnd;
+            return _emailMarkdownRenderer.RenderAsync(markdown, userOrgHubDto.OrganizationId, userOrgHubDto.OrganizationName, maxTextLength);
         }
     }
 }

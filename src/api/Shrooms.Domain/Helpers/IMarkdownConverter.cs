@@ -4,6 +4,6 @@ namespace Shrooms.Domain.Helpers
     {
         string ConvertToHtml(string markdown);
 
-        string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages);
+        string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages, int? maxTextLength = null);
     }
 }

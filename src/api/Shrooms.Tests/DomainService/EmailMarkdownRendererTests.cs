@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -30,12 +31,12 @@ namespace Shrooms.Tests.DomainService
             _appSettings = Substitute.For<IApplicationSettings>();
 
             _appSettings.ApiUrl.Returns("https://api.example.com/");
-            _customEmojiService.GetAllAsync(3, "org").Returns(new CustomEmojiListDto
+            _customEmojiService.GetAllAsync(3, "org", Arg.Any<CancellationToken>()).Returns(new CustomEmojiListDto
             {
                 Emojis = new List<CustomEmojiDto> { new CustomEmojiDto { Name = "parrot", Url = "/storage/org/parrot.gif" } }
             });
             _mentionLinkExpander.ExpandToMarkdown(Arg.Any<string>(), Arg.Any<string>()).Returns(call => call.ArgAt<string>(0) + " [mentions]");
-            _markdownConverter.ConvertToHtml(Arg.Any<string>(), Arg.Any<IReadOnlyDictionary<string, string>>()).Returns("<p>html</p>");
+            _markdownConverter.ConvertToHtml(Arg.Any<string>(), Arg.Any<IReadOnlyDictionary<string, string>>(), Arg.Any<int?>()).Returns("<p>html</p>");
 
             _sut = new EmailMarkdownRenderer(_markdownConverter, _mentionLinkExpander, _customEmojiService, _appSettings);
         }
@@ -49,17 +50,26 @@ namespace Shrooms.Tests.DomainService
             _markdownConverter.Received(1).ConvertToHtml(
                 "hi :parrot: [mentions]",
                 Arg.Is<IReadOnlyDictionary<string, string>>(images =>
-                    images.Count == 1 && images["parrot"] == "https://api.example.com/storage/org/parrot.gif"));
+                    images.Count == 1 && images["parrot"] == "https://api.example.com/storage/org/parrot.gif"),
+                null);
+        }
+
+        [Test]
+        public async Task RenderAsync_WithMaxTextLength_PassesItToTheConverter()
+        {
+            await _sut.RenderAsync("hi :parrot:", 3, "org", 150);
+
+            _markdownConverter.Received(1).ConvertToHtml("hi :parrot: [mentions]", Arg.Any<IReadOnlyDictionary<string, string>>(), 150);
         }
 
         [Test]
         public async Task RenderAsync_OrganisationWithoutEmoji_PassesAnEmptyMap()
         {
-            _customEmojiService.GetAllAsync(3, "org").Returns(new CustomEmojiListDto { Emojis = null });
+            _customEmojiService.GetAllAsync(3, "org", Arg.Any<CancellationToken>()).Returns(new CustomEmojiListDto { Emojis = null });
 
             await _sut.RenderAsync("hi :parrot:", 3, "org");
 
-            _markdownConverter.Received(1).ConvertToHtml("hi :parrot: [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0));
+            _markdownConverter.Received(1).ConvertToHtml("hi :parrot: [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0), null);
         }
 
         [Test]
@@ -68,7 +78,7 @@ namespace Shrooms.Tests.DomainService
             await _sut.RenderAsync("hi", 3, "org");
 
             await _customEmojiService.DidNotReceiveWithAnyArgs().GetAllAsync(0, null);
-            _markdownConverter.Received(1).ConvertToHtml("hi [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0));
+            _markdownConverter.Received(1).ConvertToHtml("hi [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0), null);
         }
 
         [Test]

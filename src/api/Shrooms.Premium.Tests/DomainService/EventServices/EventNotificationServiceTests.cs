@@ -1,7 +1,11 @@
-﻿using NSubstitute;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Events;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -46,107 +50,32 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task NotifyNewEventAsync_RendersTheDescriptionForTheOrganisation()
+        public async Task NotifyNewEventAsync_RendersTheDescriptionCutToTheTeaserLength()
         {
             var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = "bring :parrot:", StartDate = DateTime.UtcNow };
+            var description = new string('a', 400) + " :parrot: @[Jonas](user:3f2a9c1e-0000-4000-8000-000000000000)";
+            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = description, StartDate = DateTime.UtcNow };
 
             await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
 
-            await _emailMarkdownRenderer.Received(1).RenderAsync("bring :parrot:", 3, "org");
+            await _emailMarkdownRenderer.Received(1).RenderAsync(description, 3, "org", 150);
         }
 
         [Test]
-        public async Task NotifyNewEventAsync_LongDescription_IsCutBeforeRenderingWithoutSplittingAnEmoji()
+        public async Task NotifySharedEventAsync_RendersThePostInFullAndTheDescriptionAsATeaser()
         {
             var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var head = new string('a', 149);
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + "🎉" + new string('b', 20), StartDate = DateTime.UtcNow };
+            var shared = new SharedEventEmailDto
+            {
+                CreatedPost = new NewlyCreatedPostDto { Id = 7, MessageBody = "look :parrot:", WallName = "Main", SharedEventId = "e1", User = new UserDto { FullName = "Jonas" } },
+                Details = new SharedEventEmailDetailsDto { Name = "Party", Description = "bring :tada:", StartDate = DateTime.UtcNow },
+                Receivers = new List<WallMemberEmailReceiverDto>()
+            };
 
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
+            await _sut.NotifySharedEventAsync(shared, userOrg);
 
-            await _emailMarkdownRenderer.Received(1).RenderAsync(head + "...", 3, "org");
-        }
-
-        [TestCase("👍🏽", 148)]
-        [TestCase("👨‍👩‍👧", 148)]
-        [TestCase("🇱🇹", 148)]
-        [TestCase("1️⃣", 149)]
-        public async Task NotifyNewEventAsync_LongDescription_IsCutBeforeAMultiPartEmoji(string emoji, int headLength)
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var head = new string('a', headLength);
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + emoji + new string('b', 20), StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(head + "...", 3, "org");
-        }
-
-        [TestCase("Join https://zoom.us/j/", "Join ")]
-        [TestCase("Join [call](https://zoom.us/j/", "Join ")]
-        [TestCase("Join www.zoom.us/j/", "Join ")]
-        [TestCase("Join mailto:", "Join ")]
-        public async Task NotifyNewEventAsync_CutInsideAUrl_DropsTheWholeUrl(string head, string kept)
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var padding = new string('a', 150 - head.Length - 3) + " a ";
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = padding + head + "1234567890 more", StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(padding + kept + "...", 3, "org");
-        }
-
-        [Test]
-        public async Task NotifyNewEventAsync_UrlLongerThanTheLimitAtTheStart_IsKeptWhole()
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var url = "https://zoom.us/j/" + new string('1', 200);
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = url + " see you", StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(url + "...", 3, "org");
-        }
-
-        [Test]
-        public async Task NotifyNewEventAsync_UrlEndingAtTheCut_IsKept()
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var url = "https://zoom.us/j/123";
-            var head = new string('a', 150 - url.Length - 1) + " " + url;
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + " more text", StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(head + "...", 3, "org");
-        }
-
-        [Test]
-        public async Task NotifyNewEventAsync_UrlStartingAfterTheCut_DoesNotMoveTheCut()
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var head = "x " + new string('a', 147) + "(";
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + "https://zoom.us/j/1)", StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(head + "...", 3, "org");
-        }
-
-        [TestCase(" :partypar", " ")]
-        [TestCase(" :tada::skin", " :tada:")]
-        [TestCase("ačiū:ta", "ačiū:ta")]
-        public async Task NotifyNewEventAsync_LongDescription_IsCutBeforeAHalfToken(string tail, string kept)
-        {
-            var userOrg = new UserAndOrganizationHubDto { OrganizationId = 3, OrganizationName = "org", UserId = "u" };
-            var head = new string('a', 150 - tail.Length);
-            var eventDto = new CreateEventDto { Id = "e1", Name = "Party", Description = head + tail + "rrot: more", StartDate = DateTime.UtcNow };
-
-            await _sut.NotifyNewEventAsync(eventDto, new List<IEmailReceiver>(), userOrg);
-
-            await _emailMarkdownRenderer.Received(1).RenderAsync(head + kept + "...", 3, "org");
+            await _emailMarkdownRenderer.Received(1).RenderAsync("look :parrot:", 3, "org", null);
+            await _emailMarkdownRenderer.Received(1).RenderAsync("bring :tada:", 3, "org", 150);
         }
 
         [Test]

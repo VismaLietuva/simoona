@@ -23,7 +23,7 @@ namespace Shrooms.Domain.Helpers
             return Markdown.ToHtml(ExpandMentions(markdown), Pipeline);
         }
 
-        public string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages)
+        public string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages, int? maxTextLength = null)
         {
             if (string.IsNullOrEmpty(markdown))
             {
@@ -32,6 +32,10 @@ namespace Shrooms.Domain.Helpers
 
             var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
+            if (maxTextLength.HasValue)
+            {
+                MarkdownDocumentTruncator.Apply(document, maxTextLength.Value);
+            }
 
             return Markdown.ToHtml(document, Pipeline);
         }
