@@ -122,10 +122,7 @@ namespace Shrooms.Domain.Services.Emoji
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Emoji does not exist");
             }
 
-            // An emoji with no CreatedBy has no owner to match against, so it is admin-only.
-            var isOwner = !string.IsNullOrEmpty(emoji.CreatedBy) && emoji.CreatedBy == userOrg.UserId;
-
-            if (!isOwner && !await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.CustomEmoji))
+            if (!await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.CustomEmoji))
             {
                 throw new UnauthorizedException();
             }
