@@ -120,9 +120,11 @@ namespace Shrooms.Domain.Helpers
                     continue;
                 }
 
+                Inline anchor = run[^1];
                 foreach (var inline in replacement)
                 {
-                    run[0].InsertBefore(inline);
+                    anchor.InsertAfter(inline);
+                    anchor = inline;
                 }
 
                 foreach (var literal in run)
