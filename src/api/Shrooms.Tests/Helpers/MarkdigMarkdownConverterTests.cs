@@ -296,9 +296,30 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_OneArgumentOverload_LeavesBareUrlsAlone()
+        public void ConvertToHtml_OneArgumentOverload_LinksBareUrls()
         {
-            Assert.That(_sut.ConvertToHtml("see https://x.y"), Is.EqualTo("<p>see https://x.y</p>\n"));
+            Assert.That(_sut.ConvertToHtml("see https://x.y"), Is.EqualTo("<p>see <a href=\"https://x.y\">https://x.y</a></p>\n"));
+        }
+
+        [TestCase("see https://x.y.", "<p>see <a href=\"https://x.y\">https://x.y</a>.</p>\n")]
+        [TestCase("(https://x.y)", "<p>(<a href=\"https://x.y\">https://x.y</a>)</p>\n")]
+        [TestCase("[https://a.b](https://c.d)", "<p><a href=\"https://c.d\">https://a.b</a></p>\n")]
+        [TestCase("<a href=\"https://x.y\">https://x.y</a>", "<p><a href=\"https://x.y\">https://x.y</a></p>\n")]
+        [TestCase("`https://a.b`", "<p><code>https://a.b</code></p>\n")]
+        [TestCase("javascript:alert(1)", "<p>javascript:alert(1)</p>\n")]
+        [TestCase("https://x.y/\"onmouseover=\"alert(1)", "<p><a href=\"https://x.y/%22onmouseover=%22alert(1)\">https://x.y/&quot;onmouseover=&quot;alert(1)</a></p>\n")]
+        public void ConvertToHtml_OneArgumentOverload_LinksOnlyPlainTextUrls(string markdown, string html)
+        {
+            Assert.That(_sut.ConvertToHtml(markdown), Is.EqualTo(html));
+        }
+
+        [TestCase("see https://x.y and www.x.y")]
+        [TestCase("**bold** _em_ ~~del~~ `code`")]
+        [TestCase("# title\nline\n\n- item\n> quote")]
+        [TestCase("[label](https://x.y) ![alt](https://x.y/i.png)")]
+        public void ConvertToHtml_WithoutEmoji_BothOverloadsAgree(string markdown)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(_sut.ConvertToHtml(markdown)));
         }
     }
 }

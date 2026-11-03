@@ -10,14 +10,6 @@ namespace Shrooms.Domain.Helpers
             new MarkdownPipelineBuilder()
                 .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
                 .UseSoftlineBreakAsHardlineBreak()
-                .Build();
-
-        // Bare URLs become links, as on the wall. The emoji rewriter leaves autolink labels alone,
-        // so a token inside a URL is never turned into an emoji.
-        private static readonly MarkdownPipeline EmojiPipeline =
-            new MarkdownPipelineBuilder()
-                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
-                .UseSoftlineBreakAsHardlineBreak()
                 .UseAutoLinks()
                 .Build();
 
@@ -38,10 +30,10 @@ namespace Shrooms.Domain.Helpers
                 return string.Empty;
             }
 
-            var document = Markdown.Parse(ExpandMentions(markdown), EmojiPipeline);
+            var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
 
-            return Markdown.ToHtml(document, EmojiPipeline);
+            return Markdown.ToHtml(document, Pipeline);
         }
 
         private static string ExpandMentions(string markdown)
