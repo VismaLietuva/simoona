@@ -38,8 +38,6 @@ namespace Shrooms.Domain.Services.Email
             return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis?.Emojis));
         }
 
-        // CustomEmojiDto.Url is relative to the API host, which is what the web client expects.
-        // A mail client has no such base, so the image needs the absolute address.
         private IReadOnlyDictionary<string, string> ToImageUrls(IEnumerable<CustomEmojiDto> emojis)
         {
             var images = new Dictionary<string, string>(StringComparer.Ordinal);

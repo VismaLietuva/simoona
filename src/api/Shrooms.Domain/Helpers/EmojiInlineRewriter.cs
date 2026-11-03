@@ -7,15 +7,6 @@ using Markdig.Syntax.Inlines;
 
 namespace Shrooms.Domain.Helpers
 {
-    // Replaces :shortcode: tokens in a parsed document with the same rules as the web app's
-    // scanner, so a post renders alike on the wall and in the email:
-    //
-    // - a custom name wins over a standard one, as on the wall; an unknown name stays literal;
-    // - a token glued to a word does not count. Letters, digits, marks and colons glue, so a
-    //   colon chain such as status:ok:200 or fe80::a:1 is one word. Glue is judged on the text
-    //   the reader sees, across emphasis, code spans and links: **word**:tada: stays literal;
-    // - a token right after an accepted or unknown token is fine (:nope::tada: renders the second);
-    // - code spans, autolink labels and image alt text are never rewritten.
     internal static partial class EmojiInlineRewriter
     {
         private const int ToneVariantCount = 6;
@@ -26,8 +17,6 @@ namespace Shrooms.Domain.Helpers
         [GeneratedRegex(@"\G:skin-tone-([2-6]):")]
         private static partial Regex Tone();
 
-        // One inline leaf of a block in reading order: a literal to scan, text that only gives
-        // glue context, or a boundary (break, image, raw HTML) that resets the context.
         private readonly record struct Leaf(LiteralInline Scan, string Text)
         {
             public static Leaf Boundary => default;
@@ -103,8 +92,6 @@ namespace Shrooms.Domain.Helpers
                     continue;
                 }
 
-                // Consecutive sibling literals form one run: Markdig splits text at unmatched
-                // delimiters, so a token such as :heart_eyes: can span several of them.
                 run.Clear();
                 var hasColon = false;
                 var parent = leaf.Scan.Parent;
@@ -115,7 +102,6 @@ namespace Shrooms.Domain.Helpers
                     index++;
                 }
 
-                // Most text carries no shortcode; without a colon only the glue context moves on.
                 if (!hasColon)
                 {
                     var tail = run[^1].Content;
@@ -223,8 +209,6 @@ namespace Shrooms.Domain.Helpers
             return output;
         }
 
-        // Returns the inline that replaces the token, or null when the name is unknown. A standard
-        // tone-capable emoji also consumes a following :skin-tone-N: and moves end past it.
         private static Inline Resolve(string text, string name, IReadOnlyDictionary<string, string> custom, ref int end)
         {
             if (custom.TryGetValue(name, out var imageUrl))
@@ -273,7 +257,6 @@ namespace Shrooms.Domain.Helpers
             return EndsGlued(text, text.Length);
         }
 
-        // Whether the code point just before text[end] is a word character or a colon.
         private static bool EndsGlued(string text, int end)
         {
             if (end == 0)

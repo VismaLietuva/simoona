@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -23,6 +24,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
     public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
         private static readonly Regex PartialShortcode = new(@"(?<=^|[^\p{L}\p{N}\p{M}:]|:[a-z0-9_+-]{1,60}:):[a-z0-9_+-]*$", RegexOptions.Compiled);
+
+        private static readonly Regex UrlStart = new(@"(?:https?|ftp)://|mailto:|tel:|www\.", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
@@ -222,7 +225,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             return _emailMarkdownRenderer.RenderAsync(markdown, userOrgHubDto.OrganizationId, userOrgHubDto.OrganizationName);
         }
 
-        // The description is a teaser in these emails, so it is cut before rendering.
         private Task<string> RenderTruncatedAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto, int maxCharacterCount = 150)
         {
             if (string.IsNullOrEmpty(markdown))
@@ -230,14 +232,64 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 return Task.FromResult<string>(null);
             }
 
-            if (markdown.Length > maxCharacterCount)
+            return RenderAsync(Truncate(markdown, maxCharacterCount), userOrgHubDto);
+        }
+
+        private static string Truncate(string markdown, int maxCharacterCount)
+        {
+            if (markdown.Length <= maxCharacterCount)
             {
-                // Never cut between the two halves of a surrogate pair: a lone half renders as U+FFFD.
-                var cut = char.IsHighSurrogate(markdown[maxCharacterCount - 1]) ? maxCharacterCount - 1 : maxCharacterCount;
-                markdown = $"{PartialShortcode.Replace(markdown[..cut], string.Empty)}...";
+                return markdown;
             }
 
-            return RenderAsync(markdown, userOrgHubDto);
+            var cut = KeepUrlWhole(markdown, LastTextElementBoundary(markdown, maxCharacterCount));
+
+            return $"{PartialShortcode.Replace(markdown[..cut], string.Empty)}...";
+        }
+
+        private static int LastTextElementBoundary(string text, int maxLength)
+        {
+            var boundary = 0;
+            while (boundary < text.Length)
+            {
+                var next = boundary + StringInfo.GetNextTextElementLength(text, boundary);
+                if (next > maxLength)
+                {
+                    break;
+                }
+
+                boundary = next;
+            }
+
+            return boundary;
+        }
+
+        private static int KeepUrlWhole(string text, int cut)
+        {
+            if (cut == 0 || cut >= text.Length || char.IsWhiteSpace(text[cut - 1]) || char.IsWhiteSpace(text[cut]))
+            {
+                return cut;
+            }
+
+            var wordStart = cut;
+            while (wordStart > 0 && !char.IsWhiteSpace(text[wordStart - 1]))
+            {
+                wordStart--;
+            }
+
+            var wordEnd = cut;
+            while (wordEnd < text.Length && !char.IsWhiteSpace(text[wordEnd]))
+            {
+                wordEnd++;
+            }
+
+            var url = UrlStart.Match(text[wordStart..wordEnd]);
+            if (!url.Success || wordStart + url.Index >= cut)
+            {
+                return cut;
+            }
+
+            return wordStart > 0 ? wordStart : wordEnd;
         }
     }
 }

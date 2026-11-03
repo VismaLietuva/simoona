@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Text.Json;
 using NUnit.Framework;
 using Shrooms.Domain.Helpers;
 
@@ -25,6 +27,21 @@ namespace Shrooms.Tests.Helpers
         public void TryGet_UnknownName_ReturnsFalse()
         {
             Assert.That(StandardEmojiTable.TryGet("definitely-not-an-emoji", out _), Is.False);
+        }
+
+        [Test]
+        public void EveryEntry_IsOneCharacterOrSixToneVariants()
+        {
+            using var stream = typeof(StandardEmojiTable).Assembly.GetManifestResourceStream("Shrooms.Domain.emoji-shortcodes.json");
+            using var document = JsonDocument.Parse(stream);
+
+            var unexpected = document.RootElement.GetProperty("emojis").EnumerateObject()
+                .Where(entry => entry.Value.ValueKind != JsonValueKind.String
+                    && (entry.Value.ValueKind != JsonValueKind.Array || entry.Value.GetArrayLength() != 6))
+                .Select(entry => entry.Name)
+                .ToList();
+
+            Assert.That(unexpected, Is.Empty);
         }
 
         [Test]
