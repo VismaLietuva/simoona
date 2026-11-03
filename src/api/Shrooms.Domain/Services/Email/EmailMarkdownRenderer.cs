@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Helpers;
@@ -12,17 +13,20 @@ namespace Shrooms.Domain.Services.Email
         private readonly IMentionLinkExpander _mentionLinkExpander;
         private readonly ICustomEmojiService _customEmojiService;
         private readonly IApplicationSettings _appSettings;
+        private readonly ILogger<EmailMarkdownRenderer> _logger;
 
         public EmailMarkdownRenderer(
             IMarkdownConverter markdownConverter,
             IMentionLinkExpander mentionLinkExpander,
             ICustomEmojiService customEmojiService,
-            IApplicationSettings appSettings)
+            IApplicationSettings appSettings,
+            ILogger<EmailMarkdownRenderer> logger)
         {
             _markdownConverter = markdownConverter;
             _mentionLinkExpander = mentionLinkExpander;
             _customEmojiService = customEmojiService;
             _appSettings = appSettings;
+            _logger = logger;
         }
 
         public async Task<string> RenderAsync(string markdown, int organizationId, string organizationShortName, int? maxTextLength = null)
@@ -32,10 +36,23 @@ namespace Shrooms.Domain.Services.Email
                 return string.Empty;
             }
 
-            var emojis = markdown.Contains(':') ? await _customEmojiService.GetAllAsync(organizationId, organizationShortName) : null;
+            var emojis = EmojiInlineRewriter.ContainsToken(markdown) ? await LoadEmojisAsync(organizationId, organizationShortName) : null;
             var withMentionLinks = _mentionLinkExpander.ExpandToMarkdown(markdown, organizationShortName);
 
-            return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis?.Emojis), maxTextLength);
+            return _markdownConverter.ConvertToHtml(withMentionLinks, ToImageUrls(emojis), maxTextLength);
+        }
+
+        private async Task<IEnumerable<CustomEmojiDto>> LoadEmojisAsync(int organizationId, string organizationShortName)
+        {
+            try
+            {
+                return (await _customEmojiService.GetAllAsync(organizationId, organizationShortName)).Emojis;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Custom emoji lookup failed for organization {OrganizationId}; rendering the email without custom emoji", organizationId);
+                return null;
+            }
         }
 
         private IReadOnlyDictionary<string, string> ToImageUrls(IEnumerable<CustomEmojiDto> emojis)

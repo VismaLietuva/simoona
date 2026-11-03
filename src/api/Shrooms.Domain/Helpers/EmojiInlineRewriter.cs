@@ -24,6 +24,11 @@ namespace Shrooms.Domain.Helpers
             public bool IsBoundary => Scan == null && Text == null;
         }
 
+        public static bool ContainsToken(string text)
+        {
+            return Token().IsMatch(text);
+        }
+
         public static void Apply(MarkdownDocument document, IReadOnlyDictionary<string, string> customEmojiImages)
         {
             var custom = customEmojiImages ?? ReadOnlyDictionary<string, string>.Empty;

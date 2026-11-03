@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
 using Shrooms.Contracts.Infrastructure;
@@ -19,6 +23,7 @@ namespace Shrooms.Tests.DomainService
         private IMentionLinkExpander _mentionLinkExpander;
         private ICustomEmojiService _customEmojiService;
         private IApplicationSettings _appSettings;
+        private ILogger<EmailMarkdownRenderer> _logger;
 
         private EmailMarkdownRenderer _sut;
 
@@ -29,6 +34,7 @@ namespace Shrooms.Tests.DomainService
             _mentionLinkExpander = Substitute.For<IMentionLinkExpander>();
             _customEmojiService = Substitute.For<ICustomEmojiService>();
             _appSettings = Substitute.For<IApplicationSettings>();
+            _logger = Substitute.For<ILogger<EmailMarkdownRenderer>>();
 
             _appSettings.ApiUrl.Returns("https://api.example.com/");
             _customEmojiService.GetAllAsync(3, "org", Arg.Any<CancellationToken>()).Returns(new CustomEmojiListDto
@@ -38,7 +44,7 @@ namespace Shrooms.Tests.DomainService
             _mentionLinkExpander.ExpandToMarkdown(Arg.Any<string>(), Arg.Any<string>()).Returns(call => call.ArgAt<string>(0) + " [mentions]");
             _markdownConverter.ConvertToHtml(Arg.Any<string>(), Arg.Any<IReadOnlyDictionary<string, string>>(), Arg.Any<int?>()).Returns("<p>html</p>");
 
-            _sut = new EmailMarkdownRenderer(_markdownConverter, _mentionLinkExpander, _customEmojiService, _appSettings);
+            _sut = new EmailMarkdownRenderer(_markdownConverter, _mentionLinkExpander, _customEmojiService, _appSettings, _logger);
         }
 
         [Test]
@@ -73,12 +79,41 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task RenderAsync_NoColon_SkipsTheEmojiLookup()
+        public async Task RenderAsync_EmojiLookupFails_RendersWithoutCustomEmoji()
         {
-            await _sut.RenderAsync("hi", 3, "org");
+            _customEmojiService.GetAllAsync(3, "org", Arg.Any<CancellationToken>()).ThrowsAsync(new InvalidOperationException("db down"));
+
+            var result = await _sut.RenderAsync("hi :parrot:", 3, "org");
+
+            Assert.That(result, Is.EqualTo("<p>html</p>"));
+            _markdownConverter.Received(1).ConvertToHtml("hi :parrot: [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0), null);
+        }
+
+        [Test]
+        public async Task RenderAsync_EmojiLookupFails_LogsTheError()
+        {
+            var failure = new InvalidOperationException("db down");
+            _customEmojiService.GetAllAsync(3, "org", Arg.Any<CancellationToken>()).ThrowsAsync(failure);
+
+            await _sut.RenderAsync("hi :parrot:", 3, "org");
+
+            var errors = _logger.ReceivedCalls()
+                .Where(call => call.GetMethodInfo().Name == nameof(ILogger.Log))
+                .Select(call => call.GetArguments())
+                .Where(args => (LogLevel)args[0] == LogLevel.Error)
+                .ToList();
+            Assert.That(errors, Has.Count.EqualTo(1));
+            Assert.That(errors[0][3], Is.SameAs(failure));
+        }
+
+        [TestCase("hi")]
+        [TestCase("see https://x.y at 10:30")]
+        public async Task RenderAsync_NoShortcode_SkipsTheEmojiLookup(string markdown)
+        {
+            await _sut.RenderAsync(markdown, 3, "org");
 
             await _customEmojiService.DidNotReceiveWithAnyArgs().GetAllAsync(0, null);
-            _markdownConverter.Received(1).ConvertToHtml("hi [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0), null);
+            _markdownConverter.Received(1).ConvertToHtml(markdown + " [mentions]", Arg.Is<IReadOnlyDictionary<string, string>>(images => images.Count == 0), null);
         }
 
         [Test]
