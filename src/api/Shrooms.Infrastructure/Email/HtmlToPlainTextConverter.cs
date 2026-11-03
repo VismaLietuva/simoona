@@ -24,7 +24,7 @@ namespace Shrooms.Infrastructure.Email
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ImageAlt = new(
-            @"<img\b[^>]*?\balt\s*=\s*([""'])(.*?)\1[^>]*>",
+            @"<img\b[^>]*?(?<![\w-])alt\s*=\s*([""'])(.*?)\1[^>]*>",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex Tags = new("<[^>]+>", RegexOptions.Compiled);

@@ -95,6 +95,12 @@ namespace Shrooms.EmailTemplates.Tests
         }
 
         [Test]
+        public void Convert_OnAnAttributeThatOnlyEndsInAlt_DoesNotReadItAsAltText()
+        {
+            Assert.That(HtmlToPlainTextConverter.Convert("<p>a <img data-alt=\"internal-id\" src=\"x.png\"> b</p>"), Is.EqualTo("a b"));
+        }
+
+        [Test]
         public void Convert_OnAltWithApostrophe_KeepsTheWholeAlt()
         {
             Assert.That(HtmlToPlainTextConverter.Convert("<p><img src=\"x.png\" alt=\"it's done\"></p>"), Is.EqualTo("it's done"));
