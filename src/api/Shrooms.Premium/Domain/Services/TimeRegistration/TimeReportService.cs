@@ -36,30 +36,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             var first = TimeMonth.Parse(month);
             var last = TimeMonth.LastDay(first);
             var organizationId = userOrg.OrganizationId;
-            var ids = await _support.EmployeeIdsAsync(organizationId);
-
-            var users = await _users
-                .AsNoTracking()
-                .Where(user => user.OrganizationId == organizationId && ids.Contains(user.Id))
-                .Select(user => new
-                {
-                    user.Id,
-                    user.FirstName,
-                    user.LastName,
-                    user.Email,
-                    JobTitle = user.JobPosition != null ? user.JobPosition.Title : null,
-                    user.PictureId,
-                    ManagerFirstName = user.Manager.FirstName,
-                    ManagerLastName = user.Manager.LastName
-                })
-                .ToListAsync();
-            var statuses = await _support.StatusesAsync(ids, first, organizationId);
-            var calendars = await _support.CalendarsAsync(ids, first, organizationId);
-            var autoFillPending = first <= TimeMonth.Of(await _support.TodayAsync(organizationId))
-                                  && await _support.LockAsync(first, organizationId) == null;
-            var autoFills = autoFillPending
-                ? await _support.AutoFillsAsync(ids, organizationId)
-                : new Dictionary<string, TimeAutoFill>();
+            var activeIds = await _support.EmployeeIdsAsync(organizationId);
+            var active = new HashSet<string>(activeIds, StringComparer.OrdinalIgnoreCase);
 
             var entries = (await _entries
                     .AsNoTracking()
@@ -77,12 +55,40 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     })
                     .ToListAsync())
                 .ToLookup(entry => entry.UserId, StringComparer.OrdinalIgnoreCase);
+            var ids = activeIds
+                .Concat(entries.Select(group => group.Key).Where(id => !active.Contains(id)))
+                .ToList();
+
+            var users = await _users
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(user => user.OrganizationId == organizationId && ids.Contains(user.Id))
+                .Select(user => new
+                {
+                    user.Id,
+                    user.FirstName,
+                    user.LastName,
+                    user.Email,
+                    JobTitle = user.JobPosition != null ? user.JobPosition.Title : null,
+                    user.PictureId,
+                    ManagerFirstName = user.Manager.FirstName,
+                    ManagerLastName = user.Manager.LastName
+                })
+                .ToListAsync();
+            var statuses = await _support.StatusesAsync(ids, first, organizationId);
+            var calendars = await _support.CalendarsAsync(activeIds, first, organizationId);
+            var autoFillPending = first <= TimeMonth.Of(await _support.TodayAsync(organizationId))
+                                  && await _support.LockAsync(first, organizationId) == null;
+            var autoFills = autoFillPending
+                ? await _support.AutoFillsAsync(activeIds, organizationId)
+                : new Dictionary<string, TimeAutoFill>();
 
             var employees = new List<TimeReportEmployeeDto>();
             var projects = new List<TimeReportProjectDto>();
             foreach (var user in users)
             {
-                var calendar = calendars[user.Id];
+                var isFormer = !active.Contains(user.Id);
+                var calendar = isFormer ? null : calendars[user.Id];
                 var status = statuses[user.Id];
                 var rows = new Dictionary<(int ProjectId, int TaskId), TimeReportProjectDto>();
                 foreach (var entry in entries[user.Id])
@@ -90,7 +96,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     Row(rows, user.Id, entry.ProjectId, entry.TaskId, entry.CustomerName, entry.ProjectName, entry.TaskName).Minutes += entry.Minutes;
                 }
 
-                if (status != TimePeriodStatus.Approved && autoFills.TryGetValue(user.Id, out var autoFill))
+                if (!isFormer && status != TimePeriodStatus.Approved && autoFills.TryGetValue(user.Id, out var autoFill))
                 {
                     var byDay = entries[user.Id].ToLookup(entry => entry.Date.Date);
                     var filled = calendar.Days.Sum(day => calendar.AutoFillMinutes(
@@ -114,8 +120,9 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     PictureId = user.PictureId,
                     ManagerName = TimeTableService.FullName(user.ManagerFirstName, user.ManagerLastName),
                     Status = TimeTableService.Wire(status),
-                    LoggedMinutes = worked.Sum(row => row.Minutes) + calendar.Days.Sum(calendar.AbsenceMinutes),
-                    ExpectedMinutes = calendar.Days.Sum(calendar.ExpectedMinutes)
+                    LoggedMinutes = worked.Sum(row => row.Minutes) + (isFormer ? 0 : calendar.Days.Sum(calendar.AbsenceMinutes)),
+                    ExpectedMinutes = isFormer ? null : calendar.Days.Sum(calendar.ExpectedMinutes),
+                    IsFormer = isFormer
                 });
             }
 
