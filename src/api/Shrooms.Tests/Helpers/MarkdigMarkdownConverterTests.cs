@@ -295,12 +295,15 @@ namespace Shrooms.Tests.Helpers
             Assert.That(_sut.ConvertToHtml(":tada:"), Is.EqualTo("<p>:tada:</p>\n"));
         }
 
-        [Test]
-        public void ConvertToHtml_OneArgumentOverload_LinksBareUrls()
+        [TestCase("see https://x.y", "<p>see https://x.y</p>\n")]
+        [TestCase("see www.x.y", "<p>see www.x.y</p>\n")]
+        [TestCase("[label](https://x.y)", "<p><a href=\"https://x.y\">label</a></p>\n")]
+        public void ConvertToHtml_OneArgumentOverload_LeavesBareUrlsAsText(string markdown, string html)
         {
-            Assert.That(_sut.ConvertToHtml("see https://x.y"), Is.EqualTo("<p>see <a href=\"https://x.y\">https://x.y</a></p>\n"));
+            Assert.That(_sut.ConvertToHtml(markdown), Is.EqualTo(html));
         }
 
+        [TestCase("see https://x.y", "<p>see <a href=\"https://x.y\">https://x.y</a></p>\n")]
         [TestCase("see https://x.y.", "<p>see <a href=\"https://x.y\">https://x.y</a>.</p>\n")]
         [TestCase("(https://x.y)", "<p>(<a href=\"https://x.y\">https://x.y</a>)</p>\n")]
         [TestCase("[https://a.b](https://c.d)", "<p><a href=\"https://c.d\">https://a.b</a></p>\n")]
@@ -308,16 +311,15 @@ namespace Shrooms.Tests.Helpers
         [TestCase("`https://a.b`", "<p><code>https://a.b</code></p>\n")]
         [TestCase("javascript:alert(1)", "<p>javascript:alert(1)</p>\n")]
         [TestCase("https://x.y/\"onmouseover=\"alert(1)", "<p><a href=\"https://x.y/%22onmouseover=%22alert(1)\">https://x.y/&quot;onmouseover=&quot;alert(1)</a></p>\n")]
-        public void ConvertToHtml_OneArgumentOverload_LinksOnlyPlainTextUrls(string markdown, string html)
+        public void ConvertToHtml_EmojiOverload_LinksOnlyPlainTextUrls(string markdown, string html)
         {
-            Assert.That(_sut.ConvertToHtml(markdown), Is.EqualTo(html));
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
         }
 
-        [TestCase("see https://x.y and www.x.y")]
         [TestCase("**bold** _em_ ~~del~~ `code`")]
         [TestCase("# title\nline\n\n- item\n> quote")]
         [TestCase("[label](https://x.y) ![alt](https://x.y/i.png)")]
-        public void ConvertToHtml_WithoutEmoji_BothOverloadsAgree(string markdown)
+        public void ConvertToHtml_WithoutEmojiOrBareUrls_BothOverloadsAgree(string markdown)
         {
             Assert.That(Convert(markdown, Parrot), Is.EqualTo(_sut.ConvertToHtml(markdown)));
         }

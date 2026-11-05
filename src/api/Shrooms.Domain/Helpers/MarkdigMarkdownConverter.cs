@@ -6,12 +6,9 @@ namespace Shrooms.Domain.Helpers
 {
     public class MarkdigMarkdownConverter : IMarkdownConverter
     {
-        private static readonly MarkdownPipeline Pipeline =
-            new MarkdownPipelineBuilder()
-                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
-                .UseSoftlineBreakAsHardlineBreak()
-                .UseAutoLinks()
-                .Build();
+        private static readonly MarkdownPipeline Pipeline = BasePipeline().Build();
+
+        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().Build();
 
         public string ConvertToHtml(string markdown)
         {
@@ -30,14 +27,21 @@ namespace Shrooms.Domain.Helpers
                 return string.Empty;
             }
 
-            var document = Markdown.Parse(ExpandMentions(markdown), Pipeline);
+            var document = Markdown.Parse(ExpandMentions(markdown), EmailPipeline);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
             if (maxTextLength.HasValue)
             {
                 MarkdownDocumentTruncator.Apply(document, maxTextLength.Value);
             }
 
-            return Markdown.ToHtml(document, Pipeline);
+            return Markdown.ToHtml(document, EmailPipeline);
+        }
+
+        private static MarkdownPipelineBuilder BasePipeline()
+        {
+            return new MarkdownPipelineBuilder()
+                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
+                .UseSoftlineBreakAsHardlineBreak();
         }
 
         private static string ExpandMentions(string markdown)
