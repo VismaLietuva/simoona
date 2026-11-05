@@ -99,7 +99,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
-        [PermissionAuthorize(Permission = BasicPermissions.CustomEmoji)]
+        [PermissionAuthorize(Permission = AdministrationPermissions.CustomEmoji)]
         public async Task<IActionResult> Delete(int id)
         {
             try
