@@ -12,6 +12,7 @@ namespace Shrooms.Domain.Helpers
         public static void Apply(MarkdownDocument document, int maxTextLength)
         {
             var remaining = maxTextLength;
+            var keptAnything = false;
             LeafBlock previousLeaf = null;
 
             foreach (var leaf in document.Descendants<LeafBlock>().ToList())
@@ -21,24 +22,34 @@ namespace Shrooms.Domain.Helpers
                     var length = RawLength(leaf);
                     if (length > remaining)
                     {
+                        if (!keptAnything && remaining > 0)
+                        {
+                            leaf.Lines = new StringLineGroup(Prefix(leaf.Lines.ToString(), remaining));
+                            RemoveBlocksAfter(leaf);
+                            AppendEllipsis(document, leaf);
+                            return;
+                        }
+
                         RemoveBlockAndFollowing(leaf);
                         AppendEllipsis(document, previousLeaf);
                         return;
                     }
 
                     remaining -= length;
+                    keptAnything |= length > 0;
                     previousLeaf = leaf;
                     continue;
                 }
 
-                var keptSomething = false;
+                var keptInBlock = false;
                 foreach (var inline in Leaves(leaf.Inline).ToList())
                 {
                     var length = TextLength(inline);
                     if (length <= remaining)
                     {
                         remaining -= length;
-                        keptSomething |= length > 0;
+                        keptInBlock |= length > 0;
+                        keptAnything |= length > 0;
                         continue;
                     }
 
@@ -47,7 +58,11 @@ namespace Shrooms.Domain.Helpers
                         literal.Content = new StringSlice(Prefix(literal.Content.ToString(), remaining));
                         RemoveFollowing(literal, leaf.Inline, false);
                     }
-                    else if (keptSomething)
+                    else if (!keptAnything && Shorten(inline, remaining))
+                    {
+                        RemoveFollowing(inline, leaf.Inline, false);
+                    }
+                    else if (keptInBlock)
                     {
                         RemoveFollowing(inline, leaf.Inline, true);
                     }
@@ -64,6 +79,20 @@ namespace Shrooms.Domain.Helpers
                 }
 
                 previousLeaf = leaf;
+            }
+        }
+
+        private static bool Shorten(Inline inline, int maxTextElements)
+        {
+            switch (inline)
+            {
+                case CodeInline code when maxTextElements > 0:
+                    code.Content = Prefix(code.Content, maxTextElements);
+                    return true;
+                case AutolinkInline:
+                    return true;
+                default:
+                    return false;
             }
         }
 
@@ -100,7 +129,7 @@ namespace Shrooms.Domain.Helpers
 
         private static int RawLength(LeafBlock leaf)
         {
-            return leaf is CodeBlock code ? code.Lines.ToString().Length : 0;
+            return leaf is CodeBlock or HtmlBlock ? Graphemes(leaf.Lines.ToString()) : 0;
         }
 
         private static int Graphemes(string text)

@@ -419,6 +419,44 @@ namespace Shrooms.Tests.Helpers
             Assert.That(Cut("abc\ndef", 4), Is.EqualTo("<p>abc...</p>\n"));
         }
 
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutBeforeAnHtmlBlock_DropsIt()
+        {
+            Assert.That(Cut("intro\n\n<div>" + new string('x', 200) + "</div>", 10), Is.EqualTo("<p>intro...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_LeadingHtmlBlockLongerThanTheLimit_IsCutWithAnEllipsis()
+        {
+            var html = "<div>" + new string('x', 200) + "</div>";
+
+            Assert.That(Cut(html + "\n\nmore", 150), Is.EqualTo($"{html[..150]}\n<p>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_LeadingCodeBlockLongerThanTheLimit_IsCutWithAnEllipsis()
+        {
+            var code = new string('x', 200);
+
+            Assert.That(Cut($"```\n{code}\n```\n\nmore", 150), Is.EqualTo($"<pre><code>{code[..150]}\n</code></pre>\n<p>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_LeadingCodeSpanLongerThanTheLimit_IsCutWithAnEllipsis()
+        {
+            var code = new string('x', 200);
+
+            Assert.That(Cut($"`{code}` more", 150), Is.EqualTo($"<p><code>{code[..150]}</code>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_LeadingAutolinkLongerThanTheLimit_IsKeptWhole()
+        {
+            var url = "https://zoom.us/j/" + new string('1', 200);
+
+            Assert.That(Cut($"<{url}> see you", 150), Is.EqualTo($"<p><a href=\"{url}\">{url}</a>...</p>\n"));
+        }
+
         private string Cut(string markdown, int maxTextLength)
         {
             return _sut.ConvertToHtml(markdown, Parrot, maxTextLength);
