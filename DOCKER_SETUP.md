@@ -7,8 +7,7 @@ This guide explains how to get Simoona running from a clean repository checkout 
 | Tool | Purpose |
 |------|---------|
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Runs all containers |
-
-| .NET 10 SDK | Only needed for [local fast-mode development](#local-development-fast-mode) |
+| .NET 10 SDK, 10.0.4xx band (pinned in [`global.json`](global.json)) | Only needed for [local fast-mode development](#local-development-fast-mode) |
 | Node.js + gulp | Only needed for [local fast-mode development](#local-development-fast-mode) |
 
 ---
