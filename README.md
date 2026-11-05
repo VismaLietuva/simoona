@@ -1,6 +1,6 @@
 # Simoona
 
-[![CI](https://github.com/VismaLietuva/simoona/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/VismaLietuva/simoona/actions/workflows/ci.yml) [![Join the chat at https://gitter.im/simoona-oss/community](https://badges.gitter.im/simoona-oss/community.svg)](https://gitter.im/simoona-oss/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/j5y450yftsvso2je?svg=true)](https://ci.appveyor.com/project/Simoona/simoona-ks9ka) [![Join the chat at https://gitter.im/simoona-oss/community](https://badges.gitter.im/simoona-oss/community.svg)](https://gitter.im/simoona-oss/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Simoona is an open source intranet solution powered by Visma. We created Simoona so your company could make its communication more intuitive, more efficient, more empowering, and more fun. In the open source version, you will be able to use the core functions of Simoona. Want to add a feature? No problem, you can either get the full version from us or edit the open source version and make it the best intranet solution for your team. Focus on what's important and create an atmosphere of respect and acknowledgment.
 
