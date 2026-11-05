@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using LinqKit;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -36,6 +37,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IPermissionService _permissionService;
 
         private readonly DbSet<Post> _postsDbSet;
+        private readonly DbSet<Comment> _commentsDbSet;
         private readonly DbSet<WallMember> _wallUsersDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<WallModerator> _moderatorsDbSet;
@@ -50,6 +52,7 @@ namespace Shrooms.Domain.Services.Wall
             _permissionService = permissionService;
 
             _postsDbSet = uow.GetDbSet<Post>();
+            _commentsDbSet = uow.GetDbSet<Comment>();
             _wallUsersDbSet = uow.GetDbSet<WallMember>();
             _moderatorsDbSet = uow.GetDbSet<WallModerator>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -165,7 +168,7 @@ namespace Shrooms.Domain.Services.Wall
             await _uow.SaveChangesAsync(updateWallDto.UserId);
         }
 
-        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg)
+        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var wall = await _wallsDbSet
                 .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
@@ -177,7 +180,7 @@ namespace Shrooms.Domain.Services.Wall
                     Type = x.Type,
                     Logo = x.Logo
                 })
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             return wall;
         }
@@ -215,21 +218,46 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
-            var walls = filter == WallsListFilter.Followed ? await GetUserFollowedWallsAsync(userOrg) : await GetAllOrNotFollowedWallsAsync(userOrg, filter);
+            var query = _wallsDbSet.Where(BuildWallsListScope(userOrg, filter));
+
+            // The followed list has always been returned unordered.
+            if (filter != WallsListFilter.Followed)
+            {
+                query = query
+                    .OrderBy(x => x.Type)
+                    .ThenBy(w => w.Name.ToLower());
+            }
+
+            var walls = await query
+                .Select(w => new WallDto
+                {
+                    Id = w.Id,
+                    Name = w.Name,
+                    Description = w.Description,
+                    // Don't simplify, since it's EF projection
+                    IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
+                    Type = w.Type,
+                    Logo = w.Logo,
+                    TotalMembers = w.Members.Count,
+                    PostsCount = w.Posts.Count,
+                    IsHiddenFromAllWalls = w.IsHiddenFromAllWalls,
+                    CreatedBy = w.CreatedBy
+                })
+                .ToListAsync();
 
             await MapModeratorsToWallsAsync(walls);
 
             return walls;
         }
 
-        public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId)
+        public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId, CancellationToken cancellationToken = default)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, WallsListFilter.None);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, WallsListFilter.None, cancellationToken: cancellationToken);
         }
 
-        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, WallsListFilter filter)
+        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, WallsListFilter filter, CancellationToken cancellationToken = default)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, filter);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, filter, cancellationToken: cancellationToken);
         }
 
         public async Task<PostDto> GetWallPostAsync(UserAndOrganizationDto userOrg, int postId)
@@ -247,18 +275,18 @@ namespace Shrooms.Domain.Services.Wall
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
             }
 
-            var moderators = await _moderatorsDbSet.Where(x => x.WallId == post.WallId).ToListAsync();
             var postInList = new List<Post> { post };
+            var moderatedWallIds = await GetModeratedWallIdsAsync(userOrg.UserId, postInList);
             var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, postInList);
             var users = await GetUsersAsync(postInList);
-            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts).ToList();
+            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderatedWallIds, watchedPosts).ToList();
 
             await AssignEventIdsAsync(posts, userOrg);
 
             return posts.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize)
+        public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             Expression<Func<Post, bool>> exp = post =>
                 (!post.IsHidden && post.MessageBody.Contains(searchString)) ||
@@ -267,7 +295,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All, includeJoinedEventWalls: true);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All, includeJoinedEventWalls: true, cancellationToken);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
@@ -691,55 +719,58 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter, bool includeJoinedEventWalls = false)
+        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter, bool includeJoinedEventWalls = false, CancellationToken cancellationToken = default)
         {
             if (filter == null)
             {
                 filter = post => true;
             }
 
-            List<int> wallsIds;
-            var includeEventWalls = false;
+            Expression<Func<Post, bool>> wallScope;
 
-            if (wallId.HasValue && WallIsValid(userOrg, wallId.Value))
+            if (wallId.HasValue)
             {
-                wallsIds = new List<int> { wallId.Value };
+                await EnsureWallExistsAsync(userOrg, wallId.Value, cancellationToken);
+                wallScope = post => post.WallId == wallId.Value;
             }
             else
             {
-                wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
                 // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
-                includeEventWalls = (wallsListFilter == WallsListFilter.Followed || includeJoinedEventWalls) &&
-                                    await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event);
+                var includeEventWalls = (wallsListFilter == WallsListFilter.Followed || includeJoinedEventWalls) &&
+                                        await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event, cancellationToken);
+                wallScope = BuildFeedScope(userOrg, wallsListFilter, includeEventWalls);
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
 
+            // The Id tiebreak keeps pages stable when posts share a LastActivity.
             var posts = await _postsDbSet
+                .AsNoTracking()
                 .Include(post => post.Wall)
-                .Include(post => post.Comments)
-                .Where(BuildWallScope(userOrg, wallsIds, includeEventWalls))
+                .Where(wallScope)
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
+                .ThenByDescending(x => x.Id)
                 .Skip(entriesCountToSkip)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            var postWallIds = posts.Select(post => post.WallId).Distinct().ToList();
-            var moderators = await _moderatorsDbSet.Where(x => postWallIds.Contains(x.WallId)).ToListAsync();
-            var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts);
-            var users = await GetUsersAsync(posts);
+            await LoadCommentsAsync(posts, cancellationToken);
 
-            var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts).ToList();
+            var moderatedWallIds = await GetModeratedWallIdsAsync(userOrg.UserId, posts, cancellationToken);
+            var watchedPosts = await RetrieveWatchedPostsAsync(userOrg.UserId, posts, cancellationToken);
+            var users = await GetUsersAsync(posts, cancellationToken);
 
-            await AssignEventIdsAsync(mappedPosts, userOrg);
+            var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderatedWallIds, watchedPosts).ToList();
+
+            await AssignEventIdsAsync(mappedPosts, userOrg, cancellationToken);
 
             return mappedPosts;
         }
 
         // Event walls have no wall page, so posts from them carry the event id to
         // link to instead.
-        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg)
+        private async Task AssignEventIdsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
             var eventPosts = posts.Where(post => post.WallType == WallType.Events).ToList();
 
@@ -756,7 +787,7 @@ namespace Shrooms.Domain.Services.Wall
                     .Where(@event => @event.OrganizationId == userOrg.OrganizationId &&
                                      eventWallIds.Contains(@event.WallId))
                     .Select(@event => new { @event.WallId, @event.Id, @event.EndDate })
-                    .ToListAsync())
+                    .ToListAsync(cancellationToken))
                 .GroupBy(x => x.WallId)
                 .ToDictionary(
                     group => group.Key,
@@ -771,21 +802,54 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        // Event walls are matched by predicate, not id: they must stay out of GetWallsListAsync, which feeds the sidebar.
-        private static Expression<Func<Post, bool>> BuildWallScope(UserAndOrganizationDto userOrg, List<int> wallsIds, bool includeEventWalls)
+        // Event walls are added here rather than in BuildWallsListScope: they must stay out of the sidebar.
+        private static Expression<Func<Post, bool>> BuildFeedScope(UserAndOrganizationDto userOrg, WallsListFilter filter, bool includeEventWalls)
         {
-            if (!includeEventWalls)
-            {
-                return post => wallsIds.Contains(post.WallId);
-            }
+            var wallsListScope = BuildWallsListScope(userOrg, filter);
 
-            return post => wallsIds.Contains(post.WallId) ||
-                           (post.Wall.Type == WallType.Events &&
-                            post.Wall.OrganizationId == userOrg.OrganizationId &&
-                            post.Wall.Members.Any(member => member.UserId == userOrg.UserId));
+            Expression<Func<Post, bool>> scope = includeEventWalls
+                ? post => wallsListScope.Invoke(post.Wall) ||
+                          (post.Wall.Type == WallType.Events &&
+                           post.Wall.OrganizationId == userOrg.OrganizationId &&
+                           post.Wall.Members.Any(member => member.UserId == userOrg.UserId))
+                : post => wallsListScope.Invoke(post.Wall);
+
+            return scope.Expand();
         }
 
-        private async Task<List<ApplicationUser>> GetUsersAsync(IReadOnlyCollection<Post> posts)
+        // Comments are read by the ids of the posts already on the page, in their own query so post columns
+        // don't repeat per comment. A split query would repeat the paged selection instead, and activity in
+        // between could move a different post onto the page and leave a selected one without its comments.
+        private async Task LoadCommentsAsync(List<Post> posts, CancellationToken cancellationToken)
+        {
+            var postIds = posts.Select(post => post.Id).ToList();
+
+            var commentsByPostId = (await _commentsDbSet
+                    .AsNoTracking()
+                    .Where(comment => postIds.Contains(comment.PostId))
+                    .OrderBy(comment => comment.Id)
+                    .ToListAsync(cancellationToken))
+                .ToLookup(comment => comment.PostId);
+
+            foreach (var post in posts)
+            {
+                post.Comments = commentsByPostId[post.Id].ToList();
+            }
+        }
+
+        private async Task<HashSet<int>> GetModeratedWallIdsAsync(string userId, IReadOnlyCollection<Post> posts, CancellationToken cancellationToken = default)
+        {
+            var postWallIds = posts.Select(post => post.WallId).Distinct().ToList();
+
+            var moderatedWallIds = await _moderatorsDbSet
+                .Where(moderator => moderator.UserId == userId && postWallIds.Contains(moderator.WallId))
+                .Select(moderator => moderator.WallId)
+                .ToListAsync(cancellationToken);
+
+            return new HashSet<int>(moderatedWallIds);
+        }
+
+        private async Task<Dictionary<string, UserDto>> GetUsersAsync(IReadOnlyCollection<Post> posts, CancellationToken cancellationToken = default)
         {
             var comments = posts.SelectMany(s => s.Comments).ToList();
 
@@ -803,10 +867,19 @@ namespace Shrooms.Domain.Services.Wall
                 .Distinct()
                 .ToList();
 
-            return await _usersDbSet.Where(user => userIds.Contains(user.Id)).ToListAsync();
+            return await _usersDbSet
+                .Where(user => userIds.Contains(user.Id))
+                .Select(user => new UserDto
+                {
+                    UserId = user.Id,
+                    FullName = user.FirstName + " " + user.LastName,
+                    PictureId = user.PictureId,
+                    UserName = user.UserName
+                })
+                .ToDictionaryAsync(user => user.UserId, cancellationToken);
         }
 
-        private IEnumerable<PostDto> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, List<ApplicationUser> users, List<WallModerator> moderators, HashSet<int> watchedPosts)
+        private IEnumerable<PostDto> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, Dictionary<string, UserDto> users, HashSet<int> moderatedWallIds, HashSet<int> watchedPosts)
         {
             foreach (var post in posts)
             {
@@ -822,7 +895,7 @@ namespace Shrooms.Domain.Services.Wall
                 postDto.Author = MapUserToDto(post.AuthorId, users);
                 postDto.Likes = MapLikesToDto(post.Likes, users);
                 postDto.IsLiked = post.IsLikedByUser(userId);
-                postDto.CanModerate = moderators.Any(x => x.UserId == userId && x.WallId == post.WallId) || post.CreatedBy == userId;
+                postDto.CanModerate = moderatedWallIds.Contains(post.WallId) || post.CreatedBy == userId;
                 postDto.SharedEventId = post.SharedEventId;
                 postDto.Comments = post.Comments.Select(c => new CommentDto
                 {
@@ -838,7 +911,7 @@ namespace Shrooms.Domain.Services.Wall
                         : c.Images,
                     Created = c.Created,
                     PostId = c.PostId,
-                    CanModerate = moderators.Any(x => x.UserId == userId && x.WallId == c.Post.WallId) || c.AuthorId == userId,
+                    CanModerate = moderatedWallIds.Contains(post.WallId) || c.AuthorId == userId,
                     IsEdited = c.LastEdit > c.Created,
                     LastEdit = c.LastEdit,
                     IsHidden = c.IsHidden
@@ -849,127 +922,67 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        private async Task<HashSet<int>> RetrieveWatchedPostsAsync(string userId, List<Post> posts)
+        private async Task<HashSet<int>> RetrieveWatchedPostsAsync(string userId, List<Post> posts, CancellationToken cancellationToken = default)
         {
             var postIds = posts.Select(s => s.Id).ToList();
-            var watchedList = await _postWatchers.Where(w => w.UserId == userId && postIds.Contains(w.PostId)).Select(s => s.PostId).ToListAsync();
+            var watchedList = await _postWatchers.Where(w => w.UserId == userId && postIds.Contains(w.PostId)).Select(s => s.PostId).ToListAsync(cancellationToken);
 
             return new HashSet<int>(watchedList);
         }
 
-        private UserDto MapUserToDto(string userId, IEnumerable<ApplicationUser> users)
+        private static UserDto MapUserToDto(string userId, Dictionary<string, UserDto> users)
         {
-            var user = users.FirstOrDefault(u => u.Id == userId);
-
-            return user == null ? new UserDto { FullName = BusinessLayerConstants.DeletedUserName } : _mapper.Map<UserDto>(user);
+            return userId != null && users.TryGetValue(userId, out var user)
+                ? user
+                : new UserDto { FullName = BusinessLayerConstants.DeletedUserName };
         }
 
-        private IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)
+        private static IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, Dictionary<string, UserDto> users)
         {
             return likes
-                .Select(like => new { User = users.FirstOrDefault(user => user.Id == like.UserId), Like = like })
-                .Select(likeWithUserData =>
+                .Where(like => like.UserId != null && users.ContainsKey(like.UserId))
+                .Select(like =>
                 {
-                    if (likeWithUserData.User == null)
-                    {
-                        return null;
-                    }
+                    var user = users[like.UserId];
 
                     return new LikeDto
                     {
-                        UserId = likeWithUserData.User.Id,
-                        FullName = likeWithUserData.User.FullName,
-                        PictureId = likeWithUserData.User.PictureId,
-                        Type = likeWithUserData.Like.Type
+                        UserId = user.UserId,
+                        FullName = user.FullName,
+                        PictureId = user.PictureId,
+                        Type = like.Type
                     };
                 })
-                .Where(like => like != null)
                 .ToList();
         }
 
-        private bool WallIsValid(UserAndOrganizationDto userOrg, int wallId)
+        private async Task EnsureWallExistsAsync(UserAndOrganizationDto userOrg, int wallId, CancellationToken cancellationToken)
         {
-            var wallExists = _wallsDbSet.Any(w => w.Id == wallId && w.OrganizationId == userOrg.OrganizationId);
+            var wallExists = await _wallsDbSet.AnyAsync(w => w.Id == wallId && w.OrganizationId == userOrg.OrganizationId, cancellationToken);
             if (!wallExists)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
             }
-
-            return true;
         }
 
-        private async Task<IList<WallDto>> GetAllOrNotFollowedWallsAsync(UserAndOrganizationDto userOrg, WallsListFilter filter)
+        // The walls a list filter covers. The aggregated feed reuses it so the feed and the sidebar always agree.
+        private static Expression<Func<MultiwallWall, bool>> BuildWallsListScope(UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
-            var wallFilters = new Dictionary<WallsListFilter, Expression<Func<MultiwallWall, bool>>>
+            Expression<Func<MultiwallWall, bool>> filterScope = filter switch
             {
-                { WallsListFilter.All, w => true },
-                { WallsListFilter.NotHiddenFromAllWalls, w => !w.IsHiddenFromAllWalls || w.Members.Any(m => m.UserId == userOrg.UserId) },
-                { WallsListFilter.NotFollowed, w => w.Members.All(m => m.UserId != userOrg.UserId) }
+                WallsListFilter.All => w => true,
+                WallsListFilter.Followed => w => w.Type == WallType.Main || w.Members.Any(m => m.UserId == userOrg.UserId),
+                WallsListFilter.NotHiddenFromAllWalls => w => !w.IsHiddenFromAllWalls || w.Members.Any(m => m.UserId == userOrg.UserId),
+                WallsListFilter.NotFollowed => w => w.Members.All(m => m.UserId != userOrg.UserId),
+                _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, "Unsupported walls list filter")
             };
 
-            var walls = await _wallsDbSet
-                .Include(w => w.Members)
-                .Where(w => w.OrganizationId == userOrg.OrganizationId)
-                .Where(wallFilters[filter])
-                .Where(w => w.Type == WallType.Main || w.Type == WallType.UserCreated)
-                .OrderBy(x => x.Type)
-                .ThenBy(w => w.Name.ToLower())
-                .Select(w => new WallDto
-                {
-                    Id = w.Id,
-                    Name = w.Name,
-                    Description = w.Description,
-                    // Don't simplify, since it's EF projection
-                    IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
-                    Type = w.Type,
-                    Logo = w.Logo,
-                    TotalMembers = w.Members.Count,
-                    PostsCount = w.Posts.Count,
-                    IsHiddenFromAllWalls = w.IsHiddenFromAllWalls,
-                    CreatedBy = w.CreatedBy
-                })
-                .ToListAsync();
+            Expression<Func<MultiwallWall, bool>> scope = w =>
+                w.OrganizationId == userOrg.OrganizationId &&
+                (w.Type == WallType.Main || w.Type == WallType.UserCreated) &&
+                filterScope.Invoke(w);
 
-            return walls;
-        }
-
-        private async Task<IList<WallDto>> GetUserFollowedWallsAsync(UserAndOrganizationDto userOrg)
-        {
-            var followedWalls = await _wallsDbSet
-                .Include(w => w.Members)
-                .Where(w => w.Type == WallType.Main || w.Type == WallType.UserCreated)
-                .Join(_wallUsersDbSet, wall => wall.Id, walluser => walluser.WallId, (wall, wallUser) => new
-                {
-                    Id = wall.Id,
-                    Name = wall.Name,
-                    Description = wall.Description,
-                    Type = wall.Type,
-                    IsFollowing = true,
-                    Logo = wall.Logo,
-                    TotalMembers = wall.Members.Count,
-                    PostsCount = wall.Posts.Count,
-                    IsHiddenFromAllWalls = wall.IsHiddenFromAllWalls,
-                    CreatedBy = wall.CreatedBy,
-                    UserId = wallUser.UserId
-                })
-                .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
-                .Select(x => new WallDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description,
-                    Type = x.Type,
-                    IsFollowing = true,
-                    Logo = x.Logo,
-                    TotalMembers = x.TotalMembers,
-                    PostsCount = x.PostsCount,
-                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls,
-                    CreatedBy = x.CreatedBy
-                })
-                .Distinct()
-                .ToListAsync();
-
-            return followedWalls;
+            return scope.Expand();
         }
     }
 }

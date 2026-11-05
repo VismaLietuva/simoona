@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -25,7 +26,9 @@ namespace Shrooms.Premium.Tests.ModelMappings
 
         /// <summary>
         /// Deterministic sample: each member gets a value derived from its name, so a value landing on the wrong member shows.
-        /// A salt gives another sample of the same type whose values differ, e.g. an existing destination to map onto.
+        /// A salt gives another sample of the same type, e.g. an existing destination to map onto, whose members differ from
+        /// the unsalted sample's and from their defaults: mapping onto it shows a member wrongly kept as well as one wrongly
+        /// reset. Bools cannot do both; they stay true, so a reset to false shows but a wrongly kept true does not.
         /// </summary>
         public static object Fill(Type type, string salt = "")
         {
@@ -224,7 +227,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                     .Union(right.Properties().Select(p => p.Name))
                     .SelectMany(name =>
                     {
-                        var memberPath = path.Length == 0 ? name : $"{path}.{name}";
+                        var memberPath = Child(path, name);
                         return left.ContainsKey(name) && right.ContainsKey(name)
                             ? DifferingPaths(left[name], right[name], memberPath)
                             : new List<string> { memberPath };
@@ -245,6 +248,18 @@ namespace Shrooms.Premium.Tests.ModelMappings
             return new List<string> { path.Length == 0 ? "(value)" : path };
         }
 
+        // JSONPath to a property, which Blank hands to SelectToken: "Floor.Name", or "Floor['display.name']" when the name is
+        // not a plain identifier, so SelectToken neither misreads it nor throws.
+        private static string Child(string path, string name)
+        {
+            if (Regex.IsMatch(name, "^[A-Za-z_][A-Za-z0-9_]*$"))
+            {
+                return path.Length == 0 ? name : $"{path}.{name}";
+            }
+
+            return $"{path}['{name.Replace("\\", "\\\\").Replace("'", "\\'")}']";
+        }
+
         private static bool HasCycle(object current, ISet<object> onPath, ISet<object> done)
         {
             if (current == null || current is string || current.GetType().IsValueType || done.Contains(current))
@@ -257,21 +272,13 @@ namespace Shrooms.Premium.Tests.ModelMappings
                 return true;
             }
 
-            var children = current is IEnumerable items
-                ? items.Cast<object>()
-                : current.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.GetIndexParameters().Length == 0 && p.GetMethod != null && !p.PropertyType.IsValueType && p.PropertyType != typeof(string))
-                    .Select(p =>
-                    {
-                        try
-                        {
-                            return p.GetValue(current);
-                        }
-                        catch (TargetInvocationException)
-                        {
-                            return null;
-                        }
-                    });
+            // Dictionary entries are KeyValuePair structs, which the walk skips, so a dictionary gives its keys and values.
+            var children = current switch
+            {
+                IDictionary dictionary => dictionary.Keys.Cast<object>().Concat(dictionary.Values.Cast<object>()),
+                IEnumerable items => items.Cast<object>(),
+                _ => Members(current)
+            };
 
             if (children.Any(child => HasCycle(child, onPath, done)))
             {
@@ -283,21 +290,44 @@ namespace Shrooms.Premium.Tests.ModelMappings
             return false;
         }
 
+        private static IEnumerable<object> Members(object current)
+        {
+            var type = current.GetType();
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetIndexParameters().Length == 0 && p.GetMethod != null && !p.PropertyType.IsValueType && p.PropertyType != typeof(string))
+                .Select(p =>
+                {
+                    try
+                    {
+                        return p.GetValue(current);
+                    }
+                    catch (TargetInvocationException)
+                    {
+                        return null;
+                    }
+                });
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .Where(f => !f.FieldType.IsValueType && f.FieldType != typeof(string))
+                .Select(f => f.GetValue(current));
+            return properties.Concat(fields);
+        }
+
         private static object Fill(Type type, int depth, string salt, string seed)
         {
-            seed = salt + seed;
             var underlying = Nullable.GetUnderlyingType(type) ?? type;
-            var number = Math.Abs(StableHash(seed) % 1000) + 1;
+            var number = Number(seed, salted: salt.Length > 0);
 
             if (underlying == typeof(string))
             {
-                return "s-" + seed;
+                return "s-" + salt + seed;
             }
 
             if (underlying.IsEnum)
             {
+                // Unsalted takes the second value, salted the last: neither is the first, usually the default.
                 var values = Enum.GetValues(underlying);
-                return values.Length > 1 ? values.GetValue(1) : values.Length == 1 ? values.GetValue(0) : Activator.CreateInstance(underlying);
+                var index = values.Length > 2 && salt.Length > 0 ? values.Length - 1 : Math.Min(1, values.Length - 1);
+                return index >= 0 ? values.GetValue(index) : Activator.CreateInstance(underlying);
             }
 
             if (underlying == typeof(bool))
@@ -440,6 +470,21 @@ namespace Shrooms.Premium.Tests.ModelMappings
             {
                 // A member whose setter validates or throws keeps its default; the samples only need most members filled.
             }
+        }
+
+        // 1..1000 from the member name. Salted, its last two digits (all a byte or a small int gets) differ from the unsalted
+        // number's and are never 00, so the salted value is neither the unsalted one nor 0.
+        private static int Number(string seed, bool salted)
+        {
+            var number = Math.Abs(StableHash(seed) % 1000) + 1;
+            if (!salted)
+            {
+                return number;
+            }
+
+            var lastTwo = number % 100;
+            var saltedLastTwo = (lastTwo + 37) % 100;
+            return number - lastTwo + (saltedLastTwo == 0 ? 38 : saltedLastTwo);
         }
 
         private static int StableHash(string value)

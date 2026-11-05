@@ -22,87 +22,88 @@ namespace Shrooms.Premium.Tests.ModelMappings
         // self-referencing maps whose cycle the generated sample cannot close. The check says when a map needs one.
         private static readonly Dictionary<(Type Source, Type Destination), Func<object>[]> HandWrittenSamples = new();
 
-        // Maps not translated yet whose Mapster convention result differs from AutoMapper's: the work left before PR 6
-        // switches over, which needs this list empty. A listed map that starts matching, or an unlisted one that stops
-        // (say a DTO changed), fails UntranslatedMaps_DifferOnlyWhereListed, so the list stays exact.
-        private static readonly string[] UntranslatedMaps =
+        // Maps not translated yet whose Mapster convention result differs from AutoMapper's, with the reason: the work left
+        // before PR 6 switches over, which needs this list empty. A listed map that starts matching, an unlisted one that
+        // starts differing, or a listed one that differs for another reason (say a DTO changed) fails
+        // UntranslatedMaps_DifferOnlyWhereListed, so the list stays exact.
+        private static readonly Dictionary<string, string> UntranslatedMaps = new()
         {
-            "AbstractClassifier → AbstractClassifierPostViewModel",
-            "AbstractClassifier → AbstractClassifierViewModel",
-            "AbstractClassifierAbstractViewModel → Language",
-            "AbstractClassifierPostViewModel → AbstractClassifier",
-            "AbstractClassifierViewModel → AbstractClassifier",
-            "ApplicationRole → RoleMiniViewModel",
-            "ApplicationRoleViewModel → ApplicationRole",
-            "ApplicationUser → AbstractViewModel",
-            "ApplicationUser → AdministrationUserDto",
-            "ApplicationUser → ApplicationUserDetailsViewModel",
-            "ApplicationUser → ApplicationUserViewModel",
-            "ApplicationUser → ChangeProfileInfoViewModel",
-            "ApplicationUser → ChangeProfileOfficeViewModel",
-            "ApplicationUser → OfficeUserDto",
-            "ApplicationUser → String",
-            "ApplicationUser → UserDto",
-            "ApplicationUserMinimalDto → ApplicationUser",
-            "ApplicationUserMinimalDto → String",
-            "ApplicationUserViewModel → ApplicationUser",
-            "ApplicationUserViewModel → String",
-            "Certificate → CertificatePostViewModel",
-            "CertificatePostViewModel → Certificate",
-            "CertificatePostViewModel → Int32",
-            "CertificateViewModel → Certificate",
-            "ChangeProfileInfoViewModel → ApplicationUser",
-            "ChangeProfileOfficeViewModel → ApplicationUser",
-            "Comment → CommentDto",
-            "CommentViewModel → Comment",
-            "CommitteePostDto → Committee",
-            "CommitteePostViewModel → Committee",
-            "CommitteeViewModel → Committee",
-            "CreateEventViewModel → CreateEventDto",
-            "CreateWallPostViewModel → NewPostDto",
-            "CreateWallViewModel → CreateWallDto",
-            "EditCommentViewModel → EditCommentDto",
-            "EditPostViewModel → EditPostDto",
-            "Event → Event",
-            "EventChangeOptionViewModel → EventChangeOptionsDto",
-            "EventDetailsDto → EventDetailsViewModel",
-            "EventEditDetailsDto → EventEditDetailsViewModel",
-            "EventJoinMultipleViewModel → EventJoinDto",
-            "EventJoinViewModel → EventJoinDto",
-            "EventListItemDto → EventListItemViewModel",
-            "EventQuestionStructureDto → EventQuestionViewModel",
-            "EventQuestionViewModel → EventQuestionStructureDto",
-            "EventReminderDetailsDto → EventReminderDetailsViewModel",
-            "Exam → Int32",
-            "ExamPostViewModel → Exam",
-            "ExamPostViewModel → Int32",
-            "Floor → FloorViewModel",
-            "Floor → MapFloorViewModel",
-            "FloorPostViewModel → Floor",
-            "ILazyPaged<BooksByOfficeDto> → LazyPaged<BooksByOfficeViewModel>",
-            "LotteryDetailsViewModel → LotteryDetailsDto",
-            "NewCommentViewModel → NewCommentDto",
-            "Notification → NotificationDto",
-            "NotificationDto → NotificationViewModel",
-            "Office → OfficeViewModel",
-            "OfficePostViewModel → Office",
-            "Post → PostDto",
-            "PostDto → EventPostViewModel",
-            "QualificationLevelPostViewModel → QualificationLevel",
-            "QualificationLevelViewModel → QualificationLevel",
-            "RoleMiniViewModel → ApplicationRole",
-            "Room → RoomPostViewModel",
-            "Room → RoomViewModel",
-            "RoomPostViewModel → Room",
-            "RoomTypePostViewModel → RoomType",
-            "RoomViewModel → Room",
-            "ServiceRequestCategoryViewModel → ServiceRequestCategoryDto",
-            "ShareEventViewModel → NewPostDto",
-            "UpdateAttendStatusViewModel → UpdateAttendStatusDto",
-            "UpdateEventViewModel → EditEventDto",
-            "UpdateWallViewModel → UpdateWallDto",
-            "UserKudosInformationDto → UserKudosInformationViewModel",
-            "WallPostViewModel → NotificationDto",
+            ["AbstractClassifier → AbstractClassifierPostViewModel"] = "no sample can be generated for the source; add a hand-written one.",
+            ["AbstractClassifier → AbstractClassifierViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["AbstractClassifierAbstractViewModel → Language"] = "Mapster throws InvalidOperationException on the generated sample.",
+            ["AbstractClassifierPostViewModel → AbstractClassifier"] = "AutoMapper throws ArgumentException on the generated sample; add a hand-written sample.",
+            ["AbstractClassifierViewModel → AbstractClassifier"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["ApplicationRole → RoleMiniViewModel"] = "differs from AutoMapper on the generated sample at Permissions.",
+            ["ApplicationRoleViewModel → ApplicationRole"] = "differs from AutoMapper on the generated sample at OrganizationId.",
+            ["ApplicationUser → AbstractViewModel"] = "AutoMapper throws FormatException on the generated sample; add a hand-written sample.",
+            ["ApplicationUser → AdministrationUserDto"] = "differs from AutoMapper on the generated sample at JobTitle, HasRoom.",
+            ["ApplicationUser → ApplicationUserDetailsViewModel"] = "differs from AutoMapper on the generated sample at JobTitle.",
+            ["ApplicationUser → ApplicationUserViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["ApplicationUser → ChangeProfileInfoViewModel"] = "differs from AutoMapper on the generated sample at JobTitle.",
+            ["ApplicationUser → ChangeProfileOfficeViewModel"] = "differs from AutoMapper on the generated sample mapped onto an existing destination at Room.Office.",
+            ["ApplicationUser → OfficeUserDto"] = "differs from AutoMapper on the generated sample at JobTitle.",
+            ["ApplicationUser → String"] = "differs from AutoMapper on the generated sample at (value).",
+            ["ApplicationUser → UserDto"] = "differs from AutoMapper on the generated sample at UserId.",
+            ["ApplicationUserMinimalDto → ApplicationUser"] = "Mapster throws InvalidCastException on the generated sample.",
+            ["ApplicationUserMinimalDto → String"] = "differs from AutoMapper on the generated sample at (value).",
+            ["ApplicationUserViewModel → ApplicationUser"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["ApplicationUserViewModel → String"] = "differs from AutoMapper on the generated sample at (value).",
+            ["Certificate → CertificatePostViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["CertificatePostViewModel → Certificate"] = "differs from AutoMapper on the generated sample at Exams.",
+            ["CertificatePostViewModel → Int32"] = "Mapster throws InvalidOperationException on the generated sample.",
+            ["CertificateViewModel → Certificate"] = "Mapster throws InvalidOperationException on the empty sample.",
+            ["ChangeProfileInfoViewModel → ApplicationUser"] = "differs from AutoMapper on the empty sample at Certificates.",
+            ["ChangeProfileOfficeViewModel → ApplicationUser"] = "differs from AutoMapper on the generated sample at RoomId, Room.",
+            ["Comment → CommentDto"] = "differs from AutoMapper on the generated sample at Likes, Author.",
+            ["CommentViewModel → Comment"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["CommitteePostDto → Committee"] = "Mapster throws InvalidCastException on the generated sample.",
+            ["CommitteePostViewModel → Committee"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["CommitteeViewModel → Committee"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["CreateEventViewModel → CreateEventDto"] = "differs from AutoMapper on the generated sample at Offices.",
+            ["CreateWallPostViewModel → NewPostDto"] = "differs from AutoMapper on the generated sample at Images[0].",
+            ["CreateWallViewModel → CreateWallDto"] = "differs from AutoMapper on the generated sample at ModeratorsIds.",
+            ["EditCommentViewModel → EditCommentDto"] = "differs from AutoMapper on the generated sample at Images[0].",
+            ["EditPostViewModel → EditPostDto"] = "differs from AutoMapper on the generated sample at Images[0].",
+            ["Event → Event"] = "differs from AutoMapper on the empty sample at EventParticipants.",
+            ["EventChangeOptionViewModel → EventChangeOptionsDto"] = "differs from AutoMapper on the generated sample at Answers.",
+            ["EventDetailsDto → EventDetailsViewModel"] = "differs from AutoMapper on the generated sample at OfficesName.",
+            ["EventEditDetailsDto → EventEditDetailsViewModel"] = "differs from AutoMapper on the empty sample at OfficeIds.",
+            ["EventJoinMultipleViewModel → EventJoinDto"] = "differs from AutoMapper on the generated sample at Answers.",
+            ["EventJoinViewModel → EventJoinDto"] = "differs from AutoMapper on the generated sample at Answers.",
+            ["EventListItemDto → EventListItemViewModel"] = "differs from AutoMapper on the empty sample at OfficeIds.",
+            ["EventQuestionStructureDto → EventQuestionViewModel"] = "differs from AutoMapper on the generated sample at ShowIf.",
+            ["EventQuestionViewModel → EventQuestionStructureDto"] = "differs from AutoMapper on the generated sample at ShowIfOptionId.",
+            ["EventReminderDetailsDto → EventReminderDetailsViewModel"] = "differs from AutoMapper on the generated sample at IsDisabled.",
+            ["Exam → Int32"] = "Mapster throws InvalidOperationException on the generated sample.",
+            ["ExamPostViewModel → Exam"] = "differs from AutoMapper on the generated sample at Id.",
+            ["ExamPostViewModel → Int32"] = "Mapster throws InvalidOperationException on the generated sample.",
+            ["Floor → FloorViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["Floor → MapFloorViewModel"] = "differs from AutoMapper on the generated sample at OrganizationName.",
+            ["FloorPostViewModel → Floor"] = "differs from AutoMapper on the empty sample mapped onto an existing destination at Id.",
+            ["ILazyPaged<BooksByOfficeDto> → LazyPaged<BooksByOfficeViewModel>"] = "no sample can be generated for the source; add a hand-written one.",
+            ["LotteryDetailsViewModel → LotteryDetailsDto"] = "differs from AutoMapper on the generated sample at Buyer.",
+            ["NewCommentViewModel → NewCommentDto"] = "differs from AutoMapper on the generated sample at Images[0].",
+            ["Notification → NotificationDto"] = "differs from AutoMapper on the generated sample at SourceIds.",
+            ["NotificationDto → NotificationViewModel"] = "differs from AutoMapper on the generated sample at StackedIds, Others.",
+            ["Office → OfficeViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["OfficePostViewModel → Office"] = "differs from AutoMapper on the generated sample at Id.",
+            ["Post → PostDto"] = "differs from AutoMapper on the generated sample at Author, Comments, Likes.",
+            ["PostDto → EventPostViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["QualificationLevelPostViewModel → QualificationLevel"] = "differs from AutoMapper on the empty sample mapped onto an existing destination at Id.",
+            ["QualificationLevelViewModel → QualificationLevel"] = "differs from AutoMapper on the generated sample at ApplicationUsers.",
+            ["RoleMiniViewModel → ApplicationRole"] = "differs from AutoMapper on the generated sample at OrganizationId, Permissions.",
+            ["Room → RoomPostViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["Room → RoomViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["RoomPostViewModel → Room"] = "differs from AutoMapper on the generated sample at Floor, RoomType, ApplicationUsers, Id.",
+            ["RoomTypePostViewModel → RoomType"] = "differs from AutoMapper on the generated sample at Id.",
+            ["RoomViewModel → Room"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
+            ["ServiceRequestCategoryViewModel → ServiceRequestCategoryDto"] = "differs from AutoMapper on the generated sample at IsNecessary.",
+            ["ShareEventViewModel → NewPostDto"] = "differs from AutoMapper on the generated sample at SharedEventId, MentionedUserIds.",
+            ["UpdateAttendStatusViewModel → UpdateAttendStatusDto"] = "differs from AutoMapper on the generated sample at ChosenOptions, Answers.",
+            ["UpdateEventViewModel → EditEventDto"] = "differs from AutoMapper on the generated sample at Offices.",
+            ["UpdateWallViewModel → UpdateWallDto"] = "differs from AutoMapper on the generated sample at ModeratorsIds.",
+            ["UserKudosInformationDto → UserKudosInformationViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
+            ["WallPostViewModel → NotificationDto"] = "differs from AutoMapper on the generated sample at Title, Description.",
         };
 
         private static readonly Dictionary<(Type Source, Type Destination), Func<object>[]> NoSamples = new();
@@ -126,17 +127,21 @@ namespace Shrooms.Premium.Tests.ModelMappings
         public void UntranslatedMaps_DifferOnlyWhereListed()
         {
             var differing = Production.Value.Untranslated;
-            var newlyDiffering = differing.Where(m => !UntranslatedMaps.Contains(m.Key)).Select(m => $"  {m.Key}: {m.Value}").ToList();
-            var nowMatching = UntranslatedMaps.Where(m => !differing.ContainsKey(m)).Select(m => $"  {m}").ToList();
+            var newlyDiffering = differing.Where(m => !UntranslatedMaps.ContainsKey(m.Key)).Select(m => $"  {m.Key}: {m.Value}").ToList();
+            var nowMatching = UntranslatedMaps.Keys.Where(m => !differing.ContainsKey(m)).Select(m => $"  {m}").ToList();
+            var reasonChanged = differing.Where(m => UntranslatedMaps.TryGetValue(m.Key, out var listed) && listed != m.Value)
+                .Select(m => $"  {m.Key}: was \"{UntranslatedMaps[m.Key]}\", now \"{m.Value}\"").ToList();
 
             var message = string.Join(Environment.NewLine, new[]
                 {
                     newlyDiffering.Count > 0 ? "Differ from AutoMapper but are not in UntranslatedMaps (translate them):" : null,
                     string.Join(Environment.NewLine, newlyDiffering),
                     nowMatching.Count > 0 ? "Match AutoMapper now (remove them from UntranslatedMaps):" : null,
-                    string.Join(Environment.NewLine, nowMatching)
+                    string.Join(Environment.NewLine, nowMatching),
+                    reasonChanged.Count > 0 ? "Differ for another reason than listed (translate them, or update the reason):" : null,
+                    string.Join(Environment.NewLine, reasonChanged)
                 }.Where(line => !string.IsNullOrEmpty(line)));
-            Assert.That(newlyDiffering.Count + nowMatching.Count, Is.Zero, message);
+            Assert.That(newlyDiffering.Count + nowMatching.Count + reasonChanged.Count, Is.Zero, message);
         }
 
         [Test]
@@ -189,6 +194,30 @@ namespace Shrooms.Premium.Tests.ModelMappings
             var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
 
             Assert.That(result.Failures, Has.One.Contains("AutoMapper has no map"));
+            Assert.That(result.Translated, Is.Zero);
+        }
+
+        [Test]
+        public void Check_CountsAMapCoveredByABaseTypeRuleAsTranslated()
+        {
+            // Mapster applies the Person rule to Manager too, so a wrong rule must fail Manager's map, not list it as untranslated.
+            var autoMapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Person, PersonDto>(MemberList.None).ForMember(d => d.FullName, o => o.MapFrom(s => s.FirstName + " " + s.LastName));
+                cfg.CreateMap<Manager, PersonDto>(MemberList.None).ForMember(d => d.FullName, o => o.MapFrom(s => s.FirstName + " " + s.LastName));
+            });
+            var faithful = MapsterSettings.Create();
+            faithful.NewConfig<Person, PersonDto>().Map(d => d.FullName, s => s.FirstName + " " + s.LastName);
+            var wrong = MapsterSettings.Create();
+            wrong.NewConfig<Person, PersonDto>().Map(d => d.FullName, s => s.FirstName);
+
+            var faithfulResult = MappingParity.Check(autoMapper, faithful, NoSamples);
+            var wrongResult = MappingParity.Check(autoMapper, wrong, NoSamples);
+
+            Assert.That(faithfulResult.Translated, Is.EqualTo(2));
+            Assert.That(faithfulResult.Failures, Is.Empty);
+            Assert.That(wrongResult.Failures, Has.One.StartsWith("Manager → PersonDto").And.Contains("at FullName"));
+            Assert.That(wrongResult.Untranslated, Is.Empty);
         }
 
         [Test]
@@ -231,6 +260,18 @@ namespace Shrooms.Premium.Tests.ModelMappings
         }
 
         [Test]
+        public void Check_SkipsMappingOntoADestinationItCannotBuild()
+        {
+            // Badge has no parameterless constructor, so there is no existing Badge to map onto: only new ones are compared.
+            var mapster = MapsterSettings.Create();
+            mapster.NewConfig<Person, Badge>().ConstructUsing(s => new Badge(s.Id));
+
+            var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
+
+            Assert.That(result.Failures, Is.Empty);
+        }
+
+        [Test]
         public void Check_ReportsASelfReferencingMapWithoutPreserveReference()
         {
             var mapster = MapsterSettings.Create();
@@ -239,6 +280,18 @@ namespace Shrooms.Premium.Tests.ModelMappings
             var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
 
             Assert.That(result.Failures, Has.One.Contains("PreserveReference(true)"));
+        }
+
+        [Test]
+        public void Check_ReadsPreserveReferenceFromAnyRuleThatApplies()
+        {
+            var mapster = MapsterSettings.Create();
+            mapster.NewConfig<Node, NodeDto>();
+            mapster.ForDestinationType<NodeDto>().PreserveReference(true);
+
+            var result = MappingParity.Check(AutoMapperConfig(), mapster, NoSamples);
+
+            Assert.That(result.Failures, Is.Empty);
         }
 
         [Test]
@@ -350,6 +403,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
                     .ForMember(d => d.Condition, o => o.MapFrom(s => s.ShowIf != null && s.ShowIf.Count > 0 ? s.ShowIf[0] : s.ShowIfOptionId));
                 cfg.CreateMap<RoomUpdate, Room>(MemberList.None)
                     .ForMember(d => d.Id, o => o.Ignore());
+                cfg.CreateMap<Person, Badge>(MemberList.None);
                 cfg.CreateMap<Node, NodeDto>(MemberList.None);
                 cfg.CreateMap<Shape, ShapeDto>(MemberList.None);
                 cfg.CreateMap<Reading, ReadingDto>(MemberList.None);
@@ -370,6 +424,20 @@ namespace Shrooms.Premium.Tests.ModelMappings
             public int Id { get; set; }
 
             public string FullName { get; set; }
+        }
+
+        public class Manager : Person
+        {
+        }
+
+        public class Badge
+        {
+            public Badge(int id)
+            {
+                Id = id;
+            }
+
+            public int Id { get; }
         }
 
         public class Employee
