@@ -85,6 +85,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
             var employees = new List<TimeReportEmployeeDto>();
             var projects = new List<TimeReportProjectDto>();
+            var absences = new List<TimeReportProjectDto>();
             foreach (var user in users)
             {
                 var isFormer = !active.Contains(user.Id);
@@ -111,6 +112,20 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
                 var worked = rows.Values.Where(row => row.Minutes > 0).ToList();
                 projects.AddRange(worked);
+                var approved = isFormer
+                    ? new List<TimeReportProjectDto>()
+                    : calendar.Days
+                        .Where(day => calendar.Absences.TryGetValue(day, out var absence) && absence.Status == VacationRequestStatus.Approved)
+                        .GroupBy(day => calendar.Absences[day].Type)
+                        .Select(group => new TimeReportProjectDto
+                        {
+                            EmployeeId = user.Id,
+                            AbsenceType = group.Key.ToString().ToLowerInvariant(),
+                            Minutes = group.Sum(calendar.ExpectedMinutes)
+                        })
+                        .Where(row => row.Minutes > 0)
+                        .ToList();
+                absences.AddRange(approved);
                 employees.Add(new TimeReportEmployeeDto
                 {
                     Id = user.Id,
@@ -120,8 +135,9 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     PictureId = user.PictureId,
                     ManagerName = TimeTableService.FullName(user.ManagerFirstName, user.ManagerLastName),
                     Status = TimeTableService.Wire(status),
-                    LoggedMinutes = worked.Sum(row => row.Minutes) + (isFormer ? 0 : calendar.Days.Sum(calendar.AbsenceMinutes)),
+                    LoggedMinutes = worked.Sum(row => row.Minutes) + approved.Sum(row => row.Minutes),
                     ExpectedMinutes = isFormer ? null : calendar.Days.Sum(calendar.ExpectedMinutes),
+                    AbsenceMinutes = isFormer ? null : approved.Sum(row => row.Minutes),
                     IsFormer = isFormer
                 });
             }
@@ -138,6 +154,9 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     .ThenBy(row => row.ProjectName, StringComparer.CurrentCultureIgnoreCase)
                     .ThenBy(row => row.TaskName, StringComparer.CurrentCultureIgnoreCase)
                     .ThenBy(row => names[row.EmployeeId], StringComparer.CurrentCultureIgnoreCase)
+                    .Concat(absences
+                        .OrderBy(row => row.AbsenceType, StringComparer.Ordinal)
+                        .ThenBy(row => names[row.EmployeeId], StringComparer.CurrentCultureIgnoreCase))
                     .ToList()
             };
         }

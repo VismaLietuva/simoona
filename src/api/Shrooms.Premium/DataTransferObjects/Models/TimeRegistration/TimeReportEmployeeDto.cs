@@ -10,6 +10,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.TimeRegistration
 
         public int? ExpectedMinutes { get; set; }
 
+        public int? AbsenceMinutes { get; set; }
+
         public bool IsFormer { get; set; }
     }
 }
