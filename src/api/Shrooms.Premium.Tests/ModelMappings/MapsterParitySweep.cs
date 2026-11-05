@@ -10,9 +10,8 @@ using AutoMapper.Internal;
 using Mapster;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Shrooms.Premium.Presentation.ModelMappings.Profiles;
+using Shrooms.Presentation.ModelMappings;
 using Shrooms.Presentation.ModelMappings.MapsterSetup;
-using Shrooms.Presentation.ModelMappings.Profiles;
 
 namespace Shrooms.Premium.Tests.ModelMappings
 {
@@ -30,7 +29,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
         [Test]
         public void Sweep()
         {
-            var autoMapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(typeof(Other).Assembly, typeof(EventsProfile).Assembly));
+            var autoMapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(MappingAssemblies.Names));
             var autoMapper = autoMapperConfig.CreateMapper();
             var typeMaps = autoMapperConfig.Internal().GetAllTypeMaps()
                 .OrderBy(m => m.Profile.Name).ThenBy(m => m.SourceType.Name).ThenBy(m => m.DestinationType.Name)
