@@ -18,7 +18,7 @@ namespace Shrooms.Domain.Services.Wall
 
         Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg);
+        Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default);
 
         Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDto userOrg);
 
@@ -32,15 +32,15 @@ namespace Shrooms.Domain.Services.Wall
 
         Task<IEnumerable<string>> GetWallMembersIdsAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId);
+        Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userAndOrg, int pageNumber, int pageSize);
+        Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userAndOrg, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userAndOrg);
 
         Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userId);
 
-        Task<IEnumerable<PostDto>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDto userAndOrg, WallsListFilter filter);
+        Task<IEnumerable<PostDto>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDto userAndOrg, WallsListFilter filter, CancellationToken cancellationToken = default);
 
         Task AddMemberToWallsAsync(string userId, List<int> wallIds);
 

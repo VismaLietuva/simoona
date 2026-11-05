@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Emoji;
 using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Common.Filters;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using SixLabors.ImageSharp;
@@ -188,7 +190,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public async Task Delete_WhenNotOwnerAndNotAdmin_ReturnsForbidden()
+        public async Task Delete_WhenNotAdmin_ReturnsForbidden()
         {
             _customEmojiService
                 .DeleteAsync(1, Arg.Any<UserAndOrganizationDto>())
@@ -197,6 +199,16 @@ namespace Shrooms.Tests.Controllers.WebApi
             var result = await _emojiController.Delete(1);
 
             Assert.That(result.GetStatusCode(), Is.EqualTo(HttpStatusCode.Forbidden));
+        }
+
+        [Test]
+        public void Delete_Should_Require_The_Administration_Permission()
+        {
+            var delete = typeof(EmojiController).GetMethod(nameof(EmojiController.Delete));
+            var attribute = delete.GetCustomAttribute<PermissionAuthorizeAttribute>();
+
+            Assert.That(attribute, Is.Not.Null);
+            Assert.That(attribute.Permission, Is.EqualTo(AdministrationPermissions.CustomEmoji));
         }
     }
 }
