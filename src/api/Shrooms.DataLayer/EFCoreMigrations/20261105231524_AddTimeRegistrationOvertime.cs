@@ -6,11 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Shrooms.DataLayer.EFCoreMigrations
 {
     /// <inheritdoc />
-    public partial class AddTimeOvertimeRequests : Migration
+    public partial class AddTimeRegistrationOvertime : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<bool>(
+                name: "IsOvertime",
+                table: "TimeTasks",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
+
+            migrationBuilder.AddColumn<bool>(
+                name: "OvertimeAppNotifications",
+                table: "NotificationsSettings",
+                type: "bit",
+                nullable: false,
+                defaultValue: true);
+
             migrationBuilder.CreateTable(
                 name: "TimeOvertimeRequests",
                 columns: table => new
@@ -94,6 +108,14 @@ namespace Shrooms.DataLayer.EFCoreMigrations
         {
             migrationBuilder.DropTable(
                 name: "TimeOvertimeRequests");
+
+            migrationBuilder.DropColumn(
+                name: "IsOvertime",
+                table: "TimeTasks");
+
+            migrationBuilder.DropColumn(
+                name: "OvertimeAppNotifications",
+                table: "NotificationsSettings");
         }
     }
 }

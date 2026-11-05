@@ -12,8 +12,8 @@ using Shrooms.DataLayer.DAL;
 namespace Shrooms.DataLayer.EFCoreMigrations
 {
     [DbContext(typeof(ShroomsDbContext))]
-    [Migration("20261105225704_AddOvertimeNotificationSetting")]
-    partial class AddOvertimeNotificationSetting
+    [Migration("20261105231524_AddTimeRegistrationOvertime")]
+    partial class AddTimeRegistrationOvertime
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
