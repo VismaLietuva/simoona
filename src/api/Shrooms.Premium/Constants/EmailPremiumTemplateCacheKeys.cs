@@ -7,6 +7,9 @@ namespace Shrooms.Premium.Constants
         public const string VacationWithdrawn = "/EmailTemplates/Vacations/VacationWithdrawn.cshtml";
         public const string VacationDecided = "/EmailTemplates/Vacations/VacationDecided.cshtml";
         public const string VacationDecidedByAdmin = "/EmailTemplates/Vacations/VacationDecidedByAdmin.cshtml";
+        public const string OvertimeRequested = "/EmailTemplates/TimeRegistration/OvertimeRequested.cshtml";
+        public const string OvertimeOrdered = "/EmailTemplates/TimeRegistration/OvertimeOrdered.cshtml";
+        public const string OvertimeDecided = "/EmailTemplates/TimeRegistration/OvertimeDecided.cshtml";
         public const string BookRemind = "/EmailTemplates/Books/BookRemind.cshtml";
         public const string BookReport = "/EmailTemplates/Books/BookReport.cshtml";
         public const string BookTaken = "/EmailTemplates/Books/BookTaken.cshtml";

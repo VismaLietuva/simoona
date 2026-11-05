@@ -23,5 +23,9 @@ namespace Shrooms.Premium.DataTransferObjects.Models.TimeRegistration
         public int? AutoFillProjectId { get; set; }
 
         public IEnumerable<TimeProjectOptionDto> AvailableProjects { get; set; }
+
+        public int OvertimeBeforeMinutes { get; set; }
+
+        public IEnumerable<TimeDayMinutesDto> PriorDays { get; set; }
     }
 }

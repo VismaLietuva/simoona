@@ -30,6 +30,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
 
         public bool VacationsAppNotifications;
 
+        public bool OvertimeAppNotifications;
+
         public IEnumerable<WallNotificationsViewModel> Walls;
     }
 }

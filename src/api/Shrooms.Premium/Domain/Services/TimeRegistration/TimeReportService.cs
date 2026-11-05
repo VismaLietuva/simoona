@@ -139,6 +139,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     LoggedMinutes = worked.Sum(row => row.Minutes) + approved.Sum(row => row.Minutes),
                     ExpectedMinutes = isFormer ? null : calendar.Days.Sum(calendar.ExpectedMinutes),
                     AbsenceMinutes = isFormer ? null : approved.Sum(row => row.Minutes),
+                    OvertimeMinutes = entries[user.Id].Where(entry => entry.IsOvertime).Sum(entry => entry.Minutes),
                     IsFormer = isFormer
                 });
             }

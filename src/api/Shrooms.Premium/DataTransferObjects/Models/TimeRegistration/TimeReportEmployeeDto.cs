@@ -12,6 +12,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.TimeRegistration
 
         public int? AbsenceMinutes { get; set; }
 
+        public int OvertimeMinutes { get; set; }
+
         public bool IsFormer { get; set; }
     }
 }
