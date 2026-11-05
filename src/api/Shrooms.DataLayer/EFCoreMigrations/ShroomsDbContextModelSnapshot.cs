@@ -4377,6 +4377,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsOvertime")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 

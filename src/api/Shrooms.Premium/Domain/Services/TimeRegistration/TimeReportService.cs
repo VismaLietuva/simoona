@@ -51,7 +51,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                         Minutes = entry.Minutes,
                         CustomerName = entry.Project.Customer.Name,
                         ProjectName = entry.Project.Name,
-                        TaskName = entry.Task.Name
+                        TaskName = entry.Task.Name,
+                        IsOvertime = entry.Task.IsOvertime
                     })
                     .ToListAsync())
                 .ToLookup(entry => entry.UserId, StringComparer.OrdinalIgnoreCase);
@@ -102,7 +103,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     var byDay = entries[user.Id].ToLookup(entry => entry.Date.Date);
                     var filled = calendar.Days.Sum(day => calendar.AutoFillMinutes(
                         day,
-                        byDay[day].Sum(entry => entry.Minutes),
+                        byDay[day].Where(entry => !entry.IsOvertime).Sum(entry => entry.Minutes),
                         byDay[day].Any(entry => entry.TaskId == autoFill.TaskId)));
                     if (filled > 0)
                     {
@@ -202,6 +203,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             public string ProjectName { get; set; }
 
             public string TaskName { get; set; }
+
+            public bool IsOvertime { get; set; }
         }
     }
 }

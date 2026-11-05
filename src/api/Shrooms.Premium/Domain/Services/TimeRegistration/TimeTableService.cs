@@ -61,7 +61,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     Tasks = project.Tasks
                         .Where(task => !task.IsDeleted)
                         .OrderBy(task => task.Id)
-                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault })
+                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault, IsOvertime = task.IsOvertime })
                 })
                 .ToListAsync();
 
