@@ -182,6 +182,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<NotificationUser> NotificationUsers { get; set; }
 
+        public virtual DbSet<UserSettings> UserSettings { get; set; }
+
         public virtual DbSet<PostWatcher> PostWatchers { get; set; }
 
         public virtual DbSet<CustomEmoji> CustomEmojis { get; set; }
@@ -282,6 +284,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new KudosBasketEntityConfig());
             modelBuilder.ApplyConfiguration(new KudosLogEntityConfig());
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserSettingsEntityConfig());
             // Identity configurations are handled by ASP.NET Core Identity
             // modelBuilder.ApplyConfiguration(new IdentityUserRoleEntityConfig());
             // modelBuilder.ApplyConfiguration(new IdentityUserLoginEntityConfig());

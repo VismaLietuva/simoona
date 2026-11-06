@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
 using Shrooms.Presentation.Api.Filters;
@@ -586,7 +587,9 @@ namespace Shrooms.Presentation.Api.Controllers
             var organizationId = User.Identity.GetOrganizationId();
             var claimsIdentity = User.Identity as ClaimsIdentity;
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.Users
+                .Include(u => u.Settings)
+                .FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 throw new InvalidOperationException($"Authenticated user '{userId}' not found in the database. The token may be stale.");
@@ -605,8 +608,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 FullName = User.FindFirstValue(ClaimTypes.GivenName),
                 Permissions = permissions,
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
-                CultureCode = user?.CultureCode,
-                TimeZone = user?.TimeZone,
+                CultureCode = user.Settings?.CultureCode,
+                TimeZone = user.Settings?.TimeZone,
                 PictureId = user?.PictureId
             };
 

@@ -44,7 +44,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
                 .Select(user => new LotteryStartedEmailUserInfoDto
                 {
                     Email = user.Email,
-                    TimeZoneKey = user.TimeZone
+                    TimeZoneKey = user.Settings.TimeZone
                 })
                 .ToListAsync();
             var organization = await _organizationService.GetOrganizationByIdAsync(organizationId);

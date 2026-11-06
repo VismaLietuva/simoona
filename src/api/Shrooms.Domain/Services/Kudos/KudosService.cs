@@ -212,12 +212,10 @@ namespace Shrooms.Domain.Services.Kudos
                 .Take(BusinessLayerConstants.MaxKudosLogsPerPage)
                 .ToListAsync();
 
-            var user = await _usersDbSet.FindAsync(options.UserId);
+            var culture = await GetUserCultureAsync(options.UserId);
 
-            if (user != null)
+            if (culture != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
-
                 foreach (var kudosLog in kudosLogs)
                 {
                     if (IsTranslatableKudosType(kudosLog.Type.Type))
@@ -309,12 +307,10 @@ namespace Shrooms.Domain.Services.Kudos
                 }
             }
 
-            var user = await _usersDbSet.FindAsync(userId);
+            var culture = await GetUserCultureAsync(userId);
 
-            if (user != null)
+            if (culture != null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
-
                 foreach (var userLog in userLogs)
                 {
                     if (IsTranslatableKudosType(userLog.Type.Type))
@@ -445,7 +441,10 @@ namespace Shrooms.Domain.Services.Kudos
         {
             await ValidateUserAsync(organizationId, userId);
 
-            var user = await _usersDbSet.FindAsync(userId);
+            var user = await _usersDbSet
+                .Where(u => u.Id == userId)
+                .Select(u => new { u.EmploymentDate, u.Settings.CultureCode })
+                .FirstOrDefaultAsync();
             var employmentDate = user?.EmploymentDate;
 
             var kudosLogs = await _kudosLogsDbSet
@@ -481,14 +480,12 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var kudosTypes = (await _kudosTypesDbSet.ToListAsync()).Select(MapKudosTypesToDto).ToList();
 
-            var user = await _usersDbSet.FindAsync(userAndOrg.UserId);
+            var culture = await GetUserCultureAsync(userAndOrg.UserId);
 
-            if (user == null)
+            if (culture == null)
             {
                 return kudosTypes;
             }
-
-            var culture = CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
 
             foreach (var kudosType in kudosTypes)
             {
@@ -502,6 +499,17 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             return kudosTypes;
+        }
+
+        // Null when the user does not exist, so callers leave names untranslated.
+        private async Task<CultureInfo> GetUserCultureAsync(string userId)
+        {
+            var user = await _usersDbSet
+                .Where(u => u.Id == userId)
+                .Select(u => new { u.Settings.CultureCode })
+                .FirstOrDefaultAsync();
+
+            return user == null ? null : CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
         }
 
         public async Task<int> GetKudosTypeIdAsync(string kudosTypeName)

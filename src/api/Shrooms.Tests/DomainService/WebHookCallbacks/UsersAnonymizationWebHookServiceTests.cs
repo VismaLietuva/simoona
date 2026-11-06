@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -78,6 +78,23 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             // Assert
             Assert.That(_usersDbSet.Any(user => !user.IsAnonymized), Is.False);
+        }
+
+        [Test]
+        public async Task Should_Clear_Ui_Preferences_But_Keep_Culture_And_Time_Zone()
+        {
+            var organization = _mockDbContext.Organizations.First();
+            var settings = new UserSettings { CultureCode = "lt-LT", TimeZone = "FLE Standard Time", Preferences = "{\"sidebarFavorites\":[\"wall-7\"]}" };
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+            {
+                new() { Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), Settings = settings }
+            });
+
+            await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
+
+            Assert.That(settings.Preferences, Is.Null);
+            Assert.That(settings.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(settings.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         [Test]

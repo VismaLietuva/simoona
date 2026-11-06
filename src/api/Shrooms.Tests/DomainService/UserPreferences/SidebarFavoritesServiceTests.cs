@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -28,11 +28,11 @@ namespace Shrooms.Tests.DomainService.UserPreferences
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
-            _user = new ApplicationUser { Id = UserId, OrganizationId = OrganizationId };
+            _user = new ApplicationUser { Id = UserId, OrganizationId = OrganizationId, Settings = new UserSettings() };
             _uow.MockDbSetForAsync(new List<ApplicationUser>
             {
                 _user,
-                new ApplicationUser { Id = "someone-else", OrganizationId = OrganizationId, WallWidgetPreferences = "{\"sidebarFavorites\":[\"kudos\"]}" }
+                new ApplicationUser { Id = "someone-else", OrganizationId = OrganizationId, Settings = new UserSettings { Preferences = "{\"sidebarFavorites\":[\"kudos\"]}" } }
             });
 
             _sut = new SidebarFavoritesService(_uow);
@@ -48,7 +48,7 @@ namespace Shrooms.Tests.DomainService.UserPreferences
         [Test]
         public async Task GetAsync_LegacyWidgetArrayStored_ReturnsNull()
         {
-            _user.WallWidgetPreferences = "[{\"id\":\"polls\",\"visible\":true}]";
+            _user.Settings.Preferences = "[{\"id\":\"polls\",\"visible\":true}]";
 
             Assert.That(await _sut.GetAsync(UserOrg()), Is.Null);
         }
@@ -56,13 +56,23 @@ namespace Shrooms.Tests.DomainService.UserPreferences
         [Test]
         public async Task SaveAsync_KeepsTheWidgetLayout()
         {
-            _user.WallWidgetPreferences = "[{\"id\":\"polls\",\"visible\":true}]";
+            _user.Settings.Preferences = "[{\"id\":\"polls\",\"visible\":true}]";
 
             await _sut.SaveAsync("[\"events\",\"kudos\"]", UserOrg());
 
             Assert.That(await _sut.GetAsync(UserOrg()), Is.EqualTo("[\"events\",\"kudos\"]"));
             Assert.That(await _widgets.GetAsync(UserOrg()), Is.EqualTo("[{\"id\":\"polls\",\"visible\":true}]"));
             await _uow.Received(1).SaveChangesAsync(UserId);
+        }
+
+        [Test]
+        public async Task SaveAsync_UserWithoutSettingsRow_CreatesIt()
+        {
+            _user.Settings = null;
+
+            await _sut.SaveAsync("[\"events\"]", UserOrg());
+
+            Assert.That(_user.Settings.Preferences, Is.EqualTo("{\"sidebarFavorites\":[\"events\"]}"));
         }
 
         [Test]
@@ -86,7 +96,7 @@ namespace Shrooms.Tests.DomainService.UserPreferences
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _sut.SaveAsync(favorites, UserOrg()));
 
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.SidebarFavoritesInvalid));
-            Assert.That(_user.WallWidgetPreferences, Is.Null);
+            Assert.That(_user.Settings.Preferences, Is.Null);
         }
 
         [Test]

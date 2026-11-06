@@ -4406,6 +4406,46 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("TimeTasks", (string)null);
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.UserSettings", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CultureCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<TimeSpan?>("DailyMailingHour")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsTutorialComplete")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Preferences")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TimeZone")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserSettings", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VacationPage", b =>
                 {
                     b.Property<int>("Id")
@@ -6701,6 +6741,17 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.UserSettings", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithOne("Settings")
+                        .HasForeignKey("Shrooms.DataLayer.EntityModels.Models.UserSettings", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VacationPage", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
@@ -6914,6 +6965,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .IsRequired();
 
                     b.Navigation("OwnedProjects");
+
+                    b.Navigation("Settings")
+                        .IsRequired();
 
                     b.Navigation("WallUsers");
 
