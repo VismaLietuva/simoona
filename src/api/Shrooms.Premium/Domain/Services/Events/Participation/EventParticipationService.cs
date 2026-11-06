@@ -825,10 +825,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             // Declining does not clear a participant's picks (ValidateAnswersForStatusChange returns
             // null for any non-going status, which means "leave the selection alone"), so without
-            // this the sheet caters for people who dropped out. Only they are excluded: someone
-            // still deciding belongs on the roster, and over-ordering for them beats missing them.
+            // this the sheet caters for people who dropped out. Waitlisted people have no seat yet,
+            // so they stay off the sheet too. Only these are excluded: someone still deciding
+            // belongs on the roster, and over-ordering for them beats missing them.
             return e => e.EventParticipants
-                .Where(p => p.AttendStatus != (int)AttendingStatus.NotAttending)
+                .Where(p => p.AttendStatus != (int)AttendingStatus.NotAttending
+                            && p.AttendStatus != (int)AttendingStatus.Waitlisted)
                 .Select(p => new EventParticipantDto
                 {
                     FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)

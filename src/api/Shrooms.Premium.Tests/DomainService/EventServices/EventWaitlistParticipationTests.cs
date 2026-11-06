@@ -308,6 +308,18 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public async Task Should_Not_Promote_Exactly_At_The_Cutoff()
+        {
+            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours));
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
         public async Task Should_Promote_Just_Before_The_Cutoff()
         {
             _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(-1));
@@ -471,6 +483,20 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
         }
 
+        [Test]
+        public async Task Should_Leave_Waitlisted_People_Off_The_Roster()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("queued", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            SetNames("going", "Going", "Person");
+            SetNames("queued", "Queued", "Person");
+
+            var roster = (await _sut.GetEventParticipantsAsync(eventGuid, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 })).ToList();
+
+            Assert.That(roster.Select(p => p.FirstName), Is.EqualTo(new[] { "Going" }));
+        }
+
         private static UpdateAttendStatusDto UpdateDto(Guid eventId, AttendingStatus status)
         {
             return new UpdateAttendStatusDto
@@ -606,6 +632,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private DateTime? WaitlistedAtOf(string userId) =>
             _participants.Single(p => p.ApplicationUserId == userId).WaitlistedAt;
 
+        private void SetNames(string userId, string firstName, string lastName)
+        {
+            var user = _participants.Single(p => p.ApplicationUserId == userId).ApplicationUser;
+            user.FirstName = firstName;
+            user.LastName = lastName;
+        }
+
         private void RemoveParticipant(string userId) =>
             _eventParticipantsDbSet.Remove(_participants.Single(p => p.ApplicationUserId == userId));
 
@@ -645,6 +678,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Event = @event,
                 EventId = @event.Id,
                 ApplicationUserId = userId,
+                ApplicationUser = new ApplicationUser { Id = userId },
                 AttendStatus = (int)status,
                 WaitlistedAt = waitlistedAt,
                 EventOptions = new List<EventOption>()

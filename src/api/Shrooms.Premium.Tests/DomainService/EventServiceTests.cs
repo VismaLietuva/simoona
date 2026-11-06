@@ -272,6 +272,114 @@ namespace Shrooms.Premium.Tests.DomainService
                 "only the caller's own picks used to be rewritten, so every other option leaked its participants");
         }
 
+        [TestCase("first", 1)]
+        [TestCase("tieA", 2)]
+        [TestCase("tieB", 3)]
+        [TestCase("second", 4)]
+        public async Task Should_Position_A_Queued_Viewer_By_Waitlisted_Time_Then_Id_In_Details(string viewerId, int expectedPosition)
+        {
+            var eventId = MockEventDetailsWithWaitlist(canSeeParticipants: true);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = viewerId };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.WaitlistPosition, Is.EqualTo(expectedPosition));
+        }
+
+        [TestCase("going")]
+        [TestCase("maybe")]
+        [TestCase("stranger")]
+        public async Task Should_Not_Position_A_Viewer_Who_Is_Not_Queued_In_Details(string viewerId)
+        {
+            var eventId = MockEventDetailsWithWaitlist(canSeeParticipants: true);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = viewerId };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.WaitlistPosition, Is.Null);
+        }
+
+        [Test]
+        public async Task Should_Count_Only_Waitlisted_People_As_The_Waitlist_In_Details()
+        {
+            var eventId = MockEventDetailsWithWaitlist(canSeeParticipants: true);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "going" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.WaitlistCount, Is.EqualTo(4));
+            Assert.That(result.GoingCount, Is.EqualTo(1));
+            Assert.That(result.MaybeGoingCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Waitlist_Count_And_Position_For_A_Viewer_Who_Cannot_See_Participants()
+        {
+            var eventId = MockEventDetailsWithWaitlist(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "tieB" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.Participants.Select(p => p.UserId), Is.EqualTo(new[] { "tieB" }));
+            Assert.That(result.WaitlistCount, Is.EqualTo(4));
+            Assert.That(result.WaitlistPosition, Is.EqualTo(3));
+        }
+
+        private Guid MockEventDetailsWithWaitlist(bool canSeeParticipants)
+        {
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.EventUsers)
+                .Returns(canSeeParticipants);
+
+            var eventId = Guid.NewGuid();
+            var responsibleUser = new ApplicationUser { Id = "responsibleUser1", FirstName = "user1f", LastName = "user1l" };
+
+            EventParticipant Participant(int id, string userId, AttendingStatus status, DateTime? waitlistedAt) => new EventParticipant
+            {
+                Id = id,
+                EventId = eventId,
+                ApplicationUserId = userId,
+                ApplicationUser = new ApplicationUser { Id = userId, FirstName = userId, LastName = "User" },
+                AttendStatus = (int)status,
+                AttendComment = string.Empty,
+                WaitlistedAt = waitlistedAt,
+                EventOptions = new List<EventOption>()
+            };
+
+            // Listed out of queue order; the queue is first (id 3), tieA (6), tieB (7), second (5).
+            var participants = new List<EventParticipant>
+            {
+                Participant(5, "second", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")),
+                Participant(7, "tieB", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                Participant(10, "going", AttendingStatus.Attending, null),
+                Participant(6, "tieA", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                Participant(11, "maybe", AttendingStatus.MaybeAttending, null),
+                Participant(3, "first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-19"))
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = eventId,
+                    OrganizationId = 2,
+                    Offices = "[\"1\"]",
+                    MaxChoices = 0,
+                    HasWaitlist = true,
+                    ResponsibleUser = responsibleUser,
+                    ResponsibleUserId = responsibleUser.Id,
+                    EventOptions = new List<EventOption>(),
+                    EventQuestions = new List<EventQuestion>(),
+                    EventParticipants = participants
+                }
+            };
+
+            _officeDbSet.SetDbSetDataForAsync(new List<Office> { new Office { Id = 1, Name = "Office", OrganizationId = 2 } });
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+
+            return eventId;
+        }
+
         private Guid MockEventDetailsWithAnsweredQuestion(bool canSeeParticipants)
         {
             _permissionService
