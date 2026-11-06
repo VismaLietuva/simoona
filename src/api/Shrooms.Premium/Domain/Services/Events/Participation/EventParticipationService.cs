@@ -91,23 +91,49 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _semaphoreSlim.WaitAsync();
             try
             {
-                var eventDto = await GetJoinableEventAsync(joinDto);
-                await ValidateJoinAddPermissionsAsync(joinDto, eventDto, addedByColleague);
+                await _eventSeatLock.RunAsync(joinDto.EventId, async () =>
+                {
+                    var eventDto = await GetJoinableEventAsync(joinDto);
+                    await ValidateJoinAddPermissionsAsync(joinDto, eventDto, addedByColleague);
 
-                eventDto.SelectedOptions = GetSelectedOptions(eventDto, joinDto);
-                ValidateEventBeforeJoin(joinDto, eventDto);
+                    eventDto.SelectedOptions = GetSelectedOptions(eventDto, joinDto);
 
-                var users = await GetUsersFromParticipantIdsAsync(joinDto.ParticipantIds);
-                var firstTimeParticipants = await AddAllFirstTimeParticipantsAsync(users, joinDto, eventDto);
-                await AddAllChangeStatusParticipantsAsync(joinDto, eventDto);
-                await _uow.SaveChangesAsync(false);
+                    var waitlisting = ShouldJoinWaitlist(joinDto, eventDto, addedByColleague);
+                    ValidateEventBeforeJoin(joinDto, eventDto, waitlisting);
 
-                NotifyJoinedUsers(joinDto, eventDto, firstTimeParticipants);
+                    if (waitlisting)
+                    {
+                        joinDto.AttendStatus = AttendingStatus.Waitlisted;
+                    }
+
+                    var users = await GetUsersFromParticipantIdsAsync(joinDto.ParticipantIds);
+                    var firstTimeParticipants = await AddAllFirstTimeParticipantsAsync(users, joinDto, eventDto);
+                    await AddAllChangeStatusParticipantsAsync(joinDto, eventDto);
+                    await _uow.SaveChangesAsync(false);
+
+                    if (!waitlisting)
+                    {
+                        NotifyJoinedUsers(joinDto, eventDto, firstTimeParticipants);
+                    }
+                });
             }
             finally
             {
                 _semaphoreSlim.Release();
             }
+        }
+
+        private static bool ShouldJoinWaitlist(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
+        {
+            if (!eventDto.HasWaitlist || addedByColleague || joinDto.AttendStatus != AttendingStatus.Attending)
+            {
+                return false;
+            }
+
+            var alreadyAttending = eventDto.Participants.Any(p => p.Id == joinDto.UserId && p.AttendStatus == (int)AttendingStatus.Attending);
+            var attendingCount = eventDto.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
+
+            return !alreadyAttending && eventDto.MaxParticipants > 0 && attendingCount >= eventDto.MaxParticipants;
         }
 
         private void NotifyJoinedUsers(EventJoinDto joinDto, EventJoinValidationDto eventDto, List<EventParticipantFirstTimeJoinDto> firstTimeParticipants)
@@ -455,7 +481,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             return selectedOptions;
         }
 
-        private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
+        private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool waitlisting)
         {
             var chosenOptions = SubmittedOptionIds(joinDto.ChosenOptions, joinDto.Answers);
             var legacyOptionIds = LegacyOptionIds(eventDto.Options);
@@ -472,7 +498,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 OptionRules.IgnoreSingleJoin);
 
             _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
-            _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
+            if (!waitlisting)
+            {
+                _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
+            }
 
             // Last, so "event is full" and the option-count codes are not masked by an answer
             // error. CheckIfProvidedOptionsAreValid above already rejects an unknown option with
@@ -825,17 +854,22 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     ModifiedBy = userId,
                     EventOptions = eventOptions,
                     AttendComment = string.Empty,
-                    AttendStatus = (int)status
+                    AttendStatus = (int)status,
+                    WaitlistedAt = status == AttendingStatus.Waitlisted ? timeStamp : (DateTime?)null
                 };
                 _eventParticipantsDbSet.Add(newParticipant);
             }
             else
             {
+                var wasWaitlisted = participant.AttendStatus == (int)AttendingStatus.Waitlisted;
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
                 participant.EventOptions = eventOptions;
                 participant.AttendStatus = (int)status;
                 participant.AttendComment = string.Empty;
+                participant.WaitlistedAt = status == AttendingStatus.Waitlisted
+                    ? (wasWaitlisted ? participant.WaitlistedAt : timeStamp)
+                    : null;
             }
         }
 
