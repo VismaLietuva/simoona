@@ -760,6 +760,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 Description = e.Description,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
+                HasWaitlist = e.HasWaitlist,
                 Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,

@@ -425,7 +425,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null
                     ? (AttendingStatus)e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
                     : AttendingStatus.Idle,
-                MaxChoices = e.MaxChoices
+                MaxChoices = e.MaxChoices,
+                HasWaitlist = e.HasWaitlist
             };
         }
 

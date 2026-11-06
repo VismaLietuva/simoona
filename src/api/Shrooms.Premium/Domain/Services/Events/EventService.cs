@@ -151,6 +151,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
             @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
 
+            var waitlist = @event.Participants
+                .Where(p => p.AttendStatus == (int)AttendingStatus.Waitlisted)
+                .OrderBy(p => p.WaitlistedAt)
+                .ThenBy(p => p.Id)
+                .ToList();
+            @event.WaitlistCount = waitlist.Count;
+            var queuePosition = waitlist.FindIndex(p => p.UserId == userOrg.UserId);
+            @event.WaitlistPosition = queuePosition < 0 ? null : queuePosition + 1;
+
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
             @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
@@ -371,6 +380,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 Recurrence = e.EventRecurring,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
+                HasWaitlist = e.HasWaitlist,
+                WaitlistCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Waitlisted),
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
@@ -615,6 +626,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.IsPinned = eventArgsDto.IsPinned;
             newEvent.AllowMaybeGoing = eventArgsDto.AllowMaybeGoing;
             newEvent.AllowNotGoing = eventArgsDto.AllowNotGoing;
+            newEvent.HasWaitlist = eventArgsDto.HasWaitlist;
         }
 
         private async Task SetEventRemindersAsync(IEventArgsDto eventArgsDto, Event eventToUpdate)
@@ -756,6 +768,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 EndDate = e.EndDate,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
+                HasWaitlist = e.HasWaitlist,
                 MaxParticipants = e.MaxParticipants,
                 MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
@@ -827,7 +840,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                     FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                     ImageName = p.ApplicationUser.PictureId,
                     AttendStatus = p.AttendStatus,
-                    AttendComment = p.AttendComment
+                    AttendComment = p.AttendComment,
+                    WaitlistedAt = p.WaitlistedAt
                 }),
 
                 // Not derivable from the option-level Participants lists above: those are scoped to

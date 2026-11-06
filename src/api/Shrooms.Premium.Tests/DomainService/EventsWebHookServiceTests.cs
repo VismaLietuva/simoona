@@ -88,6 +88,22 @@ namespace Shrooms.Premium.Tests.DomainService
                 "Rule must survive the clone");
         }
 
+        [Test]
+        public async Task Should_Keep_The_Waitlist_Flag_On_The_Next_Occurrence()
+        {
+            MockExpiredRecurringEventWithWaitlist();
+
+            await _service.UpdateRecurringEventsAsync();
+
+            var addedEvents = _eventsDbSet.ReceivedCalls()
+                .Where(call => call.GetMethodInfo().Name == nameof(DbSet<Event>.Add))
+                .Select(call => (Event)call.GetArguments()[0])
+                .ToList();
+
+            Assert.That(addedEvents, Has.Count.EqualTo(1));
+            Assert.That(addedEvents[0].HasWaitlist, Is.True);
+        }
+
         private void MockExpiredRecurringEventWithQuestions()
         {
             var eventId = Guid.NewGuid();
@@ -128,6 +144,31 @@ namespace Shrooms.Premium.Tests.DomainService
                             ShowIfOptionId = 91, Options = new List<EventOption> { margherita }
                         }
                     }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+        }
+
+        private void MockExpiredRecurringEventWithWaitlist()
+        {
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = Guid.NewGuid(),
+                    OrganizationId = 2,
+                    Name = "Weekly lunch",
+                    EventRecurring = EventRecurrenceOptions.EveryWeek,
+                    EndDate = DateTime.Parse("2026-08-01"),
+                    LocalStartDate = DateTime.Parse("2026-07-31"),
+                    LocalEndDate = DateTime.Parse("2026-08-01"),
+                    LocalRegistrationDeadline = DateTime.Parse("2026-07-30"),
+                    ResponsibleUserId = "host1",
+                    ResponsibleUser = new ApplicationUser { Id = "host1", TimeZone = DataLayerConstants.DefaultTimeZone },
+                    HasWaitlist = true,
+                    EventOptions = new List<EventOption>(),
+                    EventQuestions = new List<EventQuestion>()
                 }
             };
 

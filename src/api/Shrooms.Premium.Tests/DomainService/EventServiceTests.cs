@@ -432,6 +432,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     ResponsibleUser = responsibleUser,
                     ResponsibleUserId = responsibleUser.Id,
                     Reminders = new List<EventReminder>(),
+                    EventParticipants = new List<EventParticipant>(),
                     EventOptions = new List<EventOption> { legacyOption, questionOptions[0], questionOptions[1] },
                     EventQuestions = questions
                 }
@@ -501,6 +502,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     ResponsibleUser = responsibleUser,
                     ResponsibleUserId = responsibleUser.Id,
                     Reminders = new List<EventReminder>(),
+                    EventParticipants = new List<EventParticipant>(),
                     EventOptions = new List<EventOption> { dishOptions[0], dishOptions[1], pizzaOptions[0] },
                     EventQuestions = questions
                 }
