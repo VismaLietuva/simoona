@@ -64,7 +64,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
             ["CreateWallViewModel → CreateWallDto"] = "differs from AutoMapper on the generated sample at ModeratorsIds.",
             ["EditCommentViewModel → EditCommentDto"] = "differs from AutoMapper on the generated sample at Images[0].",
             ["EditPostViewModel → EditPostDto"] = "differs from AutoMapper on the generated sample at Images[0].",
-            ["EmployeeDto → EmployeeViewModel"] = "differs from AutoMapper on the generated sample at BlacklistEndDate.",
             ["Event → Event"] = "differs from AutoMapper on the empty sample at EventParticipants.",
             ["EventChangeOptionViewModel → EventChangeOptionsDto"] = "differs from AutoMapper on the generated sample at Answers.",
             ["EventDetailsDto → EventDetailsViewModel"] = "differs from AutoMapper on the generated sample at OfficesName.",
@@ -88,7 +87,6 @@ namespace Shrooms.Premium.Tests.ModelMappings
             ["NotificationDto → NotificationViewModel"] = "differs from AutoMapper on the generated sample at StackedIds, Others.",
             ["Office → OfficeViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
             ["OfficePostViewModel → Office"] = "differs from AutoMapper on the generated sample at Id.",
-            ["OrganizationalStructureDto → OrganizationalStructureViewModel"] = "AutoMapper tracks references on this self-referencing map; add .PreserveReference(true).",
             ["Post → PostDto"] = "differs from AutoMapper on the generated sample at Author, Comments, Likes.",
             ["PostDto → EventPostViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
             ["QualificationLevelPostViewModel → QualificationLevel"] = "differs from AutoMapper on the empty sample mapped onto an existing destination at Id.",
@@ -104,9 +102,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
             ["UpdateAttendStatusViewModel → UpdateAttendStatusDto"] = "differs from AutoMapper on the generated sample at ChosenOptions, Answers.",
             ["UpdateEventViewModel → EditEventDto"] = "differs from AutoMapper on the generated sample at Offices.",
             ["UpdateWallViewModel → UpdateWallDto"] = "differs from AutoMapper on the generated sample at ModeratorsIds.",
-            ["UserDto → ApplicationUserViewModel"] = "differs from AutoMapper on the generated sample at PictureId.",
             ["UserKudosInformationDto → UserKudosInformationViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
-            ["VacationDto → VacationViewModel"] = "differs from AutoMapper on the generated sample at DateStart, DateEnd.",
             ["WallPostViewModel → NotificationDto"] = "differs from AutoMapper on the generated sample at Title, Description.",
         };
 
