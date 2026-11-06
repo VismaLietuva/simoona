@@ -236,6 +236,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<FeatureFlagUser> FeatureFlagUsers { get; set; }
 
+        public virtual DbSet<KudosCalculatorSettings> KudosCalculatorSettings { get; set; }
+
         public int SaveChanges(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
@@ -353,6 +355,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new TimeMonthLockEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagUserEntityConfig());
+            modelBuilder.ApplyConfiguration(new KudosCalculatorSettingsEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
