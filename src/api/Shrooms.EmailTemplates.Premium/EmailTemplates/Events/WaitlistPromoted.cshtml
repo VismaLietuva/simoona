@@ -1,0 +1,16 @@
+﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventWaitlistPromotedEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"A spot opened up for {Model.EventTitle}.";
+}
+
+<email-heading eyebrow="Events">A spot opened up, <email-em>you are going</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">"<strong>@Model.EventTitle</strong>"</p>
+    <p style="margin:8px 0 0 0;">
+        You were on the waitlist and have been added to the event, which will take place on
+        @Model.StartDate.ToString("yyyy-MM-dd HH:mm").
+        If you can no longer make it, open the event and decline so the next person can join.
+    </p>
+    <email-button href="@Model.EventUrl">Open the event</email-button>
+</email-card>

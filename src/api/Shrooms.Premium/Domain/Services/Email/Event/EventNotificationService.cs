@@ -7,9 +7,11 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Events;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Organizations;
@@ -25,8 +27,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
+        private readonly IUnitOfWork2 _uow;
 
         private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Notification> _notificationsDbSet;
 
         public EventNotificationService(
             IUnitOfWork2 uow,
@@ -41,8 +45,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             _appSettings = appSettings;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
+            _uow = uow;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
+            _notificationsDbSet = uow.GetDbSet<Notification>();
         }
 
         public async Task NotifyRemovedEventParticipantsAsync(string eventName, Guid eventId, int orgId, IEnumerable<string> users)
@@ -139,8 +145,51 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 EmailPremiumTemplateCacheKeys.EventNew);
         }
 
-        public Task NotifyWaitlistPromotedAsync(Guid eventId, string eventName, DateTime startDate, int orgId, IEnumerable<string> userIds) =>
-            throw new NotImplementedException();
+        public async Task NotifyWaitlistPromotedAsync(Guid eventId, string eventName, DateTime startDate, int orgId, IEnumerable<string> userIds)
+        {
+            var ids = userIds.ToList();
+            var organization = await _organizationService.GetOrganizationByIdAsync(orgId);
+            var people = await _usersDbSet
+                .Where(u => ids.Contains(u.Id))
+                .Select(u => new
+                {
+                    u.Id,
+                    u.Email,
+                    u.TimeZone,
+                    WantsEmail = u.NotificationsSettings == null || u.NotificationsSettings.EventsEmailNotifications,
+                    WantsApp = u.NotificationsSettings == null || u.NotificationsSettings.EventsAppNotifications
+                })
+                .ToListAsync();
+
+            var emailReceivers = people
+                .Where(p => p.WantsEmail && !string.IsNullOrEmpty(p.Email))
+                .Select(p => new UserEmailReceiverDto { Email = p.Email, TimeZoneKey = p.TimeZone })
+                .ToList();
+            if (emailReceivers.Count > 0)
+            {
+                var eventUrl = _appSettings.EventUrl(organization.ShortName, eventId.ToString());
+                var template = new EventWaitlistPromotedEmailTemplateViewModel(GetNotificationSettingsUrl(organization), eventName, eventUrl, startDate);
+                await SendMultipleEmailsAsync(
+                    emailReceivers,
+                    CreateSubject("A spot opened up: {0}", eventName),
+                    template,
+                    EmailPremiumTemplateCacheKeys.EventWaitlistPromoted);
+            }
+
+            var appRecipients = people.Where(p => p.WantsApp).Select(p => p.Id).ToList();
+            if (appRecipients.Count > 0)
+            {
+                _notificationsDbSet.Add(Notification.Create(
+                    eventName,
+                    "A spot opened up and you are now going",
+                    null,
+                    new Sources { EventId = eventId.ToString() },
+                    NotificationType.EventWaitlistPromoted,
+                    orgId,
+                    appRecipients));
+                await _uow.SaveChangesAsync(false);
+            }
+        }
 
         private async Task SendManagerNotifyEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
         {
