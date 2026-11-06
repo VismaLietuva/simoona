@@ -216,6 +216,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await ValidateEvent(newEventDto);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
+            _eventValidationService.CheckIfWaitlistAllowed(newEventDto.HasWaitlist, newEventDto.NewOptions.Count(), newEventDto.Questions?.Count ?? 0);
 
             // Before MapNewEventAsync, which creates the event's wall and commits it: a tree
             // rejected after that point leaves an orphan wall behind.
@@ -273,6 +274,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
+            _eventValidationService.CheckIfWaitlistCanBeDisabled(eventDto.HasWaitlist, eventToUpdate);
+            _eventValidationService.CheckIfWaitlistAllowed(eventDto.HasWaitlist, totalOptionsProvided, eventDto.Questions?.Count ?? 0);
 
             await ValidateEvent(eventDto);
 
