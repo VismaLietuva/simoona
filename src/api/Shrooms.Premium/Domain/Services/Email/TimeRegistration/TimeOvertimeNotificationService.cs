@@ -54,7 +54,9 @@ namespace Shrooms.Premium.Domain.Services.Email.TimeRegistration
                 return;
             }
 
-            var recipientId = TimeRegistrationRules.SameUser(actor.UserId, employee.Id) ? employee.ManagerId : employee.Id;
+            var recipientId = !TimeRegistrationRules.SameUser(actor.UserId, employee.Id)
+                ? employee.Id
+                : request.OrderedByManager ? request.RequestedById : employee.ManagerId;
             if (string.IsNullOrEmpty(recipientId) || TimeRegistrationRules.SameUser(recipientId, actor.UserId))
             {
                 return;

@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         {
             var since = (await _support.TodayAsync(userOrg.OrganizationId)).AddDays(-TeamHistoryDays);
             return await ListAsync(_requests
-                .Where(request => request.OrganizationId == userOrg.OrganizationId && request.User.ManagerId == userOrg.UserId)
+                .Where(request => request.OrganizationId == userOrg.OrganizationId && request.User.ManagerId == userOrg.UserId && !request.User.IsDeleted)
                 .Where(request => request.Status == TimeOvertimeRequestStatus.Pending || request.DateTo >= since));
         }
 
@@ -183,6 +183,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         private async Task<IEnumerable<TimeOvertimeRequestDto>> ListAsync(IQueryable<TimeOvertimeRequest> query)
         {
             var rows = await query
+                .IgnoreQueryFilters()
                 .AsNoTracking()
                 .OrderBy(request => request.Status == TimeOvertimeRequestStatus.Pending ? 0 : 1)
                 .ThenByDescending(request => request.DateFrom)
