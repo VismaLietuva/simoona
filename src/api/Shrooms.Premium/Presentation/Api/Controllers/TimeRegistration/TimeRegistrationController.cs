@@ -18,11 +18,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
     {
         private readonly ITimeTableService _timeTableService;
         private readonly ITimePeriodService _periodService;
+        private readonly ITimeReportService _reportService;
 
-        public TimeRegistrationController(ITimeTableService timeTableService, ITimePeriodService periodService)
+        public TimeRegistrationController(ITimeTableService timeTableService, ITimePeriodService periodService, ITimeReportService reportService)
         {
             _timeTableService = timeTableService;
             _periodService = periodService;
+            _reportService = reportService;
         }
 
         [HttpGet]
@@ -120,6 +122,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
         public Task<IActionResult> Employees([FromQuery] string month)
         {
             return GuardedAsync(() => _periodService.GetEmployeesAsync(month, GetUserAndOrganization()));
+        }
+
+        [HttpGet]
+        [Route("Report")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.TimeRegistration)]
+        [ProducesResponseType(typeof(TimeReportDto), StatusCodes.Status200OK)]
+        public Task<IActionResult> Report([FromQuery] string month)
+        {
+            return GuardedAsync(() => _reportService.GetReportAsync(month, GetUserAndOrganization()));
         }
 
         [HttpGet]
