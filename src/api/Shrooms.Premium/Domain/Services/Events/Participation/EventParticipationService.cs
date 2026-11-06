@@ -45,6 +45,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private readonly IWallService _wallService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly IEventAnswerValidator _eventAnswerValidator;
+        private readonly IEventSeatLock _eventSeatLock;
 
         public EventParticipationService(IUnitOfWork2 uow,
             ISystemClock systemClock,
@@ -53,7 +54,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             IEventValidationService eventValidationService,
             IWallService wallService,
             IAsyncRunner asyncRunner,
-            IEventAnswerValidator eventAnswerValidator)
+            IEventAnswerValidator eventAnswerValidator,
+            IEventSeatLock eventSeatLock)
         {
             _uow = uow;
             _eventsDbSet = _uow.GetDbSet<Event>();
@@ -67,6 +69,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _wallService = wallService;
             _asyncRunner = asyncRunner;
             _eventAnswerValidator = eventAnswerValidator;
+            _eventSeatLock = eventSeatLock;
         }
 
         public async Task ResetVirtualAttendeesAsync(Event @event, UserAndOrganizationDto userOrg) =>

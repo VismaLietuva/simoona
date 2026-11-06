@@ -23,6 +23,7 @@ using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Participation;
+using Shrooms.Premium.Tests.Mocks;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.Tests.DomainService.EventServices
@@ -83,7 +84,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     _eventValidationServiceMock,
                     _wallService,
                     _asyncRunner,
-                    _eventAnswerValidator);
+                    _eventAnswerValidator,
+                    new PassThroughEventSeatLock());
         }
 
         [Test]
@@ -205,7 +207,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _eventValidationService,
                 _wallService,
                 _asyncRunner,
-                _eventAnswerValidator);
+                _eventAnswerValidator,
+                new PassThroughEventSeatLock());
 
             var eventJoinDto = new EventJoinDto
             {
@@ -237,7 +240,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _eventValidationService,
                 _wallService,
                 _asyncRunner,
-                _eventAnswerValidator);
+                _eventAnswerValidator,
+                new PassThroughEventSeatLock());
 
             var eventJoinDto = new EventJoinDto
             {
@@ -267,7 +271,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _eventValidationService,
                 _wallService,
                 _asyncRunner,
-                _eventAnswerValidator);
+                _eventAnswerValidator,
+                new PassThroughEventSeatLock());
 
             var eventJoinDto = new EventJoinDto
             {
@@ -295,7 +300,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 _eventValidationService,
                 _wallService,
                 _asyncRunner,
-                _eventAnswerValidator);
+                _eventAnswerValidator,
+                new PassThroughEventSeatLock());
 
             var eventJoinDto = new EventJoinDto
             {
