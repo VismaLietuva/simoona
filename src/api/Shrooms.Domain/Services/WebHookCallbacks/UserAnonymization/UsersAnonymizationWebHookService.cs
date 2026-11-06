@@ -37,7 +37,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
             var organization = await _organizationsDbSet.FirstAsync(org => org.ShortName == organizationName);
 
             var cutoffDate = DateTime.UtcNow.AddDays(-_anonymizeUsersAfterDays);
+            // Only soft-deleted users qualify, so the !IsDeleted query filter must be bypassed.
             var usersToAnonymize = await _usersDbSet
+                .IgnoreQueryFilters()
                 .Where(u => u.IsDeleted &&
                             u.OrganizationId == organization.Id &&
                             !u.IsAnonymized &&
