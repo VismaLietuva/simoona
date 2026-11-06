@@ -35,9 +35,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             var result = new SqlParameter("@result", SqlDbType.Int) { Direction = ParameterDirection.Output };
             await database.ExecuteSqlRawAsync(
-                "EXEC @result = sp_getapplock @Resource = @resource, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = " + LockTimeoutMilliseconds,
+                "EXEC @result = sp_getapplock @Resource = @resource, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = @timeout",
                 result,
-                new SqlParameter("@resource", $"EventSeats:{eventId}"));
+                new SqlParameter("@resource", $"EventSeats:{eventId}"),
+                new SqlParameter("@timeout", SqlDbType.Int) { Value = LockTimeoutMilliseconds });
 
             if ((int)result.Value < 0)
             {
