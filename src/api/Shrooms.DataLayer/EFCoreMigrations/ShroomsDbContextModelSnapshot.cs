@@ -4823,6 +4823,50 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("VideoLibraryItems", (string)null);
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("VideoLibraryItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VideoLibraryItemId", "SortOrder")
+                        .HasDatabaseName("IX_VideoLibraryMaterials_VideoLibraryItemId_SortOrder");
+
+                    b.ToTable("VideoLibraryMaterials", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>
                 {
                     b.Property<int>("Id")
@@ -6848,6 +6892,17 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("VideoType");
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryMaterial", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryItem", "VideoLibraryItem")
+                        .WithMany("Materials")
+                        .HasForeignKey("VideoLibraryItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VideoLibraryItem");
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>
                 {
                     b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
@@ -7064,6 +7119,11 @@ namespace Shrooms.DataLayer.EFCoreMigrations
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.Vacations.VacationOrder", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoLibraryItem", b =>
+                {
+                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.VideoLibrary.VideoType", b =>

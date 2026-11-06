@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 
@@ -28,10 +29,14 @@ namespace Shrooms.Presentation.WebViewModels.Models.VideoLibrary
 
         public int? VideoTypeId { get; set; }
 
+        public IList<VideoLibraryMaterialViewModel> Materials { get; set; }
+
         public string VideoTypeTitle { get; set; }
 
         public DateTime Created { get; set; }
 
         public bool IsNew { get; set; }
+
+        public bool CanEdit { get; set; }
     }
 }

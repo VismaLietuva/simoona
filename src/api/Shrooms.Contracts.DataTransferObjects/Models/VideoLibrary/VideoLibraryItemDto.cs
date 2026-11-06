@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
 {
@@ -23,5 +24,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary
         public DateTime Created { get; set; }
 
         public bool IsNew { get; set; }
+
+        public bool CanEdit { get; set; }
+        public IList<VideoLibraryMaterialDto> Materials { get; set; }
     }
 }
