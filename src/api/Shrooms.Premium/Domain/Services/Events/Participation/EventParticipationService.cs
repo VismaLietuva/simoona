@@ -157,30 +157,67 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         public async Task UpdateAttendStatusAsync(UpdateAttendStatusDto updateAttendStatusDto)
         {
-            var @event = await _eventsDbSet
-                .Include(x => x.EventParticipants)
-                .Include(x => x.EventOptions)
-                .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
-                .Include(x => x.EventType)
-                .Where(x => x.Id == updateAttendStatusDto.EventId
-                            && x.OrganizationId == updateAttendStatusDto.OrganizationId)
-                .Select(MapEventToJoinValidationDto)
-                .FirstOrDefaultAsync();
+            var wasAttending = false;
 
-            _eventValidationService.CheckIfEventExists(@event);
-            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
-            _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDto.AttendStatus);
-            _eventValidationService.CheckIfAttendOptionIsAllowed(updateAttendStatusDto.AttendStatus, @event);
+            await _eventSeatLock.RunAsync(updateAttendStatusDto.EventId, async () =>
+            {
+                var @event = await _eventsDbSet
+                    .Include(x => x.EventParticipants)
+                    .Include(x => x.EventOptions)
+                    .Include(x => x.EventQuestions).ThenInclude(q => q.Options)
+                    .Include(x => x.EventType)
+                    .Where(x => x.Id == updateAttendStatusDto.EventId
+                                && x.OrganizationId == updateAttendStatusDto.OrganizationId)
+                    .Select(MapEventToJoinValidationDto)
+                    .FirstOrDefaultAsync();
 
-            var participant = await _eventParticipantsDbSet
-                .Include(p => p.EventOptions)
-                .FirstOrDefaultAsync(p => p.EventId == @event.Id && p.ApplicationUserId == updateAttendStatusDto.UserId);
+                _eventValidationService.CheckIfEventExists(@event);
+                _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
+                _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDto.AttendStatus);
+                _eventValidationService.CheckIfAttendOptionIsAllowed(updateAttendStatusDto.AttendStatus, @event);
 
-            var chosenOptionsToSave = ValidateAnswersForStatusChange(updateAttendStatusDto, @event, participant?.EventOptions);
+                var participant = await _eventParticipantsDbSet
+                    .Include(p => p.EventOptions)
+                    .FirstOrDefaultAsync(p => p.EventId == @event.Id && p.ApplicationUserId == updateAttendStatusDto.UserId);
 
-            await AddParticipantWithStatusAsync(updateAttendStatusDto.UserId, updateAttendStatusDto.AttendStatus, updateAttendStatusDto.AttendComment, @event, chosenOptionsToSave);
+                wasAttending = participant?.AttendStatus == (int)AttendingStatus.Attending;
+                var status = ResolveStatusAgainstCapacity(updateAttendStatusDto.AttendStatus, participant, @event);
 
-            await _uow.SaveChangesAsync(false);
+                var chosenOptionsToSave = ValidateAnswersForStatusChange(updateAttendStatusDto, @event, participant?.EventOptions);
+
+                await AddParticipantWithStatusAsync(updateAttendStatusDto.UserId, status, updateAttendStatusDto.AttendComment, @event, chosenOptionsToSave);
+
+                await _uow.SaveChangesAsync(false);
+            });
+
+            if (wasAttending && updateAttendStatusDto.AttendStatus != AttendingStatus.Attending)
+            {
+                await PromoteFromWaitlistAsync(updateAttendStatusDto.EventId, updateAttendStatusDto.OrganizationId);
+            }
+        }
+
+        public Task PromoteFromWaitlistAsync(Guid eventId, int organizationId) => Task.CompletedTask;
+
+        private AttendingStatus ResolveStatusAgainstCapacity(AttendingStatus requested, EventParticipant participant, EventJoinValidationDto @event)
+        {
+            var alreadyAttending = participant?.AttendStatus == (int)AttendingStatus.Attending;
+            if (requested != AttendingStatus.Attending || alreadyAttending || @event.MaxParticipants == 0)
+            {
+                return requested;
+            }
+
+            var attendingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
+            if (attendingCount < @event.MaxParticipants)
+            {
+                return requested;
+            }
+
+            if (!@event.HasWaitlist)
+            {
+                _eventValidationService.CheckIfEventIsFull(@event.MaxParticipants, attendingCount);
+            }
+
+            return AttendingStatus.Waitlisted;
         }
 
         public async Task DeleteByEventAsync(Guid eventId, string userId)
@@ -883,10 +920,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             if (participant != null)
             {
+                var wasWaitlisted = participant.AttendStatus == (int)AttendingStatus.Waitlisted;
                 participant.AttendStatus = (int)status;
                 participant.AttendComment = attendComment;
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
+                participant.WaitlistedAt = status == AttendingStatus.Waitlisted
+                    ? (wasWaitlisted ? participant.WaitlistedAt : timeStamp)
+                    : null;
 
                 if (chosenOptions != null)
                 {
@@ -906,6 +947,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     ModifiedBy = userId,
                     AttendComment = attendComment,
                     AttendStatus = (int)status,
+                    WaitlistedAt = status == AttendingStatus.Waitlisted ? timeStamp : (DateTime?)null,
                     EventOptions = chosenOptions ?? new List<EventOption>()
                 };
 

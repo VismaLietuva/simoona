@@ -16,6 +16,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task UpdateAttendStatusAsync(UpdateAttendStatusDto updateAttendStatusDto);
 
+        Task PromoteFromWaitlistAsync(Guid eventId, int organizationId);
+
         Task DeleteByEventAsync(Guid eventId, string userId);
 
         Task LeaveAsync(Guid eventId, UserAndOrganizationDto userOrg, string leaveComment);

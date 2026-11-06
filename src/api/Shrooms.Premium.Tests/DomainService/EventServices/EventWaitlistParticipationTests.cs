@@ -167,6 +167,80 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.That(queued.WaitlistedAt, Is.EqualTo(DateTime.Parse("2016-03-20")));
         }
 
+        [Test]
+        public void Should_Reject_Maybe_To_Going_On_A_Full_Event_Without_A_Waitlist()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: false, maybeUserId: "testUserId");
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var exception = Assert.ThrowsAsync<EventException>(() => _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending)));
+
+            Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
+        }
+
+        [Test]
+        public async Task Should_Waitlist_Maybe_To_Going_On_A_Full_Waitlist_Event()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, maybeUserId: "testUserId");
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending));
+
+            var participant = _eventParticipantsDbSet.ToList().Single(p => p.ApplicationUserId == "testUserId");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Waitlisted));
+            Assert.That(participant.WaitlistedAt, Is.EqualTo(DateTime.Parse("2016-03-28")));
+        }
+
+        [Test]
+        public async Task Should_Leave_The_Queue_When_A_Waitlisted_User_Chooses_Maybe()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, queuedUserId: "testUserId", queuedAt: DateTime.Parse("2016-03-20"));
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.MaybeAttending));
+
+            var participant = _eventParticipantsDbSet.ToList().Single(p => p.ApplicationUserId == "testUserId");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.MaybeAttending));
+            Assert.That(participant.WaitlistedAt, Is.Null);
+        }
+
+        [Test]
+        public async Task Should_Keep_Position_When_A_Queued_User_Asks_For_Going_While_Still_Full()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, queuedUserId: "testUserId", queuedAt: DateTime.Parse("2016-03-20"));
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending));
+
+            var participant = _eventParticipantsDbSet.ToList().Single(p => p.ApplicationUserId == "testUserId");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Waitlisted));
+            Assert.That(participant.WaitlistedAt, Is.EqualTo(DateTime.Parse("2016-03-20")));
+        }
+
+        [Test]
+        public async Task Should_Allow_Going_When_A_Seat_Is_Free()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: false, maxParticipants: 2, maybeUserId: "testUserId");
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending));
+
+            var participant = _eventParticipantsDbSet.ToList().Single(p => p.ApplicationUserId == "testUserId");
+            Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
+        }
+
+        private static UpdateAttendStatusDto UpdateDto(Guid eventId, AttendingStatus status)
+        {
+            return new UpdateAttendStatusDto
+            {
+                EventId = eventId,
+                UserId = "testUserId",
+                OrganizationId = 2,
+                AttendStatus = status,
+                AttendComment = string.Empty
+            };
+        }
+
         private static EventJoinDto JoinDto(Guid eventGuid)
         {
             return new EventJoinDto
@@ -185,7 +259,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             int maxParticipants = 1,
             bool sendEmailToManager = false,
             string queuedUserId = null,
-            DateTime? queuedAt = null)
+            DateTime? queuedAt = null,
+            string maybeUserId = null)
         {
             var eventId = Guid.NewGuid();
             var @event = new Event
@@ -199,6 +274,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 MaxChoices = 0,
                 MaxParticipants = maxParticipants,
                 HasWaitlist = hasWaitlist,
+                AllowMaybeGoing = true,
                 OrganizationId = 2,
                 Name = "Test event",
                 EventType = new EventType
@@ -220,6 +296,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             if (queuedUserId != null)
             {
                 participants.Add(CreateParticipant(@event, queuedUserId, AttendingStatus.Waitlisted, queuedAt));
+            }
+
+            if (maybeUserId != null)
+            {
+                participants.Add(CreateParticipant(@event, maybeUserId, AttendingStatus.MaybeAttending, null));
             }
 
             foreach (var participant in participants)
