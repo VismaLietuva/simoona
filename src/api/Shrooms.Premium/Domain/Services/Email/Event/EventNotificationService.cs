@@ -139,6 +139,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 EmailPremiumTemplateCacheKeys.EventNew);
         }
 
+        public Task NotifyWaitlistPromotedAsync(Guid eventId, string eventName, DateTime startDate, int orgId, IEnumerable<string> userIds) =>
+            throw new NotImplementedException();
+
         private async Task SendManagerNotifyEmailAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
         {
             if (!isJoiningEvent)

@@ -26,5 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         Task NotifySharedEventAsync(SharedEventEmailDto shareEventEmailDto, UserAndOrganizationHubDto userOrgHubDto);
 
         Task NotifyNewEventAsync(CreateEventDto eventArgsDto, IEnumerable<IEmailReceiver> receivers, UserAndOrganizationHubDto userOrgHubDto);
+
+        Task NotifyWaitlistPromotedAsync(Guid eventId, string eventName, DateTime startDate, int orgId, IEnumerable<string> userIds);
     }
 }

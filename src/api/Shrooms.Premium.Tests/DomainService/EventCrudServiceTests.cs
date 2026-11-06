@@ -42,6 +42,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IUnitOfWork2 _uow;
         private IWallService _wallService;
         private IEventService _eventService;
+        private IEventParticipationService _eventParticipationService;
         private ISystemClock _systemClockMock;
         private IPermissionService _permissionService;
         private ISystemClock _systemClock;
@@ -63,7 +64,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _wallService = Substitute.For<IWallService>();
             _systemClock = Substitute.For<ISystemClock>();
 
-            var eventParticipationService = Substitute.For<IEventParticipationService>();
+            _eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             var eventValidationService = new EventValidationService(_systemClockMock);
             var officeMapService = Substitute.For<IOfficeMapService>();
@@ -75,7 +76,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 _permissionService,
                 eventUtilitiesService,
                 eventValidationService,
-                eventParticipationService,
+                _eventParticipationService,
                 _wallService,
                 markdownConverter,
                 officeMapService,
@@ -1157,6 +1158,65 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
             return users;
+        }
+
+        [Test]
+        public async Task Should_Promote_The_Queue_After_Updating_A_Waitlist_Event()
+        {
+            var eventId = await UpdateOneTimeEventAsync(hasWaitlist: true);
+
+            await _eventParticipationService.Received(1).PromoteFromWaitlistAsync(eventId, 1);
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_After_Updating_An_Event_Without_A_Waitlist()
+        {
+            await UpdateOneTimeEventAsync(hasWaitlist: false);
+
+            await _eventParticipationService.DidNotReceiveWithAnyArgs().PromoteFromWaitlistAsync(default, default);
+        }
+
+        private async Task<Guid> UpdateOneTimeEventAsync(bool hasWaitlist)
+        {
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, new List<EventReminder>());
+            @event.HasWaitlist = hasWaitlist;
+
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id.ToString(),
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = "[\"" + office.Id + "\"]"
+                },
+                RegistrationDeadlineDate = @event.StartDate,
+                MaxOptions = 0,
+                HasWaitlist = hasWaitlist,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                Reminders = new List<EventReminderDto>()
+            };
+
+            await _eventService.UpdateEventAsync(editDto);
+
+            return eventId;
         }
 
         private Event MockOneTimeEvent(List<ApplicationUser> users, List<EventType> eventTypes, Office office, Guid eventId, List<EventReminder> reminders)

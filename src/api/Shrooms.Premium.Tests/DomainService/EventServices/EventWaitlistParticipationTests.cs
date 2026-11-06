@@ -34,6 +34,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<EventOption> _eventOptionsDbSet;
         private DbSet<EventParticipant> _eventParticipantsDbSet;
+        private List<EventParticipant> _participants;
+        private Event _event;
 
         private IUnitOfWork2 _uow;
         private ISystemClock _systemClockMock;
@@ -41,6 +43,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private IWallService _wallService;
         private IAsyncRunner _asyncRunner;
         private EventParticipationService _sut;
+
+        private static readonly DateTime Start = DateTime.Parse("2016-04-10");
 
         [SetUp]
         public void TestInitializer()
@@ -63,6 +67,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _permissionService = Substitute.For<IPermissionService>();
             _wallService = Substitute.For<IWallService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
 
             _sut = new EventParticipationService(
                 _uow,
@@ -229,6 +234,243 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.That(participant.AttendStatus, Is.EqualTo((int)AttendingStatus.Attending));
         }
 
+        [Test]
+        public async Task Should_Promote_The_Earliest_Queued_User_When_A_Seat_Frees_Up()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("second", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            RemoveParticipant("going");
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+            Assert.That(StatusOf("second"), Is.EqualTo(AttendingStatus.Waitlisted));
+            Assert.That(WaitlistedAtOf("first"), Is.Null);
+            await _uow.Received().SaveChangesAsync(false);
+        }
+
+        [Test]
+        public async Task Should_Order_The_Queue_By_Id_When_Users_Queued_At_The_Same_Time()
+        {
+            var queuedAt = DateTime.Parse("2016-03-20");
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("later", AttendingStatus.Waitlisted, queuedAt),
+                ("earlier", AttendingStatus.Waitlisted, queuedAt));
+            _participants.Single(p => p.ApplicationUserId == "later").Id = 2;
+            _participants.Single(p => p.ApplicationUserId == "earlier").Id = 1;
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("earlier"), Is.EqualTo(AttendingStatus.Attending));
+            Assert.That(StatusOf("later"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Promote_Several_When_Several_Seats_Are_Free()
+        {
+            var eventGuid = MockWaitlistEvent(3, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("a", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("b", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")),
+                ("c", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-22")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("a"), Is.EqualTo(AttendingStatus.Attending));
+            Assert.That(StatusOf("b"), Is.EqualTo(AttendingStatus.Attending));
+            Assert.That(StatusOf("c"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_When_The_Event_Is_Still_Full()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_Within_The_Cutoff_Before_The_Start()
+        {
+            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Promote_Just_Before_The_Cutoff()
+        {
+            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(-1));
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_On_An_Event_Without_A_Waitlist()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start, false,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_An_Event_Of_Another_Organization()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 3);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Notify_Promoted_Users_And_Send_The_Calendar_Invite()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            _asyncRunner.Received(1).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+            _asyncRunner.Received(1).Run<IEventCalendarService>(Arg.Any<Func<IEventCalendarService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_Nothing_When_Nobody_Is_Promoted()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            _asyncRunner.DidNotReceiveWithAnyArgs().Run<IEventNotificationService>(default, default);
+            _asyncRunner.DidNotReceiveWithAnyArgs().Run<IEventCalendarService>(default, default);
+            await _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync(default(bool));
+        }
+
+        [Test]
+        public async Task Should_Skip_A_Candidate_Who_Breaks_The_Single_Join_Rule()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("blocked", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("next", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")));
+            MakeSingleJoinConflictFor("blocked");
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("blocked"), Is.EqualTo(AttendingStatus.Waitlisted));
+            Assert.That(StatusOf("next"), Is.EqualTo(AttendingStatus.Attending));
+        }
+
+        [Test]
+        public async Task Should_Keep_The_Queue_Position_Of_A_Skipped_Candidate()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("blocked", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            MakeSingleJoinConflictFor("blocked");
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(WaitlistedAtOf("blocked"), Is.EqualTo(DateTime.Parse("2016-03-20")));
+            _asyncRunner.DidNotReceiveWithAnyArgs().Run<IEventNotificationService>(default, default);
+        }
+
+        [Test]
+        public async Task Should_Promote_After_An_Attending_User_Leaves()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.LeaveAsync(eventGuid, new UserAndOrganizationDto { UserId = "going", OrganizationId = 2 }, string.Empty);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_When_A_Waitlisted_User_Leaves()
+        {
+            var eventGuid = MockWaitlistEvent(2, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("second", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")));
+
+            await _sut.LeaveAsync(eventGuid, new UserAndOrganizationDto { UserId = "first", OrganizationId = 2 }, string.Empty);
+
+            Assert.That(StatusOf("second"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
+        [Test]
+        public async Task Should_Promote_After_An_Attending_User_Is_Expelled_And_Still_Notify_The_Expelled_User()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await _sut.ExpelAsync(eventGuid, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 }, "going");
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+            _asyncRunner.Received(2).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_When_A_Waitlisted_User_Is_Expelled()
+        {
+            var eventGuid = MockWaitlistEvent(2, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("second", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-21")));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await _sut.ExpelAsync(eventGuid, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 }, "first");
+
+            Assert.That(StatusOf("second"), Is.EqualTo(AttendingStatus.Waitlisted));
+            _asyncRunner.Received(1).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Promote_After_An_Attending_User_Changes_To_Not_Going()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("testUserId", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.NotAttending));
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+        }
+
+        [Test]
+        public async Task Should_Not_Promote_When_A_Maybe_User_Changes_To_Not_Going()
+        {
+            var eventGuid = MockWaitlistEvent(2, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("testUserId", AttendingStatus.MaybeAttending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.NotAttending));
+
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
+        }
+
         private static UpdateAttendStatusDto UpdateDto(Guid eventId, AttendingStatus status)
         {
             return new UpdateAttendStatusDto
@@ -313,6 +555,89 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
+        private Guid MockWaitlistEvent(int maxParticipants, DateTime start, params (string userId, AttendingStatus status, DateTime? queuedAt)[] participants) =>
+            MockWaitlistEvent(maxParticipants, start, true, participants);
+
+        private Guid MockWaitlistEvent(int maxParticipants, DateTime start, bool hasWaitlist, params (string userId, AttendingStatus status, DateTime? queuedAt)[] participants)
+        {
+            _event = new Event
+            {
+                StartDate = start,
+                EndDate = start.AddDays(1),
+                RegistrationDeadline = start,
+                EventOptions = new List<EventOption>(),
+                EventQuestions = new List<EventQuestion>(),
+                Id = Guid.NewGuid(),
+                MaxChoices = 0,
+                MaxParticipants = maxParticipants,
+                HasWaitlist = hasWaitlist,
+                AllowMaybeGoing = true,
+                AllowNotGoing = true,
+                OrganizationId = 2,
+                Name = "Test event",
+                ResponsibleUserId = "host",
+                EventType = new EventType
+                {
+                    Name = "test type",
+                    IsSingleJoin = false,
+                    Id = 1
+                },
+                EventParticipants = new List<EventParticipant>(),
+                EventTypeId = 1
+            };
+
+            var rows = participants
+                .Select(p => CreateParticipant(_event, p.userId, p.status, p.queuedAt))
+                .ToList();
+
+            foreach (var row in rows)
+            {
+                _event.EventParticipants.Add(row);
+            }
+
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event> { _event });
+            MockParticipantsDbSet(rows);
+            return _event.Id;
+        }
+
+        private AttendingStatus StatusOf(string userId) =>
+            (AttendingStatus)_participants.Single(p => p.ApplicationUserId == userId).AttendStatus;
+
+        private DateTime? WaitlistedAtOf(string userId) =>
+            _participants.Single(p => p.ApplicationUserId == userId).WaitlistedAt;
+
+        private void RemoveParticipant(string userId) =>
+            _eventParticipantsDbSet.Remove(_participants.Single(p => p.ApplicationUserId == userId));
+
+        private void MakeSingleJoinConflictFor(string userId)
+        {
+            _event.EventType.IsSingleJoin = true;
+
+            var sameWeekEvent = new Event
+            {
+                Id = Guid.NewGuid(),
+                OrganizationId = 2,
+                Name = "Same week event",
+                StartDate = _event.StartDate.AddDays(2),
+                EndDate = _event.StartDate.AddDays(3),
+                EventTypeId = _event.EventTypeId,
+                EventType = _event.EventType,
+                EventOptions = new List<EventOption>(),
+                EventQuestions = new List<EventQuestion>(),
+                EventParticipants = new List<EventParticipant>
+                {
+                    new EventParticipant
+                    {
+                        ApplicationUserId = userId,
+                        AttendStatus = (int)AttendingStatus.Attending,
+                        EventOptions = new List<EventOption>()
+                    }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event> { _event, sameWeekEvent });
+        }
+
         private static EventParticipant CreateParticipant(Event @event, string userId, AttendingStatus status, DateTime? waitlistedAt)
         {
             return new EventParticipant
@@ -328,7 +653,17 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
         private void MockParticipantsDbSet(List<EventParticipant> participants)
         {
+            _participants = participants;
             _eventParticipantsDbSet.SetDbSetDataForAsync(participants.ToList());
+            _eventParticipantsDbSet
+                .When(dbSet => dbSet.Remove(Arg.Any<EventParticipant>()))
+                .Do(callInfo =>
+                {
+                    var removed = callInfo.Arg<EventParticipant>();
+                    participants.Remove(removed);
+                    removed.Event?.EventParticipants.Remove(removed);
+                    _eventParticipantsDbSet.SetDbSetDataForAsync(participants.ToList());
+                });
             _eventParticipantsDbSet
                 .When(dbSet => dbSet.Add(Arg.Any<EventParticipant>()))
                 .Do(callInfo =>

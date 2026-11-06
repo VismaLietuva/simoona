@@ -293,6 +293,11 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             await _uow.SaveChangesAsync(false);
 
+            if (eventToUpdate.HasWaitlist)
+            {
+                await _eventParticipationService.PromoteFromWaitlistAsync(eventToUpdate.Id, eventDto.OrganizationId);
+            }
+
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
         }
 

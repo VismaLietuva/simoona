@@ -55,6 +55,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             _eventsDbSet = Substitute.For<DbSet<Event>, IQueryable<Event>, IAsyncEnumerable<Event>>();
             _uow2.GetDbSet<Event>().Returns(_eventsDbSet);
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event>());
 
             _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IAsyncEnumerable<ApplicationUser>>();
             _uow2.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
