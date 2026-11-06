@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -73,7 +74,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 markdownConverter,
                 _officeMapService,
                 _systemClock,
-                eventQuestionWriter);
+                eventQuestionWriter,
+                Substitute.For<ILogger<EventService>>());
         }
 
         [TestCase(1)]

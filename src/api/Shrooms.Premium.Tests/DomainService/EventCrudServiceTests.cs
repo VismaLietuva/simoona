@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -81,7 +82,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 markdownConverter,
                 officeMapService,
                 _systemClock,
-                eventQuestionWriter);
+                eventQuestionWriter,
+                Substitute.For<ILogger<EventService>>());
         }
 
         [Test]
@@ -1176,7 +1178,86 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventParticipationService.DidNotReceiveWithAnyArgs().PromoteFromWaitlistAsync(default, default);
         }
 
-        private async Task<Guid> UpdateOneTimeEventAsync(bool hasWaitlist)
+        [Test]
+        public void Should_Keep_A_Committed_Update_When_Promotion_Fails()
+        {
+            _eventParticipationService
+                .PromoteFromWaitlistAsync(default, default)
+                .ReturnsForAnyArgs(Task.FromException(new EventException(PremiumErrorCodes.EventIsFullCode)));
+
+            Assert.DoesNotThrowAsync(() => UpdateOneTimeEventAsync(hasWaitlist: true));
+
+            _uow.Received().SaveChangesAsync(false);
+        }
+
+        [Test]
+        public void Should_Reject_A_Waitlist_With_Sign_Up_Options_On_Create()
+        {
+            MockUsers();
+            MockEventTypes();
+            var newEvent = new CreateEventDto
+            {
+                EndDate = DateTime.UtcNow.AddHours(2),
+                StartDate = DateTime.UtcNow.AddHours(1),
+                Name = "Name",
+                TypeId = 1,
+                ImageName = "qwer",
+                Recurrence = EventRecurrenceOptions.EveryDay,
+                MaxOptions = 1,
+                MaxParticipants = 1,
+                HasWaitlist = true,
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                OrganizationId = 1,
+                ResponsibleUserId = "1",
+                Location = "place",
+                NewOptions = new List<NewEventOptionDto>
+                {
+                    new NewEventOptionDto { Option = "Type1" },
+                    new NewEventOptionDto { Option = "Type2" }
+                },
+                Reminders = new List<EventReminderDto>()
+            };
+
+            var ex = Assert.ThrowsAsync<EventException>(() => _eventService.CreateEventAsync(newEvent));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventWaitlistNotAllowedWithSignUpOptions));
+            _eventsDbSet.DidNotReceiveWithAnyArgs().Add(default);
+        }
+
+        [Test]
+        public void Should_Reject_A_Waitlist_With_Sign_Up_Options_On_Update()
+        {
+            var ex = Assert.ThrowsAsync<EventException>(() => UpdateOneTimeEventAsync(hasWaitlist: true, (editDto, _) =>
+            {
+                editDto.MaxOptions = 1;
+                editDto.NewOptions = new List<NewEventOptionDto>
+                {
+                    new NewEventOptionDto { Option = "Type1" },
+                    new NewEventOptionDto { Option = "Type2" }
+                };
+            }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventWaitlistNotAllowedWithSignUpOptions));
+        }
+
+        [Test]
+        public void Should_Reject_Disabling_A_Waitlist_That_Has_A_Queue()
+        {
+            var ex = Assert.ThrowsAsync<EventException>(() => UpdateOneTimeEventAsync(hasWaitlist: true, (editDto, @event) =>
+            {
+                editDto.HasWaitlist = false;
+                @event.EventParticipants.Add(new EventParticipant
+                {
+                    ApplicationUserId = "queued",
+                    AttendStatus = (int)AttendingStatus.Waitlisted,
+                    WaitlistedAt = DateTime.UtcNow
+                });
+            }));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventWaitlistCannotBeDisabledWithQueue));
+        }
+
+        private async Task<Guid> UpdateOneTimeEventAsync(bool hasWaitlist, Action<EditEventDto, Event> arrange = null)
         {
             MockPermissionService(_permissionService);
             var users = MockUsers();
@@ -1213,6 +1294,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = users.First().Id,
                 Reminders = new List<EventReminderDto>()
             };
+
+            arrange?.Invoke(editDto, @event);
 
             await _eventService.UpdateEventAsync(editDto);
 

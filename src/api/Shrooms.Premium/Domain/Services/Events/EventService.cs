@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -41,6 +42,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
         private readonly IEventQuestionWriter _eventQuestionWriter;
+        private readonly ILogger<EventService> _logger;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -58,7 +60,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService,
             ISystemClock systemClock,
-            IEventQuestionWriter eventQuestionWriter)
+            IEventQuestionWriter eventQuestionWriter,
+            ILogger<EventService> logger)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -77,6 +80,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _officeMapService = officeMapService;
             _systemClock = systemClock;
             _eventQuestionWriter = eventQuestionWriter;
+            _logger = logger;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -295,10 +299,24 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             if (eventToUpdate.HasWaitlist)
             {
-                await _eventParticipationService.PromoteFromWaitlistAsync(eventToUpdate.Id, eventDto.OrganizationId);
+                await PromoteAfterCommittedUpdateAsync(eventToUpdate.Id, eventDto.OrganizationId);
             }
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
+        }
+
+        // The host's edit is already committed, so a failed promotion must not turn it into an error;
+        // the queue is promoted again on the next seat-freeing change.
+        private async Task PromoteAfterCommittedUpdateAsync(Guid eventId, int organizationId)
+        {
+            try
+            {
+                await _eventParticipationService.PromoteFromWaitlistAsync(eventId, organizationId);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Waitlist promotion after updating event {EventId} failed", eventId);
+            }
         }
 
         private async Task ResetEventAttendessAsync(Event @event, EditEventDto eventDto)

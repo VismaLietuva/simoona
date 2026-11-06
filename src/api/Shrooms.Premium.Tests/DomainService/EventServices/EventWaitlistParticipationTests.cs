@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -497,6 +498,263 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.That(roster.Select(p => p.FirstName), Is.EqualTo(new[] { "Going" }));
         }
 
+        [TestCase("2016-03-27", AttendingStatus.Waitlisted)]
+        [TestCase("2016-03-28", AttendingStatus.Attending)]
+        [TestCase("2016-03-29", AttendingStatus.Attending)]
+        public async Task Should_Promote_Only_Until_The_Registration_Deadline(string deadline, AttendingStatus expected)
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _event.RegistrationDeadline = DateTime.Parse(deadline);
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            Assert.That(StatusOf("first"), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public async Task Should_Free_And_Fill_A_Seat_On_Leave_In_One_Lock_And_Notify_After_It()
+        {
+            var seatLock = UseRecordingSeatLock();
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.LeaveAsync(eventGuid, new UserAndOrganizationDto { UserId = "going", OrganizationId = 2 }, string.Empty);
+
+            Assert.That(seatLock.Calls, Is.EqualTo(1));
+            Assert.That(seatLock.DispatchedInsideLock, Is.False);
+            Assert.That(seatLock.SavedOutsideLock, Is.False);
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+            _asyncRunner.Received(1).Run<IEventCalendarService>(Arg.Any<Func<IEventCalendarService, Task>>(), Arg.Any<string>());
+            _asyncRunner.Received(1).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Free_And_Fill_A_Seat_On_Expel_In_One_Lock_And_Notify_After_It()
+        {
+            var seatLock = UseRecordingSeatLock();
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await _sut.ExpelAsync(eventGuid, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 }, "going");
+
+            Assert.That(seatLock.Calls, Is.EqualTo(1));
+            Assert.That(seatLock.DispatchedInsideLock, Is.False);
+            Assert.That(seatLock.SavedOutsideLock, Is.False);
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+            _asyncRunner.Received(1).Run<IEventCalendarService>(Arg.Any<Func<IEventCalendarService, Task>>(), Arg.Any<string>());
+            _asyncRunner.Received(2).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Free_And_Fill_A_Seat_On_A_Status_Change_In_One_Lock_And_Notify_After_It()
+        {
+            var seatLock = UseRecordingSeatLock();
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("testUserId", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.NotAttending));
+
+            Assert.That(seatLock.Calls, Is.EqualTo(1));
+            Assert.That(seatLock.DispatchedInsideLock, Is.False);
+            Assert.That(seatLock.SavedOutsideLock, Is.False);
+            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
+            _asyncRunner.Received(1).Run<IEventCalendarService>(Arg.Any<Func<IEventCalendarService, Task>>(), Arg.Any<string>());
+            _asyncRunner.Received(1).Run<IEventNotificationService>(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_The_Join_Invite_After_The_Seat_Lock_Is_Released()
+        {
+            var seatLock = UseRecordingSeatLock();
+            var eventGuid = MockFullEvent(hasWaitlist: true, maxParticipants: 2);
+            MockUsers();
+
+            await _sut.JoinAsync(JoinDto(eventGuid));
+
+            Assert.That(seatLock.Calls, Is.EqualTo(1));
+            Assert.That(seatLock.DispatchedInsideLock, Is.False);
+            Assert.That(seatLock.SavedOutsideLock, Is.False);
+            _asyncRunner.Received(1).Run<IEventCalendarService>(Arg.Any<Func<IEventCalendarService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Keep_A_Waitlisted_User_On_The_Wall_And_Clear_The_Queue_Time_When_They_Join_Virtually()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, maxVirtualParticipants: 5, queuedUserId: "testUserId", queuedAt: DateTime.Parse("2016-03-20"));
+            MockUsers();
+            var joinDto = JoinDto(eventGuid);
+            joinDto.AttendStatus = AttendingStatus.AttendingVirtually;
+
+            await _sut.JoinAsync(joinDto);
+
+            Assert.That(StatusOf("testUserId"), Is.EqualTo(AttendingStatus.AttendingVirtually));
+            Assert.That(WaitlistedAtOf("testUserId"), Is.Null);
+            await _wallService.DidNotReceiveWithAnyArgs().JoinOrLeaveWallAsync(default, default, default, default, default);
+        }
+
+        [Test]
+        public async Task Should_Keep_A_Waitlisted_User_On_The_Wall_When_They_Join_Again()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, queuedUserId: "testUserId", queuedAt: DateTime.Parse("2016-03-20"));
+            MockUsers();
+
+            await _sut.JoinAsync(JoinDto(eventGuid));
+
+            Assert.That(StatusOf("testUserId"), Is.EqualTo(AttendingStatus.Waitlisted));
+            await _wallService.DidNotReceiveWithAnyArgs().JoinOrLeaveWallAsync(default, default, default, default, default);
+        }
+
+        [Test]
+        public async Task Should_Keep_A_Waitlisted_User_On_The_Wall_And_Clear_The_Queue_Time_When_They_Join_A_Free_Seat()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, maxParticipants: 2, queuedUserId: "testUserId", queuedAt: DateTime.Parse("2016-03-20"));
+            MockUsers();
+
+            await _sut.JoinAsync(JoinDto(eventGuid));
+
+            Assert.That(StatusOf("testUserId"), Is.EqualTo(AttendingStatus.Attending));
+            Assert.That(WaitlistedAtOf("testUserId"), Is.Null);
+            await _wallService.DidNotReceiveWithAnyArgs().JoinOrLeaveWallAsync(default, default, default, default, default);
+        }
+
+        [Test]
+        public async Task Should_Join_The_Event_Wall_On_A_First_Time_Join()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, maxParticipants: 2);
+            MockUsers();
+
+            await _sut.JoinAsync(JoinDto(eventGuid));
+
+            await _wallService.Received(1).JoinOrLeaveWallAsync(Arg.Any<int>(), "testUserId", "testUserId", 2, true);
+        }
+
+        [Test]
+        public async Task Should_Tell_The_Manager_When_A_Promoted_User_Gets_A_Seat()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _event.EventType.SendEmailToManager = true;
+            MockUserWithManager("first");
+            var notifier = CaptureNotifications();
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            await notifier.Received(1).NotifyManagerAboutEventAsync(
+                Arg.Is<UserEventAttendStatusChangeEmailDto>(dto => dto.ManagerEmail == "boss@example.com" && dto.EventId == eventGuid),
+                true);
+        }
+
+        [Test]
+        public async Task Should_Not_Tell_The_Manager_About_A_Promotion_When_The_Event_Type_Does_Not_Ask_For_It()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            var notifier = CaptureNotifications();
+
+            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
+
+            await notifier.DidNotReceiveWithAnyArgs().NotifyManagerAboutEventAsync(default, default);
+        }
+
+        [Test]
+        public async Task Should_Not_Tell_The_Manager_When_A_Waitlisted_User_Leaves()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _event.EventType.SendEmailToManager = true;
+            MockUserWithManager("first");
+            var notifier = CaptureNotifications();
+
+            await _sut.LeaveAsync(eventGuid, new UserAndOrganizationDto { UserId = "first", OrganizationId = 2 }, string.Empty);
+
+            await notifier.DidNotReceiveWithAnyArgs().NotifyManagerAboutEventAsync(default, default);
+        }
+
+        [Test]
+        public async Task Should_Still_Tell_The_Manager_When_An_Attending_User_Leaves()
+        {
+            var eventGuid = MockWaitlistEvent(2, Start,
+                ("going", AttendingStatus.Attending, null));
+            _event.EventType.SendEmailToManager = true;
+            MockUserWithManager("going");
+            var notifier = CaptureNotifications();
+
+            await _sut.LeaveAsync(eventGuid, new UserAndOrganizationDto { UserId = "going", OrganizationId = 2 }, string.Empty);
+
+            await notifier.Received(1).NotifyManagerAboutEventAsync(Arg.Is<UserEventAttendStatusChangeEmailDto>(dto => dto.ManagerEmail == "boss@example.com"), false);
+        }
+
+        [Test]
+        public async Task Should_Not_Tell_The_Manager_When_A_Waitlisted_User_Is_Expelled()
+        {
+            var eventGuid = MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
+            _event.EventType.SendEmailToManager = true;
+            MockUserWithManager("first");
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+            var notifier = CaptureNotifications();
+
+            await _sut.ExpelAsync(eventGuid, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 }, "first");
+
+            await notifier.DidNotReceiveWithAnyArgs().NotifyManagerAboutEventAsync(default, default);
+            await notifier.Received(1).NotifyRemovedEventParticipantsAsync(Arg.Any<string>(), eventGuid, 2, Arg.Any<IEnumerable<string>>());
+        }
+
+        private RecordingEventSeatLock UseRecordingSeatLock()
+        {
+            var seatLock = new RecordingEventSeatLock();
+            _asyncRunner
+                .WhenForAnyArgs(runner => runner.Run<IEventCalendarService>(default, default))
+                .Do(_ => seatLock.RecordDispatch());
+            _asyncRunner
+                .WhenForAnyArgs(runner => runner.Run<IEventNotificationService>(default, default))
+                .Do(_ => seatLock.RecordDispatch());
+            _uow
+                .WhenForAnyArgs(uow => uow.SaveChangesAsync(default(bool)))
+                .Do(_ => seatLock.RecordSave());
+
+            _sut = new EventParticipationService(
+                _uow,
+                _systemClockMock,
+                Substitute.For<IRoleService>(),
+                _permissionService,
+                new EventValidationService(_systemClockMock),
+                _wallService,
+                _asyncRunner,
+                new EventAnswerValidator(),
+                seatLock);
+
+            return seatLock;
+        }
+
+        private IEventNotificationService CaptureNotifications()
+        {
+            var notifier = Substitute.For<IEventNotificationService>();
+            _asyncRunner
+                .WhenForAnyArgs(runner => runner.Run<IEventNotificationService>(default, default))
+                .Do(callInfo => callInfo.Arg<Func<IEventNotificationService, Task>>()(notifier).GetAwaiter().GetResult());
+
+            return notifier;
+        }
+
+        private void MockUserWithManager(string userId)
+        {
+            var manager = new ApplicationUser { Id = "boss", OrganizationId = 2, Email = "boss@example.com" };
+            var user = _participants.Single(p => p.ApplicationUserId == userId).ApplicationUser;
+            user.OrganizationId = 2;
+            user.ManagerId = manager.Id;
+            user.Manager = manager;
+
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user, manager });
+        }
+
         private static UpdateAttendStatusDto UpdateDto(Guid eventId, AttendingStatus status)
         {
             return new UpdateAttendStatusDto
@@ -525,6 +783,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private Guid MockFullEvent(
             bool hasWaitlist,
             int maxParticipants = 1,
+            int maxVirtualParticipants = 0,
             bool sendEmailToManager = false,
             string queuedUserId = null,
             DateTime? queuedAt = null,
@@ -541,6 +800,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Id = eventId,
                 MaxChoices = 0,
                 MaxParticipants = maxParticipants,
+                MaxVirtualParticipants = maxVirtualParticipants,
                 HasWaitlist = hasWaitlist,
                 AllowMaybeGoing = true,
                 OrganizationId = 2,
@@ -727,6 +987,41 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
+        }
+
+        private sealed class RecordingEventSeatLock : IEventSeatLock
+        {
+            private bool _inside;
+
+            public int Calls { get; private set; }
+
+            public bool DispatchedInsideLock { get; private set; }
+
+            public bool SavedOutsideLock { get; private set; }
+
+            public void RecordDispatch()
+            {
+                DispatchedInsideLock |= _inside;
+            }
+
+            public void RecordSave()
+            {
+                SavedOutsideLock |= !_inside;
+            }
+
+            public async Task RunAsync(Guid eventId, Func<Task> work)
+            {
+                Calls++;
+                _inside = true;
+                try
+                {
+                    await work();
+                }
+                finally
+                {
+                    _inside = false;
+                }
+            }
         }
     }
 }
