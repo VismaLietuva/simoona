@@ -10,6 +10,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public string ApplicationUserId { get; set; }
         public int AttendStatus { get; set; }
         public string AttendComment { get; set; }
+        public DateTime? WaitlistedAt { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
     }
