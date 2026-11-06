@@ -421,9 +421,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization(), cancellationToken);
                 var result = _mapper.Map<EventDetailsDto, EventDetailsViewModel>(eventDto);
 
-                var officesCount = await _officeMapService.GetOfficesCountAsync(cancellationToken);
-                result.IsForAllOffices = result.OfficesName.Count() == officesCount;
-
                 return Ok(result);
             }
             catch (EventException e)
