@@ -13,6 +13,7 @@ using Shrooms.Presentation.WebViewModels.Models.Emoji;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shrooms.Presentation.Api.Controllers
@@ -32,9 +33,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("List")]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(CancellationToken cancellationToken = default)
         {
-            var result = await _customEmojiService.GetAllAsync(GetUserAndOrganization(), GetOrganizationName());
+            var result = await _customEmojiService.GetAllAsync(GetUserAndOrganization(), GetOrganizationName(), cancellationToken);
 
             var etag = $"\"{result.ETag}\"";
             Response.Headers.ETag = etag;

@@ -30,7 +30,7 @@ namespace Shrooms.EmailTemplates.Seeds
                 // Core
                 new(EmailTemplateCacheKeys.NewWallPost, new NewWallPostEmailTemplateViewModel(
                     "New post in Engineering wall", "Engineering wall", "Wall", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1",
-                    "We are shipping the new email templates this week.", SettingsUrl, "Read it")),
+                    "We are shipping the new email templates this week 🎉 <img src=\"https://simoona.example.com/storage/org/parrot.gif\" alt=\":parrot:\" title=\":parrot:\" width=\"20\" height=\"20\" style=\"vertical-align:-4px\">", SettingsUrl, "Read it")),
                 new(EmailTemplateCacheKeys.NewPostComment, new NewCommentEmailTemplateViewModel(
                     "New comment in Engineering wall", "Engineering wall", "Wall", PictureUrl, "Rasa Petraitiene", "https://simoona.example.com/posts/1#c2",
                     "Agreed - let us pick this up on Monday.", SettingsUrl, "View comment")),
