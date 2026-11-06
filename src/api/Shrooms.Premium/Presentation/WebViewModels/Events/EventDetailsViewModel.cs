@@ -20,6 +20,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
+        public bool HasWaitlist { get; set; }
 
         public IEnumerable<string> OfficesName { get; set; }
 
@@ -67,5 +68,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
+        public int WaitlistCount { get; set; }
+        public int? WaitlistPosition { get; set; }
     }
 }

@@ -28,6 +28,7 @@
         public const string EventOptionsExcelTableName = "Event Options";
 
         public const int EventReportVisitedEventPreviewCount = 3;
+        public const int WaitlistPromotionCutoffHours = 12;
     }
 
     public enum AttendingStatus
@@ -36,7 +37,8 @@
         Attending,
         MaybeAttending,
         Idle,
-        AttendingVirtually
+        AttendingVirtually,
+        Waitlisted
     }
 
     public enum MyEventsOptions

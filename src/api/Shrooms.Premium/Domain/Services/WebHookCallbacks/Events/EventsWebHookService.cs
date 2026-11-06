@@ -84,6 +84,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 Modified = @event.Modified,
                 ModifiedBy = @event.ModifiedBy,
                 Place = @event.Place,
+                HasWaitlist = @event.HasWaitlist,
                 Created = @event.Created,
                 LocalStartDate = _recurrencePeriods[@event.EventRecurring](@event.LocalStartDate),
                 LocalEndDate = _recurrencePeriods[@event.EventRecurring](@event.LocalEndDate),

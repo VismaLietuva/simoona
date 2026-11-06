@@ -55,6 +55,8 @@
         public const string EventQuestionPayloadInvalid = "246";
         public const string EventQuestionNotFound = "247";
         public const string EventQuestionOptionNotFound = "248";
+        public const string EventWaitlistNotAllowedWithSignUpOptions = "249";
+        public const string EventWaitlistCannotBeDisabledWithQueue = "250";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

@@ -96,6 +96,8 @@ namespace Shrooms.EmailTemplates.Seeds
                     SampleDate, SampleEndDate)),
                 new(EmailPremiumTemplateCacheKeys.EventParticipantExpelled, new EventParticipantExpelledEmailTemplateViewModel(
                     SettingsUrl, "Engineering all-hands", "https://simoona.example.com/events/1")),
+                new(EmailPremiumTemplateCacheKeys.EventWaitlistPromoted, new EventWaitlistPromotedEmailTemplateViewModel(
+                    SettingsUrl, "Engineering all-hands", "https://simoona.example.com/events/1", SampleDate)),
                 new(EmailPremiumTemplateCacheKeys.EventJoinRemind, new EventJoinRemindEmailTemplateViewModel(SettingsUrl)
                 {
                     EventTypes = new Dictionary<string, string>

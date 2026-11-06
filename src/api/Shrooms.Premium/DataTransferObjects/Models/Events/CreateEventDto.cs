@@ -25,6 +25,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public bool AllowMaybeGoing { get; set; }
 
         public bool AllowNotGoing { get; set; }
+        public bool HasWaitlist { get; set; }
 
         public bool IsShownInUpcomingEventsWidget { get; set; }
 

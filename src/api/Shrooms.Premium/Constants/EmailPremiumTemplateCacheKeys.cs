@@ -15,6 +15,7 @@ namespace Shrooms.Premium.Constants
         public const string BookTaken = "/EmailTemplates/Books/BookTaken.cshtml";
         public const string EventParticipantExpelled = "/EmailTemplates/Events/ParticipantExpelled.cshtml";
         public const string EventJoinRemind = "/EmailTemplates/Events/RemindToJoin.cshtml";
+        public const string EventWaitlistPromoted = "/EmailTemplates/Events/WaitlistPromoted.cshtml";
         public const string LoyaltyKudosReceived = "/EmailTemplates/LoyaltyKudos/LoyaltyKudosReceived.cshtml";
         public const string LoyaltyKudosDecreased = "/EmailTemplates/LoyaltyKudos/LoyaltyKudosDecreased.cshtml";
         public const string CommitteeSuggestion = "/EmailTemplates/Committees/CommitteesSuggestion.cshtml";

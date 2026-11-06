@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -41,6 +42,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
         private readonly IEventQuestionWriter _eventQuestionWriter;
+        private readonly ILogger<EventService> _logger;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -58,7 +60,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService,
             ISystemClock systemClock,
-            IEventQuestionWriter eventQuestionWriter)
+            IEventQuestionWriter eventQuestionWriter,
+            ILogger<EventService> logger)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -77,6 +80,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _officeMapService = officeMapService;
             _systemClock = systemClock;
             _eventQuestionWriter = eventQuestionWriter;
+            _logger = logger;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -151,6 +155,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
             @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
 
+            var waitlist = @event.Participants
+                .Where(p => p.AttendStatus == (int)AttendingStatus.Waitlisted)
+                .OrderBy(p => p.WaitlistedAt)
+                .ThenBy(p => p.Id)
+                .ToList();
+            @event.WaitlistCount = waitlist.Count;
+            var queuePosition = waitlist.FindIndex(p => p.UserId == userOrg.UserId);
+            @event.WaitlistPosition = queuePosition < 0 ? null : queuePosition + 1;
+
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
             @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
@@ -207,6 +220,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await ValidateEvent(newEventDto);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
+            _eventValidationService.CheckIfWaitlistAllowed(newEventDto.HasWaitlist, newEventDto.NewOptions.Count(), newEventDto.Questions?.Count ?? 0);
 
             // Before MapNewEventAsync, which creates the event's wall and commits it: a tree
             // rejected after that point leaves an orphan wall behind.
@@ -264,6 +278,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
+            _eventValidationService.CheckIfWaitlistCanBeDisabled(eventDto.HasWaitlist, eventToUpdate);
+            _eventValidationService.CheckIfWaitlistAllowed(eventDto.HasWaitlist, totalOptionsProvided, eventDto.Questions?.Count ?? 0);
 
             await ValidateEvent(eventDto);
 
@@ -281,7 +297,26 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             await _uow.SaveChangesAsync(false);
 
+            if (eventToUpdate.HasWaitlist)
+            {
+                await PromoteAfterCommittedUpdateAsync(eventToUpdate.Id, eventDto.OrganizationId);
+            }
+
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
+        }
+
+        // The host's edit is already committed, so a failed promotion must not turn it into an error;
+        // the queue is promoted again on the next seat-freeing change.
+        private async Task PromoteAfterCommittedUpdateAsync(Guid eventId, int organizationId)
+        {
+            try
+            {
+                await _eventParticipationService.PromoteFromWaitlistAsync(eventId, organizationId);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Waitlist promotion after updating event {EventId} failed", eventId);
+            }
         }
 
         private async Task ResetEventAttendessAsync(Event @event, EditEventDto eventDto)
@@ -371,6 +406,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 Recurrence = e.EventRecurring,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
+                HasWaitlist = e.HasWaitlist,
+                WaitlistCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Waitlisted),
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
@@ -615,6 +652,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.IsPinned = eventArgsDto.IsPinned;
             newEvent.AllowMaybeGoing = eventArgsDto.AllowMaybeGoing;
             newEvent.AllowNotGoing = eventArgsDto.AllowNotGoing;
+            newEvent.HasWaitlist = eventArgsDto.HasWaitlist;
         }
 
         private async Task SetEventRemindersAsync(IEventArgsDto eventArgsDto, Event eventToUpdate)
@@ -756,6 +794,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 EndDate = e.EndDate,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
+                HasWaitlist = e.HasWaitlist,
                 MaxParticipants = e.MaxParticipants,
                 MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
@@ -827,7 +866,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                     FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                     ImageName = p.ApplicationUser.PictureId,
                     AttendStatus = p.AttendStatus,
-                    AttendComment = p.AttendComment
+                    AttendComment = p.AttendComment,
+                    WaitlistedAt = p.WaitlistedAt
                 }),
 
                 // Not derivable from the option-level Participants lists above: those are scoped to

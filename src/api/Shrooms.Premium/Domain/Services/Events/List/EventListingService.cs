@@ -364,7 +364,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> EventParticipantVisitedReportEventsFilter(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg, int eventTypesLength)
         {
-            return e => e.EventParticipants.Any(participant => participant.ApplicationUserId == visitedArgsDto.UserId) &&
+            return e => e.EventParticipants.Any(participant => participant.ApplicationUserId == visitedArgsDto.UserId &&
+                                                               participant.AttendStatus != (int)AttendingStatus.Waitlisted) &&
                             e.EndDate < DateTime.UtcNow &&
                             e.OrganizationId == userOrg.OrganizationId &&
                             (eventTypesLength == 0 || visitedArgsDto.EventTypeIds.Contains(e.EventType.Id));
@@ -425,7 +426,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null
                     ? (AttendingStatus)e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
                     : AttendingStatus.Idle,
-                MaxChoices = e.MaxChoices
+                MaxChoices = e.MaxChoices,
+                HasWaitlist = e.HasWaitlist
             };
         }
 
