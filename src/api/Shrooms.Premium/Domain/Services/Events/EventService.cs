@@ -238,9 +238,10 @@ namespace Shrooms.Premium.Domain.Services.Events
                 })
                 .ToListAsync(cancellationToken);
 
-            // Gives both the event's office names and the total office count.
+            // Gives both the event's office names and the total office count. The Select keeps the
+            // SQL to two columns: ToDictionaryAsync's selectors run only after materialization.
             var allOffices = await _officeDbSet
-                .AsNoTracking()
+                .Select(office => new { office.Id, office.Name })
                 .ToDictionaryAsync(office => office.Id, office => office.Name, cancellationToken);
 
             // Option lists name only people who are going, in person or virtually.
