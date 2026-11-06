@@ -2874,6 +2874,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("OvertimeAppNotifications")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ProjectsAppNotifications")
                         .HasColumnType("bit");
 
@@ -4206,6 +4209,87 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.ToTable("TimeMonthLocks", (string)null);
                 });
 
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeOvertimeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("DecidedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DecidedById")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("MinutesPerDay")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("OrderedByManager")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RequestedById")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ReviewComment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DecidedById");
+
+                    b.HasIndex("RequestedById");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("OrganizationId", "Status")
+                        .HasDatabaseName("IX_TimeOvertimeRequests_OrganizationId_Status");
+
+                    b.HasIndex("OrganizationId", "UserId", "DateFrom")
+                        .HasDatabaseName("IX_TimeOvertimeRequests_OrganizationId_UserId_DateFrom");
+
+                    b.ToTable("TimeOvertimeRequests", (string)null);
+                });
+
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimePeriod", b =>
                 {
                     b.Property<int>("Id")
@@ -4375,6 +4459,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOvertime")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("Modified")
@@ -6615,6 +6702,40 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Navigation("LockedBy");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimeOvertimeRequest", b =>
+                {
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "DecidedBy")
+                        .WithMany()
+                        .HasForeignKey("DecidedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "RequestedBy")
+                        .WithMany()
+                        .HasForeignKey("RequestedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Shrooms.DataLayer.EntityModels.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DecidedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("RequestedBy");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Shrooms.DataLayer.EntityModels.Models.TimeRegistration.TimePeriod", b =>

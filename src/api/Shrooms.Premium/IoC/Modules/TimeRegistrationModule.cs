@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shrooms.Premium.Domain.Services.Email.TimeRegistration;
 using Shrooms.Premium.Domain.Services.TimeRegistration;
 
 namespace Shrooms.Premium.IoC.Modules
@@ -12,6 +13,8 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<ITimeTableService, TimeTableService>();
             services.AddScoped<ITimePeriodService, TimePeriodService>();
             services.AddScoped<ITimeReportService, TimeReportService>();
+            services.AddScoped<ITimeOvertimeService, TimeOvertimeService>();
+            services.AddScoped<ITimeOvertimeNotificationService, TimeOvertimeNotificationService>();
             return services;
         }
     }
