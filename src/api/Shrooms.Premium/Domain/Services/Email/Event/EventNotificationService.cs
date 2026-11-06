@@ -179,14 +179,18 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var appRecipients = people.Where(p => p.WantsApp).Select(p => p.Id).ToList();
             if (appRecipients.Count > 0)
             {
-                _notificationsDbSet.Add(Notification.Create(
+                var notification = Notification.Create(
+                    "Waitlist",
                     eventName,
-                    "A spot opened up and you are now going",
                     null,
                     new Sources { EventId = eventId.ToString() },
                     NotificationType.EventWaitlistPromoted,
                     orgId,
-                    appRecipients));
+                    appRecipients);
+                notification.Created = DateTime.UtcNow;
+                notification.Modified = notification.Created;
+
+                _notificationsDbSet.Add(notification);
                 await _uow.SaveChangesAsync(false);
             }
         }

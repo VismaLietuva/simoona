@@ -141,6 +141,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var startDate = new DateTime(2026, 3, 17, 9, 30, 0, DateTimeKind.Utc);
             ArrangeUsers(new ApplicationUser { Id = "u1", Email = "u1@email.com", TimeZone = "Europe/Vilnius", NotificationsSettings = null });
             var emails = ArrangeEmailCapture(out var templates);
+            Notification notification = null;
+            _notificationsDbSet.When(x => x.Add(Arg.Any<Notification>())).Do(call => notification = call.Arg<Notification>());
 
             // Act
             await _sut.NotifyWaitlistPromotedAsync(eventId, "Museum", startDate, 1, new[] { "u1" });
@@ -156,13 +158,16 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.That(template.StartDate, Is.EqualTo(startDate));
             Assert.That(template.UserNotificationSettingsUrl, Is.EqualTo("settings-url"));
 
-            _notificationsDbSet.Received(1).Add(Arg.Is<Notification>(n =>
-                n.Type == NotificationType.EventWaitlistPromoted &&
-                n.Title == "Museum" &&
-                n.PictureId == null &&
-                n.OrganizationId == 1 &&
-                n.Sources.EventId == eventId.ToString() &&
-                n.NotificationUsers.Single().UserId == "u1"));
+            _notificationsDbSet.Received(1).Add(Arg.Any<Notification>());
+            Assert.That(notification.Type, Is.EqualTo(NotificationType.EventWaitlistPromoted));
+            Assert.That(notification.Title, Is.EqualTo("Waitlist"));
+            Assert.That(notification.Description, Is.EqualTo("Museum"));
+            Assert.That(notification.PictureId, Is.Null);
+            Assert.That(notification.OrganizationId, Is.EqualTo(1));
+            Assert.That(notification.Sources.EventId, Is.EqualTo(eventId.ToString()));
+            Assert.That(notification.NotificationUsers.Single().UserId, Is.EqualTo("u1"));
+            Assert.That(notification.Created, Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromMinutes(1)));
+            Assert.That(notification.Modified, Is.EqualTo(notification.Created));
             await _uow.Received(1).SaveChangesAsync(false);
         }
 
