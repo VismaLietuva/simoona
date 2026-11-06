@@ -65,12 +65,13 @@ jobs:
           path: src/api/*/TestResults/*.trx
           if-no-files-found: ignore
 
-      # Deployable package for master builds only. Not --no-build: that fails with NETSDK1152,
-      # because both email template projects ship EmailTemplates/_ViewImports.cshtml.
+      # Runs on every event, so a PR that breaks only publish fails here, not on master.
+      # Not --no-build: that fails with NETSDK1152, because both email template projects
+      # ship EmailTemplates/_ViewImports.cshtml.
       - name: Publish API
-        if: ${{ github.event_name != 'pull_request' }}
         run: dotnet publish Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj --configuration Release --no-restore --output ../../publish/api
 
+      # The deployable package is kept for non-PR runs (master pushes and manual runs) only.
       - name: Upload API package
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
