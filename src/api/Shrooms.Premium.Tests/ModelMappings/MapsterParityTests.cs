@@ -107,6 +107,7 @@ namespace Shrooms.Premium.Tests.ModelMappings
             ["UserDto → ApplicationUserViewModel"] = "differs from AutoMapper on the generated sample at PictureId.",
             ["UserKudosInformationDto → UserKudosInformationViewModel"] = "AutoMapper throws AutoMapperMappingException on the generated sample; add a hand-written sample.",
             ["VacationDto → VacationViewModel"] = "differs from AutoMapper on the generated sample at DateStart, DateEnd.",
+            ["VideoLibraryItemViewModel → VideoLibraryItemDto"] = "differs from AutoMapper on the empty sample at Materials.",
             ["WallPostViewModel → NotificationDto"] = "differs from AutoMapper on the generated sample at Title, Description.",
         };
 
