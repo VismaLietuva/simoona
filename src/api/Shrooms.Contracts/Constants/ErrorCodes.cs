@@ -119,6 +119,8 @@ namespace Shrooms.Contracts.Constants
         // Video library, 20**
         public const int VideoLinkInvalid = 2000;
         public const int VideoRecordedInFuture = 2001;
+        public const int VideoMaterialLinkInvalid = 2002;
+        public const int VideoMaterialsTooMany = 2003;
 
         // Time registration, 21**
         public const int TimeRegistrationNotFound = 2100;

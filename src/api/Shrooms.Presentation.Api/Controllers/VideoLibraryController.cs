@@ -3,6 +3,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels;
+using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.VideoLibrary;
 using Shrooms.Presentation.Api.Filters;
@@ -100,7 +101,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Update")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.VideoLibrary)]
+        [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(VideoLibraryItemViewModel videoViewModel)
         {
@@ -117,6 +118,10 @@ namespace Shrooms.Presentation.Api.Controllers
                 await _videoLibraryService.UpdateVideoAsync(videoDto);
                 return Ok();
             }
+            catch (UnauthorizedException)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
@@ -125,7 +130,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.VideoLibrary)]
+        [PermissionAnyOfAuthorize(BasicPermissions.VideoLibrary, AdministrationPermissions.VideoLibrary)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
@@ -138,6 +143,10 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 await _videoLibraryService.RemoveVideoAsync(id, GetUserAndOrganization());
                 return Ok();
+            }
+            catch (UnauthorizedException)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
             catch (ValidationException e)
             {

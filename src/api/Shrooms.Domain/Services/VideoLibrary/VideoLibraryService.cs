@@ -11,6 +11,8 @@ using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
+using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
 using X.PagedList;
 
@@ -25,12 +27,14 @@ namespace Shrooms.Domain.Services.VideoLibrary
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
         private readonly ISystemClock _systemClock;
+        private readonly IPermissionService _permissionService;
 
-        public VideoLibraryService(IUnitOfWork2 uow, IPictureService pictureService, ISystemClock systemClock)
+        public VideoLibraryService(IUnitOfWork2 uow, IPictureService pictureService, ISystemClock systemClock, IPermissionService permissionService)
         {
             _uow = uow;
             _pictureService = pictureService;
             _systemClock = systemClock;
+            _permissionService = permissionService;
             _videosDbSet = uow.GetDbSet<VideoLibraryItem>();
             _videoTypesDbSet = uow.GetDbSet<VideoType>();
         }
@@ -39,6 +43,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
         {
             // One cutoff for both the "recently added" filter and each video's IsNew.
             var since = RecentSince();
+            var canEditAll = await IsAdministratorAsync(args);
 
             var filtered = _videosDbSet
                 .Where(v => v.OrganizationId == args.OrganizationId)
@@ -57,7 +62,7 @@ namespace Shrooms.Domain.Services.VideoLibrary
                     .ThenByDescending(v => v.Created)
                     .ThenByDescending(v => v.Id);
 
-            var query = ordered.Select(MapVideoToDto(since));
+            var query = ordered.Select(MapVideoToDto(since, args.UserId, canEditAll));
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -131,10 +136,11 @@ namespace Shrooms.Domain.Services.VideoLibrary
         public async Task CreateVideoAsync(VideoLibraryItemDto video)
         {
             ValidateUrl(video.Url);
+            ValidateMaterials(video.Materials);
             ValidateRecordedOn(video.RecordedOn);
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
-            _videosDbSet.Add(new VideoLibraryItem
+            var entity = new VideoLibraryItem
             {
                 Title = video.Title,
                 Url = video.Url,
@@ -144,18 +150,24 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 VideoTypeId = video.VideoTypeId,
                 CreatedBy = video.UserId,
                 OrganizationId = video.OrganizationId
-            });
+            };
+
+            ReplaceMaterials(entity, video.Materials);
+            _videosDbSet.Add(entity);
 
             await _uow.SaveChangesAsync(video.UserId);
         }
 
         public async Task UpdateVideoAsync(VideoLibraryItemDto video)
         {
+            var entity = await FindAsync(_videosDbSet.Include(v => v.Materials), video.Id, video.OrganizationId);
+            await EnsureCanEditAsync(entity, video);
+
             ValidateUrl(video.Url);
+            ValidateMaterials(video.Materials);
             ValidateRecordedOn(video.RecordedOn);
             await ValidateVideoTypeAsync(video.VideoTypeId, video.OrganizationId);
 
-            var entity = await FindAsync(video.Id, video.OrganizationId);
             var replacedPictureId = entity.PictureId;
 
             entity.Title = video.Title;
@@ -169,6 +181,11 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 entity.RecordedOn = video.RecordedOn.Value;
             }
 
+            if (video.Materials != null)
+            {
+                ReplaceMaterials(entity, video.Materials);
+            }
+
             await _uow.SaveChangesAsync(video.UserId);
 
             await RemoveReplacedPictureAsync(replacedPictureId, video.PictureId, video.OrganizationId);
@@ -176,11 +193,26 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
         public async Task RemoveVideoAsync(int id, UserAndOrganizationDto userOrg)
         {
-            var entity = await FindAsync(id, userOrg.OrganizationId);
+            var entity = await FindAsync(_videosDbSet, id, userOrg.OrganizationId);
+            await EnsureCanEditAsync(entity, userOrg);
 
             entity.IsDeleted = true;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        // Whoever added a video may change or remove it; administrators may touch any.
+        private async Task EnsureCanEditAsync(VideoLibraryItem entity, UserAndOrganizationDto userOrg)
+        {
+            if (entity.CreatedBy != userOrg.UserId && !await IsAdministratorAsync(userOrg))
+            {
+                throw new UnauthorizedException();
+            }
+        }
+
+        private Task<bool> IsAdministratorAsync(UserAndOrganizationDto userOrg)
+        {
+            return _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.VideoLibrary);
         }
 
         private DateTime RecentSince()
@@ -261,9 +293,9 @@ namespace Shrooms.Domain.Services.VideoLibrary
             return video => video.RecordedOn <= to;
         }
 
-        private async Task<VideoLibraryItem> FindAsync(int id, int organizationId)
+        private static async Task<VideoLibraryItem> FindAsync(IQueryable<VideoLibraryItem> videos, int id, int organizationId)
         {
-            var entity = await _videosDbSet
+            var entity = await videos
                 .FirstOrDefaultAsync(v => v.OrganizationId == organizationId && v.Id == id);
 
             if (entity == null)
@@ -305,14 +337,62 @@ namespace Shrooms.Domain.Services.VideoLibrary
 
         private static void ValidateUrl(string url)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
-                (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            if (!IsAbsoluteHttpUrl(url))
             {
                 throw new ValidationException(ErrorCodes.VideoLinkInvalid, "Video link must be an absolute http(s) URL");
             }
         }
 
-        private static Expression<Func<VideoLibraryItem, VideoLibraryItemDto>> MapVideoToDto(DateTime recentSince)
+        private static void ValidateMaterials(IList<VideoLibraryMaterialDto> materials)
+        {
+            if (materials == null)
+            {
+                return;
+            }
+
+            if (materials.Count > VideoLibraryMaterial.MaxPerVideo)
+            {
+                throw new ValidationException(ErrorCodes.VideoMaterialsTooMany, $"A video can have at most {VideoLibraryMaterial.MaxPerVideo} materials");
+            }
+
+            if (materials.Any(m => m == null || !IsAbsoluteHttpUrl(m.Url)))
+            {
+                throw new ValidationException(ErrorCodes.VideoMaterialLinkInvalid, "Material link must be an absolute http(s) URL");
+            }
+        }
+
+        private static bool IsAbsoluteHttpUrl(string url)
+        {
+            return Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+                   (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
+
+        private static void ReplaceMaterials(VideoLibraryItem entity, IList<VideoLibraryMaterialDto> materials)
+        {
+            var existing = entity.Materials.OrderBy(m => m.SortOrder).ToList();
+            var incoming = materials ?? new List<VideoLibraryMaterialDto>();
+
+            for (var i = 0; i < incoming.Count; i++)
+            {
+                var material = i < existing.Count ? existing[i] : new VideoLibraryMaterial();
+
+                material.Title = incoming[i].Title.Trim();
+                material.Url = incoming[i].Url.Trim();
+                material.SortOrder = i;
+
+                if (i >= existing.Count)
+                {
+                    entity.Materials.Add(material);
+                }
+            }
+
+            foreach (var removed in existing.Skip(incoming.Count))
+            {
+                entity.Materials.Remove(removed);
+            }
+        }
+
+        private static Expression<Func<VideoLibraryItem, VideoLibraryItemDto>> MapVideoToDto(DateTime recentSince, string userId, bool canEditAll)
         {
             return video => new VideoLibraryItemDto
             {
@@ -325,7 +405,12 @@ namespace Shrooms.Domain.Services.VideoLibrary
                 VideoTypeId = video.VideoTypeId,
                 VideoTypeTitle = video.VideoType == null ? null : video.VideoType.Title,
                 Created = video.Created,
-                IsNew = video.Created >= recentSince
+                IsNew = video.Created >= recentSince,
+                CanEdit = canEditAll || video.CreatedBy == userId,
+                Materials = video.Materials
+                    .OrderBy(m => m.SortOrder)
+                    .Select(m => new VideoLibraryMaterialDto { Title = m.Title, Url = m.Url })
+                    .ToList()
             };
         }
     }

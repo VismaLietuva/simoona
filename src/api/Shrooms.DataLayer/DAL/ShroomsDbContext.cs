@@ -218,6 +218,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VideoLibraryItem> VideoLibraryItems { get; set; }
 
+        public virtual DbSet<VideoLibraryMaterial> VideoLibraryMaterials { get; set; }
+
         public virtual DbSet<TimeCustomer> TimeCustomers { get; set; }
 
         public virtual DbSet<TimeProject> TimeProjects { get; set; }
@@ -348,6 +350,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoLibraryItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new VideoLibraryMaterialEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeCustomerEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeProjectEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeTaskEntityConfig());
