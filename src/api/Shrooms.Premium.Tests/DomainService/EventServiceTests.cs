@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Shrooms.Premium.Tests.Mocks;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -75,7 +75,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 _officeMapService,
                 _systemClock,
                 eventQuestionWriter,
-                Substitute.For<ILogger<EventService>>());
+                new PassThroughEventSeatLock());
         }
 
         [TestCase(1)]

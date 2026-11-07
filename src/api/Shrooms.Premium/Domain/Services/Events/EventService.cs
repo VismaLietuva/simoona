@@ -1,7 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -42,7 +41,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IOfficeMapService _officeMapService;
         private readonly ISystemClock _systemClock;
         private readonly IEventQuestionWriter _eventQuestionWriter;
-        private readonly ILogger<EventService> _logger;
+        private readonly IEventSeatLock _eventSeatLock;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -61,7 +60,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             IOfficeMapService officeMapService,
             ISystemClock systemClock,
             IEventQuestionWriter eventQuestionWriter,
-            ILogger<EventService> logger)
+            IEventSeatLock eventSeatLock)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -80,7 +79,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _officeMapService = officeMapService;
             _systemClock = systemClock;
             _eventQuestionWriter = eventQuestionWriter;
-            _logger = logger;
+            _eventSeatLock = eventSeatLock;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -221,6 +220,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfWaitlistAllowed(newEventDto.HasWaitlist, newEventDto.NewOptions.Count(), newEventDto.Questions?.Count ?? 0);
+            _eventValidationService.CheckIfWaitlistHasSeats(newEventDto.HasWaitlist, newEventDto.MaxParticipants);
 
             // Before MapNewEventAsync, which creates the event's wall and commits it: a tree
             // rejected after that point leaves an orphan wall behind.
@@ -259,6 +259,15 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         public async Task UpdateEventAsync(EditEventDto eventDto)
         {
+            // The edit can free seats (higher max, reset list) or switch the waitlist off, so it shares the
+            // lock with joins and with the promotion it triggers: nobody can take a freed seat ahead of the
+            // queue, and nobody can join the queue after the disable check has passed.
+            _ = Guid.TryParse(eventDto.Id, out var eventId);
+            await _eventSeatLock.RunAsync(eventId, () => UpdateEventInsideSeatLockAsync(eventDto));
+        }
+
+        private async Task UpdateEventInsideSeatLockAsync(EditEventDto eventDto)
+        {
             var eventToUpdate = await _eventsDbSet
                 .Include(e => e.EventParticipants).ThenInclude(participant => participant.ApplicationUser).ThenInclude(u => u.Manager)
                 .Include(e => e.EventOptions)
@@ -280,6 +289,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
             _eventValidationService.CheckIfWaitlistCanBeDisabled(eventDto.HasWaitlist, eventToUpdate);
             _eventValidationService.CheckIfWaitlistAllowed(eventDto.HasWaitlist, totalOptionsProvided, eventDto.Questions?.Count ?? 0);
+            _eventValidationService.CheckIfWaitlistHasSeats(eventDto.HasWaitlist, eventDto.MaxParticipants);
 
             await ValidateEvent(eventDto);
 
@@ -299,24 +309,11 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             if (eventToUpdate.HasWaitlist)
             {
-                await PromoteAfterCommittedUpdateAsync(eventToUpdate.Id, eventDto.OrganizationId);
+                // In the same transaction as the edit; a failure rolls the edit back, as it does for leave and expel.
+                await _eventParticipationService.PromoteFromWaitlistAsync(eventToUpdate.Id, eventDto.OrganizationId);
             }
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
-        }
-
-        // The host's edit is already committed, so a failed promotion must not turn it into an error;
-        // the queue is promoted again on the next seat-freeing change.
-        private async Task PromoteAfterCommittedUpdateAsync(Guid eventId, int organizationId)
-        {
-            try
-            {
-                await _eventParticipationService.PromoteFromWaitlistAsync(eventId, organizationId);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Waitlist promotion after updating event {EventId} failed", eventId);
-            }
         }
 
         private async Task ResetEventAttendessAsync(Event @event, EditEventDto eventDto)

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Shrooms.Premium.Tests.Mocks;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -44,6 +44,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IWallService _wallService;
         private IEventService _eventService;
         private IEventParticipationService _eventParticipationService;
+        private PassThroughEventSeatLock _seatLock;
         private ISystemClock _systemClockMock;
         private IPermissionService _permissionService;
         private ISystemClock _systemClock;
@@ -72,6 +73,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var markdownConverter = Substitute.For<IMarkdownConverter>();
             var eventQuestionWriter = Substitute.For<IEventQuestionWriter>();
 
+            _seatLock = new PassThroughEventSeatLock();
             _eventService = new EventService(
                 _uow,
                 _permissionService,
@@ -83,7 +85,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 officeMapService,
                 _systemClock,
                 eventQuestionWriter,
-                Substitute.For<ILogger<EventService>>());
+                _seatLock);
         }
 
         [Test]
@@ -1179,15 +1181,42 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Keep_A_Committed_Update_When_Promotion_Fails()
+        public async Task Should_Update_And_Promote_Inside_One_Seat_Lock()
         {
+            var insideDuringPromotion = false;
+            _eventParticipationService
+                .PromoteFromWaitlistAsync(default, default)
+                .ReturnsForAnyArgs(_ =>
+                {
+                    insideDuringPromotion = _seatLock.Inside;
+                    return Task.CompletedTask;
+                });
+
+            await UpdateOneTimeEventAsync(hasWaitlist: true);
+
+            Assert.That(_seatLock.Runs, Is.EqualTo(1));
+            Assert.That(insideDuringPromotion, Is.True);
+        }
+
+        [Test]
+        public void Should_Fail_The_Update_When_Promotion_Fails()
+        {
+            // Same transaction as the edit: the lock rolls both back, as it does for leave and expel.
             _eventParticipationService
                 .PromoteFromWaitlistAsync(default, default)
                 .ReturnsForAnyArgs(Task.FromException(new EventException(PremiumErrorCodes.EventIsFullCode)));
 
-            Assert.DoesNotThrowAsync(() => UpdateOneTimeEventAsync(hasWaitlist: true));
+            var ex = Assert.ThrowsAsync<EventException>(() => UpdateOneTimeEventAsync(hasWaitlist: true));
 
-            _uow.Received().SaveChangesAsync(false);
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
+        }
+
+        [Test]
+        public void Should_Reject_A_Waitlist_Without_In_Person_Seats_On_Update()
+        {
+            var ex = Assert.ThrowsAsync<EventException>(() => UpdateOneTimeEventAsync(hasWaitlist: true, (editDto, _) => editDto.MaxParticipants = 0));
+
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventWaitlistRequiresSeats));
         }
 
         [Test]

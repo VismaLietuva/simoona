@@ -6,6 +6,24 @@ namespace Shrooms.Premium.Tests.Mocks
 {
     public class PassThroughEventSeatLock : IEventSeatLock
     {
-        public Task RunAsync(Guid eventId, Func<Task> work) => work();
+        public bool Inside { get; private set; }
+
+        public int Runs { get; private set; }
+
+        public async Task RunAsync(Guid eventId, Func<Task> work)
+        {
+            Runs++;
+            Inside = true;
+            try
+            {
+                await work();
+            }
+            finally
+            {
+                Inside = false;
+            }
+        }
+
+        public void AfterCommit(Action action) => action();
     }
 }

@@ -48,6 +48,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfEventReminderCanBeUpdated(IEventArgsDto eventArgsDto, EventReminder reminder);
         void CheckIfEventReminderCanBeAdded(IEventArgsDto eventArgsDto, EventReminderDto reminder);
         void CheckIfWaitlistAllowed(bool hasWaitlist, int legacyOptionsCount, int questionsCount);
+        void CheckIfWaitlistHasSeats(bool hasWaitlist, int maxParticipants);
         void CheckIfWaitlistCanBeDisabled(bool newHasWaitlist, Event eventToUpdate);
     }
 }

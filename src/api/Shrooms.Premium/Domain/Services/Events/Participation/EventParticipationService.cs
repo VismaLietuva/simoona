@@ -133,9 +133,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private static bool ShouldJoinWaitlist(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
+        private bool ShouldJoinWaitlist(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
         {
-            if (!eventDto.HasWaitlist || addedByColleague || joinDto.AttendStatus != AttendingStatus.Attending)
+            // Inside the cutoff nobody is promoted any more, so queueing would only strand the person.
+            if (!eventDto.HasWaitlist || addedByColleague || joinDto.AttendStatus != AttendingStatus.Attending || IsWithinPromotionCutoff(eventDto.StartDate))
             {
                 return false;
             }
@@ -313,18 +314,23 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
-            _asyncRunner.Run<IEventCalendarService>(
-                async calendar => await calendar.SendInvitationAsync(promotion.Event, promotion.UserIds, promotion.OrganizationId),
-                _uow.ConnectionName);
-
-            _asyncRunner.Run<IEventNotificationService>(
-                async notifier => await notifier.NotifyWaitlistPromotedAsync(promotion.Event.Id, promotion.Event.Name, promotion.Event.StartDate, promotion.OrganizationId, promotion.UserIds),
-                _uow.ConnectionName);
-
-            if (promotion.Event.SendEmailToManager)
+            // Deferred when the caller is itself inside the seat lock (an event edit), so nothing is
+            // sent for a promotion that the edit's transaction then rolls back.
+            _eventSeatLock.AfterCommit(() =>
             {
-                NotifyManagersAfterJoin(promotion.Event, promotion.Users);
-            }
+                _asyncRunner.Run<IEventCalendarService>(
+                    async calendar => await calendar.SendInvitationAsync(promotion.Event, promotion.UserIds, promotion.OrganizationId),
+                    _uow.ConnectionName);
+
+                _asyncRunner.Run<IEventNotificationService>(
+                    async notifier => await notifier.NotifyWaitlistPromotedAsync(promotion.Event.Id, promotion.Event.Name, promotion.Event.StartDate, promotion.OrganizationId, promotion.UserIds),
+                    _uow.ConnectionName);
+
+                if (promotion.Event.SendEmailToManager)
+                {
+                    NotifyManagersAfterJoin(promotion.Event, promotion.Users);
+                }
+            });
         }
 
         private bool IsWithinPromotionCutoff(DateTime startDate) =>
@@ -357,7 +363,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return requested;
             }
 
-            if (!@event.HasWaitlist)
+            if (!@event.HasWaitlist || IsWithinPromotionCutoff(@event.StartDate))
             {
                 _eventValidationService.CheckIfEventIsFull(@event.MaxParticipants, attendingCount);
             }
@@ -725,8 +731,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     continue;
                 }
 
-                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyManagerAboutEventAsync(user, false),
-                    _uow.ConnectionName);
+                var notice = user;
+                _eventSeatLock.AfterCommit(() => _asyncRunner.Run<IEventNotificationService>(
+                    async notifier => await notifier.NotifyManagerAboutEventAsync(notice, false),
+                    _uow.ConnectionName));
             }
         }
 
@@ -774,8 +782,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             NotifyManagers(userEventAttendStatusDto);
         }
 
+        // Resetting the in-person list also clears its queue: leaving the queue behind would have the
+        // edit promote it straight into the list the host just emptied.
         private static Func<EventParticipant, bool> FilterParticipantByAttendStatus(AttendingStatus? status) =>
-            participant => status == null || participant.AttendStatus == (int)status.Value;
+            participant => status == null ||
+                           participant.AttendStatus == (int)status.Value ||
+                           (status == AttendingStatus.Attending && participant.AttendStatus == (int)AttendingStatus.Waitlisted);
 
         private void NotifyManagersAfterJoin(
             EventJoinValidationDto eventJoinValidationDto,
@@ -841,8 +853,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg, AttendingStatus? status)
         {
-            var filteredParticipants = @event.EventParticipants.Where(FilterParticipantByAttendStatus(status));
-            var filteredParticipantIds = filteredParticipants.Select(participant => participant.ApplicationUserId);
+            // Materialized: the notice is sent after the commit, by which time the rows are gone.
+            var filteredParticipants = @event.EventParticipants.Where(FilterParticipantByAttendStatus(status)).ToList();
+            var filteredParticipantIds = filteredParticipants.Select(participant => participant.ApplicationUserId).ToList();
 
             await RemoveParticipantsFromEventWallAsync(@event, userOrg, filteredParticipants);
             _eventParticipantsDbSet.RemoveRange(filteredParticipants);
@@ -861,9 +874,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private void NotifyRemovedParticipants(Event @event, UserAndOrganizationDto userOrg, IEnumerable<string> filteredParticipantIds)
         {
-            _asyncRunner.Run<IEventNotificationService>(async notifier =>
+            _eventSeatLock.AfterCommit(() => _asyncRunner.Run<IEventNotificationService>(async notifier =>
                             await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, filteredParticipantIds),
-                            _uow.ConnectionName);
+                            _uow.ConnectionName));
         }
 
         private async Task<EventParticipant> GetParticipantAsync(Guid eventId, int userOrg, string userId)
@@ -948,7 +961,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private static IEnumerable<UserEventAttendStatusChangeEmailDto> MapEventToUserEventAttendStatusChangeEmailDto(Event @event)
         {
-            return @event.EventParticipants.Select(participant => new UserEventAttendStatusChangeEmailDto
+            // The manager never heard that a waitlisted person joined, so is not told they were removed either.
+            return @event.EventParticipants
+                .Where(participant => participant.AttendStatus != (int)AttendingStatus.Waitlisted)
+                .Select(participant => new UserEventAttendStatusChangeEmailDto
             {
                 FirstName = participant.ApplicationUser.FirstName,
                 LastName = participant.ApplicationUser.LastName,

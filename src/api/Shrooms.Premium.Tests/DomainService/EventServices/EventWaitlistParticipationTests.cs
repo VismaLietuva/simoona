@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -105,6 +105,30 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
 
             var exception = Assert.ThrowsAsync<EventException>(() => _sut.JoinAsync(JoinDto(eventGuid)));
+
+            Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
+        }
+
+        [Test]
+        public void Should_Not_Let_A_Joiner_Queue_Inside_The_Promotion_Cutoff()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true);
+            MockUsers();
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
+
+            var exception = Assert.ThrowsAsync<EventException>(() => _sut.JoinAsync(JoinDto(eventGuid)));
+
+            Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
+            _eventParticipantsDbSet.DidNotReceive().Add(Arg.Any<EventParticipant>());
+        }
+
+        [Test]
+        public void Should_Not_Let_A_Status_Change_Queue_Inside_The_Promotion_Cutoff()
+        {
+            var eventGuid = MockFullEvent(hasWaitlist: true, maybeUserId: "testUserId");
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
+
+            var exception = Assert.ThrowsAsync<EventException>(() => _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending)));
 
             Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
         }
@@ -707,6 +731,49 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             await notifier.Received(1).NotifyRemovedEventParticipantsAsync(Arg.Any<string>(), eventGuid, 2, Arg.Any<IEnumerable<string>>());
         }
 
+        [Test]
+        public async Task Should_Clear_The_Queue_Too_When_The_Host_Resets_The_In_Person_List()
+        {
+            MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("queued", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("virtual", AttendingStatus.AttendingVirtually, null));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await _sut.ResetAttendeesAsync(_event, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 });
+
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Is<IEnumerable<EventParticipant>>(removed =>
+                removed.Select(p => p.ApplicationUserId).OrderBy(id => id).SequenceEqual(new[] { "going", "queued" })));
+        }
+
+        [Test]
+        public async Task Should_Leave_The_Queue_Alone_When_The_Host_Resets_The_Virtual_List()
+        {
+            MockWaitlistEvent(1, Start,
+                ("going", AttendingStatus.Attending, null),
+                ("queued", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")),
+                ("virtual", AttendingStatus.AttendingVirtually, null));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await _sut.ResetVirtualAttendeesAsync(_event, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 });
+
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Is<IEnumerable<EventParticipant>>(removed =>
+                removed.Select(p => p.ApplicationUserId).SequenceEqual(new[] { "virtual" })));
+        }
+
+        [Test]
+        public async Task Should_Hold_The_Removal_Notice_Until_The_Surrounding_Lock_Has_Committed()
+        {
+            var seatLock = UseRecordingSeatLock();
+            MockWaitlistEvent(1, Start, ("going", AttendingStatus.Attending, null));
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Event).Returns(true);
+
+            await seatLock.RunAsync(_event.Id, () => _sut.ResetAttendeesAsync(_event, new UserAndOrganizationDto { UserId = "host", OrganizationId = 2 }));
+
+            Assert.That(seatLock.DispatchedInsideLock, Is.False);
+            _asyncRunner.ReceivedWithAnyArgs(1).Run<IEventNotificationService>(default, default);
+        }
+
         private RecordingEventSeatLock UseRecordingSeatLock()
         {
             var seatLock = new RecordingEventSeatLock();
@@ -991,6 +1058,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
         private sealed class RecordingEventSeatLock : IEventSeatLock
         {
+            private readonly List<Action> _deferred = new List<Action>();
             private bool _inside;
 
             public int Calls { get; private set; }
@@ -1021,6 +1089,24 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 {
                     _inside = false;
                 }
+
+                foreach (var action in _deferred.ToArray())
+                {
+                    action();
+                }
+
+                _deferred.Clear();
+            }
+
+            public void AfterCommit(Action action)
+            {
+                if (_inside)
+                {
+                    _deferred.Add(action);
+                    return;
+                }
+
+                action();
             }
         }
     }

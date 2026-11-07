@@ -188,6 +188,16 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        // Zero in-person seats means nobody is ever "full" for the queue to wait behind, and
+        // lowering the seats to zero would strand whoever is already queued.
+        public void CheckIfWaitlistHasSeats(bool hasWaitlist, int maxParticipants)
+        {
+            if (hasWaitlist && maxParticipants <= 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventWaitlistRequiresSeats);
+            }
+        }
+
         public void CheckIfWaitlistCanBeDisabled(bool newHasWaitlist, Event eventToUpdate)
         {
             var anyQueued = eventToUpdate.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Waitlisted);
