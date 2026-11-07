@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -133,10 +133,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private bool ShouldJoinWaitlist(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
+        private static bool ShouldJoinWaitlist(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
         {
-            // Inside the cutoff nobody is promoted any more, so queueing would only strand the person.
-            if (!eventDto.HasWaitlist || addedByColleague || joinDto.AttendStatus != AttendingStatus.Attending || IsWithinPromotionCutoff(eventDto.StartDate))
+            if (!eventDto.HasWaitlist || addedByColleague || joinDto.AttendStatus != AttendingStatus.Attending)
             {
                 return false;
             }
@@ -240,7 +239,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             // After the deadline a promoted person could no longer leave or change their answer.
             if (eventDto == null ||
                 !eventDto.HasWaitlist ||
-                IsWithinPromotionCutoff(eventDto.StartDate) ||
                 _systemClock.UtcNow > eventDto.RegistrationDeadline)
             {
                 return null;
@@ -333,9 +331,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             });
         }
 
-        private bool IsWithinPromotionCutoff(DateTime startDate) =>
-            _systemClock.UtcNow >= startDate.AddHours(-EventsConstants.WaitlistPromotionCutoffHours);
-
         private async Task<bool> CanPromoteAsync(EventJoinValidationDto eventDto, int organizationId, string userId)
         {
             try
@@ -363,7 +358,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return requested;
             }
 
-            if (!@event.HasWaitlist || IsWithinPromotionCutoff(@event.StartDate))
+            if (!@event.HasWaitlist)
             {
                 _eventValidationService.CheckIfEventIsFull(@event.MaxParticipants, attendingCount);
             }

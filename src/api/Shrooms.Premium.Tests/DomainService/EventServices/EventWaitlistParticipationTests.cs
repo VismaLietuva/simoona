@@ -110,29 +110,27 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Not_Let_A_Joiner_Queue_Inside_The_Promotion_Cutoff()
+        public async Task Should_Let_A_Joiner_Queue_Right_Up_To_The_Registration_Deadline()
         {
             var eventGuid = MockFullEvent(hasWaitlist: true);
             MockUsers();
-            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddMinutes(-1));
 
-            var exception = Assert.ThrowsAsync<EventException>(() => _sut.JoinAsync(JoinDto(eventGuid)));
+            await _sut.JoinAsync(JoinDto(eventGuid));
 
-            Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
-            _eventParticipantsDbSet.DidNotReceive().Add(Arg.Any<EventParticipant>());
+            _eventParticipantsDbSet.Received(1).Add(Arg.Is<EventParticipant>(p => p.AttendStatus == (int)AttendingStatus.Waitlisted));
         }
 
         [Test]
-        public void Should_Not_Let_A_Status_Change_Queue_Inside_The_Promotion_Cutoff()
+        public async Task Should_Let_A_Status_Change_Queue_Right_Up_To_The_Registration_Deadline()
         {
             var eventGuid = MockFullEvent(hasWaitlist: true, maybeUserId: "testUserId");
-            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05").AddMinutes(-1));
 
-            var exception = Assert.ThrowsAsync<EventException>(() => _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending)));
+            await _sut.UpdateAttendStatusAsync(UpdateDto(eventGuid, AttendingStatus.Attending));
 
-            Assert.That(exception.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
+            Assert.That(StatusOf("testUserId"), Is.EqualTo(AttendingStatus.Waitlisted));
         }
-
         [Test]
         public async Task Should_Not_Waitlist_When_There_Is_A_Free_Seat()
         {
@@ -321,33 +319,9 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task Should_Not_Promote_Within_The_Cutoff_Before_The_Start()
+        public async Task Should_Promote_Shortly_Before_The_Start_While_Registration_Is_Open()
         {
-            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(1));
-            var eventGuid = MockWaitlistEvent(1, Start,
-                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
-
-            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
-
-            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
-        }
-
-        [Test]
-        public async Task Should_Not_Promote_Exactly_At_The_Cutoff()
-        {
-            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours));
-            var eventGuid = MockWaitlistEvent(1, Start,
-                ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
-
-            await _sut.PromoteFromWaitlistAsync(eventGuid, 2);
-
-            Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Waitlisted));
-        }
-
-        [Test]
-        public async Task Should_Promote_Just_Before_The_Cutoff()
-        {
-            _systemClockMock.UtcNow.Returns(Start.AddHours(-EventsConstants.WaitlistPromotionCutoffHours).AddMinutes(-1));
+            _systemClockMock.UtcNow.Returns(Start.AddMinutes(-30));
             var eventGuid = MockWaitlistEvent(1, Start,
                 ("first", AttendingStatus.Waitlisted, DateTime.Parse("2016-03-20")));
 
@@ -355,7 +329,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             Assert.That(StatusOf("first"), Is.EqualTo(AttendingStatus.Attending));
         }
-
         [Test]
         public async Task Should_Not_Promote_On_An_Event_Without_A_Waitlist()
         {
