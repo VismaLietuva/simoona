@@ -42,6 +42,13 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         {
             return IsWorkingDay(day) ? DailyMinutes : 0;
         }
+
+        public int AutoFillMinutes(DateTime day, int loggedMinutes, bool hasAutoFillEntry)
+        {
+            return IsWorkingDay(day) && !Absences.ContainsKey(day) && !hasAutoFillEntry
+                ? Math.Max(0, DailyMinutes - loggedMinutes)
+                : 0;
+        }
     }
 
     public class TimeAbsence

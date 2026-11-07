@@ -232,6 +232,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<TimeMonthLock> TimeMonthLocks { get; set; }
 
+        public virtual DbSet<TimeOvertimeRequest> TimeOvertimeRequests { get; set; }
+
         public virtual DbSet<FeatureFlag> FeatureFlags { get; set; }
 
         public virtual DbSet<FeatureFlagUser> FeatureFlagUsers { get; set; }
@@ -353,6 +355,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new TimeEntryEntityConfig());
             modelBuilder.ApplyConfiguration(new TimePeriodEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeMonthLockEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeOvertimeRequestEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagUserEntityConfig());
             modelBuilder.ApplyConfiguration(new KudosCalculatorSettingsEntityConfig());

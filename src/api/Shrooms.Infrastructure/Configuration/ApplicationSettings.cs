@@ -85,6 +85,14 @@ namespace Shrooms.Infrastructure.Configuration
         // Rejecting needs a reason, so this lands on a page that opens the queue with the dialog on it.
         public string VacationRejectUrl(string tenant, int requestId) => GetClientPath($"vacations/reject/{requestId}");
 
+        public string OvertimeRequestsUrl(string tenant) => GetClientPath("time-registration");
+
+        public string OvertimeQueueUrl(string tenant) => GetClientPath("time-registration/manage");
+
+        public string OvertimeApproveUrl(string tenant, int requestId) => GetClientPath($"overtime/approve/{requestId}");
+
+        public string OvertimeRejectUrl(string tenant, int requestId) => GetClientPath($"overtime/reject/{requestId}");
+
         // Committees are a group type on the client, so the suggestion lands on the group list.
         public string CommitteeSugestionUrl(string tenant) => GetClientPath("groups");
 
