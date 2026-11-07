@@ -13,6 +13,8 @@
         FollowingComment,
         EventReminder,
         VacationRequest,
-        VacationReview
+        VacationReview,
+        OvertimeRequest,
+        OvertimeReview
     }
 }

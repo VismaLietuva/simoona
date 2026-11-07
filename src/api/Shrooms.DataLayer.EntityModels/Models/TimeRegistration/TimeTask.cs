@@ -14,5 +14,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.TimeRegistration
         public string Comment { get; set; }
 
         public bool IsDefault { get; set; }
+
+        public bool IsOvertime { get; set; }
     }
 }

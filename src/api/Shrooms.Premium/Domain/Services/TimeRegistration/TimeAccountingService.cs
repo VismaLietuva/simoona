@@ -118,7 +118,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     Tasks = project.Tasks
                         .Where(task => !task.IsDeleted)
                         .OrderBy(task => task.Id)
-                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault }),
+                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault, IsOvertime = task.IsOvertime }),
                     Members = project.Members.Select(member => new TimeEmployeeDto
                     {
                         Id = member.UserId,
@@ -221,6 +221,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 row.Name = task.Name.Trim();
                 row.Comment = task.Comment?.Trim() ?? string.Empty;
                 row.IsDefault = task.IsDefault;
+                row.IsOvertime = task.IsOvertime;
             }
 
             var existingMembers = project.Id == 0
@@ -313,6 +314,11 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             if (tasks.Count(task => task.IsDefault) != 1)
             {
                 throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, "Exactly one task must be the default");
+            }
+
+            if (tasks.Any(task => task.IsDefault && task.IsOvertime))
+            {
+                throw new ValidationException(ErrorCodes.TimeRegistrationInvalid, "The default task can't be an overtime task");
             }
 
             for (var i = 0; i < tasks.Count; i++)

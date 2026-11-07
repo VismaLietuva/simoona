@@ -162,6 +162,27 @@ namespace Shrooms.EmailTemplates.Seeds
                     "https://simoona.example.com/vacations/manage")
                     { Outcome = "rejected", Note = "The team is short that week.", ActorName = "Rasa Petraitiene" }),
 
+                // Time registration
+                new(EmailPremiumTemplateCacheKeys.OvertimeRequested, new OvertimeDecidableEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-18", "2",
+                    "The release needs final testing before Thursday.",
+                    "https://simoona.example.com/time-registration/manage",
+                    "https://simoona.example.com/overtime/approve/1",
+                    "https://simoona.example.com/overtime/reject/1")
+                    { ActorName = "Tomas Kazlauskas" }),
+                new(EmailPremiumTemplateCacheKeys.OvertimeOrdered, new OvertimeDecidableEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-21", "4",
+                    "Production incident follow-up.",
+                    "https://simoona.example.com/time-registration",
+                    "https://simoona.example.com/overtime/approve/2",
+                    "https://simoona.example.com/overtime/reject/2")
+                    { ActorName = "Rasa Petraitiene" }),
+                new(EmailPremiumTemplateCacheKeys.OvertimeDecided, new OvertimeEmailTemplateViewModel(
+                    SettingsUrl, "Tomas Kazlauskas", "2026-03-17 – 2026-03-18", "2",
+                    "The release needs final testing before Thursday.",
+                    "https://simoona.example.com/time-registration")
+                    { Outcome = "rejected", Note = "Please plan it for the next sprint.", ActorName = "Rasa Petraitiene" }),
+
                 new(ShowcaseKey, new KudosSentEmailTemplateViewModel(SettingsUrl, "Rasa Petraitiene", 25, "Sample", "https://simoona.example.com"))
             };
 

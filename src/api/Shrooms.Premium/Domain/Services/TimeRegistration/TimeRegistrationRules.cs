@@ -7,6 +7,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public const int FullDayMinutes = 8 * 60;
         public const int MaxDayMinutes = 24 * 60;
         public const int ReminderWorkingDays = 2;
+        public const int LimitWindowDays = 7;
 
         public static bool SameName(string a, string b)
         {
