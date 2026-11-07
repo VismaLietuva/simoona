@@ -191,7 +191,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Delete_Own_Emoji()
+        public void Should_Throw_When_Deleting_Own_Emoji_Without_Admin_Permission()
         {
             var emoji = new CustomEmoji
             {
@@ -202,10 +202,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(false);
 
-            await _customEmojiService.DeleteAsync(1, _userOrg);
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _customEmojiService.DeleteAsync(1, _userOrg));
 
-            _customEmojisDbSet.Received().Remove(Arg.Is<CustomEmoji>(x => x.Id == 1));
+            _customEmojisDbSet.DidNotReceive().Remove(Arg.Any<CustomEmoji>());
         }
 
         [Test]
@@ -220,6 +221,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(true);
 
             await _customEmojiService.DeleteAsync(1, _userOrg);
 
@@ -347,6 +349,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
             _customEmojisDbSet.SetDbSetDataForAsync(new List<CustomEmoji> { emoji }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(true);
 
             var before = await _customEmojiService.GetAllAsync(_userOrg, "Visma");
 
@@ -367,6 +370,7 @@ namespace Shrooms.Tests.DomainService
                 new()
                     { Id = 2, Name = "ship-it", BlobName = "b.png", CreatedBy = "user1", OrganizationId = 2 }
             }.AsQueryable());
+            _permissionService.UserHasPermissionAsync(_userOrg, AdministrationPermissions.CustomEmoji).Returns(true);
 
             await _customEmojiService.DeleteAsync(1, _userOrg);
             await _customEmojiService.DeleteAsync(2, _userOrg);

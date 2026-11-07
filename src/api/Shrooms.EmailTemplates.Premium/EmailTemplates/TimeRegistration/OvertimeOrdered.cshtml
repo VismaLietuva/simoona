@@ -1,0 +1,25 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.OvertimeDecidableEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.ActorName} asks you to work overtime on {Model.Period}.";
+}
+
+<email-heading eyebrow="Overtime">@Model.ActorName asks you to work <email-em>overtime</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        Overtime needs your consent before you work it. Answer with one click — you do not need to open the app.
+    </p>
+    <email-details>
+        <email-detail label="Dates">@Model.Period</email-detail>
+        <email-detail label="Hours a day">@Model.HoursPerDay</email-detail>
+    </email-details>
+    <email-quote>@Model.Reason</email-quote>
+    <email-actions>
+        <email-action>
+            <email-button href="@Model.ApproveUrl">Agree</email-button>
+        </email-action>
+        <email-action>
+            <email-button href="@Model.RejectUrl" variant="outline">Decline</email-button>
+        </email-action>
+    </email-actions>
+</email-card>

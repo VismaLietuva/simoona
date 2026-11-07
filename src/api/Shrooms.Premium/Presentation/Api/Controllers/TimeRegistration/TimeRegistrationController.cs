@@ -18,11 +18,83 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
     {
         private readonly ITimeTableService _timeTableService;
         private readonly ITimePeriodService _periodService;
+        private readonly ITimeReportService _reportService;
+        private readonly ITimeOvertimeService _overtimeService;
 
-        public TimeRegistrationController(ITimeTableService timeTableService, ITimePeriodService periodService)
+        public TimeRegistrationController(
+            ITimeTableService timeTableService,
+            ITimePeriodService periodService,
+            ITimeReportService reportService,
+            ITimeOvertimeService overtimeService)
         {
             _timeTableService = timeTableService;
             _periodService = periodService;
+            _reportService = reportService;
+            _overtimeService = overtimeService;
+        }
+
+        [HttpGet]
+        [Route("OvertimeRequests")]
+        [ProducesResponseType(typeof(IEnumerable<TimeOvertimeRequestDto>), StatusCodes.Status200OK)]
+        public Task<IActionResult> OvertimeRequests([FromQuery] string employeeId)
+        {
+            return GuardedAsync(() => _overtimeService.GetForEmployeeAsync(employeeId, GetUserAndOrganization()));
+        }
+
+        [HttpGet]
+        [Route("OvertimeRequests/Team")]
+        [ProducesResponseType(typeof(IEnumerable<TimeOvertimeRequestDto>), StatusCodes.Status200OK)]
+        public Task<IActionResult> TeamOvertimeRequests()
+        {
+            return GuardedAsync(() => _overtimeService.GetTeamAsync(GetUserAndOrganization()));
+        }
+
+        [HttpGet]
+        [Route("OvertimeRequests/{id:int}/Review")]
+        [ProducesResponseType(typeof(TimeOvertimeRequestDto), StatusCodes.Status200OK)]
+        public Task<IActionResult> ReviewOvertimeRequest(int id)
+        {
+            return GuardedAsync(() => _overtimeService.GetForReviewAsync(id, GetUserAndOrganization()));
+        }
+
+        [HttpPost]
+        [Route("OvertimeRequests")]
+        public Task<IActionResult> CreateOvertimeRequest([FromBody] TimeOvertimeRequestViewModel model)
+        {
+            return GuardedAsync(async () => new
+            {
+                Id = await _overtimeService.CreateAsync(
+                    new TimeOvertimeRequestInputDto
+                    {
+                        EmployeeId = model.EmployeeId,
+                        DateFrom = model.DateFrom,
+                        DateTo = model.DateTo,
+                        MinutesPerDay = model.MinutesPerDay,
+                        Reason = model.Reason
+                    },
+                    GetUserAndOrganization())
+            });
+        }
+
+        [HttpPost]
+        [Route("OvertimeRequests/{id:int}/Approve")]
+        public Task<IActionResult> ApproveOvertimeRequest(int id)
+        {
+            return GuardedAsync(() => _overtimeService.ApproveAsync(id, GetUserAndOrganization()));
+        }
+
+        [HttpPost]
+        [Route("OvertimeRequests/{id:int}/Reject")]
+        public Task<IActionResult> RejectOvertimeRequest(int id, [FromBody] TimeOvertimeRejectViewModel model)
+        {
+            return GuardedAsync(() => _overtimeService.RejectAsync(id, model.Comment, GetUserAndOrganization()));
+        }
+
+        [HttpPost]
+        [Route("OvertimeRequests/{id:int}/Cancel")]
+        public Task<IActionResult> CancelOvertimeRequest(int id)
+        {
+            return GuardedAsync(() => _overtimeService.CancelAsync(id, GetUserAndOrganization()));
         }
 
         [HttpGet]
@@ -120,6 +192,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.TimeRegistration
         public Task<IActionResult> Employees([FromQuery] string month)
         {
             return GuardedAsync(() => _periodService.GetEmployeesAsync(month, GetUserAndOrganization()));
+        }
+
+        [HttpGet]
+        [Route("Report")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.TimeRegistration)]
+        [ProducesResponseType(typeof(TimeReportDto), StatusCodes.Status200OK)]
+        public Task<IActionResult> Report([FromQuery] string month)
+        {
+            return GuardedAsync(() => _reportService.GetReportAsync(month, GetUserAndOrganization()));
         }
 
         [HttpGet]
