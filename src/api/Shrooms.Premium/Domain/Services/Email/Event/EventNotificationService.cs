@@ -171,7 +171,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 var template = new EventWaitlistPromotedEmailTemplateViewModel(GetNotificationSettingsUrl(organization), eventName, eventUrl, startDate);
                 await SendMultipleEmailsAsync(
                     emailReceivers,
-                    CreateSubject("A spot opened up: {0}", eventName),
+                    CreateSubject("You're in: {0}", eventName),
                     template,
                     EmailPremiumTemplateCacheKeys.EventWaitlistPromoted);
             }

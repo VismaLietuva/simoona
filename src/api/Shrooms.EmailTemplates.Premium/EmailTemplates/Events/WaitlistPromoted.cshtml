@@ -1,10 +1,10 @@
 ﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.EventWaitlistPromotedEmailTemplateViewModel
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
-    ViewData["Preheader"] = $"A spot opened up for {Model.EventTitle}.";
+    ViewData["Preheader"] = $"You got a spot for {Model.EventTitle}.";
 }
 
-<email-heading eyebrow="Events">A spot opened up, <email-em>you are going</email-em></email-heading>
+<email-heading eyebrow="Events">You got a spot, <email-em>you are going</email-em></email-heading>
 <email-card>
     <p style="margin:0;">"<strong>@Model.EventTitle</strong>"</p>
     <p style="margin:8px 0 0 0;">

@@ -149,7 +149,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             // Assert
             var email = emails.Single();
-            Assert.That(email.Subject, Is.EqualTo("A spot opened up: Museum"));
+            Assert.That(email.Subject, Is.EqualTo("You're in: Museum"));
             Assert.That(email.Receivers, Is.EqualTo(new[] { "u1@email.com" }));
 
             var template = templates.Single();
