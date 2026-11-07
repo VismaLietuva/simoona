@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -106,6 +110,27 @@ namespace Shrooms.Tests.DomainService
             await _uow.Received(1).SaveChangesAsync("user");
         }
 
+        [Test]
+        public void Should_Report_Concurrency_Error_When_Settings_Were_Just_Created_By_Someone_Else()
+        {
+            _uow.SaveChangesAsync("user").ThrowsAsync(new DbUpdateException("Duplicate", UniqueViolation()));
+
+            var ex = Assert.ThrowsAsync<ValidationException>(() => _service.UpdateAsync(ValidInput(), UserOrg()));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ConcurrencyError));
+        }
+
+        [Test]
+        public void Should_Rethrow_Other_Save_Errors()
+        {
+            var error = new DbUpdateException("Failed");
+            _uow.SaveChangesAsync("user").ThrowsAsync(error);
+
+            var ex = Assert.ThrowsAsync<DbUpdateException>(() => _service.UpdateAsync(ValidInput(), UserOrg()));
+
+            Assert.That(ex, Is.SameAs(error));
+        }
+
         [TestCase(-1, 43, 1.5, 36)]
         [TestCase(21, 201, 1.5, 36)]
         [TestCase(21, 43, 0.5, 36)]
@@ -164,6 +189,26 @@ namespace Shrooms.Tests.DomainService
         private static UserAndOrganizationDto UserOrg(int organizationId)
         {
             return new UserAndOrganizationDto { OrganizationId = organizationId, UserId = "user" };
+        }
+
+        private static SqlException UniqueViolation()
+        {
+            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+
+            var error = (SqlError)typeof(SqlError)
+                .GetConstructor(flags, null,
+                    new[] { typeof(int), typeof(byte), typeof(byte), typeof(string), typeof(string), typeof(string), typeof(int), typeof(Exception) },
+                    null)
+                .Invoke(new object[] { 2627, (byte)1, (byte)14, "server", "Violation of UNIQUE KEY constraint", "", 0, null });
+
+            var errors = (SqlErrorCollection)typeof(SqlErrorCollection)
+                .GetConstructor(flags, null, Type.EmptyTypes, null)
+                .Invoke(null);
+            typeof(SqlErrorCollection).GetMethod("Add", flags).Invoke(errors, new object[] { error });
+
+            return (SqlException)typeof(SqlException)
+                .GetMethod("CreateException", flags, null, new[] { typeof(SqlErrorCollection), typeof(string) }, null)
+                .Invoke(null, new object[] { errors, "16.0" });
         }
     }
 }
