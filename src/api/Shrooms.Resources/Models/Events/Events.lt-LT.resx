@@ -132,6 +132,9 @@
   <data name="People" xml:space="preserve">
     <value>Žmonės</value>
   </data>
+  <data name="Total" xml:space="preserve">
+    <value>Iš viso</value>
+  </data>
   <data name="WillEat" xml:space="preserve">
     <value>Valgysiu šiame renginyje</value>
   </data>

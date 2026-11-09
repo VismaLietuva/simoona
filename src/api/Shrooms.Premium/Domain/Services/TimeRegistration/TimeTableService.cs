@@ -61,7 +61,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                     Tasks = project.Tasks
                         .Where(task => !task.IsDeleted)
                         .OrderBy(task => task.Id)
-                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault })
+                        .Select(task => new TimeTaskDto { Id = task.Id, Name = task.Name, Comment = task.Comment ?? string.Empty, IsDefault = task.IsDefault, IsOvertime = task.IsOvertime })
                 })
                 .ToListAsync();
 
@@ -72,6 +72,14 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 .ToListAsync();
 
             var monthLock = await _support.LockAsync(first, organizationId);
+            var yearStart = new DateTime(first.Year, 1, 1);
+            var priorStart = first.AddDays(-(TimeRegistrationRules.LimitWindowDays - 1));
+            var earlier = await _entries
+                .AsNoTracking()
+                .Where(entry => entry.OrganizationId == organizationId && entry.UserId == actor.UserId && entry.Date < first)
+                .Where(entry => entry.Date >= priorStart || (entry.Date >= yearStart && entry.Task.IsOvertime))
+                .Select(entry => new { entry.Date, entry.Minutes, entry.Task.IsOvertime })
+                .ToListAsync();
 
             return new TimeTableDto
             {
@@ -119,6 +127,13 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 AvailableProjects = available
                     .OrderBy(project => project.CustomerName, StringComparer.CurrentCultureIgnoreCase)
                     .ThenBy(project => project.Name, StringComparer.CurrentCultureIgnoreCase)
+                    .ToList(),
+                OvertimeBeforeMinutes = earlier.Where(entry => entry.IsOvertime && entry.Date >= yearStart).Sum(entry => entry.Minutes),
+                PriorDays = earlier
+                    .Where(entry => entry.Date >= priorStart)
+                    .GroupBy(entry => entry.Date.Date)
+                    .OrderBy(group => group.Key)
+                    .Select(group => new TimeDayMinutesDto { Date = TimeMonth.ToDay(group.Key), Minutes = group.Sum(entry => entry.Minutes) })
                     .ToList()
             };
         }

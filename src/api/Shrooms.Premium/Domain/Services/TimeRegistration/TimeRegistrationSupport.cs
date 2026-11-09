@@ -296,13 +296,13 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             var logged = await _entries
                 .AsNoTracking()
                 .Where(entry => entry.OrganizationId == organizationId && entry.UserId == userId && entry.Date >= month && entry.Date <= last)
-                .Select(entry => new { entry.Date, entry.TaskId, entry.Minutes })
+                .Select(entry => new { entry.Date, entry.TaskId, entry.Minutes, entry.Task.IsOvertime })
                 .ToListAsync();
 
             foreach (var day in calendar.Days)
             {
                 var onDay = logged.Where(entry => entry.Date.Date == day).ToList();
-                var rest = calendar.AutoFillMinutes(day, onDay.Sum(entry => entry.Minutes), onDay.Any(entry => entry.TaskId == autoFill.TaskId));
+                var rest = calendar.AutoFillMinutes(day, onDay.Where(entry => !entry.IsOvertime).Sum(entry => entry.Minutes), onDay.Any(entry => entry.TaskId == autoFill.TaskId));
                 if (rest > 0)
                 {
                     _entries.Add(new TimeEntry

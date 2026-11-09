@@ -35,6 +35,35 @@ namespace Shrooms.Premium.Presentation.WebViewModels.TimeRegistration
         public string EmployeeId { get; set; }
     }
 
+    public class TimeOvertimeRequestViewModel
+    {
+        public const string DayPattern = @"^\d{4}-\d{2}-\d{2}$";
+
+        public string EmployeeId { get; set; }
+
+        [Required]
+        [RegularExpression(DayPattern)]
+        public string DateFrom { get; set; }
+
+        [Required]
+        [RegularExpression(DayPattern)]
+        public string DateTo { get; set; }
+
+        [Range(1, 24 * 60)]
+        public int MinutesPerDay { get; set; }
+
+        [Required]
+        [MaxLength(500)]
+        public string Reason { get; set; }
+    }
+
+    public class TimeOvertimeRejectViewModel
+    {
+        [Required]
+        [MaxLength(500)]
+        public string Comment { get; set; }
+    }
+
     public class TimeArchiveViewModel
     {
         [Required]

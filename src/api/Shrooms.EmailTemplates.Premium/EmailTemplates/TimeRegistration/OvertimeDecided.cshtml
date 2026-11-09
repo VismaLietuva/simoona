@@ -1,0 +1,18 @@
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.OvertimeEmailTemplateViewModel
+@{
+    Layout = "/EmailTemplates/HeaderFooter.cshtml";
+    ViewData["Preheader"] = $"{Model.Period} — {Model.Outcome}.";
+}
+
+<email-heading eyebrow="Overtime">Overtime was <email-em>@Model.Outcome</email-em></email-heading>
+<email-card>
+    <p style="margin:0;">
+        <strong>@Model.ActorName</strong> answered the overtime for @Model.EmployeeName.
+    </p>
+    <email-details>
+        <email-detail label="Dates">@Model.Period</email-detail>
+        <email-detail label="Hours a day">@Model.HoursPerDay</email-detail>
+    </email-details>
+    <email-quote>@(string.IsNullOrWhiteSpace(Model.Note) ? Model.Reason : Model.Note)</email-quote>
+    <email-button href="@Model.RequestUrl">Open time registration</email-button>
+</email-card>
