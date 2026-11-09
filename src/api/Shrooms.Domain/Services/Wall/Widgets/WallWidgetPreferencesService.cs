@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.UserPreferences;
 
 namespace Shrooms.Domain.Services.Wall.Widgets
@@ -55,7 +56,7 @@ namespace Shrooms.Domain.Services.Wall.Widgets
                 UserPreferencesDocument.WidgetsSection,
                 preferences);
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userOrg.UserId);
         }
 
         private static void ValidatePreferences(string preferences)

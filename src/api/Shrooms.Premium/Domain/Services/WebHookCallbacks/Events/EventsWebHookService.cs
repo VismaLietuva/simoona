@@ -54,6 +54,10 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
 
             foreach (var @event in eventsToUpdate)
             {
+                // Settings was included, so a null means the user has no row yet.
+                // Add one (default time zone) rather than abort the whole batch.
+                @event.ResponsibleUser.GetOrCreateSettings();
+
                 var newWallId = await CreateEventWallAsync(@event);
                 var newEvent = CreateNewEvent(@event, newWallId);
                 _eventsDbSet.Add(newEvent);

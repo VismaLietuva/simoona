@@ -24,6 +24,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
@@ -338,15 +339,19 @@ namespace Shrooms.Domain.Services.Administration
                 .Include(user => user.Settings)
                 .FirstAsync(user => user.Id == userId);
             SetTutorialStatus(applicationUser, true);
-            await _uow.SaveChangesAsync(userId);
+            await _uow.SaveUserSettingsAsync(userId);
         }
 
         public async Task<bool> GetUserTutorialStatusAsync(string userId)
         {
-            return await _usersDbSet
+            // Nullable so a user without a settings row reads as "not complete"
+            // instead of failing to materialize NULL from the LEFT JOIN.
+            var isTutorialComplete = await _usersDbSet
                 .Where(user => user.Id == userId)
-                .Select(user => user.Settings.IsTutorialComplete)
+                .Select(user => (bool?)user.Settings.IsTutorialComplete)
                 .FirstAsync();
+
+            return isTutorialComplete ?? false;
         }
 
         public async Task AddProviderEmailAsync(string userId, string provider, string email)

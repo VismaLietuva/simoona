@@ -88,7 +88,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 "Rule must survive the clone");
         }
 
-        private void MockExpiredRecurringEventWithQuestions()
+        [Test]
+        public async Task Should_Roll_Over_An_Event_Whose_Host_Has_No_Settings_Row()
+        {
+            var host = MockExpiredRecurringEventWithQuestions();
+            host.Settings = null;
+
+            await _service.UpdateRecurringEventsAsync();
+
+            _eventsDbSet.Received(1).Add(Arg.Any<Event>());
+            Assert.That(host.Settings, Is.Not.Null, "the missing settings row is added instead of aborting the batch");
+        }
+
+        private ApplicationUser MockExpiredRecurringEventWithQuestions()
         {
             var eventId = Guid.NewGuid();
 
@@ -96,6 +108,8 @@ namespace Shrooms.Premium.Tests.DomainService
             var pasta = new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0 };
             var pizzaOption = new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1 };
             var margherita = new EventOption { Id = 92, EventId = eventId, Option = "Margherita", QuestionId = 6, Order = 0 };
+
+            var host = new ApplicationUser { Id = "host1", Settings = new UserSettings { TimeZone = DataLayerConstants.DefaultTimeZone } };
 
             var events = new List<Event>
             {
@@ -110,7 +124,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     LocalEndDate = DateTime.Parse("2026-08-01"),
                     LocalRegistrationDeadline = DateTime.Parse("2026-07-30"),
                     ResponsibleUserId = "host1",
-                    ResponsibleUser = new ApplicationUser { Id = "host1", Settings = new UserSettings { TimeZone = DataLayerConstants.DefaultTimeZone } },
+                    ResponsibleUser = host,
                     MaxChoices = 1,
                     EventOptions = new List<EventOption> { soup, pasta, pizzaOption, margherita },
                     EventQuestions = new List<EventQuestion>
@@ -132,6 +146,8 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+
+            return host;
         }
     }
 }

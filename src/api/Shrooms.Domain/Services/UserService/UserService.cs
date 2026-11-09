@@ -12,6 +12,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Roles;
 using System;
 using System.Collections.Generic;
@@ -82,7 +83,7 @@ namespace Shrooms.Domain.Services.UserService
             settings.TimeZone = settingsDto.TimeZoneId;
             settings.CultureCode = culture.Name;
 
-            await _uow.SaveChangesAsync(settingsDto.UserId);
+            await _uow.SaveUserSettingsAsync(settingsDto.UserId);
         }
 
         public async Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDto userOrg)

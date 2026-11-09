@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 
 namespace Shrooms.Domain.Services.UserPreferences
 {
@@ -57,7 +58,7 @@ namespace Shrooms.Domain.Services.UserPreferences
                 UserPreferencesDocument.SidebarFavoritesSection,
                 favorites);
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userOrg.UserId);
         }
 
         // Which keys are real navigation items is the client's business (it drops

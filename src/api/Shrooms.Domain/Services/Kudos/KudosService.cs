@@ -458,7 +458,7 @@ namespace Shrooms.Domain.Services.Kudos
                     kudos.OrganizationId == organizationId)
                 .ToListAsync();
 
-            var culture = user == null ? null : CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
+            var culture = user == null ? null : ToCulture(user.CultureCode);
 
             var pieChart = kudosLogs
                 .GroupBy(log => log.KudosTypeName)
@@ -509,8 +509,10 @@ namespace Shrooms.Domain.Services.Kudos
                 .Select(u => new { u.Settings.CultureCode })
                 .FirstOrDefaultAsync();
 
-            return user == null ? null : CultureInfo.GetCultureInfo(user.CultureCode ?? "en-US");
+            return user == null ? null : ToCulture(user.CultureCode);
         }
+
+        private static CultureInfo ToCulture(string cultureCode) => CultureInfo.GetCultureInfo(cultureCode ?? BusinessLayerConstants.DefaultCulture);
 
         public async Task<int> GetKudosTypeIdAsync(string kudosTypeName)
         {

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
@@ -610,7 +610,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
                 CultureCode = user.Settings?.CultureCode,
                 TimeZone = user.Settings?.TimeZone,
-                PictureId = user?.PictureId
+                PictureId = user.PictureId
             };
 
             return userInfo;

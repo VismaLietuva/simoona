@@ -29,6 +29,18 @@ namespace Shrooms.Tests.Entities
         }
 
         [Test]
+        public void LocalStartDate_ResponsibleUserWithoutTimeZone_UsesTheDefaultTimeZone()
+        {
+            var @event = new Event
+            {
+                StartDate = new DateTime(2026, 7, 1, 9, 0, 0, DateTimeKind.Utc),
+                ResponsibleUser = new ApplicationUser { Settings = new UserSettings() }
+            };
+
+            Assert.That(@event.LocalStartDate, Is.EqualTo(new DateTime(2026, 7, 1, 12, 0, 0)));
+        }
+
+        [Test]
         public void LocalStartDate_ResponsibleUserSettingsNotLoaded_Throws()
         {
             var @event = new Event
