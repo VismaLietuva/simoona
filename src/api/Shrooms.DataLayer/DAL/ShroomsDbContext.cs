@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
+using Shrooms.DataLayer.DAL.Search;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -31,6 +34,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.DataLayer.EntityModels.Models.Group;
 using Shrooms.DataLayer.EntityModels.Models.Polls;
+using Shrooms.DataLayer.EntityModels.Models.Search;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.DataLayer.EntityModels.Models.TimeRegistration;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
@@ -79,6 +83,8 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<Picture> Pictures { get; set; }
 
         public virtual DbSet<Post> Posts { get; set; }
+
+        public virtual DbSet<SearchDocument> SearchDocuments { get; set; }
 
         public virtual DbSet<ScheduledPost> ScheduledPosts { get; set; }
 
@@ -247,14 +253,14 @@ namespace Shrooms.DataLayer.DAL
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
             SoftDeleteHandler.Execute(ChangeTracker.Entries(), this);
 
-            return base.SaveChanges();
+            return SaveWithSearchIndex(() => base.SaveChanges());
         }
 
         public async Task<int> SaveChangesAsync(string userId)
         {
             UpdateEntityMetadata(ChangeTracker.Entries(), userId);
             await SoftDeleteHandler.ExecuteAsync(ChangeTracker.Entries(), this);
-            return await base.SaveChangesAsync();
+            return await SaveWithSearchIndexAsync(() => base.SaveChangesAsync());
         }
 
         public async Task<int> SaveChangesAsync(bool useMetaTracking = true)
@@ -265,7 +271,7 @@ namespace Shrooms.DataLayer.DAL
             }
 
             await SoftDeleteHandler.ExecuteAsync(ChangeTracker.Entries(), this);
-            return await base.SaveChangesAsync();
+            return await SaveWithSearchIndexAsync(() => base.SaveChangesAsync());
         }
 
         public new int SaveChanges(bool useMetaTracking = true)
@@ -277,7 +283,7 @@ namespace Shrooms.DataLayer.DAL
 
             SoftDeleteHandler.Execute(ChangeTracker.Entries(), this);
 
-            return base.SaveChanges();
+            return SaveWithSearchIndex(() => base.SaveChanges());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -362,6 +368,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new FeatureFlagEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagUserEntityConfig());
             modelBuilder.ApplyConfiguration(new KudosCalculatorSettingsEntityConfig());
+            modelBuilder.ApplyConfiguration(new SearchDocumentEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 
@@ -442,7 +449,72 @@ namespace Shrooms.DataLayer.DAL
         {
             UpdateEntityMetadata(ChangeTracker.Entries());
             await SoftDeleteHandler.ExecuteAsync(ChangeTracker.Entries(), this);
-            return await base.SaveChangesAsync(cancellationToken);
+            return await SaveWithSearchIndexAsync(() => base.SaveChangesAsync(cancellationToken));
+        }
+
+        private int SaveWithSearchIndex(Func<int> save)
+        {
+            var searchChanges = SearchIndexChangeSet.Capture(ChangeTracker);
+            var result = save();
+            foreach (var (source, keys) in PendingSearchRefreshes(searchChanges))
+            {
+                try
+                {
+                    SearchIndexWriter.Refresh(this, source, keys);
+                }
+                catch (Exception e)
+                {
+                    LogSearchRefreshFailure(e, source);
+                }
+            }
+
+            return result;
+        }
+
+        private async Task<int> SaveWithSearchIndexAsync(Func<Task<int>> save)
+        {
+            var searchChanges = SearchIndexChangeSet.Capture(ChangeTracker);
+            var result = await save();
+            foreach (var (source, keys) in PendingSearchRefreshes(searchChanges))
+            {
+                try
+                {
+                    await SearchIndexWriter.RefreshAsync(this, source, keys);
+                }
+                catch (Exception e)
+                {
+                    LogSearchRefreshFailure(e, source);
+                }
+            }
+
+            return result;
+        }
+
+        // Search rows are a copy: a failed refresh must never fail the save, and the
+        // nightly rebuild repairs it. Inside an explicit transaction the refresh would
+        // join it, so it is left to the rebuild as well.
+        private IReadOnlyList<(SearchIndexSource Source, IReadOnlyCollection<string> Keys)> PendingSearchRefreshes(SearchIndexChangeSet changes)
+        {
+            if (changes == null || Database.CurrentTransaction != null || !SearchIndexing.IsEnabled)
+            {
+                return Array.Empty<(SearchIndexSource, IReadOnlyCollection<string>)>();
+            }
+
+            return changes.Resolve();
+        }
+
+        private void LogSearchRefreshFailure(Exception exception, SearchIndexSource source)
+        {
+            try
+            {
+                this.GetService<ILoggerFactory>()
+                    .CreateLogger<ShroomsDbContext>()
+                    .LogWarning(exception, "Could not refresh search rows for {SearchSource}.", source.Name);
+            }
+            catch
+            {
+                // Logging is best effort here, like the refresh itself.
+            }
         }
 
         private void UpdateEntityMetadata(IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries, string userId = null)

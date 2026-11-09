@@ -1,3 +1,4 @@
+using Shrooms.Domain.Services.Search;
 using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Common.Controllers;
 using Shrooms.Presentation.Common.Filters;
@@ -14,10 +15,12 @@ namespace Shrooms.Presentation.Api.Controllers
     public class ExternalJobsController : BaseController
     {
         private readonly IWebHookCallbackServices _webHookService;
+        private readonly ISearchService _searchService;
 
-        public ExternalJobsController(IWebHookCallbackServices webHookService)
+        public ExternalJobsController(IWebHookCallbackServices webHookService, ISearchService searchService)
         {
             _webHookService = webHookService;
+            _searchService = searchService;
         }
 
         [HttpPost]
@@ -39,6 +42,15 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task AnonymizeUsers()
         {
             await _webHookService.UsersAnonymization.AnonymizeUsersAsync(GetOrganizationName());
+        }
+
+        // Fills global search after the migration and repairs it nightly: rows changed
+        // outside SaveChanges (bulk updates, raw SQL, renamed users) are only picked up here.
+        [HttpPost]
+        [Route("RebuildSearchIndex")]
+        public async Task RebuildSearchIndex()
+        {
+            await _searchService.RebuildIndexAsync();
         }
 
         [HttpPost]

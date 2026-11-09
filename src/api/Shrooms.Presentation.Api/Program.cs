@@ -34,6 +34,9 @@ using Shrooms.Presentation.Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Off stops saves from writing global search rows (see docs/global-search.md).
+Shrooms.DataLayer.DAL.Search.SearchIndexing.IsEnabled = builder.Configuration.GetValue("GlobalSearch:IndexOnSave", true);
+
 builder.Services.AddHealthChecks();
 builder.Services.AddHsts(options =>
 {
