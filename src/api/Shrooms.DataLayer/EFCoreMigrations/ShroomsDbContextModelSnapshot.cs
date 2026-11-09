@@ -1228,6 +1228,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
                     b.Property<int>("EventTypeId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HasWaitlist")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
@@ -1390,6 +1393,9 @@ namespace Shrooms.DataLayer.EFCoreMigrations
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("WaitlistedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

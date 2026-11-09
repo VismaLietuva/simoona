@@ -37,7 +37,8 @@
         Attending,
         MaybeAttending,
         Idle,
-        AttendingVirtually
+        AttendingVirtually,
+        Waitlisted
     }
 
     public enum MyEventsOptions

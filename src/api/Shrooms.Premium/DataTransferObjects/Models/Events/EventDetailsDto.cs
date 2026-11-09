@@ -15,6 +15,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
+        public bool HasWaitlist { get; set; }
 
         public EventOfficesDto Offices { get; set; }
         public bool IsPinned { get; set; }
@@ -45,5 +46,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
+        public int WaitlistCount { get; set; }
+        public int? WaitlistPosition { get; set; }
     }
 }

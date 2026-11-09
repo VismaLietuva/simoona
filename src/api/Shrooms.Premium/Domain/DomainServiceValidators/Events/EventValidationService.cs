@@ -180,8 +180,40 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfWaitlistAllowed(bool hasWaitlist, int legacyOptionsCount, int questionsCount)
+        {
+            if (hasWaitlist && (legacyOptionsCount > 0 || questionsCount > 0))
+            {
+                throw new EventException(PremiumErrorCodes.EventWaitlistNotAllowedWithSignUpOptions);
+            }
+        }
+
+        // Zero in-person seats means nobody is ever "full" for the queue to wait behind, and
+        // lowering the seats to zero would strand whoever is already queued.
+        public void CheckIfWaitlistHasSeats(bool hasWaitlist, int maxParticipants)
+        {
+            if (hasWaitlist && maxParticipants <= 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventWaitlistRequiresSeats);
+            }
+        }
+
+        public void CheckIfWaitlistCanBeDisabled(bool newHasWaitlist, Event eventToUpdate)
+        {
+            var anyQueued = eventToUpdate.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Waitlisted);
+            if (eventToUpdate.HasWaitlist && !newHasWaitlist && anyQueued)
+            {
+                throw new EventException(PremiumErrorCodes.EventWaitlistCannotBeDisabledWithQueue);
+            }
+        }
+
         public void CheckIfAttendOptionIsAllowed(AttendingStatus status, EventJoinValidationDto @event)
         {
+            if (status == AttendingStatus.Waitlisted)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
             if (status == AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);

@@ -23,6 +23,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public bool AllowMaybeGoing { get; set; }
 
         public bool AllowNotGoing { get; set; }
+        public bool HasWaitlist { get; set; }
+        public int WaitlistCount { get; set; }
 
         public IEnumerable<int> OfficeIds { get; set; }
 

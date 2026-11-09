@@ -15,6 +15,7 @@
         VacationRequest,
         VacationReview,
         OvertimeRequest,
-        OvertimeReview
+        OvertimeReview,
+        EventWaitlistPromoted
     }
 }

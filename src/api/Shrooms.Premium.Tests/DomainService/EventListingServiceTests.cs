@@ -699,6 +699,48 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Not_Return_An_Event_As_Visited_When_The_User_Never_Left_The_Waitlist()
+        {
+            var type = new EventType { Id = 1, Name = "Type" };
+            var visitedId = Guid.NewGuid();
+
+            Event EndedEvent(Guid id, AttendingStatus status) => new Event
+            {
+                Id = id,
+                Name = "Event",
+                OrganizationId = 2,
+                EventTypeId = type.Id,
+                EventType = type,
+                StartDate = DateTime.UtcNow.AddDays(-3),
+                EndDate = DateTime.UtcNow.AddDays(-2),
+                EventParticipants = new List<EventParticipant>
+                {
+                    new EventParticipant { Id = 1, ApplicationUserId = "testUser1", AttendStatus = (int)status }
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event>
+            {
+                EndedEvent(visitedId, AttendingStatus.Attending),
+                EndedEvent(Guid.NewGuid(), AttendingStatus.Waitlisted)
+            });
+
+            var args = new EventParticipantVisitedEventsListingArgsDto
+            {
+                UserId = "testUser1",
+                Page = 1,
+                PageSize = 10,
+                EventTypeIds = new List<int>(),
+                EndDate = DateTime.UtcNow.AddYears(1),
+                StartDate = DateTime.UtcNow.AddYears(-1)
+            };
+
+            var result = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(args, new UserAndOrganizationDto { OrganizationId = 2 });
+
+            Assert.That(result.Select(item => item.Id), Is.EqualTo(new[] { visitedId }));
+        }
+
+        [Test]
         public async Task Should_Return_Preview_Visited_Events_Filtered_By_Date_Interval()
         {
             // Arrange

@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Premium.Presentation.WebViewModels.Events
+﻿using System;
+
+namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
     public class EventDetailsParticipantViewModel
     {
@@ -13,5 +15,6 @@
         public int AttendStatus { get; set; }
 
         public string AttendComment { get; set; }
+        public DateTime? WaitlistedAt { get; set; }
     }
 }
