@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -31,12 +32,19 @@ namespace Shrooms.Tests.DomainService
         private const int FollowedWallId = 1;
         private const int EventWallId = 2;
         private const string PostBody = "wall post body";
+        private const string OtherUserId = "otherUser";
+        private const int MainWallId = 10;
+        private const int FollowedHiddenWallId = 11;
+        private const int NotFollowedWallId = 12;
+        private const int NotFollowedHiddenWallId = 13;
+        private const int OtherOrganizationMainWallId = 14;
 
         private DbSet<Wall> _wallsDbSet;
         private DbSet<WallModerator> _wallModeratorDbSet;
         private DbSet<WallMember> _wallUsersDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<Post> _postsDbSet;
+        private DbSet<Comment> _commentsDbSet;
         private DbSet<PostWatcher> _postWatchersDbSet;
         private DbSet<Event> _eventsDbSet;
         private WallService _wallService;
@@ -53,6 +61,7 @@ namespace Shrooms.Tests.DomainService
             _wallUsersDbSet = _uow.MockDbSetForAsync<WallMember>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
             _postsDbSet = _uow.MockDbSetForAsync<Post>();
+            _commentsDbSet = _uow.MockDbSetForAsync<Comment>();
             _postWatchersDbSet = _uow.MockDbSetForAsync<PostWatcher>();
             _eventsDbSet = _uow.MockDbSetForAsync<Event>();
 
@@ -1115,6 +1124,81 @@ namespace Shrooms.Tests.DomainService
             Assert.That(posts.Any(p => p.WallId == EventWallId), Is.False);
         }
 
+        [Test]
+        public async Task Should_Not_Return_Main_Wall_Of_Another_Organization_In_Followed_Walls_List()
+        {
+            // Arrange
+            MockWallsForScopes();
+
+            // Act
+            var walls = (await _wallService.GetWallsListAsync(FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(walls.Select(w => w.Id), Is.EquivalentTo(new[] { MainWallId, FollowedHiddenWallId }));
+            Assert.That(walls.All(w => w.IsFollowing), Is.True);
+        }
+
+        [TestCase(WallsListFilter.Followed, new[] { MainWallId, FollowedHiddenWallId })]
+        [TestCase(WallsListFilter.NotHiddenFromAllWalls, new[] { MainWallId, FollowedHiddenWallId, NotFollowedWallId })]
+        [TestCase(WallsListFilter.All, new[] { MainWallId, FollowedHiddenWallId, NotFollowedWallId, NotFollowedHiddenWallId })]
+        [TestCase(WallsListFilter.NotFollowed, new[] { NotFollowedWallId, NotFollowedHiddenWallId })]
+        public async Task Should_Return_Feed_Posts_Only_From_Walls_Matching_The_Filter(WallsListFilter filter, int[] expectedWallIds)
+        {
+            // Arrange
+            MockWallsForScopes();
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), filter)).ToList();
+            var walls = (await _wallService.GetWallsListAsync(FeedUser(), filter)).ToList();
+
+            // Assert
+            Assert.That(posts.Select(p => p.WallId), Is.EquivalentTo(expectedWallIds));
+            Assert.That(walls.Select(w => w.Id), Is.EquivalentTo(expectedWallIds));
+        }
+
+        [Test]
+        public async Task Should_Order_Feed_Posts_By_Last_Activity_And_Page_Them()
+        {
+            // Arrange
+            MockWallsForScopes();
+
+            // Act
+            var firstPage = (await _wallService.GetAllPostsAsync(1, 2, FeedUser(), WallsListFilter.All)).ToList();
+            var secondPage = (await _wallService.GetAllPostsAsync(2, 2, FeedUser(), WallsListFilter.All)).ToList();
+
+            // Assert
+            Assert.That(firstPage.Select(p => p.Id), Is.EqualTo(new[] { MainWallId, FollowedHiddenWallId }));
+            Assert.That(secondPage.Select(p => p.Id), Is.EqualTo(new[] { NotFollowedWallId, NotFollowedHiddenWallId }));
+        }
+
+        [Test]
+        public async Task Should_Map_Feed_Post_Authors_Likes_And_Moderation()
+        {
+            // Arrange
+            MockWallsForScopes();
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.All)).ToList();
+
+            // Assert
+            var moderatedWallPost = posts.Single(p => p.WallId == FollowedHiddenWallId);
+            Assert.That(moderatedWallPost.CanModerate, Is.True);
+            Assert.That(moderatedWallPost.Comments.Single().CanModerate, Is.True);
+            Assert.That(moderatedWallPost.Comments.Single().Author.FullName, Is.EqualTo("Jane Doe"));
+
+            var otherWallPost = posts.Single(p => p.WallId == NotFollowedWallId);
+            Assert.That(otherWallPost.CanModerate, Is.False);
+            Assert.That(otherWallPost.Author.UserId, Is.EqualTo(OtherUserId));
+            Assert.That(otherWallPost.Author.FullName, Is.EqualTo("Jane Doe"));
+            Assert.That(otherWallPost.Author.PictureId, Is.EqualTo("jane.jpg"));
+            Assert.That(otherWallPost.Likes.Select(l => l.UserId), Is.EqualTo(new[] { OtherUserId }));
+            Assert.That(otherWallPost.Likes.Single().FullName, Is.EqualTo("Jane Doe"));
+            Assert.That(otherWallPost.IsLiked, Is.False);
+
+            var deletedAuthorPost = posts.Single(p => p.WallId == NotFollowedHiddenWallId);
+            Assert.That(deletedAuthorPost.Author.FullName, Is.EqualTo(BusinessLayerConstants.DeletedUserName));
+        }
+
         private static UserAndOrganizationDto FeedUser()
         {
             return new UserAndOrganizationDto { UserId = FeedUserId, OrganizationId = 2 };
@@ -1122,7 +1206,7 @@ namespace Shrooms.Tests.DomainService
 
         private void MockEventPermission(bool hasPermission)
         {
-            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.Event).Returns(hasPermission);
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.Event, Arg.Any<CancellationToken>()).Returns(hasPermission);
         }
 
         // Wall 1 is a user created wall the user follows, wall 2 is the wall of an event the user joined; each holds one post with the same id as its wall.
@@ -1210,6 +1294,94 @@ namespace Shrooms.Tests.DomainService
             _eventsDbSet.SetDbSetDataForAsync(events);
 
             return eventId;
+        }
+
+        // Organization 2 has a Main wall the feed user is a member of, a hidden wall the feed user follows and moderates, and two walls they don't follow
+        // (one hidden); organization 3 has a Main wall with a member. Each wall holds one post with the wall's id, newest first.
+        private void MockWallsForScopes()
+        {
+            var followedHiddenWallMember = new WallMember { Id = 1, UserId = FeedUserId, WallId = FollowedHiddenWallId };
+            var otherOrganizationMember = new WallMember { Id = 2, UserId = OtherUserId, WallId = OtherOrganizationMainWallId };
+            var mainWallMember = new WallMember { Id = 3, UserId = FeedUserId, WallId = MainWallId };
+
+            Wall CreateWall(int id, WallType type, int organizationId, bool isHidden, params WallMember[] members) => new()
+            {
+                Id = id,
+                Name = $"Wall {id}",
+                Type = type,
+                OrganizationId = organizationId,
+                IsHiddenFromAllWalls = isHidden,
+                Members = members.ToList(),
+                Moderators = new List<WallModerator>(),
+                Posts = new List<Post>()
+            };
+
+            var walls = new List<Wall>
+            {
+                CreateWall(MainWallId, WallType.Main, 2, false, mainWallMember),
+                CreateWall(FollowedHiddenWallId, WallType.UserCreated, 2, true, followedHiddenWallMember),
+                CreateWall(NotFollowedWallId, WallType.UserCreated, 2, false),
+                CreateWall(NotFollowedHiddenWallId, WallType.UserCreated, 2, true),
+                CreateWall(OtherOrganizationMainWallId, WallType.Main, 3, false, otherOrganizationMember)
+            };
+
+            var now = DateTime.UtcNow;
+            var posts = walls
+                .Select((wall, index) =>
+                {
+                    var post = new Post
+                    {
+                        Id = wall.Id,
+                        WallId = wall.Id,
+                        Wall = wall,
+                        AuthorId = FeedUserId,
+                        MessageBody = PostBody,
+                        LastActivity = now.AddMinutes(-index),
+                        Comments = new List<Comment>(),
+                        Likes = new LikesCollection()
+                    };
+
+                    wall.Posts.Add(post);
+                    return post;
+                })
+                .ToList();
+
+            var notFollowedWallPost = posts.Single(p => p.Id == NotFollowedWallId);
+            notFollowedWallPost.AuthorId = OtherUserId;
+            notFollowedWallPost.Likes.Add(new Like(OtherUserId, LikeTypeEnum.Like));
+            notFollowedWallPost.Likes.Add(new Like("deletedUser", LikeTypeEnum.Like));
+
+            posts.Single(p => p.Id == NotFollowedHiddenWallId).AuthorId = "deletedUser";
+
+            var moderatedWallPost = posts.Single(p => p.Id == FollowedHiddenWallId);
+            moderatedWallPost.Comments.Add(new Comment
+            {
+                Id = 1,
+                PostId = moderatedWallPost.Id,
+                Post = moderatedWallPost,
+                AuthorId = OtherUserId,
+                MessageBody = "comment",
+                Likes = new LikesCollection()
+            });
+
+            var users = new List<ApplicationUser>
+            {
+                new() { Id = FeedUserId, FirstName = "Feed", LastName = "User", OrganizationId = 2 },
+                new() { Id = OtherUserId, FirstName = "Jane", LastName = "Doe", PictureId = "jane.jpg", OrganizationId = 2 }
+            };
+
+            _wallsDbSet.SetDbSetDataForAsync(walls);
+            _wallUsersDbSet.SetDbSetDataForAsync(new List<WallMember> { followedHiddenWallMember, otherOrganizationMember, mainWallMember });
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>
+            {
+                new() { Id = 1, UserId = FeedUserId, User = users[0], WallId = FollowedHiddenWallId },
+                new() { Id = 2, UserId = OtherUserId, User = users[1], WallId = NotFollowedWallId }
+            });
+            _postsDbSet.SetDbSetDataForAsync(posts);
+            _commentsDbSet.SetDbSetDataForAsync(posts.SelectMany(p => p.Comments).ToList());
+            _postWatchersDbSet.SetDbSetDataForAsync(new List<PostWatcher>());
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event>());
+            _usersDbSet.SetDbSetDataForAsync(users);
         }
 
         private static void MockRoleService(IRoleService roleService)

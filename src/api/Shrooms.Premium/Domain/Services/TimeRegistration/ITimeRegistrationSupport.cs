@@ -25,6 +25,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
 
         Task<TimeCalendar> CalendarAsync(string userId, DateTime month, int organizationId);
 
+        Task<IDictionary<string, TimeCalendar>> CalendarsAsync(IReadOnlyCollection<string> userIds, DateTime month, int organizationId);
+
         Task<TimeMonthLock> LockAsync(DateTime month, int organizationId);
 
         Task ThrowIfLockedAsync(DateTime month, int organizationId);
@@ -38,6 +40,8 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         Task SetStatusAsync(string userId, DateTime month, int organizationId, TimePeriodStatus status, TimePeriodStatus? previous);
 
         Task<int?> AutoFillProjectIdAsync(string userId, int organizationId);
+
+        Task<IDictionary<string, TimeAutoFill>> AutoFillsAsync(IReadOnlyCollection<string> userIds, int organizationId);
 
         Task MaterializeAutoFillAsync(string userId, DateTime month, int organizationId);
 

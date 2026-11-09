@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build:
+    name: Build and test
+    # Windows, like the AppVeyor pipeline this replaces: UserService and its tests use Windows
+    # time zone IDs, which TimeZoneInfo.GetSystemTimeZones() does not return on Linux.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: src/api
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # global.json pins the SDK feature band (10.0.4xx); this installs its latest patch.
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      # No restore-keys: a fallback cache would carry old package versions forward forever.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/api/Directory.Packages.props', 'src/api/**/*.csproj') }}
+
+      # Release skips the API project's Debug-only TakeAppOffline target (a 10 s ping) on restore.
+      - name: Restore
+        run: dotnet restore Shrooms.sln -p:Configuration=Release
+
+      - name: Build
+        id: build
+        run: dotnet build Shrooms.sln --configuration Release --no-restore
+
+      # Runs every test project in the solution and reports failures from all of them.
+      # Each project writes its .trx to its own <project>/TestResults folder.
+      - name: Test
+        run: dotnet test Shrooms.sln --configuration Release --no-build --logger "console;verbosity=normal" --logger trx
+
+      - name: Upload test results
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results
+          path: src/api/*/TestResults/*.trx
+          if-no-files-found: ignore
+
+      # Runs on every event, so a PR that breaks only publish fails here, not on master.
+      # Not --no-build: that fails with NETSDK1152, because both email template projects
+      # ship EmailTemplates/_ViewImports.cshtml.
+      - name: Publish API
+        run: dotnet publish Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj --configuration Release --no-restore --output ../../publish/api
+
+      # The deployable package is kept for non-PR runs (master pushes and manual runs) only.
+      - name: Upload API package
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: api
+          path: publish/api/
+          if-no-files-found: error
+          retention-days: 30

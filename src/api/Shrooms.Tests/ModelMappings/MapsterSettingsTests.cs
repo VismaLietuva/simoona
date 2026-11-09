@@ -185,6 +185,38 @@ namespace Shrooms.Tests.ModelMappings
             Assert.That(result.Floor.Rooms.Single(), Is.SameAs(result));
         }
 
+        [Test]
+        public void DeepGraphs_AreMappedInFull_SoNoGlobalMaxDepth()
+        {
+            // MaxDepth would cut the chain off silently (and is unrolled at compile time, see MapsterSettings), where
+            // AutoMapper maps all of it.
+            var chain = new Node { Name = "0" };
+            var last = chain;
+            for (var i = 1; i < 30; i++)
+            {
+                last = last.Next = new Node { Name = i.ToString() };
+            }
+
+            var withMaxDepth = MapsterSettings.Create();
+            withMaxDepth.Default.MaxDepth(10);
+
+            Assert.That(MapsterSettings.Create().Default.Settings.MaxDepth, Is.Null);
+            Assert.That(Length(_autoMapper.Map<NodeDto>(chain)), Is.EqualTo(30));
+            Assert.That(Length(_mapster.Map<NodeDto>(chain)), Is.EqualTo(30));
+            Assert.That(Length(new MapsterMapper.Mapper(withMaxDepth).Map<NodeDto>(chain)), Is.EqualTo(10));
+        }
+
+        private static int Length(NodeDto node)
+        {
+            var length = 0;
+            for (; node != null; node = node.Next)
+            {
+                length++;
+            }
+
+            return length;
+        }
+
         private static Destination ExistingDestination()
         {
             return new Destination

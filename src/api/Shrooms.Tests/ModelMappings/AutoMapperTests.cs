@@ -3,9 +3,12 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
+using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Models.VideoLibrary;
 using Shrooms.Presentation.ModelMappings.Profiles;
 using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Presentation.WebViewModels.Models.VideoLibrary;
 
 namespace Shrooms.Tests.ModelMappings
 {
@@ -28,6 +31,42 @@ namespace Shrooms.Tests.ModelMappings
         {
             Assert.That(SwitchNames(typeof(UserNotificationsSettingsViewModel)),
                 Is.EquivalentTo(SwitchNames(typeof(UserNotificationsSettingsDto))));
+        }
+
+        [Test]
+        public void VideoUpdate_WithoutMaterials_MapsToNull()
+        {
+            var dto = _mapper.Map<VideoLibraryItemViewModel, VideoLibraryItemDto>(new VideoLibraryItemViewModel { Id = 1 });
+
+            Assert.That(dto.Materials, Is.Null);
+        }
+
+        [Test]
+        public void VideoUpdate_WithMaterials_MapsThem()
+        {
+            var viewModel = new VideoLibraryItemViewModel
+            {
+                Id = 1,
+                Materials = new List<VideoLibraryMaterialViewModel>
+                {
+                    new() { Title = "Slides", Url = "https://docs.google.com/presentation/d/s/edit" }
+                }
+            };
+
+            var dto = _mapper.Map<VideoLibraryItemViewModel, VideoLibraryItemDto>(viewModel);
+
+            Assert.That(dto.Materials.Single().Title, Is.EqualTo("Slides"));
+            Assert.That(dto.Materials.Single().Url, Is.EqualTo("https://docs.google.com/presentation/d/s/edit"));
+        }
+
+        [Test]
+        public void VideoUpdate_WithEmptyMaterials_StaysEmpty()
+        {
+            var viewModel = new VideoLibraryItemViewModel { Id = 1, Materials = new List<VideoLibraryMaterialViewModel>() };
+
+            var dto = _mapper.Map<VideoLibraryItemViewModel, VideoLibraryItemDto>(viewModel);
+
+            Assert.That(dto.Materials, Is.Empty);
         }
 
         [Test]

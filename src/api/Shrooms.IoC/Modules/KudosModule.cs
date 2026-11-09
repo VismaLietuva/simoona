@@ -12,6 +12,7 @@ namespace Shrooms.IoC.Modules
             services.AddScoped<IKudosServiceValidator, KudosServiceValidator>();
             services.AddScoped<IKudosService, KudosService>();
             services.AddScoped<IKudosExportService, KudosExportService>();
+            services.AddScoped<IKudosCalculatorSettingsService, KudosCalculatorSettingsService>();
             services.AddScoped<IKudosNotificationService, KudosNotificationService>();
             return services;
         }
