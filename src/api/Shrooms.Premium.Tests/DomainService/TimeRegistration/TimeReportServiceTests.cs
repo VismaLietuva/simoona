@@ -46,9 +46,10 @@ namespace Shrooms.Premium.Tests.DomainService.TimeRegistration
             Assert.That(ona.Status, Is.EqualTo("open"));
             Assert.That(ona.ExpectedMinutes, Is.EqualTo(OctoberWorkingDays * 480));
             Assert.That(ona.LoggedMinutes, Is.EqualTo(OctoberWorkingDays * 480));
+            Assert.That(ona.AbsenceMinutes, Is.EqualTo(2 * 480));
             Assert.That(
-                report.Projects.Where(row => row.EmployeeId == Ona).Select(row => (row.TaskName, row.Minutes)),
-                Is.EquivalentTo(new[] { ("Review", 120), ("Development", ((OctoberWorkingDays - 2) * 480) - 120) }));
+                report.Projects.Where(row => row.EmployeeId == Ona).Select(row => (row.TaskName ?? row.AbsenceType, row.Minutes)),
+                Is.EquivalentTo(new[] { ("Review", 120), ("Development", ((OctoberWorkingDays - 2) * 480) - 120), ("annual", 2 * 480) }));
 
             var jonas = report.Employees.Single(employee => employee.Id == Jonas);
             Assert.That(jonas.ExpectedMinutes, Is.EqualTo(OctoberWorkingDays * 360));

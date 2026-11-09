@@ -28,6 +28,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         private readonly ITimeRegistrationSupport _support;
         private readonly DbSet<ApplicationUser> _users;
         private readonly DbSet<TimeMonthLock> _locks;
+        private readonly DbSet<TimeOvertimeRequest> _overtimeRequests;
 
         public TimePeriodService(IUnitOfWork2 uow, ITimeRegistrationSupport support)
         {
@@ -35,6 +36,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
             _support = support;
             _users = uow.GetDbSet<ApplicationUser>();
             _locks = uow.GetDbSet<TimeMonthLock>();
+            _overtimeRequests = uow.GetDbSet<TimeOvertimeRequest>();
         }
 
         public async Task SubmitAsync(string month, UserAndOrganizationDto userOrg)
@@ -209,7 +211,15 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
         public async Task<TimeRegistrationOverviewDto> GetOverviewAsync(UserAndOrganizationDto userOrg)
         {
             var reports = await DirectReportIdsAsync(userOrg);
-            var overview = new TimeRegistrationOverviewDto { CanManage = reports.Count > 0 };
+            var overview = new TimeRegistrationOverviewDto
+            {
+                CanManage = reports.Count > 0,
+                ManageBadge = await _overtimeRequests.CountAsync(request =>
+                    request.OrganizationId == userOrg.OrganizationId
+                    && request.User.ManagerId == userOrg.UserId
+                    && request.Status == TimeOvertimeRequestStatus.Pending
+                    && !request.OrderedByManager)
+            };
 
             var today = await _support.TodayAsync(userOrg.OrganizationId);
             var month = TimeMonth.Of(today);
@@ -223,7 +233,7 @@ namespace Shrooms.Premium.Domain.Services.TimeRegistration
                 return overview;
             }
 
-            overview.ManageBadge = await NotApprovedAsync(reports, month, userOrg.OrganizationId);
+            overview.ManageBadge += await NotApprovedAsync(reports, month, userOrg.OrganizationId);
 
             if (await _support.IsAccountantAsync(userOrg))
             {

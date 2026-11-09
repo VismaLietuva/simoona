@@ -9,5 +9,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.TimeRegistration
         public string Comment { get; set; }
 
         public bool IsDefault { get; set; }
+
+        public bool IsOvertime { get; set; }
     }
 }

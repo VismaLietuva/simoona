@@ -1,5 +1,6 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using OfficeOpenXml.Table;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
@@ -46,6 +47,43 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             _worksheet.Cells[1, 1, 1, index - 1].Style.Font.Bold = true;
 
             return new ExcelWorksheetBuilder(_worksheet, true, _excelRowCollection);
+        }
+
+        public IExcelWorksheetBuilder AsTableWithTotals(string tableName, string totalsLabel, params string[] summedColumns)
+        {
+            var dimension = _worksheet.Dimension;
+
+            if (dimension == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddHeader)} or {nameof(AddRows)} has to be called before {nameof(AsTableWithTotals)}");
+            }
+
+            var range = _worksheet.Cells[dimension.Start.Row, dimension.Start.Column, dimension.End.Row, dimension.End.Column];
+
+            range.AutoFilter = false;
+
+            var table = _worksheet.Tables.Add(range, tableName);
+            table.TableStyle = TableStyles.None;
+            table.ShowTotal = true;
+            table.Columns[0].TotalsRowLabel = totalsLabel;
+
+            foreach (var column in summedColumns)
+            {
+                var tableColumn = table.Columns[column] ?? throw new ArgumentException($"Table '{tableName}' has no column named '{column}'.", nameof(summedColumns));
+                tableColumn.TotalsRowFunction = RowFunctions.Sum;
+            }
+
+            var totalsRow = _worksheet.Cells[table.Address.End.Row, table.Address.Start.Column, table.Address.End.Row, table.Address.End.Column];
+            totalsRow.Style.Font.Bold = true;
+            totalsRow.Calculate();
+
+            var tableBorder = _worksheet.Cells[table.Address.Address].Style.Border;
+            tableBorder.Top.Style = ExcelBorderStyle.Thin;
+            tableBorder.Bottom.Style = ExcelBorderStyle.Thin;
+            tableBorder.Left.Style = ExcelBorderStyle.Thin;
+            tableBorder.Right.Style = ExcelBorderStyle.Thin;
+
+            return this;
         }
 
         public IExcelWorksheetBuilder AutoFitColumns(int minimumWidth, int maximumWidth)

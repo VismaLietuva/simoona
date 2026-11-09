@@ -10,6 +10,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.TimeRegistration
 
         public string TaskName { get; set; }
 
+        public string AbsenceType { get; set; }
+
         public int Minutes { get; set; }
     }
 }

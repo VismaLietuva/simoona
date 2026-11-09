@@ -33,15 +33,16 @@ jobs:
         with:
           persist-credentials: false
 
+      # global.json pins the SDK feature band (10.0.4xx); this installs its latest patch.
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
+      # No restore-keys: a fallback cache would carry old package versions forward forever.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.nuget/packages
           key: nuget-${{ runner.os }}-${{ hashFiles('src/api/Directory.Packages.props', 'src/api/**/*.csproj') }}
-          restore-keys: nuget-${{ runner.os }}-
 
       # Release skips the API project's Debug-only TakeAppOffline target (a 10 s ping) on restore.
       - name: Restore
@@ -51,30 +52,31 @@ jobs:
         id: build
         run: dotnet build Shrooms.sln --configuration Release --no-restore
 
-      # Each suite runs even if an earlier one failed, so one red run shows every failure.
-      - name: Test Shrooms.Tests
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: dotnet test Shrooms.Tests/Shrooms.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal" --logger trx --results-directory ../../TestResults
-
-      - name: Test Shrooms.Premium.Tests
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: dotnet test Shrooms.Premium.Tests/Shrooms.Premium.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal" --logger trx --results-directory ../../TestResults
-
-      - name: Test Shrooms.EmailTemplates.Tests
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: dotnet test Shrooms.EmailTemplates.Tests/Shrooms.EmailTemplates.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal" --logger trx --results-directory ../../TestResults
+      # Runs every test project in the solution and reports failures from all of them.
+      # Each project writes its .trx to its own <project>/TestResults folder.
+      - name: Test
+        run: dotnet test Shrooms.sln --configuration Release --no-build --logger "console;verbosity=normal" --logger trx
 
       - name: Upload test results
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: test-results
-          path: TestResults/*.trx
+          path: src/api/*/TestResults/*.trx
           if-no-files-found: ignore
 
-      - name: Upload API build
+      # Runs on every event, so a PR that breaks only publish fails here, not on master.
+      # Not --no-build: that fails with NETSDK1152, because both email template projects
+      # ship EmailTemplates/_ViewImports.cshtml.
+      - name: Publish API
+        run: dotnet publish Shrooms.Presentation.Api/Shrooms.Presentation.Api.csproj --configuration Release --no-restore --output ../../publish/api
+
+      # The deployable package is kept for non-PR runs (master pushes and manual runs) only.
+      - name: Upload API package
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api
-          path: src/api/Shrooms.Presentation.Api/bin/Release/net10.0/
+          path: publish/api/
           if-no-files-found: error
+          retention-days: 30

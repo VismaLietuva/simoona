@@ -218,6 +218,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<VideoLibraryItem> VideoLibraryItems { get; set; }
 
+        public virtual DbSet<VideoLibraryMaterial> VideoLibraryMaterials { get; set; }
+
         public virtual DbSet<TimeCustomer> TimeCustomers { get; set; }
 
         public virtual DbSet<TimeProject> TimeProjects { get; set; }
@@ -232,9 +234,13 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<TimeMonthLock> TimeMonthLocks { get; set; }
 
+        public virtual DbSet<TimeOvertimeRequest> TimeOvertimeRequests { get; set; }
+
         public virtual DbSet<FeatureFlag> FeatureFlags { get; set; }
 
         public virtual DbSet<FeatureFlagUser> FeatureFlagUsers { get; set; }
+
+        public virtual DbSet<KudosCalculatorSettings> KudosCalculatorSettings { get; set; }
 
         public int SaveChanges(string userId)
         {
@@ -344,6 +350,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new SeatReleaseEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoTypeEntityConfig());
             modelBuilder.ApplyConfiguration(new VideoLibraryItemEntityConfig());
+            modelBuilder.ApplyConfiguration(new VideoLibraryMaterialEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeCustomerEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeProjectEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeTaskEntityConfig());
@@ -351,8 +358,10 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.ApplyConfiguration(new TimeEntryEntityConfig());
             modelBuilder.ApplyConfiguration(new TimePeriodEntityConfig());
             modelBuilder.ApplyConfiguration(new TimeMonthLockEntityConfig());
+            modelBuilder.ApplyConfiguration(new TimeOvertimeRequestEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagEntityConfig());
             modelBuilder.ApplyConfiguration(new FeatureFlagUserEntityConfig());
+            modelBuilder.ApplyConfiguration(new KudosCalculatorSettingsEntityConfig());
 
             new OtherEntitiesConfig(modelBuilder).Add();
 

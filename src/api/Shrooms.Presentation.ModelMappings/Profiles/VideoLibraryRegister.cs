@@ -17,6 +17,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             config.NewConfig<VideoTypeDto, VideoTypeViewModel>();
             config.NewConfig<VideoLibraryItemDto, VideoLibraryItemViewModel>();
+            config.NewConfig<VideoLibraryMaterialDto, VideoLibraryMaterialViewModel>();
             config.NewConfig<VideoLibraryFiltersDto, VideoLibraryFiltersViewModel>();
         }
 
@@ -24,8 +25,18 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             config.NewConfig<VideoTypeViewModel, VideoTypeDto>();
             config.NewConfig<NewVideoTypeViewModel, VideoTypeDto>();
-            config.NewConfig<VideoLibraryItemViewModel, VideoLibraryItemDto>();
+            // The profile's AllowNull() on Materials: the update keeps a video's materials when the list is missing (null)
+            // and removes them when it is empty, so null must not become [] (MapsterSettings' EmptyCollectionIfNull).
+            config.NewConfig<VideoLibraryItemViewModel, VideoLibraryItemDto>()
+                .AfterMapping((src, dest) =>
+                {
+                    if (src.Materials == null)
+                    {
+                        dest.Materials = null;
+                    }
+                });
             config.NewConfig<NewVideoLibraryItemViewModel, VideoLibraryItemDto>();
+            config.NewConfig<VideoLibraryMaterialViewModel, VideoLibraryMaterialDto>();
             config.NewConfig<VideoLibraryListArgsViewModel, VideoLibraryListArgsDto>();
             config.NewConfig<VideoLibraryFiltersArgsViewModel, VideoLibraryFiltersArgsDto>();
         }

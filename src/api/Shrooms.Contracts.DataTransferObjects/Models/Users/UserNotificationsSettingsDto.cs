@@ -30,6 +30,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Users
 
         public bool VacationsAppNotifications;
 
+        public bool OvertimeAppNotifications;
+
         public IEnumerable<WallNotificationsDto> Walls;
     }
 }
