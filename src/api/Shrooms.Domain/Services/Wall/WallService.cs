@@ -738,7 +738,16 @@ namespace Shrooms.Domain.Services.Wall
                 // The endpoint is gated on BasicPermissions.Post, so a user who can see events but cannot post still gets nothing here.
                 var includeEventWalls = (wallsListFilter == WallsListFilter.Followed || includeJoinedEventWalls) &&
                                         await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Event, cancellationToken);
-                wallScope = BuildFeedScope(userOrg, wallsListFilter, includeEventWalls);
+
+                // Read the wall ids on their own first. With the wall filter inlined, SQL Server reads and sorts
+                // every post of every matching wall to return one page; an id list lets it walk IX_LastActivity
+                // newest first and stop after the page.
+                var wallIds = await _wallsDbSet
+                    .Where(BuildWallsListScope(userOrg, wallsListFilter))
+                    .Select(wall => wall.Id)
+                    .ToListAsync(cancellationToken);
+
+                wallScope = BuildFeedScope(userOrg, wallIds, includeEventWalls);
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
@@ -803,18 +812,17 @@ namespace Shrooms.Domain.Services.Wall
         }
 
         // Event walls are added here rather than in BuildWallsListScope: they must stay out of the sidebar.
-        private static Expression<Func<Post, bool>> BuildFeedScope(UserAndOrganizationDto userOrg, WallsListFilter filter, bool includeEventWalls)
+        private static Expression<Func<Post, bool>> BuildFeedScope(UserAndOrganizationDto userOrg, List<int> wallIds, bool includeEventWalls)
         {
-            var wallsListScope = BuildWallsListScope(userOrg, filter);
+            if (!includeEventWalls)
+            {
+                return post => wallIds.Contains(post.WallId);
+            }
 
-            Expression<Func<Post, bool>> scope = includeEventWalls
-                ? post => wallsListScope.Invoke(post.Wall) ||
-                          (post.Wall.Type == WallType.Events &&
-                           post.Wall.OrganizationId == userOrg.OrganizationId &&
-                           post.Wall.Members.Any(member => member.UserId == userOrg.UserId))
-                : post => wallsListScope.Invoke(post.Wall);
-
-            return scope.Expand();
+            return post => wallIds.Contains(post.WallId) ||
+                           (post.Wall.Type == WallType.Events &&
+                            post.Wall.OrganizationId == userOrg.OrganizationId &&
+                            post.Wall.Members.Any(member => member.UserId == userOrg.UserId));
         }
 
         // Comments are read by the ids of the posts already on the page, in their own query so post columns
