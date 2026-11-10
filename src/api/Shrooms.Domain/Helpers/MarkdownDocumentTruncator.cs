@@ -58,9 +58,16 @@ namespace Shrooms.Domain.Helpers
                         literal.Content = new StringSlice(Prefix(literal.Content.ToString(), remaining));
                         RemoveFollowing(literal, leaf.Inline, false);
                     }
-                    else if (!keptAnything && Shorten(inline, remaining))
+                    else if (remaining > 0 && inline is AutolinkInline autolink)
                     {
-                        RemoveFollowing(inline, leaf.Inline, false);
+                        var link = LinkWithLabel(autolink, Prefix(autolink.Url, remaining));
+                        autolink.ReplaceBy(link);
+                        RemoveFollowing(link, leaf.Inline, false);
+                    }
+                    else if (!keptAnything && remaining > 0 && inline is CodeInline code)
+                    {
+                        code.Content = Prefix(code.Content, remaining);
+                        RemoveFollowing(code, leaf.Inline, false);
                     }
                     else if (keptInBlock)
                     {
@@ -82,18 +89,11 @@ namespace Shrooms.Domain.Helpers
             }
         }
 
-        private static bool Shorten(Inline inline, int maxTextElements)
+        private static LinkInline LinkWithLabel(AutolinkInline autolink, string label)
         {
-            switch (inline)
-            {
-                case CodeInline code when maxTextElements > 0:
-                    code.Content = Prefix(code.Content, maxTextElements);
-                    return true;
-                case AutolinkInline:
-                    return true;
-                default:
-                    return false;
-            }
+            var link = new LinkInline(autolink.IsEmail ? "mailto:" + autolink.Url : autolink.Url, null);
+            link.AppendChild(new LiteralInline(label));
+            return link;
         }
 
         private static IEnumerable<Inline> Leaves(ContainerInline container)
@@ -121,7 +121,7 @@ namespace Shrooms.Domain.Helpers
                 LiteralInline literal => Graphemes(literal.Content.ToString()),
                 CodeInline code => Graphemes(code.Content),
                 HtmlEntityInline entity => Graphemes(entity.Transcoded.ToString()),
-                AutolinkInline autolink => autolink.Url.Length,
+                AutolinkInline autolink => Graphemes(autolink.Url),
                 LineBreakInline or HtmlInline or LinkInline => 1,
                 _ => 0
             };

@@ -452,11 +452,23 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_MaxTextLength_LeadingAutolinkLongerThanTheLimit_IsKeptWhole()
+        public void ConvertToHtml_MaxTextLength_LeadingAutolinkLongerThanTheLimit_KeepsTheHrefAndCutsTheLabel()
         {
             var url = "https://zoom.us/j/" + new string('1', 200);
 
-            Assert.That(Cut($"<{url}> see you", 150), Is.EqualTo($"<p><a href=\"{url}\">{url}</a>...</p>\n"));
+            Assert.That(Cut($"<{url}> see you", 150), Is.EqualTo($"<p><a href=\"{url}\">{url[..150]}</a>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutInsideAnAutolinkAfterText_KeepsTheHrefAndCutsTheLabel()
+        {
+            Assert.That(Cut("Join <https://zoom.us/j/123456789> now", 15), Is.EqualTo("<p>Join <a href=\"https://zoom.us/j/123456789\">https://zo</a>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_MaxTextLength_CutInsideAnEmailAutolink_KeepsTheMailtoHref()
+        {
+            Assert.That(Cut("<someone@example.com> wrote", 7), Is.EqualTo("<p><a href=\"mailto:someone@example.com\">someone</a>...</p>\n"));
         }
 
         private string Cut(string markdown, int maxTextLength)
