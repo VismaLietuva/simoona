@@ -83,6 +83,11 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
             {
                 user.Settings.Preferences = null;
             }
+
+            // The pre-migration copy in AspNetUsers holds the same document.
+#pragma warning disable CS0618
+            user.WallWidgetPreferences = null;
+#pragma warning restore CS0618
         }
     }
 }

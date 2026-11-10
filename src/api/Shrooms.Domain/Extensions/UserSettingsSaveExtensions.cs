@@ -9,6 +9,8 @@ namespace Shrooms.Domain.Extensions
 {
     public static class UserSettingsSaveExtensions
     {
+        public const string ConcurrentSaveMessage = "These settings were just saved by another request. Reload the page and try again.";
+
         /// <summary>
         /// Saves a change made through <c>ApplicationUser.GetOrCreateSettings()</c>.
         /// When the user had no settings row, two parallel first writes both insert
@@ -21,13 +23,15 @@ namespace Shrooms.Domain.Extensions
             {
                 await uow.SaveChangesAsync(userId);
             }
-            catch (DbUpdateException e) when (IsUniqueViolation(e))
+            catch (DbUpdateException e) when (e.IsUniqueViolation())
             {
-                throw new ValidationException(ErrorCodes.ConcurrencyError, "Your settings were just saved by another request. Reload the page and try again.");
+                throw ConcurrentSave();
             }
         }
 
-        private static bool IsUniqueViolation(DbUpdateException e)
+        public static ValidationException ConcurrentSave() => new(ErrorCodes.ConcurrencyError, ConcurrentSaveMessage);
+
+        public static bool IsUniqueViolation(this DbUpdateException e)
         {
             return e.InnerException is SqlException sql
                    && (sql.Number == 2601 || sql.Number == 2627);

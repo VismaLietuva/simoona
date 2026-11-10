@@ -85,13 +85,18 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         {
             var organization = _mockDbContext.Organizations.First();
             var settings = new UserSettings { CultureCode = "lt-LT", TimeZone = "FLE Standard Time", Preferences = "{\"sidebarFavorites\":[\"wall-7\"]}" };
-            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>
+#pragma warning disable CS0618
+            var user = new ApplicationUser
             {
-                new() { Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), Settings = settings }
-            });
+                Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), Settings = settings,
+                WallWidgetPreferences = "{\"sidebarFavorites\":[\"wall-7\"]}"
+            };
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user });
 
             await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
 
+            Assert.That(user.WallWidgetPreferences, Is.Null, "the pre-migration copy in AspNetUsers is cleared too");
+#pragma warning restore CS0618
             Assert.That(settings.Preferences, Is.Null);
             Assert.That(settings.CultureCode, Is.EqualTo("lt-LT"));
             Assert.That(settings.TimeZone, Is.EqualTo("FLE Standard Time"));

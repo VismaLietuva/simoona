@@ -155,6 +155,13 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public virtual UserSettings Settings { get; set; }
 
+        /// <summary>
+        /// The pre-migration copy of <see cref="UserSettings.Preferences"/>, kept until a
+        /// later migration drops the column. Nothing reads it; anonymization clears it.
+        /// </summary>
+        [Obsolete("Moved to UserSettings.Preferences. Only anonymization may write it, to clear it.")]
+        public string WallWidgetPreferences { get; set; }
+
         public string GoogleEmail { get; set; }
 
         public string FacebookEmail { get; set; }

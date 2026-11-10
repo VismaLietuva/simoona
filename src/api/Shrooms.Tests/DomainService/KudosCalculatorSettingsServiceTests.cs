@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -113,7 +111,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Report_Concurrency_Error_When_Settings_Were_Just_Created_By_Someone_Else()
         {
-            _uow.SaveChangesAsync("user").ThrowsAsync(new DbUpdateException("Duplicate", UniqueViolation()));
+            _uow.SaveChangesAsync("user").ThrowsAsync(new DbUpdateException("Duplicate", SqlExceptions.UniqueViolation()));
 
             var ex = Assert.ThrowsAsync<ValidationException>(() => _service.UpdateAsync(ValidInput(), UserOrg()));
 
@@ -189,26 +187,6 @@ namespace Shrooms.Tests.DomainService
         private static UserAndOrganizationDto UserOrg(int organizationId)
         {
             return new UserAndOrganizationDto { OrganizationId = organizationId, UserId = "user" };
-        }
-
-        private static SqlException UniqueViolation()
-        {
-            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
-
-            var error = (SqlError)typeof(SqlError)
-                .GetConstructor(flags, null,
-                    new[] { typeof(int), typeof(byte), typeof(byte), typeof(string), typeof(string), typeof(string), typeof(int), typeof(Exception) },
-                    null)
-                .Invoke(new object[] { 2627, (byte)1, (byte)14, "server", "Violation of UNIQUE KEY constraint", "", 0, null });
-
-            var errors = (SqlErrorCollection)typeof(SqlErrorCollection)
-                .GetConstructor(flags, null, Type.EmptyTypes, null)
-                .Invoke(null);
-            typeof(SqlErrorCollection).GetMethod("Add", flags).Invoke(errors, new object[] { error });
-
-            return (SqlException)typeof(SqlException)
-                .GetMethod("CreateException", flags, null, new[] { typeof(SqlErrorCollection), typeof(string) }, null)
-                .Invoke(null, new object[] { errors, "16.0" });
         }
     }
 }

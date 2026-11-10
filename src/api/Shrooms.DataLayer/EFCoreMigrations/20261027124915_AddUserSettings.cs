@@ -45,11 +45,18 @@ IF EXISTS (SELECT 1 FROM dbo.AspNetUsers WHERE LEN([CultureCode]) > 20 OR LEN([T
                 });
 
             // One row per user, soft-deleted ones included. The AspNetUsers columns
-            // stay until a later migration drops them.
+            // stay until a later migration drops them; that migration first runs
+            // UserSettingsCatchUp.Sql for what old instances wrote after this ran. Users anonymized before this
+            // migration kept their preferences (the old anonymization never cleared
+            // them) and are never anonymized again, so clear both copies here.
             migrationBuilder.Sql(@"
 INSERT dbo.UserSettings ([UserId], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete], [Preferences], [Created], [CreatedBy], [Modified], [ModifiedBy])
-SELECT [Id], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete], [WallWidgetPreferences], SYSUTCDATETIME(), NULL, SYSUTCDATETIME(), NULL
-FROM dbo.AspNetUsers
+SELECT [Id], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete],
+       CASE WHEN [IsAnonymized] = 1 THEN NULL ELSE [WallWidgetPreferences] END,
+       SYSUTCDATETIME(), NULL, SYSUTCDATETIME(), NULL
+FROM dbo.AspNetUsers;
+
+UPDATE dbo.AspNetUsers SET [WallWidgetPreferences] = NULL WHERE [IsAnonymized] = 1 AND [WallWidgetPreferences] IS NOT NULL;
 ");
         }
 

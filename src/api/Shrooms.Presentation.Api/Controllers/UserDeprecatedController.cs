@@ -18,6 +18,7 @@ using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.BlacklistUsers;
@@ -825,7 +826,15 @@ namespace Shrooms.Presentation.Api.Controllers
             user.GetOrCreateSettings().DailyMailingHour = model.DailyMailingHour;
 
             _applicationUserRepository.Update(user);
-            await _unitOfWork.SaveAsync();
+
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (DbUpdateException e) when (e.IsUniqueViolation())
+            {
+                return BadRequestWithError(UserSettingsSaveExtensions.ConcurrentSave());
+            }
 
             return Ok();
         }

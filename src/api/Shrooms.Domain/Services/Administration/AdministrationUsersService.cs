@@ -207,7 +207,7 @@ namespace Shrooms.Domain.Services.Administration
             await SetWelcomeKudosAsync(applicationUser);
 
             await AddWallsToNewUser(applicationUser, userAndOrg);
-            await _uow.SaveChangesAsync(userAndOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userAndOrg.UserId);
         }
 
         public async Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization)

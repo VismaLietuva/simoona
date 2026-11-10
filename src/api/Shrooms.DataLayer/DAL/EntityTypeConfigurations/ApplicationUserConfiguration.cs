@@ -124,13 +124,13 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .WithOne(s => s.ApplicationUser)
                 .HasForeignKey<NotificationsSettings>("ApplicationUserId");
 
-            // Moved to UserSettings. The columns stay, unmapped to any CLR property,
-            // so a rollback still finds them; a later migration drops them.
+            // Moved to UserSettings. The columns stay so a rollback still finds them;
+            // a later migration drops them. WallWidgetPreferences keeps an [Obsolete]
+            // CLR property so anonymization can clear the old copy.
             builder.Property<string>("CultureCode");
             builder.Property<string>("TimeZone");
             builder.Property<TimeSpan?>("DailyMailingHour");
             builder.Property<bool>("IsTutorialComplete");
-            builder.Property<string>("WallWidgetPreferences");
         }
     }
 }
