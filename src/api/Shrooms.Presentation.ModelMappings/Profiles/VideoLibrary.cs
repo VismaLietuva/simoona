@@ -16,6 +16,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             CreateMap<VideoTypeDto, VideoTypeViewModel>(MemberList.None);
             CreateMap<VideoLibraryItemDto, VideoLibraryItemViewModel>(MemberList.None);
+            CreateMap<VideoLibraryMaterialDto, VideoLibraryMaterialViewModel>(MemberList.None);
             CreateMap<VideoLibraryFiltersDto, VideoLibraryFiltersViewModel>(MemberList.None);
         }
 
@@ -23,8 +24,10 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             CreateMap<VideoTypeViewModel, VideoTypeDto>(MemberList.None);
             CreateMap<NewVideoTypeViewModel, VideoTypeDto>(MemberList.None);
-            CreateMap<VideoLibraryItemViewModel, VideoLibraryItemDto>(MemberList.None);
+            CreateMap<VideoLibraryItemViewModel, VideoLibraryItemDto>(MemberList.None)
+                .ForMember(dest => dest.Materials, opt => opt.AllowNull());
             CreateMap<NewVideoLibraryItemViewModel, VideoLibraryItemDto>(MemberList.None);
+            CreateMap<VideoLibraryMaterialViewModel, VideoLibraryMaterialDto>(MemberList.None);
             CreateMap<VideoLibraryListArgsViewModel, VideoLibraryListArgsDto>(MemberList.None);
             CreateMap<VideoLibraryFiltersArgsViewModel, VideoLibraryFiltersArgsDto>(MemberList.None);
         }

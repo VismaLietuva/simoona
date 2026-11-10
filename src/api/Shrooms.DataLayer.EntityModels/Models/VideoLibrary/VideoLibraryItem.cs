@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Shrooms.DataLayer.EntityModels.Models.VideoLibrary
 {
@@ -22,5 +23,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.VideoLibrary
         public int? VideoTypeId { get; set; }
 
         public virtual VideoType VideoType { get; set; }
+
+        public virtual ICollection<VideoLibraryMaterial> Materials { get; set; } = new List<VideoLibraryMaterial>();
     }
 }

@@ -19,8 +19,8 @@ Then fold `Design/layout.html` into `EmailTemplates/HeaderFooter.cshtml`:
 5. Replace `PREHEADER_SLOT` with `@ViewData["Preheader"]`.
 6. Keep the `@model` line and the generated-file comment at the top.
 
-Recompiling is not a CI step on purpose. `appveyor.yml` is a pure .NET pipeline, and adding npm to
-it to regenerate one layout that changes twice a year is a bad trade. Checking that the two files
+Recompiling is not a CI step on purpose. `.github/workflows/ci.yml` is a pure .NET pipeline, and adding
+npm to it to regenerate one layout that changes twice a year is a bad trade. Checking that the two files
 still agree costs nothing, though, so `LayoutIsGeneratedTests` applies the substitutions above to
 `Design/layout.html` and compares — hand-editing the `.cshtml` fails the build instead of drifting
 silently.

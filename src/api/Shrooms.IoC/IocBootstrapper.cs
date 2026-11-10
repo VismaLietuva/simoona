@@ -19,7 +19,7 @@ using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.IoC.Modules;
 using Shrooms.Premium.IoC.Modules;
-using System.Reflection;
+using Shrooms.Presentation.ModelMappings;
 
 namespace Shrooms.IoC
 {
@@ -91,9 +91,7 @@ namespace Shrooms.IoC
             services.AddPremiumWebHookCallbacks();
 
             // AutoMapper
-            services.AddAutoMapper(
-                Assembly.Load("Shrooms.Presentation.ModelMappings"),
-                Assembly.Load("Shrooms.Premium"));
+            services.AddAutoMapper(MappingAssemblies.Load());
 
             // Must come after every other registration so views can resolve injected services.
             services.AddRazorTemplating();
