@@ -8,7 +8,8 @@ This guide explains how to get Simoona running from a clean repository checkout 
 |------|---------|
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Runs all containers |
 | .NET 10 SDK, 10.0.4xx band (pinned in [`global.json`](global.json)) | Only needed for [local fast-mode development](#local-development-fast-mode) |
-| Node.js + gulp | Only needed for [local fast-mode development](#local-development-fast-mode) |
+
+The front end lives in the separate simoona-nextjs repository and is run from there. It expects the API at http://localhost:50321.
 
 ---
 
@@ -19,13 +20,12 @@ cd src/api
 docker compose up -d
 ```
 
-This starts three containers:
+This starts two containers:
 
 | Container | Description |
 |-----------|-------------|
 | `simoona-db` | SQL Server 2022. Creates `SimoonaDB` and `SimoonaDBJobs` on first boot. |
 | `simoona-api` | .NET 10 API. Waits for the DB to be healthy, then applies all EF Core migrations automatically on startup. |
-| `simoona-webapp` | AngularJS frontend served by Node. |
 
 Wait for the API to finish migrating before proceeding:
 
@@ -66,9 +66,10 @@ The script is **idempotent** — safe to run again after a partial failure.
 
 ## 3. Open the app
 
+Start the simoona-nextjs front end, which serves the web app at http://localhost:3000.
+
 | Service | URL |
 |---------|-----|
-| Web app | http://localhost:3000 |
 | API | http://localhost:50321 |
 | Swagger UI | http://localhost:50321/swagger |
 | Hangfire dashboard | http://localhost:50321/hangfire |
@@ -79,20 +80,13 @@ Log in with `tester@example.com` / `testerPass123` (or whatever you passed to th
 
 ## Local development (fast mode)
 
-Fast mode mounts your local build output into the containers instead of rebuilding Docker images on every change.
+Fast mode mounts your local API build output into the container instead of rebuilding the Docker image on every change.
 
 ### One-time setup
 
 **Build the API:**
 ```powershell
 dotnet build src/api/Shrooms.Presentation.Api -c Debug
-```
-
-**Build the webapp** (requires Node.js and gulp):
-```bash
-cd src/webapp
-npm install
-gulp build-dev
 ```
 
 ### Start with the override file
@@ -108,12 +102,6 @@ After changing API code, rebuild on the host and restart the container:
 ```powershell
 dotnet build src/api/Shrooms.Presentation.Api -c Debug
 docker restart simoona-api
-```
-
-After changing webapp code:
-```bash
-cd src/webapp && gulp build-dev
-docker restart simoona-webapp
 ```
 
 ---

@@ -32,12 +32,4 @@ builder.AddExecutable("db-setup", "pwsh", "../../build",
     .WithReference(simoonaDb)
     .WaitFor(api);
 
-// webapp: runs "npm run start:aspire" which gulp-builds then starts the Express server.
-// The webapp's gulp.config.js has endpoint hardcoded to http://localhost:50321, so no
-// extra env config is needed as long as the API port is fixed above.
-builder.AddJavaScriptApp("webapp", "../../webapp", "start:aspire")
-    .WithHttpEndpoint(port: 3000, name: "http", env: "PORT")
-    .WithEnvironment("NODE_ENV", "build")
-    .WaitFor(api);
-
 builder.Build().Run();
