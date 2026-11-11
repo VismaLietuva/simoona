@@ -17,6 +17,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public bool AllowNotGoing { get; set; }
 
         public EventOfficesDto Offices { get; set; }
+        public bool IsForAllOffices { get; set; }
         public bool IsPinned { get; set; }
         public string Location { get; set; }
         public string Description { get; set; }

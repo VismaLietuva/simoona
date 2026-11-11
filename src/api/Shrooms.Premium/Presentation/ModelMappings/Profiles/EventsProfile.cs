@@ -29,7 +29,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventOptionDto, EventOptionViewModel>(MemberList.None);
             CreateMap<EventDetailsDto, EventDetailsViewModel>(MemberList.None)
                 .Ignore(x => x.Comments)
-                .Ignore(x => x.IsForAllOffices)
                 .ForMember(dest => dest.OfficesName, opt => opt.MapFrom(u => u.Offices.OfficeNames));
 
             CreateMap<NewEventOptionDto, NewEventOptionViewModel>(MemberList.None);
