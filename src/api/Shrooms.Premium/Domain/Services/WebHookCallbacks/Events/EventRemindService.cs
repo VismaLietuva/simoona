@@ -103,7 +103,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                     .Select(participant => new EventReminderEmailReceiverDto
                     {
                         Email = participant.ApplicationUser.Email,
-                        TimeZoneKey = participant.ApplicationUser.TimeZone
+                        TimeZoneKey = participant.ApplicationUser.Settings?.TimeZone
                     })
                     .ToList()
             };
@@ -123,7 +123,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                     .Select(participant => new EventReminderEmailReceiverDto
                     {
                         Email = participant.ApplicationUser.Email,
-                        TimeZoneKey = participant.ApplicationUser.TimeZone
+                        TimeZoneKey = participant.ApplicationUser.Settings?.TimeZone
                     })
                     .ToList()
             };

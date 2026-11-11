@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -38,6 +38,7 @@ namespace Shrooms.Tests.DomainService
         private IKudosService _kudosService;
         private DbSet<ApplicationUser> _userDbSet;
         private DbSet<Wall> _wallsDbSet;
+        private DbSet<Organization> _organizationDbSet;
         private HttpClient _httpClient;
 
         [TearDown]
@@ -66,6 +67,9 @@ namespace Shrooms.Tests.DomainService
 
             _wallsDbSet = Substitute.For<DbSet<Wall>>();
             uow2.GetDbSet<Wall>().Returns(_wallsDbSet);
+
+            _organizationDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IAsyncEnumerable<Organization>>();
+            uow2.GetDbSet<Organization>().Returns(_organizationDbSet);
 
             var excelBuilder = Substitute.For<IExcelBuilderFactory>();
 
@@ -132,7 +136,23 @@ namespace Shrooms.Tests.DomainService
 
             await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
-            Assert.That(users[0].IsTutorialComplete, Is.True);
+            Assert.That(users[0].Settings.IsTutorialComplete, Is.True);
+        }
+
+        [Test]
+        public async Task CreateNewUserAsync_GivesTheUserSettingsWithTheOrganizationDefaults()
+        {
+            var organization = new Organization { Id = 2, ShortName = "visma", CultureCode = "lt-LT", TimeZone = "FLE Standard Time" };
+            _organizationDbSet.SetDbSetDataForAsync(new List<Organization> { organization });
+            _organizationService.GetOrganizationByNameAsync("visma").Returns(organization);
+            _userManager.CreateAsync(Arg.Any<ApplicationUser>(), "password").Returns(IdentityResult.Success);
+            _userManager.AddLoginAsync(Arg.Any<ApplicationUser>(), Arg.Any<UserLoginInfo>()).Returns(IdentityResult.Success);
+            var user = new ApplicationUser { Id = "new-user" };
+
+            await _administrationUsersService.CreateNewUserAsync(user, "password", "visma");
+
+            Assert.That(user.Settings.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(user.Settings.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         private sealed class StubHttpMessageHandler : HttpMessageHandler

@@ -18,6 +18,7 @@ using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Seats;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.BlacklistUsers;
@@ -390,7 +391,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var user = await _applicationUserRepository
                 .Get(e => e.Id == id,
                     includeProperties:
-                    "Roles,ManagedUsers,Manager,Room,Room.RoomType,Room.Floor,Room.Floor.Office,RoomToConfirm,RoomToConfirm.RoomType,RoomToConfirm.Floor,RoomToConfirm.Floor.Office,Projects,Organization,Certificates,WorkingHours,Skills,QualificationLevel,Exams")
+                    "Roles,ManagedUsers,Manager,Room,Room.RoomType,Room.Floor,Room.Floor.Office,RoomToConfirm,RoomToConfirm.RoomType,RoomToConfirm.Floor,RoomToConfirm.Floor.Office,Projects,Organization,Certificates,WorkingHours,Skills,QualificationLevel,Exams,Settings")
                 .FirstOrDefaultAsync();
 
             if (user == null)
@@ -497,7 +498,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return StatusCode(403);
             }
 
-            var user = await _applicationUserRepository.Get(u => u.Id == id).FirstOrDefaultAsync();
+            var user = await _applicationUserRepository.Get(u => u.Id == id, includeProperties: "Settings").FirstOrDefaultAsync();
             if (user == null)
             {
                 return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
@@ -815,16 +816,25 @@ namespace Shrooms.Presentation.Api.Controllers
                 return StatusCode(403);
             }
 
-            var user = await _applicationUserRepository.Get(u => u.Id == model.Id).FirstOrDefaultAsync();
+            var user = await _applicationUserRepository.Get(u => u.Id == model.Id, includeProperties: "Settings").FirstOrDefaultAsync();
             if (user == null)
             {
                 return StatusCode(404, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             _mapper.Map(model, user);
+            user.GetOrCreateSettings().DailyMailingHour = model.DailyMailingHour;
 
             _applicationUserRepository.Update(user);
-            await _unitOfWork.SaveAsync();
+
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (DbUpdateException e) when (e.IsUniqueViolation())
+            {
+                return BadRequestWithError(UserSettingsSaveExtensions.ConcurrentSave());
+            }
 
             return Ok();
         }

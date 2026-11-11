@@ -105,7 +105,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<ApplicationUser, ApplicationUserDetailsViewModel>(MemberList.None)
                 .ForMember(dest => dest.Roles, opt => opt.Ignore())
                 .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title))
-                .ForMember(dest => dest.Projects, src => src.MapFrom(d => d.Projects));
+                .ForMember(dest => dest.Projects, src => src.MapFrom(d => d.Projects))
+                .ForMember(dest => dest.DailyMailingHour, src => src.MapFrom(d => d.Settings.DailyMailingHour));
 
             CreateMap<ApplicationUserMinimalDto, string>(MemberList.None)
                 .ConvertUsing(src => src.Id);
@@ -162,7 +163,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
             CreateMap<ApplicationUser, ApplicationUserOfficeInfoViewModel>(MemberList.None);
 
-            CreateMap<ApplicationUser, ApplicationUserShroomsInfoViewModel>(MemberList.None);
+            CreateMap<ApplicationUser, ApplicationUserShroomsInfoViewModel>(MemberList.None)
+                .ForMember(dest => dest.DailyMailingHour, src => src.MapFrom(d => d.Settings.DailyMailingHour));
 
             CreateMap<ApplicationUser, ManagerMiniViewModel>(MemberList.None);
 
