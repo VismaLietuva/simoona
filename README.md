@@ -48,31 +48,16 @@ Simoona is an open source intranet solution powered by Visma. We created Simoona
 
 Simoona consists of two main parts:
 
-* Front-end webapp - purely AngularJS application (no server-side code),
-* Back-end app - ASP.NET MVC+WebApi project, with EntityFramework code-first database.
+* Front end - a Next.js application, kept in the separate simoona-nextjs repository,
+* Back end (this repository) - an ASP.NET Core API on .NET 10, with an EF Core code-first database.
 
 ## Quick Start with Docker
 
 The fastest way to run Simoona locally is with Docker. See the **[Docker Setup Guide](DOCKER_SETUP.md)**.
 
-## Install from Binaries
-
-The easiest way to install and try out Simoona is from pre-compiled binaries.
-To do it, please follow the [Install from binaries guidelines](LocalSetup.md).
-
-## Install from Source Code (IIS)
-
-If you are planning to contribute or change Simoona code using the classic IIS setup, follow the [Installation from source code guidelines](build/README.md).
-
 ## Developing and Contributing
 
 If you are planning to contribute to the Simoona project, please look into more detailed documentation about Simoona parts:
-
-1. [Front-end webapp](src/webapp/README.md)
-    * Gulp Command List
-    * Configuration
-    * SSL Cerificate
-    * Web Config
 
 1. [Back-end app](src/api/README.md)
     * QuickStart

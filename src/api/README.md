@@ -52,10 +52,10 @@ All configurable properties are located in `src\api\Main\PresentationLayer\Shroo
 Don't forget to change API and Client urls if running on different addresses:
 
 ```xml
-<!-- Url used to redirect back to AngularJS application after external login -->
+<!-- Url used to redirect back to the front-end application after external login -->
 <add key="OAuthRedirectUri" value="http://localhost:3000/" />
 
-<!-- Urls for AngularJS application and API -->
+<!-- Urls for the front-end application and API -->
 <add key="ClientUrl" value="http://localhost:3000/" />
 <add key="ApiUrl" value="http://localhost:50321" />
 ```

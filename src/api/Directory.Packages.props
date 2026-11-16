@@ -6,7 +6,6 @@
   <!-- Aspire -->
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.4.6" />
-    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.4.6" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.4.6" />
   </ItemGroup>
   <!-- Microsoft platform: EF Core + ASP.NET Core. Keep on one version. -->
