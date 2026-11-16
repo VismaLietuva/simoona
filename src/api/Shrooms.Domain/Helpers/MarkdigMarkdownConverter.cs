@@ -6,11 +6,9 @@ namespace Shrooms.Domain.Helpers
 {
     public class MarkdigMarkdownConverter : IMarkdownConverter
     {
-        private static readonly MarkdownPipeline Pipeline =
-            new MarkdownPipelineBuilder()
-                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
-                .UseSoftlineBreakAsHardlineBreak()
-                .Build();
+        private static readonly MarkdownPipeline Pipeline = BasePipeline().Build();
+
+        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().Build();
 
         public string ConvertToHtml(string markdown)
         {
@@ -19,9 +17,36 @@ namespace Shrooms.Domain.Helpers
                 return string.Empty;
             }
 
-            var withMentions = MentionTokenParser.Replace(markdown, token => $"**@{token.Label}**");
+            return Markdown.ToHtml(ExpandMentions(markdown), Pipeline);
+        }
 
-            return Markdown.ToHtml(withMentions, Pipeline);
+        public string ConvertToHtml(string markdown, IReadOnlyDictionary<string, string> customEmojiImages, int? maxTextLength = null)
+        {
+            if (string.IsNullOrEmpty(markdown))
+            {
+                return string.Empty;
+            }
+
+            var document = Markdown.Parse(ExpandMentions(markdown), EmailPipeline);
+            EmojiInlineRewriter.Apply(document, customEmojiImages);
+            if (maxTextLength.HasValue)
+            {
+                MarkdownDocumentTruncator.Apply(document, maxTextLength.Value);
+            }
+
+            return Markdown.ToHtml(document, EmailPipeline);
+        }
+
+        private static MarkdownPipelineBuilder BasePipeline()
+        {
+            return new MarkdownPipelineBuilder()
+                .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
+                .UseSoftlineBreakAsHardlineBreak();
+        }
+
+        private static string ExpandMentions(string markdown)
+        {
+            return MentionTokenParser.Replace(markdown, token => $"**@{token.Label}**");
         }
     }
 }

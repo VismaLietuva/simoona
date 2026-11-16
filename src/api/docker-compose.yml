@@ -32,13 +32,3 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
-  webapp:
-    container_name: simoona-webapp
-    build:
-      context: ../webapp
-      dockerfile: Dockerfile
-    ports:
-      - "3000:7203"
-    depends_on:
-      - api

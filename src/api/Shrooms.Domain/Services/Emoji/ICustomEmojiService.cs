@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Emoji;
@@ -6,7 +7,9 @@ namespace Shrooms.Domain.Services.Emoji
 {
     public interface ICustomEmojiService
     {
-        Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName);
+        Task<CustomEmojiListDto> GetAllAsync(UserAndOrganizationDto userOrg, string tenantName, CancellationToken cancellationToken = default);
+
+        Task<CustomEmojiListDto> GetAllAsync(int organizationId, string tenantName, CancellationToken cancellationToken = default);
 
         Task<CustomEmojiDto> CreateAsync(NewCustomEmojiDto emojiDto, UserAndOrganizationDto userOrg, string tenantName);
 

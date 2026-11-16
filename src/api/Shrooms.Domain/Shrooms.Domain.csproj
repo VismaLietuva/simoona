@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Helpers\emoji-shortcodes.json" LogicalName="Shrooms.Domain.emoji-shortcodes.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Shrooms.Authentification\Shrooms.Authentification.csproj" />
     <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj" />
     <ProjectReference Include="..\Shrooms.Domain.ServiceValidators\Shrooms.Domain.ServiceValidators.csproj" />

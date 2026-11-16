@@ -10,7 +10,6 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
@@ -22,9 +21,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 {
     public class EventNotificationService : NotificationServiceBase, IEventNotificationService
     {
+        private const int DescriptionTeaserLength = 150;
+
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
-        private readonly IMarkdownConverter _markdownConverter;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<ApplicationUser> _usersDbSet;
 
@@ -34,13 +35,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter)
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
             _organizationService = organizationService;
-            _markdownConverter = markdownConverter;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
@@ -104,7 +105,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var postUrl = _appSettings.WallPostUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.Id);
             var eventUrl = _appSettings.EventUrl(userOrgHubDto.OrganizationName, shareEventEmailDto.CreatedPost.SharedEventId);
             var subject = CreateSubject(Resources.Models.Events.Events.ShareEventEmailSubject, shareEventEmailDto.Details.Name, shareEventEmailDto.CreatedPost.WallName);
-            var body = _markdownConverter.ConvertToHtml(shareEventEmailDto.CreatedPost.MessageBody);
+            var body = await RenderAsync(shareEventEmailDto.CreatedPost.MessageBody, userOrgHubDto);
+            var description = await RenderAsync(shareEventEmailDto.Details.Description, userOrgHubDto, DescriptionTeaserLength);
             var emailTemplate = new SharedEventEmailTemplateViewModel(
                 postUrl,
                 eventUrl,
@@ -113,7 +115,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 shareEventEmailDto.CreatedPost.WallName,
                 shareEventEmailDto.Details.Name,
                 shareEventEmailDto.Details.StartDate,
-                RemoveMarkdownTextOverflow(shareEventEmailDto.Details.Description),
+                description,
                 shareEventEmailDto.Details.Location,
                 GetNotificationSettingsUrl(userOrgHubDto));
 
@@ -127,7 +129,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var template = new NewEventEmailTemplateViewModel(
                 eventUrl,
                 eventArgsDto.Name,
-                RemoveMarkdownTextOverflow(eventArgsDto.Description),
+                await RenderAsync(eventArgsDto.Description, userOrgHubDto, DescriptionTeaserLength),
                 eventArgsDto.Location,
                 eventArgsDto.StartDate,
                 GetNotificationSettingsUrl(userOrgHubDto));
@@ -214,19 +216,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await SendMultipleEmailsAsync(startEmailDto.Receivers, subject, emailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
-        private string RemoveMarkdownTextOverflow(string text, int maxCharacterCount = 150)
+        private Task<string> RenderAsync(string markdown, UserAndOrganizationHubDto userOrgHubDto, int? maxTextLength = null)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return null;
-            }
-
-            if (text.Length <= maxCharacterCount)
-            {
-                return _markdownConverter.ConvertToHtml(text);
-            }
-
-            return _markdownConverter.ConvertToHtml($"{string.Join("", text.Take(maxCharacterCount))}...");
+            return _emailMarkdownRenderer.RenderAsync(markdown, userOrgHubDto.OrganizationId, userOrgHubDto.OrganizationName, maxTextLength);
         }
     }
 }

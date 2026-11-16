@@ -13,10 +13,8 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Models.Walls.Comments;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -32,8 +30,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IPostService _postService;
-        private readonly IMarkdownConverter _markdownConverter;
-        private readonly IMentionLinkExpander _mentionLinkExpander;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Project> _projectsDbSet;
@@ -48,9 +45,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter,
             IPostService postService,
-            IMentionLinkExpander mentionLinkExpander)
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -58,9 +54,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             _userService = userService;
             _commentService = commentService;
             _organizationService = organizationService;
-            _markdownConverter = markdownConverter;
             _postService = postService;
-            _mentionLinkExpander = mentionLinkExpander;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
@@ -91,7 +86,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                     commentDto.PostId,
                     commentAuthor.FullName,
                     mentionedUsers,
-                    organization.ShortName);
+                    organization);
             }
         }
 
@@ -119,16 +114,17 @@ namespace Shrooms.Domain.Services.Email.Posting
                 mentionCommentDto.PostId,
                 mentionCommentDto.AuthorFullName,
                 mentionedUsers,
-                organization.ShortName);
+                organization);
         }
 
-        private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, Organization organization)
         {
+            var organizationShortName = organization.ShortName;
             var comment = await _commentService.GetCommentBodyAsync(commentId);
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
 
-            var messageBody = ConvertBodyToHtml(comment, organizationShortName);
+            var messageBody = await _emailMarkdownRenderer.RenderAsync(comment, organization.Id, organizationShortName);
 
             foreach (var mentionedUser in mentionedUsers)
             {
@@ -149,12 +145,6 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private string ConvertBodyToHtml(string messageBody, string organizationShortName)
-        {
-            return _markdownConverter.ConvertToHtml(
-                _mentionLinkExpander.ExpandToMarkdown(messageBody, organizationShortName));
-        }
-
         private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentAuthor, Organization organization)
         {
             var comment = await LoadCommentAsync(commentDto.CommentId);
@@ -165,7 +155,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var userNotificationSettingsUrl = GetNotificationSettingsUrl(organization);
 
             var subject = CreateSubject(Templates.NewPostCommentEmailSubject, wall.Name, commentAuthor.FullName);
-            var body = ConvertBodyToHtml(comment.MessageBody, organization.ShortName);
+            var body = await _emailMarkdownRenderer.RenderAsync(comment.MessageBody, organization.Id, organization.ShortName);
 
             var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(WallEmailPresentation.GetCommentTitle(wall),
                 wall.Name,
