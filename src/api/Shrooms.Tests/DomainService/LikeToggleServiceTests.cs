@@ -129,6 +129,7 @@ namespace Shrooms.Tests.DomainService
         [TestCase("")]
         [TestCase("Party Parrot")]
         [TestCase("<script>")]
+        [TestCase("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public void Should_Reject_Emoji_Reaction_With_Missing_Or_Malformed_Name(string emojiName)
         {
             Assert.ThrowsAsync<ValidationException>(() => _service.ToggleAsync(new LikesCollection(), EmojiReaction(emojiName), UserOrg));
