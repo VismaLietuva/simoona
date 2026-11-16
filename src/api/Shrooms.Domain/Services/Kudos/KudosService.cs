@@ -15,6 +15,7 @@ using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
+using Shrooms.Domain.Services.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
@@ -51,6 +52,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IApplicationSettings _settings;
+        private readonly ILikeToggleService _likeToggleService;
 
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != KudosTypeEnum.Send &&
                                                                                      x.Type != KudosTypeEnum.Minus &&
@@ -68,9 +70,11 @@ namespace Shrooms.Domain.Services.Kudos
             IKudosServiceValidator kudosServiceValidator,
             IAsyncRunner asyncRunner,
             IFilterPresetService filterPresetService,
-            IApplicationSettings settings)
+            IApplicationSettings settings,
+            ILikeToggleService likeToggleService)
         {
             _uow = uow;
+            _likeToggleService = likeToggleService;
             _mapper = mapper;
             _permissionService = permissionService;
             _kudosServiceValidator = kudosServiceValidator;
@@ -390,15 +394,7 @@ namespace Shrooms.Domain.Services.Kudos
 
                 kudosLog.Likes ??= new LikesCollection();
 
-                var like = kudosLog.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
-                if (like == null)
-                {
-                    kudosLog.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
-                }
-                else
-                {
-                    kudosLog.Likes.Remove(like);
-                }
+                await _likeToggleService.ToggleAsync(kudosLog.Likes, addLikeDto, userOrg);
 
                 await _uow.SaveChangesAsync(userOrg.UserId);
             }
@@ -436,7 +432,8 @@ namespace Shrooms.Domain.Services.Kudos
                     UserId = likeWithUserData.User.Id,
                     FullName = likeWithUserData.User.FullName,
                     PictureId = likeWithUserData.User.PictureId,
-                    Type = likeWithUserData.Like.Type
+                    Type = likeWithUserData.Like.Type,
+                    EmojiName = likeWithUserData.Like.EmojiName
                 })
                 .ToList();
         }
