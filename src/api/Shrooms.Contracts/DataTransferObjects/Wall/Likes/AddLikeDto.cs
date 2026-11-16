@@ -7,5 +7,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Likes
         public int Id { get; set; }
 
         public LikeTypeEnum Type { get; set; }
+
+        public string EmojiName { get; set; }
     }
 }

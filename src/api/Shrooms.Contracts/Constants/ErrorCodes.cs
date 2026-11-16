@@ -37,6 +37,7 @@ namespace Shrooms.Contracts.Constants
         public const int UserIsNotAMemberOfWall = 501;
         public const int ScheduledPostTimeInPast = 502;
         public const int ScheduledPostContentInvalid = 503;
+        public const int ReactionEmojiInvalid = 504;
 
         // Know Your Speaker, 8**
         public const int GameAlreadyFinished = 801;
