@@ -12,31 +12,38 @@ namespace Shrooms.DataLayer.EFCoreMigrations
     /// instance is gone by the time this runs. Idempotent.
     /// </para>
     /// </summary>
-    internal static class UserSettingsCatchUp
+    public static class UserSettingsCatchUp
     {
         public const string Sql = @"
 -- Every AddUserSettings backfill row was written by one statement, so it has the earliest Created.
 DECLARE @backfill datetime2 = (SELECT MIN([Created]) FROM dbo.UserSettings);
+DECLARE @now datetime2 = SYSUTCDATETIME();
 
 -- 1. Users created by an old instance have no row: copy theirs from the old columns.
 INSERT dbo.UserSettings ([UserId], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete], [Preferences], [Created], [CreatedBy], [Modified], [ModifiedBy])
 SELECT u.[Id], u.[CultureCode], u.[TimeZone], u.[DailyMailingHour], u.[IsTutorialComplete],
        CASE WHEN u.[IsAnonymized] = 1 THEN NULL ELSE u.[WallWidgetPreferences] END,
-       SYSUTCDATETIME(), NULL, SYSUTCDATETIME(), NULL
+       @now, NULL, @now, NULL
 FROM dbo.AspNetUsers u
 WHERE NOT EXISTS (SELECT 1 FROM dbo.UserSettings s WHERE s.[UserId] = u.[Id]);
 
 IF @backfill IS NULL RETURN;
 
--- 2. Rows the new code created on demand (GetOrCreateSettings) start without a culture;
---    user creation always sets one. Fill what is missing from the old columns.
+-- 2. A row the new code created on demand (GetOrCreateSettings) for a user an old instance
+--    created starts empty, while that user's old columns hold what the old instance wrote.
+--    Fill what the row is missing; a value the new code set wins. The new code never writes
+--    the old columns, so for a user it created they are empty and the row is left alone.
 UPDATE s
 SET s.[CultureCode] = COALESCE(s.[CultureCode], u.[CultureCode]),
     s.[TimeZone] = COALESCE(s.[TimeZone], u.[TimeZone]),
-    s.[DailyMailingHour] = COALESCE(s.[DailyMailingHour], u.[DailyMailingHour])
+    s.[DailyMailingHour] = COALESCE(s.[DailyMailingHour], u.[DailyMailingHour]),
+    s.[IsTutorialComplete] = CASE WHEN u.[IsTutorialComplete] = 1 THEN CAST(1 AS bit) ELSE s.[IsTutorialComplete] END,
+    s.[Preferences] = COALESCE(s.[Preferences], CASE WHEN u.[IsAnonymized] = 1 THEN NULL ELSE u.[WallWidgetPreferences] END)
 FROM dbo.UserSettings s
 JOIN dbo.AspNetUsers u ON u.[Id] = s.[UserId]
-WHERE s.[Created] > @backfill AND s.[CultureCode] IS NULL;
+WHERE s.[Created] > @backfill
+  AND (u.[CultureCode] IS NOT NULL OR u.[TimeZone] IS NOT NULL OR u.[DailyMailingHour] IS NOT NULL
+       OR u.[IsTutorialComplete] = 1 OR u.[WallWidgetPreferences] IS NOT NULL);
 
 -- 3. Only old code writes the old columns, so where they differ from a backfill row the
 --    new code never touched (Modified still equals Created), an old instance changed
@@ -47,7 +54,7 @@ SET s.[CultureCode] = u.[CultureCode],
     s.[DailyMailingHour] = u.[DailyMailingHour],
     s.[IsTutorialComplete] = u.[IsTutorialComplete],
     s.[Preferences] = CASE WHEN u.[IsAnonymized] = 1 THEN NULL ELSE u.[WallWidgetPreferences] END,
-    s.[Modified] = SYSUTCDATETIME()
+    s.[Modified] = @now
 FROM dbo.UserSettings s
 JOIN dbo.AspNetUsers u ON u.[Id] = s.[UserId]
 WHERE s.[Created] = @backfill AND s.[Modified] = s.[Created]

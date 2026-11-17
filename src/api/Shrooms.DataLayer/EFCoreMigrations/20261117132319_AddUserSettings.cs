@@ -49,11 +49,16 @@ IF EXISTS (SELECT 1 FROM dbo.AspNetUsers WHERE LEN([CultureCode]) > 20 OR LEN([T
             // UserSettingsCatchUp.Sql for what old instances wrote after this ran. Users anonymized before this
             // migration kept their preferences (the old anonymization never cleared
             // them) and are never anonymized again, so clear both copies here.
+            // The clock is read once: UserSettingsCatchUp tells a backfill row the new
+            // code never touched by Modified = Created, and two SYSUTCDATETIME() calls
+            // in one statement are evaluated separately and can differ.
             migrationBuilder.Sql(@"
+DECLARE @now datetime2 = SYSUTCDATETIME();
+
 INSERT dbo.UserSettings ([UserId], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete], [Preferences], [Created], [CreatedBy], [Modified], [ModifiedBy])
 SELECT [Id], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete],
        CASE WHEN [IsAnonymized] = 1 THEN NULL ELSE [WallWidgetPreferences] END,
-       SYSUTCDATETIME(), NULL, SYSUTCDATETIME(), NULL
+       @now, NULL, @now, NULL
 FROM dbo.AspNetUsers;
 
 UPDATE dbo.AspNetUsers SET [WallWidgetPreferences] = NULL WHERE [IsAnonymized] = 1 AND [WallWidgetPreferences] IS NOT NULL;

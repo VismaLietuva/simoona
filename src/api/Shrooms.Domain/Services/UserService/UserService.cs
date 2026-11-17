@@ -129,7 +129,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(u => new { u.Settings.CultureCode, u.Settings.TimeZone })
                 .FirstAsync();
 
-            var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode ?? "en-US");
+            var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture);
 
             var settingsDto = new LocalizationSettingsDto
             {
@@ -143,7 +143,7 @@ namespace Shrooms.Domain.Services.UserService
                     {
                         Id = tz.Id,
                         DisplayName = tz.DisplayName,
-                        IsSelected = string.Equals(tz.Id, userSettings.TimeZone ?? "UTC", StringComparison.InvariantCultureIgnoreCase)
+                        IsSelected = string.Equals(tz.Id, userSettings.TimeZone ?? DataLayerConstants.DefaultTimeZone, StringComparison.InvariantCultureIgnoreCase)
                     })
                     .ToList()
             };

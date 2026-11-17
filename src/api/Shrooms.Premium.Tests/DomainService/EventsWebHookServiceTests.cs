@@ -97,7 +97,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _service.UpdateRecurringEventsAsync();
 
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
-            Assert.That(host.Settings, Is.Not.Null, "the missing settings row is added instead of aborting the batch");
+            Assert.That(host.Settings, Is.Null, "rolling an event over only reads the host's time zone; it must not add a settings row");
         }
 
         private ApplicationUser MockExpiredRecurringEventWithQuestions()

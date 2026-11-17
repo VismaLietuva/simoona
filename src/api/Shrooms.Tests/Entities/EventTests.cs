@@ -41,7 +41,7 @@ namespace Shrooms.Tests.Entities
         }
 
         [Test]
-        public void LocalStartDate_ResponsibleUserSettingsNotLoaded_Throws()
+        public void LocalStartDate_ResponsibleUserWithoutSettingsRow_UsesTheDefaultTimeZone()
         {
             var @event = new Event
             {
@@ -49,7 +49,19 @@ namespace Shrooms.Tests.Entities
                 ResponsibleUser = new ApplicationUser()
             };
 
-            Assert.Throws<InvalidOperationException>(() => _ = @event.LocalStartDate);
+            Assert.That(@event.LocalStartDate, Is.EqualTo(new DateTime(2026, 7, 1, 12, 0, 0)));
+        }
+
+        [Test]
+        public void LocalStartDate_Set_WithoutSettingsRow_ConvertsFromTheDefaultTimeZone()
+        {
+            var @event = new Event
+            {
+                ResponsibleUser = new ApplicationUser(),
+                LocalStartDate = new DateTime(2026, 7, 1, 12, 0, 0)
+            };
+
+            Assert.That(@event.StartDate, Is.EqualTo(new DateTime(2026, 7, 1, 9, 0, 0)));
         }
     }
 }

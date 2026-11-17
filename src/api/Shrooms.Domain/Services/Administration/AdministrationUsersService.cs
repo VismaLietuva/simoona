@@ -214,9 +214,7 @@ namespace Shrooms.Domain.Services.Administration
         {
             // EF6: info.ExternalIdentity → EF Core: info.Principal
             var externalIdentity = info.Principal;
-            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .FirstAsync();
+            var settings = await CreateSettingsFromOrganizationDefaultsAsync(requestedOrganization);
 
             var user = new ApplicationUser
             {
@@ -226,11 +224,7 @@ namespace Shrooms.Domain.Services.Administration
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
                 OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id,
                 EmploymentDate = DateTime.UtcNow,
-                Settings = new UserSettings
-                {
-                    CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
-                    TimeZone = userSettings.TimeZone
-                },
+                Settings = settings,
                 NotificationsSettings = null
             };
 
@@ -254,17 +248,11 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization)
         {
-            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .FirstAsync();
+            var settings = await CreateSettingsFromOrganizationDefaultsAsync(requestedOrganization);
 
             user.OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id;
             user.EmploymentDate = DateTime.UtcNow;
-            user.Settings = new UserSettings
-            {
-                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
-                TimeZone = userSettings.TimeZone
-            };
+            user.Settings = settings;
             user.NotificationsSettings = null;
 
             var result = await _userManager.CreateAsync(user, password);
@@ -486,6 +474,21 @@ namespace Shrooms.Domain.Services.Administration
             }
 
             return number;
+        }
+
+        // Every way of creating a user starts them on the organization's culture and time zone.
+        private async Task<UserSettings> CreateSettingsFromOrganizationDefaultsAsync(string organizationName)
+        {
+            var defaults = await _organizationDbSet
+                .Where(o => o.ShortName == organizationName)
+                .Select(o => new { o.CultureCode, o.TimeZone })
+                .FirstAsync();
+
+            return new UserSettings
+            {
+                CultureCode = defaults.CultureCode ?? BusinessLayerConstants.DefaultCulture,
+                TimeZone = defaults.TimeZone
+            };
         }
 
         private static void SetTutorialStatus(ApplicationUser user, bool tutorialStatus)

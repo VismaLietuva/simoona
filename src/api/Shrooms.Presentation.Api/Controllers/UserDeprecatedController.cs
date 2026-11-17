@@ -831,7 +831,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 await _unitOfWork.SaveAsync();
             }
-            catch (DbUpdateException e) when (e.IsUniqueViolation())
+            catch (DbUpdateException e) when (e.IsUserSettingsKeyViolation())
             {
                 return BadRequestWithError(UserSettingsSaveExtensions.ConcurrentSave());
             }

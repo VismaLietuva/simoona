@@ -29,16 +29,25 @@ namespace Shrooms.Tests.Extensions
             await _uow.Received(1).SaveChangesAsync("user");
         }
 
-        [TestCase(2627)]
-        [TestCase(2601)]
-        public void SaveUserSettingsAsync_Duplicate_Key_Reports_A_Concurrency_Error(int sqlErrorNumber)
+        [Test]
+        public void SaveUserSettingsAsync_Duplicate_Settings_Row_Reports_A_Concurrency_Error()
         {
-            var duplicate = SqlExceptions.WithNumber(sqlErrorNumber, "Violation of PRIMARY KEY constraint 'PK_UserSettings'");
+            var duplicate = SqlExceptions.WithNumber(2627, "Violation of PRIMARY KEY constraint 'PK_UserSettings'. Cannot insert duplicate key in object 'dbo.UserSettings'.");
             _uow.SaveChangesAsync("user").ThrowsAsync(new DbUpdateException("Duplicate", duplicate));
 
             var ex = Assert.ThrowsAsync<ValidationException>(() => _uow.SaveUserSettingsAsync("user"));
 
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ConcurrencyError));
+        }
+
+        [TestCase(2627, "Violation of PRIMARY KEY constraint 'PK_WallMembers'. Cannot insert duplicate key in object 'dbo.WallMembers'.")]
+        [TestCase(2601, "Cannot insert duplicate key row in object 'dbo.KudosLogs' with unique index 'IX_KudosLogs'.")]
+        public void SaveUserSettingsAsync_Duplicate_In_Another_Table_Is_Rethrown(int sqlErrorNumber, string message)
+        {
+            var duplicate = SqlExceptions.WithNumber(sqlErrorNumber, message);
+            _uow.SaveChangesAsync("user").ThrowsAsync(new DbUpdateException("Duplicate", duplicate));
+
+            Assert.ThrowsAsync<DbUpdateException>(() => _uow.SaveUserSettingsAsync("user"));
         }
 
         [Test]
