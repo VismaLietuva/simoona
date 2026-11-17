@@ -26,6 +26,7 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
+using Shrooms.Domain.Services.Wall.Likes;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 
@@ -94,7 +95,8 @@ namespace Shrooms.Tests.DomainService
                 kudosServiceValidation,
                 asyncRunner,
                 _filterPresetService,
-                _settings);
+                _settings,
+                new LikeToggleService(_uow));
         }
 
         #region GetKudosLogs
@@ -330,6 +332,32 @@ namespace Shrooms.Tests.DomainService
             Assert.That(likes.First().UserId, Is.EqualTo("testUserId3"));
             Assert.That(likes.First().Type, Is.EqualTo(LikeTypeEnum.Congrats));
             Assert.That(likes.First().FullName, Is.Not.Empty);
+        }
+
+        [Test]
+        public async Task Should_Return_Emoji_Name_Of_Wall_Kudos_Log_Reactions()
+        {
+            var log = ApprovedKudosLogForLikes();
+            log.Employee = new ApplicationUser { Id = "testUserId", FirstName = "name", LastName = "surname" };
+            log.Likes = new LikesCollection { new Like("testUserId3", LikeTypeEnum.Emoji, "party-parrot") };
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            var result = (await _kudosService.GetLastKudosLogsForWallAsync(new UserAndOrganizationDto { OrganizationId = 2 })).ToList();
+
+            Assert.That(result.Single().Likes.Single().Type, Is.EqualTo(LikeTypeEnum.Emoji));
+            Assert.That(result.Single().Likes.Single().EmojiName, Is.EqualTo("party-parrot"));
+        }
+
+        [Test]
+        public async Task Should_Add_Emoji_Reaction_To_Kudos_Log()
+        {
+            var log = ApprovedKudosLogForLikes();
+            _kudosLogsDbSet.SetDbSetDataForAsync(new List<KudosLog> { log }.AsQueryable());
+
+            await _kudosService.ToggleLikeAsync(new AddLikeDto { Id = 10, Type = LikeTypeEnum.Emoji, EmojiName = "tada" },
+                new UserAndOrganizationDto { UserId = "testUserId3", OrganizationId = 2 });
+
+            Assert.That(log.Likes.Single().EmojiName, Is.EqualTo("tada"));
         }
 
         [Test]

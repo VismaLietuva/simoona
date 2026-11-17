@@ -958,7 +958,8 @@ namespace Shrooms.Domain.Services.Wall
                         UserId = user.UserId,
                         FullName = user.FullName,
                         PictureId = user.PictureId,
-                        Type = like.Type
+                        Type = like.Type,
+                        EmojiName = like.EmojiName
                     };
                 })
                 .ToList();

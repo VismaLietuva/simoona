@@ -20,6 +20,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
+using Shrooms.Domain.Services.Wall.Likes;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.DomainService
@@ -62,7 +63,31 @@ namespace Shrooms.Tests.DomainService
                 .ResolveAddedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>())
                 .Returns(Enumerable.Empty<string>());
 
-            _commentService = new CommentService(uow, _systemClock, _wallService, _mentionResolver);
+            _commentService = new CommentService(uow, _systemClock, _wallService, _mentionResolver, new LikeToggleService(uow));
+        }
+
+        [Test]
+        public async Task Should_Add_Emoji_Reaction_To_Comment()
+        {
+            var comment = new Comment
+            {
+                Id = 1,
+                Likes = new LikesCollection(),
+                Post = new Post
+                {
+                    Wall = new Wall
+                    {
+                        OrganizationId = 2
+                    }
+                }
+            };
+
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
+
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Emoji, EmojiName = "tada" },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            Assert.That(comment.Likes.Single().EmojiName, Is.EqualTo("tada"));
         }
 
         [Test]
