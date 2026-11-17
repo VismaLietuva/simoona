@@ -224,6 +224,18 @@ namespace Shrooms.Tests.DomainService
             Assert.That(results.Events.Single().Name, Is.EqualTo("Guild meetup"));
         }
 
+        [Test]
+        public async Task Should_Return_When_An_Event_Starts_And_Ends()
+        {
+            var start = Now.AddDays(5);
+            GivenEvents(EventAt("Kudos evening", "Vilnius", start));
+
+            var found = (await SearchAsync("Kudos")).Events.Single();
+
+            Assert.That(found.StartDate, Is.EqualTo(start));
+            Assert.That(found.EndDate, Is.EqualTo(start.AddHours(2)));
+        }
+
         private Task<GlobalSearchResultsDto> SearchAsync(string search)
         {
             return _searchService.SearchAsync(search, 8, CurrentUser());

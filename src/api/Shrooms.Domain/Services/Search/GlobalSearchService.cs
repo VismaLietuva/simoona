@@ -143,6 +143,7 @@ namespace Shrooms.Domain.Services.Search
                     Id = e.Id,
                     Name = e.Name,
                     StartDate = e.StartDate,
+                    EndDate = e.EndDate,
                     Place = e.Place
                 })
                 .ToArrayAsync(cancellationToken);
