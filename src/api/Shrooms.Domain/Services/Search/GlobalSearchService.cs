@@ -10,16 +10,21 @@ using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Polls;
+using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
+using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Search
 {
-    public class GlobalSearchService : IGlobalSearchService
+    public partial class GlobalSearchService : IGlobalSearchService
     {
         public const int MinSearchLength = 2;
         public const int MaxSearchLength = 50;
@@ -32,6 +37,14 @@ namespace Shrooms.Domain.Services.Search
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<KudosLog> _kudosLogsDbSet;
+        private readonly DbSet<Project> _projectsDbSet;
+        private readonly DbSet<GroupEntity> _groupsDbSet;
+        private readonly DbSet<BookOffice> _bookOfficesDbSet;
+        private readonly DbSet<Poll> _pollsDbSet;
+        private readonly DbSet<VideoLibraryItem> _videosDbSet;
+        private readonly DbSet<ServiceRequest> _serviceRequestsDbSet;
+        private readonly DbSet<ServiceRequestCategory> _serviceRequestCategoriesDbSet;
 
         public GlobalSearchService(IUnitOfWork2 uow, IPermissionService permissionService, IRoleService roleService, ISystemClock systemClock, IWallService wallService)
         {
@@ -42,6 +55,14 @@ namespace Shrooms.Domain.Services.Search
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _wallsDbSet = uow.GetDbSet<MultiwallWall>();
             _eventsDbSet = uow.GetDbSet<Event>();
+            _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
+            _projectsDbSet = uow.GetDbSet<Project>();
+            _groupsDbSet = uow.GetDbSet<GroupEntity>();
+            _bookOfficesDbSet = uow.GetDbSet<BookOffice>();
+            _pollsDbSet = uow.GetDbSet<Poll>();
+            _videosDbSet = uow.GetDbSet<VideoLibraryItem>();
+            _serviceRequestsDbSet = uow.GetDbSet<ServiceRequest>();
+            _serviceRequestCategoriesDbSet = uow.GetDbSet<ServiceRequestCategory>();
         }
 
         public async Task<GlobalSearchResultsDto> SearchAsync(string search, int limit, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
@@ -76,6 +97,42 @@ namespace Shrooms.Domain.Services.Search
             if (permissions.Contains(BasicPermissions.Event))
             {
                 results.Events = await SearchEventsAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.Kudos))
+            {
+                results.Kudos = await SearchKudosAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.Project))
+            {
+                results.Projects = await SearchProjectsAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.Groups))
+            {
+                results.Groups = await SearchGroupsAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.Book))
+            {
+                results.Books = await SearchBooksAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.Poll) || permissions.Contains(AdministrationPermissions.Poll))
+            {
+                results.Polls = await SearchPollsAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.VideoLibrary) || permissions.Contains(AdministrationPermissions.VideoLibrary))
+            {
+                results.Videos = await SearchVideosAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (permissions.Contains(BasicPermissions.ServiceRequest))
+            {
+                var seesAll = permissions.Contains(AdministrationPermissions.ServiceRequest);
+                results.ServiceRequests = await SearchServiceRequestsAsync(term, take, seesAll, userOrg, cancellationToken);
             }
 
             return results;

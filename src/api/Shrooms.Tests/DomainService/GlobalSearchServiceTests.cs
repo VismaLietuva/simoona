@@ -17,13 +17,18 @@ using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.DataLayer.EntityModels.Models.Polls;
+using Shrooms.DataLayer.EntityModels.Models.VideoLibrary;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Search;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Tests.Extensions;
+using GroupEntity = Shrooms.DataLayer.EntityModels.Models.Group.Group;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -40,12 +45,27 @@ namespace Shrooms.Tests.DomainService
         {
             BasicPermissions.EmployeeList,
             BasicPermissions.Post,
-            BasicPermissions.Event
+            BasicPermissions.Event,
+            BasicPermissions.Kudos,
+            BasicPermissions.Project,
+            BasicPermissions.Groups,
+            BasicPermissions.Book,
+            BasicPermissions.Poll,
+            BasicPermissions.VideoLibrary,
+            BasicPermissions.ServiceRequest
         };
 
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<Wall> _wallsDbSet;
         private DbSet<Event> _eventsDbSet;
+        private DbSet<KudosLog> _kudosLogsDbSet;
+        private DbSet<Project> _projectsDbSet;
+        private DbSet<GroupEntity> _groupsDbSet;
+        private DbSet<BookOffice> _bookOfficesDbSet;
+        private DbSet<Poll> _pollsDbSet;
+        private DbSet<VideoLibraryItem> _videosDbSet;
+        private DbSet<ServiceRequest> _serviceRequestsDbSet;
+        private DbSet<ServiceRequestCategory> _serviceRequestCategoriesDbSet;
         private IPermissionService _permissionService;
         private IWallService _wallService;
         private IGlobalSearchService _searchService;
@@ -58,6 +78,14 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
             _wallsDbSet = uow.MockDbSetForAsync<Wall>();
             _eventsDbSet = uow.MockDbSetForAsync<Event>();
+            _kudosLogsDbSet = uow.MockDbSetForAsync<KudosLog>();
+            _projectsDbSet = uow.MockDbSetForAsync<Project>();
+            _groupsDbSet = uow.MockDbSetForAsync<GroupEntity>();
+            _bookOfficesDbSet = uow.MockDbSetForAsync<BookOffice>();
+            _pollsDbSet = uow.MockDbSetForAsync<Poll>();
+            _videosDbSet = uow.MockDbSetForAsync<VideoLibraryItem>();
+            _serviceRequestsDbSet = uow.MockDbSetForAsync<ServiceRequest>();
+            _serviceRequestCategoriesDbSet = uow.MockDbSetForAsync<ServiceRequestCategory>();
 
             _permissionService = Substitute.For<IPermissionService>();
             GivenPermissions(AllPermissions);
@@ -313,6 +341,200 @@ namespace Shrooms.Tests.DomainService
             await _wallService.DidNotReceiveWithAnyArgs().SearchWallAsync(default, default, default, default, default);
         }
 
+        [Test]
+        public async Task Should_Find_Kudos_By_Its_Comment()
+        {
+            GivenUsers(Person("sender", "Ona", "Petraite", "Developer"));
+            GivenKudos(Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Great release"));
+
+            var found = (await SearchAsync("release")).Kudos.Single();
+
+            Assert.That(found.Title, Is.EqualTo("Ona Petraite → Tomas Kudosas"));
+            Assert.That(found.Description, Is.EqualTo("Teamwork · Great release"));
+            Assert.That(found.LinkId, Is.EqualTo("receiver-1"));
+        }
+
+        [Test]
+        public async Task Should_Not_Find_Kudos_By_Sender_Receiver_Or_Type()
+        {
+            GivenUsers(Person("sender", "Ona", "Petraite", "Developer"));
+            GivenKudos(Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Great release"));
+
+            foreach (var search in new[] { "Petraite", "Kudosas", "Teamwork" })
+            {
+                Assert.That((await SearchAsync(search)).Kudos, Is.Empty, search);
+            }
+        }
+
+        [Test]
+        public async Task Should_Not_Find_Kudos_Through_A_Hidden_Comment()
+        {
+            var hidden = Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Secret reason");
+            hidden.IsCommentHidden = true;
+            GivenKudos(hidden);
+
+            Assert.That((await SearchAsync("Secret")).Kudos, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Only_Find_Kudos_The_Kudos_Page_Lists()
+        {
+            var pending = Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Thanks one");
+            pending.Status = KudosStatus.Pending;
+            var minus = Kudos(2, "sender", "Tomas", "Kudosas", "Teamwork", "Thanks two");
+            minus.KudosSystemType = KudosTypeEnum.Minus;
+            var refund = Kudos(3, "sender", "Tomas", "Kudosas", "Teamwork", "Thanks three");
+            refund.KudosSystemType = KudosTypeEnum.Refund;
+            var donation = Kudos(4, "sender", "Tomas", "Kudosas", "Teamwork", "Thanks four");
+            donation.KudosBasketId = 9;
+            GivenKudos(pending, minus, refund, donation, Kudos(5, "sender", "Tomas", "Kudosas", "Teamwork", "Thanks five"));
+
+            var kudos = (await SearchAsync("Thanks")).Kudos;
+
+            Assert.That(kudos.Select(item => item.Id), Is.EqualTo(new[] { "5" }));
+        }
+
+        [Test]
+        public async Task Should_Find_Projects_And_Approved_Groups_By_Name_Only()
+        {
+            _projectsDbSet.SetDbSetDataForAsync(new List<Project>
+            {
+                new Project { Id = 1, Name = "kudos portal", Desc = "For customers", OrganizationId = OrganizationId },
+                new Project { Id = 2, Name = "Billing", Desc = "Invoices and kudos", OrganizationId = OrganizationId }
+            });
+            _groupsDbSet.SetDbSetDataForAsync(new List<GroupEntity>
+            {
+                new GroupEntity { Id = 1, Name = "kudos committee", Description = "Decides", Status = GroupStatus.Approved, OrganizationId = OrganizationId },
+                new GroupEntity { Id = 3, Name = "Board", Description = "Talks about kudos", Status = GroupStatus.Approved, OrganizationId = OrganizationId },
+                new GroupEntity { Id = 2, Name = "kudos fans", Description = "Likes", Status = GroupStatus.Pending, OrganizationId = OrganizationId }
+            });
+
+            var results = await SearchAsync("kudos");
+
+            Assert.That(results.Projects.Select(item => item.Title), Is.EqualTo(new[] { "kudos portal" }));
+            Assert.That(results.Projects.Single().Description, Is.EqualTo("For customers"));
+            Assert.That(results.Groups.Select(item => item.Title), Is.EqualTo(new[] { "kudos committee" }));
+        }
+
+        [Test]
+        public async Task Should_Find_A_Book_Copy_An_Office_Still_Holds()
+        {
+            var book = new Book { Id = 1, Title = "Clean Code", Author = "Robert Martin", Code = "9780132350884" };
+            _bookOfficesDbSet.SetDbSetDataForAsync(new List<BookOffice>
+            {
+                new BookOffice { Id = 10, Book = book, Office = new Office { Name = "Vilnius" }, Quantity = 2, OrganizationId = OrganizationId },
+                new BookOffice { Id = 11, Book = book, Office = new Office { Name = "Kaunas" }, Quantity = 0, OrganizationId = OrganizationId }
+            });
+
+            var found = (await SearchAsync("Clean")).Books.Single();
+
+            Assert.That(found.Id, Is.EqualTo("10"));
+            Assert.That(found.Title, Is.EqualTo("Clean Code"));
+            Assert.That(found.Description, Is.EqualTo("Robert Martin · Vilnius"));
+        }
+
+        [Test]
+        public async Task Should_Not_Find_A_Book_By_Its_Author_Or_Code()
+        {
+            var book = new Book { Id = 1, Title = "Clean Code", Author = "Robert Martin", Code = "9780132350884" };
+            _bookOfficesDbSet.SetDbSetDataForAsync(new List<BookOffice>
+            {
+                new BookOffice { Id = 10, Book = book, Office = new Office { Name = "Vilnius" }, Quantity = 2, OrganizationId = OrganizationId }
+            });
+
+            Assert.That((await SearchAsync("Martin")).Books, Is.Empty);
+            Assert.That((await SearchAsync("9780132350884")).Books, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Find_Published_Polls_And_Videos()
+        {
+            _pollsDbSet.SetDbSetDataForAsync(new List<Poll>
+            {
+                new Poll { Id = 1, Title = "Kudos budget", State = PollState.Published, OrganizationId = OrganizationId, Created = Now },
+                new Poll { Id = 2, Title = "Kudos draft", State = PollState.Draft, OrganizationId = OrganizationId, Created = Now },
+                new Poll { Id = 3, Title = "Kudos idea", State = PollState.Pending, OrganizationId = OrganizationId, Created = Now }
+            });
+            _videosDbSet.SetDbSetDataForAsync(new List<VideoLibraryItem>
+            {
+                new VideoLibraryItem { Id = 1, Title = "Kudos explained", RecordedOn = new DateOnly(2026, 5, 4), OrganizationId = OrganizationId }
+            });
+
+            var results = await SearchAsync("Kudos");
+
+            Assert.That(results.Polls.Select(item => item.Title), Is.EqualTo(new[] { "Kudos budget" }));
+            Assert.That(results.Videos.Single().Date, Is.EqualTo(new DateTime(2026, 5, 4)));
+        }
+
+        [Test]
+        public async Task Should_Only_Find_Service_Requests_The_User_Raised_Or_Is_Assigned()
+        {
+            GivenServiceRequests(
+                Request(1, "Laptop broken", "Hardware", UserId),
+                Request(2, "Laptop slow", "Hardware", "someone-else"),
+                Request(3, "Laptop licence", "Software", "someone-else"));
+            _serviceRequestCategoriesDbSet.SetDbSetDataForAsync(new List<ServiceRequestCategory>
+            {
+                new ServiceRequestCategory { Name = "Software", Assignees = new List<ApplicationUser> { new ApplicationUser { Id = UserId } } },
+                new ServiceRequestCategory { Name = "Hardware", Assignees = new List<ApplicationUser>() }
+            });
+
+            var requests = (await SearchAsync("Laptop")).ServiceRequests;
+
+            Assert.That(requests.Select(item => item.Id), Is.EquivalentTo(new[] { "1", "3" }));
+            Assert.That(requests.First(item => item.Id == "1").Description, Is.EqualTo("Hardware · Open"));
+        }
+
+        [Test]
+        public async Task Should_Let_A_Service_Request_Admin_Find_Every_Request()
+        {
+            GivenPermissions(BasicPermissions.ServiceRequest, AdministrationPermissions.ServiceRequest);
+            GivenServiceRequests(
+                Request(1, "Laptop broken", "Hardware", UserId),
+                Request(2, "Laptop slow", "Hardware", "someone-else"));
+
+            var requests = (await SearchAsync("Laptop")).ServiceRequests;
+
+            Assert.That(requests.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task Should_Leave_The_New_Sections_Empty_Without_Their_Permissions()
+        {
+            GivenPermissions(BasicPermissions.Event);
+            GivenKudos(Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Kudos"));
+            GivenServiceRequests(Request(1, "Kudos shop order", "Shop", UserId));
+            _projectsDbSet.SetDbSetDataForAsync(new List<Project> { new Project { Id = 1, Name = "Kudos", OrganizationId = OrganizationId } });
+
+            var results = await SearchAsync("Kudos");
+
+            Assert.That(results.Kudos, Is.Empty);
+            Assert.That(results.Projects, Is.Empty);
+            Assert.That(results.ServiceRequests, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Match_Polls_Videos_And_Service_Requests_On_Their_Title_Only()
+        {
+            _pollsDbSet.SetDbSetDataForAsync(new List<Poll>
+            {
+                new Poll { Id = 1, Title = "Budget", Description = "About kudos", State = PollState.Published, OrganizationId = OrganizationId, Created = Now }
+            });
+            _videosDbSet.SetDbSetDataForAsync(new List<VideoLibraryItem>
+            {
+                new VideoLibraryItem { Id = 1, Title = "Demo", Description = "About kudos", RecordedOn = new DateOnly(2026, 5, 4), OrganizationId = OrganizationId }
+            });
+            var request = Request(1, "Laptop broken", "kudos", UserId);
+            request.Description = "About kudos";
+            GivenServiceRequests(request);
+
+            var results = await SearchAsync("kudos");
+
+            Assert.That(results.Polls, Is.Empty);
+            Assert.That(results.Videos, Is.Empty);
+            Assert.That(results.ServiceRequests, Is.Empty);
+        }
+
         private Task<GlobalSearchResultsDto> SearchAsync(string search)
         {
             return _searchService.SearchAsync(search, 8, CurrentUser());
@@ -335,6 +557,47 @@ namespace Shrooms.Tests.DomainService
             _wallService
                 .SearchWallAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(posts);
+        }
+
+        private void GivenKudos(params KudosLog[] logs)
+        {
+            _kudosLogsDbSet.SetDbSetDataForAsync(logs.ToList());
+        }
+
+        private void GivenServiceRequests(params ServiceRequest[] requests)
+        {
+            _serviceRequestsDbSet.SetDbSetDataForAsync(requests.ToList());
+        }
+
+        private static KudosLog Kudos(int id, string senderId, string receiverFirstName, string receiverLastName, string type, string comment)
+        {
+            return new KudosLog
+            {
+                Id = id,
+                OrganizationId = OrganizationId,
+                CreatedBy = senderId,
+                EmployeeId = $"receiver-{id}",
+                Employee = new ApplicationUser { FirstName = receiverFirstName, LastName = receiverLastName },
+                KudosTypeName = type,
+                KudosSystemType = KudosTypeEnum.Ordinary,
+                Status = KudosStatus.Approved,
+                Comments = comment,
+                Created = Now.AddDays(-id)
+            };
+        }
+
+        private static ServiceRequest Request(int id, string title, string category, string employeeId)
+        {
+            return new ServiceRequest
+            {
+                Id = id,
+                Title = title,
+                CategoryName = category,
+                EmployeeId = employeeId,
+                OrganizationId = OrganizationId,
+                Status = new ServiceRequestStatus { Title = "Open" },
+                Created = Now.AddDays(-id)
+            };
         }
 
         private void GivenUsers(params ApplicationUser[] users)

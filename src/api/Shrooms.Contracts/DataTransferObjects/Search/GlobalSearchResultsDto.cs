@@ -12,6 +12,39 @@ namespace Shrooms.Contracts.DataTransferObjects.Search
         public IEnumerable<GlobalSearchEventDto> Events { get; set; } = Array.Empty<GlobalSearchEventDto>();
 
         public IEnumerable<GlobalSearchPostDto> Posts { get; set; } = Array.Empty<GlobalSearchPostDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Kudos { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Projects { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Groups { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Books { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Polls { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> Videos { get; set; } = Array.Empty<GlobalSearchItemDto>();
+
+        public IEnumerable<GlobalSearchItemDto> ServiceRequests { get; set; } = Array.Empty<GlobalSearchItemDto>();
+    }
+
+    /// <summary>
+    /// A result of a section that needs no more than a title, a line of detail and a date.
+    /// </summary>
+    public class GlobalSearchItemDto
+    {
+        public string Id { get; set; }
+
+        public string Title { get; set; }
+
+        public string Description { get; set; }
+
+        public DateTime? Date { get; set; }
+
+        /// <summary>
+        /// Set when the result opens somewhere other than its own page: a kudos entry opens its receiver's profile.
+        /// </summary>
+        public string LinkId { get; set; }
     }
 
     public class GlobalSearchPersonDto

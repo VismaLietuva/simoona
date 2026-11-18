@@ -24,14 +24,26 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         /// <summary>
-        /// People, walls, events and posts for the global search, in one request.
+        /// Every section's matches for the global search, in one request.
         /// </summary>
         /// <param name="s">What has been typed. Fewer than two characters returns empty groups.</param>
         /// <param name="limit">Most entries per group; capped at 50.</param>
         /// <response code="200">Matches per group. A group the user has no permission for is empty.</response>
         [HttpGet]
         [Route("Quick")]
-        [PermissionAnyOfAuthorize(BasicPermissions.EmployeeList, BasicPermissions.Post, BasicPermissions.Event)]
+        [PermissionAnyOfAuthorize(
+            BasicPermissions.EmployeeList,
+            BasicPermissions.Post,
+            BasicPermissions.Event,
+            BasicPermissions.Kudos,
+            BasicPermissions.Project,
+            BasicPermissions.Groups,
+            BasicPermissions.Book,
+            BasicPermissions.Poll,
+            AdministrationPermissions.Poll,
+            BasicPermissions.VideoLibrary,
+            AdministrationPermissions.VideoLibrary,
+            BasicPermissions.ServiceRequest)]
         [ProducesResponseType(typeof(GlobalSearchResultsDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Quick(string s = null, int limit = DefaultLimit, CancellationToken cancellationToken = default)
         {
