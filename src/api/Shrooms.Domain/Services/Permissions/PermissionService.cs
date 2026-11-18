@@ -6,7 +6,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MoreLinq;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
@@ -78,7 +77,7 @@ namespace Shrooms.Domain.Services.Permissions
             return allPermissions
                 .Select(x => new PermissionGroupDto
                 {
-                    Name = x.Name.Split(DataLayerConstants.PermissionSplitter).First().ToLower()
+                    Name = PermissionGroups.GetGroupName(x.Name)
                 })
                 .DistinctBy(x => x.Name)
                 .OrderBy(x => x.Name)
@@ -112,7 +111,12 @@ namespace Shrooms.Domain.Services.Permissions
             return await GetPermissionsAsync(organizationId, roleFilter);
         }
 
-        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter = null)
+        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId)
+        {
+            return await GetPermissionsAsync(organizationId, null);
+        }
+
+        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter)
         {
             return await _permissionsDbSet
                 .Include(x => x.Module.Organizations)
