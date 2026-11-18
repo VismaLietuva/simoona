@@ -6,12 +6,14 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Search;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
+using Shrooms.Domain.Services.Wall;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
@@ -26,12 +28,14 @@ namespace Shrooms.Domain.Services.Search
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
         private readonly ISystemClock _systemClock;
+        private readonly IWallService _wallService;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<MultiwallWall> _wallsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
 
-        public GlobalSearchService(IUnitOfWork2 uow, IPermissionService permissionService, IRoleService roleService, ISystemClock systemClock)
+        public GlobalSearchService(IUnitOfWork2 uow, IPermissionService permissionService, IRoleService roleService, ISystemClock systemClock, IWallService wallService)
         {
+            _wallService = wallService;
             _permissionService = permissionService;
             _roleService = roleService;
             _systemClock = systemClock;
@@ -66,6 +70,7 @@ namespace Shrooms.Domain.Services.Search
             if (permissions.Contains(BasicPermissions.Post))
             {
                 results.Walls = await SearchWallsAsync(term, take, userOrg, cancellationToken);
+                results.Posts = await SearchPostsAsync(term, take, userOrg, cancellationToken);
             }
 
             if (permissions.Contains(BasicPermissions.Event))
@@ -125,6 +130,46 @@ namespace Shrooms.Domain.Services.Search
                     TotalMembers = wall.Members.Count
                 })
                 .ToArrayAsync(cancellationToken);
+        }
+
+        // The wall search decides which posts the user may see and what counts as a match,
+        // so the quick search and the full post search can never disagree.
+        private async Task<GlobalSearchPostDto[]> SearchPostsAsync(string term, int take, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
+        {
+            var posts = await _wallService.SearchWallAsync(term, userOrg, 1, take, cancellationToken);
+
+            return posts
+                .Select(post => new GlobalSearchPostDto
+                {
+                    Id = post.Id,
+                    Text = MatchedText(post, term),
+                    AuthorFullName = post.Author?.FullName,
+                    WallName = post.WallName,
+                    Created = post.Created
+                })
+                .ToArray();
+        }
+
+        // A post is also found through its comments, and a hidden post only through them.
+        private static string MatchedText(PostDto post, string term)
+        {
+            if (!post.IsHidden && Contains(post.MessageBody, term))
+            {
+                return post.MessageBody;
+            }
+
+            var comment = post.Comments?.FirstOrDefault(c => !c.IsHidden && Contains(c.MessageBody, term));
+            if (comment != null)
+            {
+                return comment.MessageBody;
+            }
+
+            return post.IsHidden ? string.Empty : post.MessageBody;
+        }
+
+        private static bool Contains(string text, string term)
+        {
+            return text != null && text.Contains(term, StringComparison.OrdinalIgnoreCase);
         }
 
         // Events still to come are listed ahead of finished ones.

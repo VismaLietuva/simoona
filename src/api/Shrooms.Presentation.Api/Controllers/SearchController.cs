@@ -24,7 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         /// <summary>
-        /// People, walls and events for the global search, in one request.
+        /// People, walls, events and posts for the global search, in one request.
         /// </summary>
         /// <param name="s">What has been typed. Fewer than two characters returns empty groups.</param>
         /// <param name="limit">Most entries per group; capped at 50.</param>

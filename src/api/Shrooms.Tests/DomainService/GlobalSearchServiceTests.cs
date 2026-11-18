@@ -11,6 +11,9 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Search;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -19,6 +22,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Search;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.DomainService
@@ -43,6 +47,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<Wall> _wallsDbSet;
         private DbSet<Event> _eventsDbSet;
         private IPermissionService _permissionService;
+        private IWallService _wallService;
         private IGlobalSearchService _searchService;
 
         [SetUp]
@@ -64,7 +69,10 @@ namespace Shrooms.Tests.DomainService
             var systemClock = Substitute.For<ISystemClock>();
             systemClock.UtcNow.Returns(Now);
 
-            _searchService = new GlobalSearchService(uow, _permissionService, roleService, systemClock);
+            _wallService = Substitute.For<IWallService>();
+            GivenPosts();
+
+            _searchService = new GlobalSearchService(uow, _permissionService, roleService, systemClock, _wallService);
         }
 
         [Test]
@@ -236,6 +244,75 @@ namespace Shrooms.Tests.DomainService
             Assert.That(found.EndDate, Is.EqualTo(start.AddHours(2)));
         }
 
+        [Test]
+        public async Task Should_Return_Posts_From_The_Wall_Search()
+        {
+            GivenPosts(new PostDto
+            {
+                Id = 7,
+                MessageBody = "Huge Kudos to the platform team",
+                Author = new UserDto { FullName = "Ona Petraite" },
+                WallName = "Vilnius office",
+                Created = Now.AddDays(-2)
+            });
+
+            var post = (await SearchAsync("kudos")).Posts.Single();
+
+            Assert.That(post.Id, Is.EqualTo(7));
+            Assert.That(post.Text, Is.EqualTo("Huge Kudos to the platform team"));
+            Assert.That(post.AuthorFullName, Is.EqualTo("Ona Petraite"));
+            Assert.That(post.WallName, Is.EqualTo("Vilnius office"));
+            await _wallService.Received(1).SearchWallAsync("kudos", Arg.Any<UserAndOrganizationDto>(), 1, 8, Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task Should_Show_The_Comment_When_A_Post_Was_Found_Through_It()
+        {
+            GivenPosts(new PostDto
+            {
+                Id = 7,
+                MessageBody = "Release is out",
+                Comments = new[]
+                {
+                    new CommentDto { MessageBody = "Nice work" },
+                    new CommentDto { MessageBody = "Kudos to everyone", IsHidden = true },
+                    new CommentDto { MessageBody = "Well deserved kudos" }
+                }
+            });
+
+            var post = (await SearchAsync("kudos")).Posts.Single();
+
+            Assert.That(post.Text, Is.EqualTo("Well deserved kudos"));
+        }
+
+        [Test]
+        public async Task Should_Not_Leak_The_Body_Of_A_Hidden_Post()
+        {
+            GivenPosts(new PostDto
+            {
+                Id = 7,
+                MessageBody = "Hidden kudos rant",
+                IsHidden = true,
+                Comments = new[] { new CommentDto { MessageBody = "kudos anyway" } }
+            });
+
+            var post = (await SearchAsync("kudos")).Posts.Single();
+
+            Assert.That(post.Text, Is.EqualTo("kudos anyway"));
+        }
+
+        [Test]
+        public async Task Should_Not_Search_Posts_Without_The_Post_Permission()
+        {
+            GivenPermissions(BasicPermissions.Event);
+            GivenPosts(new PostDto { Id = 7, MessageBody = "Kudos" });
+
+            var results = await SearchAsync("Kudos");
+
+            Assert.That(results.Posts, Is.Empty);
+            await _wallService.DidNotReceiveWithAnyArgs().SearchWallAsync(default, default, default, default, default);
+        }
+
         private Task<GlobalSearchResultsDto> SearchAsync(string search)
         {
             return _searchService.SearchAsync(search, 8, CurrentUser());
@@ -251,6 +328,13 @@ namespace Shrooms.Tests.DomainService
             _permissionService
                 .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .Returns(permissions);
+        }
+
+        private void GivenPosts(params PostDto[] posts)
+        {
+            _wallService
+                .SearchWallAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(posts);
         }
 
         private void GivenUsers(params ApplicationUser[] users)

@@ -7,7 +7,7 @@ namespace Shrooms.Domain.Services.Search
     public interface IGlobalSearchService
     {
         /// <summary>
-        /// People, walls and events matching the search, at most <paramref name="limit"/> of each.
+        /// People, walls, events and posts matching the search, at most <paramref name="limit"/> of each.
         /// A group the user has no permission for comes back empty, and so does every group
         /// when the search is shorter than <see cref="GlobalSearchService.MinSearchLength"/>.
         /// </summary>

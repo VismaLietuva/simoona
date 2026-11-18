@@ -10,6 +10,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Search
         public IEnumerable<GlobalSearchWallDto> Walls { get; set; } = Array.Empty<GlobalSearchWallDto>();
 
         public IEnumerable<GlobalSearchEventDto> Events { get; set; } = Array.Empty<GlobalSearchEventDto>();
+
+        public IEnumerable<GlobalSearchPostDto> Posts { get; set; } = Array.Empty<GlobalSearchPostDto>();
     }
 
     public class GlobalSearchPersonDto
@@ -30,6 +32,22 @@ namespace Shrooms.Contracts.DataTransferObjects.Search
         public string Name { get; set; }
 
         public int TotalMembers { get; set; }
+    }
+
+    public class GlobalSearchPostDto
+    {
+        public int Id { get; set; }
+
+        /// <summary>
+        /// The text the search was found in: the post itself, or the comment under it that matched.
+        /// </summary>
+        public string Text { get; set; }
+
+        public string AuthorFullName { get; set; }
+
+        public string WallName { get; set; }
+
+        public DateTime Created { get; set; }
     }
 
     public class GlobalSearchEventDto
