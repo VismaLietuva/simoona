@@ -34,6 +34,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
     [Authorize]
     public class ServiceRequestsController : BaseController
     {
+        private static readonly string[] IncludableNavigations =
+        {
+            nameof(ServiceRequest.Priority),
+            nameof(ServiceRequest.Status),
+            nameof(ServiceRequest.Employee),
+            nameof(ServiceRequest.KudosShopItem)
+        };
+
         private readonly IUnitOfWork _uow;
         private readonly IRepository<ServiceRequest> _serviceRequestRepository;
         private readonly IRepository<ServiceRequestCategory> _categoryRepository;
@@ -71,7 +79,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
         public IActionResult Get(int id, string includeProperties = "")
         {
-            var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
+            var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: IncludableOnly(includeProperties)).FirstOrDefault();
 
             if (model == null)
             {
@@ -156,7 +164,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
             var models = await _serviceRequestRepository
-                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? "Created")
+                .Get(includeProperties: IncludableOnly(includeProperties), filter: filter, orderBy: sortQuery ?? "Created")
                 .ToPagedListAsync(page, pageSize);
 
             var pagedModel = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
@@ -170,6 +178,26 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             };
 
             return result;
+        }
+
+        // The include list comes from the client, and the repository loads any
+        // navigation path on the entity, so Employee.Manager.ManagedUsers or
+        // Employee.Room.ApplicationUsers would pull whole teams of users into
+        // memory. Only what ServiceRequestViewModel shows is loaded; anything
+        // else is dropped, the way the repository already drops paths that do
+        // not exist.
+        private static string IncludableOnly(string includeProperties)
+        {
+            if (string.IsNullOrWhiteSpace(includeProperties))
+            {
+                return string.Empty;
+            }
+
+            var includable = includeProperties
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(path => IncludableNavigations.Contains(path, StringComparer.OrdinalIgnoreCase));
+
+            return string.Join(", ", includable);
         }
 
         [HttpGet]

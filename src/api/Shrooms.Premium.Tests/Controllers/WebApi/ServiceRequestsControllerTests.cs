@@ -42,6 +42,9 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         private IRepository<ServiceRequest> _serviceRequestRepository;
         private List<ServiceRequest> _requests;
 
+        // The include list the controller handed the repository last.
+        private string _loadedIncludes;
+
         [SetUp]
         public void TestInitializers()
         {
@@ -77,6 +80,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                     Arg.Any<int?>())
                 .Returns(call =>
                 {
+                    _loadedIncludes = call.ArgAt<string>(3);
                     var filter = call.Arg<Expression<Func<ServiceRequest, bool>>>();
                     return new TestDbAsyncEnumerable<ServiceRequest>(_requests.Where(filter.Compile()));
                 });
@@ -279,6 +283,30 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             var identityTypes = ReachableTypes(typeof(ServiceRequestViewModel)).Where(IsIdentityType).ToList();
 
             ClassicAssert.IsEmpty(identityTypes, string.Join(", ", identityTypes.Select(t => t.Name)));
+        }
+
+        // The include list is the client's, and the repository loads any path on
+        // the entity. Only what the response shows may be loaded; a nested user
+        // graph would pull a manager's whole team or everyone in a room.
+        [TestCase("Priority, Status, Employee, KudosShopItem", "Priority, Status, Employee, KudosShopItem")]
+        [TestCase("Employee.Manager.ManagedUsers, Employee.JobPosition.Users, Employee.Room.ApplicationUsers", "")]
+        [TestCase("Employee, Employee.Organization, KudosShopItem.Organization", "Employee")]
+        [TestCase(null, "")]
+        public async Task GetPagedFiltered_ClientChoosesIncludes_LoadsOnlyWhatTheResponseShows(string requested, string loaded)
+        {
+            await _sut.GetPagedFiltered(requested);
+
+            ClassicAssert.AreEqual(loaded, _loadedIncludes);
+        }
+
+        // What the edit page asks for. ServiceRequestCategory is not a navigation
+        // on the entity, so the repository dropped it before this list existed too.
+        [Test]
+        public void Get_FrontendIncludes_LoadsTheResponseNavigations()
+        {
+            _sut.Get(1, "Priority, Status, Employee, ServiceRequestCategory, Employee.Manager.ManagedUsers");
+
+            ClassicAssert.AreEqual("Priority, Status, Employee", _loadedIncludes);
         }
 
         private static readonly string[] IdentityFieldNames =
