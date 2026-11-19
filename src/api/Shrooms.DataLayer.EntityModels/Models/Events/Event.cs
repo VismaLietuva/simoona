@@ -98,8 +98,14 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
             set => RegistrationDeadline = GetUtcDateFromLocalDate(value);
         }
 
-        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TZConvert.GetTimeZoneInfo(GetResponsibleUserTimeZone()));
 
-        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TZConvert.GetTimeZoneInfo(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
+        private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) => TimeZoneInfo.ConvertTimeToUtc(localDateTime, TZConvert.GetTimeZoneInfo(GetResponsibleUserTimeZone()));
+
+        // Lazy loading is off: a query that reads the local dates must include
+        // ResponsibleUser.Settings, or every host converts in the default time zone.
+        // A host with no settings row, or no time zone in it, gets the default too,
+        // so reading the dates never has to add a row.
+        private string GetResponsibleUserTimeZone() => ResponsibleUser?.Settings?.TimeZone ?? DataLayerConstants.DefaultTimeZone;
     }
 }

@@ -140,7 +140,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         ApplicationUser = new ApplicationUser
                         {
                             Email = "testEmail1",
-                            TimeZone = "testTimeZone1"
+                            Settings = new UserSettings { TimeZone = "testTimeZone1" }
                         }
                     },
                     new EventParticipant
@@ -149,7 +149,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         ApplicationUser = new ApplicationUser
                         {
                             Email = "testEmail2",
-                            TimeZone = "testTimeZone2"
+                            Settings = new UserSettings { TimeZone = "testTimeZone2" }
                         }
                     },
                     new EventParticipant
@@ -158,7 +158,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         ApplicationUser = new ApplicationUser
                         {
                             Email = "testEmail3",
-                            TimeZone = "testTimeZone3"
+                            Settings = new UserSettings { TimeZone = "testTimeZone3" }
                         }
                     }
                 }
