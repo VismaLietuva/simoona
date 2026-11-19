@@ -41,6 +41,8 @@ namespace Shrooms.Tests.DomainService
 
         private static readonly DateTime Now = new DateTime(2026, 11, 17, 10, 0, 0, DateTimeKind.Utc);
 
+        private static readonly UserDto Commenter = new UserDto { UserId = "commenter", FullName = "Marta Jonaite" };
+
         private static readonly string[] AllPermissions =
         {
             BasicPermissions.EmployeeList,
@@ -302,15 +304,45 @@ namespace Shrooms.Tests.DomainService
                 MessageBody = "Release is out",
                 Comments = new[]
                 {
-                    new CommentDto { MessageBody = "Nice work" },
-                    new CommentDto { MessageBody = "Kudos to everyone", IsHidden = true },
-                    new CommentDto { MessageBody = "Well deserved kudos" }
+                    new CommentDto { MessageBody = "Nice work", Author = Commenter },
+                    new CommentDto { MessageBody = "Kudos to everyone", IsHidden = true, Author = Commenter },
+                    new CommentDto { MessageBody = "Well deserved kudos", Author = Commenter }
                 }
             });
 
             var post = (await SearchAsync("kudos")).Posts.Single();
 
             Assert.That(post.Text, Is.EqualTo("Well deserved kudos"));
+        }
+
+        [Test]
+        public async Task Should_Not_Show_A_Comment_Whose_Author_Is_Gone()
+        {
+            GivenPosts(new PostDto
+            {
+                Id = 7,
+                MessageBody = "Release is out",
+                Comments = new[]
+                {
+                    new CommentDto { MessageBody = "kudos from someone who left", Author = new UserDto { FullName = "Deleted user" } },
+                    new CommentDto { MessageBody = "Well deserved kudos", Author = Commenter }
+                }
+            });
+
+            var post = (await SearchAsync("kudos")).Posts.Single();
+
+            Assert.That(post.Text, Is.EqualTo("Well deserved kudos"));
+        }
+
+        [Test]
+        public async Task Should_Return_No_People_For_A_Search_Of_Separators_Only()
+        {
+            GivenUsers(Person("u1", "Tomas", "Kudosas", "QA engineer"));
+
+            foreach (var search in new[] { ",,", "||", "; ;" })
+            {
+                Assert.That((await SearchAsync(search)).People, Is.Empty, search);
+            }
         }
 
         [Test]
@@ -321,7 +353,7 @@ namespace Shrooms.Tests.DomainService
                 Id = 7,
                 MessageBody = "Hidden kudos rant",
                 IsHidden = true,
-                Comments = new[] { new CommentDto { MessageBody = "kudos anyway" } }
+                Comments = new[] { new CommentDto { MessageBody = "kudos anyway", Author = Commenter } }
             });
 
             var post = (await SearchAsync("kudos")).Posts.Single();

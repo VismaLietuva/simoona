@@ -141,13 +141,21 @@ namespace Shrooms.Domain.Services.Search
         // Same rule as the employee list: every word must appear in the name or the job title.
         private async Task<GlobalSearchPersonDto[]> SearchPeopleAsync(string term, int take, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
         {
+            // A search of separators only (",,") has no words, and with no words there is
+            // no filter: it would list the first employees as if they had matched.
+            var words = term.Split(WebApiConstants.SearchSplitter, StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length == 0)
+            {
+                return Array.Empty<GlobalSearchPersonDto>();
+            }
+
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser, cancellationToken);
 
             var query = _usersDbSet
                 .Where(user => user.OrganizationId == userOrg.OrganizationId)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId));
 
-            foreach (var word in term.Split(WebApiConstants.SearchSplitter, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var word in words)
             {
                 query = query.Where(user =>
                     user.FirstName.Contains(word) ||
@@ -208,6 +216,8 @@ namespace Shrooms.Domain.Services.Search
         }
 
         // A post is also found through its comments, and a hidden post only through them.
+        // The wall search never matches a comment whose author is gone, so such a comment
+        // is not offered as the reason the post was found either.
         private static string MatchedText(PostDto post, string term)
         {
             if (!post.IsHidden && Contains(post.MessageBody, term))
@@ -215,7 +225,7 @@ namespace Shrooms.Domain.Services.Search
                 return post.MessageBody;
             }
 
-            var comment = post.Comments?.FirstOrDefault(c => !c.IsHidden && Contains(c.MessageBody, term));
+            var comment = post.Comments?.FirstOrDefault(c => !c.IsHidden && c.Author?.UserId != null && Contains(c.MessageBody, term));
             if (comment != null)
             {
                 return comment.MessageBody;
