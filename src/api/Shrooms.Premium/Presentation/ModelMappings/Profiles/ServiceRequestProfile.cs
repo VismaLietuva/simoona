@@ -1,6 +1,8 @@
 using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
+using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
@@ -33,10 +35,11 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelMappings()
         {
-            CreateMap<ServiceRequestViewModel, ServiceRequest>(MemberList.None);
             CreateMap<ServiceRequest, ServiceRequestViewModel>(MemberList.None)
                 .ForMember(dest => dest.KudosShopItem,
                     opt => opt.MapFrom(src => src.KudosShopItemId.HasValue ? src.KudosShopItem : null));
+            CreateMap<ApplicationUser, ServiceRequestEmployeeViewModel>(MemberList.None);
+            CreateMap<KudosShopItem, KudosShopItemViewModel>(MemberList.None);
             CreateMap<ServiceRequestPostViewModel, ServiceRequest>(MemberList.None).ReverseMap();
 
             CreateMap<ServiceRequestComment, ServiceRequestCommentViewModel>(MemberList.None)
