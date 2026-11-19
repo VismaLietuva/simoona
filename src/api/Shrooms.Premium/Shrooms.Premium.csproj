@@ -30,6 +30,7 @@
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Ical.Net" />
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="Mapster" />
     <PackageReference Include="PDFsharp" />
     <PackageReference Include="TimeZoneConverter" />
     <PackageReference Include="X.PagedList" />
