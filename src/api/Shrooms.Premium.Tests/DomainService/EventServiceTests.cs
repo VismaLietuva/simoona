@@ -1,4 +1,4 @@
-using NSubstitute;
+﻿using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Shrooms.Contracts.DAL;
@@ -34,6 +34,9 @@ namespace Shrooms.Premium.Tests.DomainService
         private DbSet<Event> _eventsDbSet;
         private DbSet<Office> _officeDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<EventParticipant> _eventParticipantsDbSet;
+        private DbSet<EventOption> _eventOptionsDbSet;
+        private DbSet<EventQuestion> _eventQuestionsDbSet;
 
         private IUnitOfWork2 _uow;
         private IWallService _wallService;
@@ -51,6 +54,9 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventsDbSet = _uow.MockDbSetForAsync<Event>();
             _officeDbSet = _uow.MockDbSetForAsync<Office>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
+            _eventParticipantsDbSet = _uow.MockDbSetForAsync<EventParticipant>();
+            _eventOptionsDbSet = _uow.MockDbSetForAsync<EventOption>();
+            _eventQuestionsDbSet = _uow.MockDbSetForAsync<EventQuestion>();
 
             _permissionService = Substitute.For<IPermissionService>();
             _wallService = Substitute.For<IWallService>();
@@ -272,10 +278,98 @@ namespace Shrooms.Premium.Tests.DomainService
                 "only the caller's own picks used to be rewritten, so every other option leaked its participants");
         }
 
+        [Test]
+        public async Task Should_Count_Every_Participant_Even_When_The_Caller_Sees_Only_Their_Own_Row()
+        {
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.Participants.Select(p => p.UserId), Is.EqualTo(new[] { "testUser1" }));
+            Assert.That(result.GoingCount, Is.EqualTo(2), "counts must not shrink with the trimmed participant list");
+            Assert.That(result.MaybeGoingCount, Is.EqualTo(1));
+            Assert.That(result.VirtuallyGoingCount, Is.EqualTo(0));
+            Assert.That(result.NotGoingCount, Is.EqualTo(0));
+            Assert.That(result.IsFull, Is.True, "two going with room for two");
+            Assert.That(result.ParticipatingStatus, Is.EqualTo(AttendingStatus.Attending));
+        }
+
+        [Test]
+        public async Task Should_Return_Every_Participant_To_A_Caller_Who_Can_See_Them()
+        {
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: true);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.Participants.Select(p => p.UserId), Is.EquivalentTo(new[] { "testUser1", "otherUser", "maybeUser" }));
+            Assert.That(result.Options.Single(option => option.Name == "Soup").Participants.Select(p => p.UserId), Is.EqualTo(new[] { "otherUser" }));
+        }
+
+        [Test]
+        public async Task Should_Return_The_Status_And_Answers_Of_A_Maybe_Caller()
+        {
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "maybeUser" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.ParticipatingStatus, Is.EqualTo(AttendingStatus.MaybeAttending));
+            Assert.That(result.MyChosenOptions, Is.EquivalentTo(new[] { 90 }));
+            Assert.That(result.Participants.Select(p => p.UserId), Is.EqualTo(new[] { "maybeUser" }));
+            Assert.That(result.Questions.First().Options.First().Participants, Is.Empty,
+                "option lists name only people who are going");
+        }
+
+        [Test]
+        public async Task Should_Return_Idle_And_No_Participants_To_A_Caller_Who_Has_Not_Responded()
+        {
+            var eventId = MockEventDetailsWithAnsweredQuestion(canSeeParticipants: false);
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 2, UserId = "stranger" };
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, userOrg);
+
+            Assert.That(result.ParticipatingStatus, Is.EqualTo(AttendingStatus.Idle));
+            Assert.That(result.Participants, Is.Empty);
+            Assert.That(result.MyChosenOptions, Is.Empty);
+            Assert.That(result.Questions.SelectMany(q => q.Options).SelectMany(o => o.Participants), Is.Empty);
+            Assert.That(result.GoingCount, Is.EqualTo(2));
+        }
+
+        [TestCase("[\"11\"]", new[] { "Eleven" }, false)]
+        [TestCase("[\"1\",\"11\"]", new[] { "One", "Eleven" }, true)]
+        [TestCase("[]", new string[0], false)]
+        public async Task Should_Resolve_Office_Names_By_Id(string eventOffices, string[] expectedNames, bool expectedForAllOffices)
+        {
+            var eventId = MockEventDetailsWithLegacyAndQuestionOptions(eventOffices);
+            _officeDbSet.SetDbSetDataForAsync(new List<Office>
+            {
+                new Office { Id = 1, Name = "One", OrganizationId = 2 },
+                new Office { Id = 11, Name = "Eleven", OrganizationId = 2 }
+            });
+
+            var result = await _eventService.GetEventDetailsAsync(eventId, new UserAndOrganizationDto { OrganizationId = 2, UserId = "testUser1" });
+
+            // "1" is a substring of ["11"], which the old lookup matched.
+            Assert.That(result.Offices.OfficeNames, Is.EqualTo(expectedNames));
+            Assert.That(result.IsForAllOffices, Is.EqualTo(expectedForAllOffices));
+        }
+
+        // The service reads participants, options and questions from their own tables, so each
+        // mock is filled from the same object graph the event carries.
+        private void SetEventDetailsData(Event @event)
+        {
+            _eventsDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
+            _eventParticipantsDbSet.SetDbSetDataForAsync(@event.EventParticipants.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(@event.EventOptions.AsQueryable());
+            _eventQuestionsDbSet.SetDbSetDataForAsync(@event.EventQuestions.AsQueryable());
+        }
+
         private Guid MockEventDetailsWithAnsweredQuestion(bool canSeeParticipants)
         {
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.EventUsers)
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), BasicPermissions.EventUsers, Arg.Any<CancellationToken>())
                 .Returns(canSeeParticipants);
 
             var eventId = Guid.NewGuid();
@@ -299,57 +393,59 @@ namespace Shrooms.Premium.Tests.DomainService
                 AttendStatus = (int)AttendingStatus.Attending,
                 AttendComment = string.Empty
             };
+            var maybe = new EventParticipant
+            {
+                Id = 3,
+                EventId = eventId,
+                ApplicationUserId = "maybeUser",
+                ApplicationUser = new ApplicationUser { Id = "maybeUser", FirstName = "Maybe", LastName = "User" },
+                AttendStatus = (int)AttendingStatus.MaybeAttending,
+                AttendComment = string.Empty
+            };
 
-            // Both picked Pasta (90); nobody picked Pizza (91).
-            var pasta = new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0, EventParticipants = new List<EventParticipant> { me, colleague } };
+            // All three picked Pasta (90); nobody picked Pizza (91).
+            var pasta = new EventOption { Id = 90, EventId = eventId, Option = "Pasta", QuestionId = 5, Order = 0, EventParticipants = new List<EventParticipant> { me, colleague, maybe } };
             var pizza = new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1, EventParticipants = new List<EventParticipant>() };
             var margherita = new EventOption { Id = 92, EventId = eventId, Option = "Margherita", QuestionId = 6, Order = 0, EventParticipants = new List<EventParticipant>() };
 
             // A legacy option the colleague picked and the caller did not.
             var soup = new EventOption { Id = 80, EventId = eventId, Option = "Soup", QuestionId = null, Order = 0, EventParticipants = new List<EventParticipant> { colleague } };
 
-            // The inverse navigation the details projection reads for the caller's own selection.
-            // EF fills it from the ThenInclude; a mocked DbSet does no relationship fixup.
-            me.EventOptions = new List<EventOption> { pasta };
-            colleague.EventOptions = new List<EventOption> { soup, pasta };
-
-            var events = new List<Event>
+            var @event = new Event
             {
-                new Event
+                Id = eventId,
+                OrganizationId = 2,
+                Offices = "[\"1\"]",
+                MaxChoices = 0,
+                MaxParticipants = 2,
+                ResponsibleUser = responsibleUser,
+                ResponsibleUserId = responsibleUser.Id,
+                EventOptions = new List<EventOption> { soup, pasta, pizza, margherita },
+                EventParticipants = new List<EventParticipant> { me, colleague, maybe },
+                EventQuestions = new List<EventQuestion>
                 {
-                    Id = eventId,
-                    OrganizationId = 2,
-                    Offices = "[\"1\"]",
-                    MaxChoices = 0,
-                    ResponsibleUser = responsibleUser,
-                    ResponsibleUserId = responsibleUser.Id,
-                    EventOptions = new List<EventOption> { soup, pasta, pizza, margherita },
-                    EventParticipants = new List<EventParticipant> { me, colleague },
-                    EventQuestions = new List<EventQuestion>
+                    new EventQuestion
                     {
-                        new EventQuestion
-                        {
-                            Id = 5, EventId = eventId, Title = "Pick your dish", Order = 0,
-                            SelectType = EventQuestionSelectType.Single, IsRequired = true,
-                            ShowIfOptionId = null, Options = new List<EventOption> { pasta, pizza }
-                        },
-                        new EventQuestion
-                        {
-                            Id = 6, EventId = eventId, Title = "Which pizza?", Order = 1,
-                            SelectType = EventQuestionSelectType.Single, IsRequired = true,
-                            ShowIfOptionId = 91, Options = new List<EventOption> { margherita }
-                        }
+                        Id = 5, EventId = eventId, Title = "Pick your dish", Order = 0,
+                        SelectType = EventQuestionSelectType.Single, IsRequired = true,
+                        ShowIfOptionId = null, Options = new List<EventOption> { pasta, pizza }
+                    },
+                    new EventQuestion
+                    {
+                        Id = 6, EventId = eventId, Title = "Which pizza?", Order = 1,
+                        SelectType = EventQuestionSelectType.Single, IsRequired = true,
+                        ShowIfOptionId = 91, Options = new List<EventOption> { margherita }
                     }
                 }
             };
 
             _officeDbSet.SetDbSetDataForAsync(new List<Office> { new Office { Id = 1, Name = "Office", OrganizationId = 2 } });
-            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            SetEventDetailsData(@event);
 
             return eventId;
         }
 
-        private Guid MockEventDetailsWithLegacyAndQuestionOptions()
+        private Guid MockEventDetailsWithLegacyAndQuestionOptions(string offices = "[\"1\"]")
         {
             var eventId = Guid.NewGuid();
             var responsibleUser = new ApplicationUser
@@ -367,25 +463,22 @@ namespace Shrooms.Premium.Tests.DomainService
                 new EventOption { Id = 91, EventId = eventId, Option = "Pizza", QuestionId = 5, Order = 1, EventParticipants = new List<EventParticipant>() }
             };
 
-            var events = new List<Event>
+            var @event = new Event
             {
-                new Event
-                {
-                    Id = eventId,
-                    OrganizationId = 2,
-                    Offices = "[\"1\"]",
-                    MaxChoices = 1,
-                    ResponsibleUser = responsibleUser,
-                    ResponsibleUserId = responsibleUser.Id,
-                    EventOptions = options,
-                    // EF never hands back a null collection navigation; the mock must not either.
-                    EventQuestions = new List<EventQuestion>(),
-                    EventParticipants = new List<EventParticipant>()
-                }
+                Id = eventId,
+                OrganizationId = 2,
+                Offices = offices,
+                MaxChoices = 1,
+                ResponsibleUser = responsibleUser,
+                ResponsibleUserId = responsibleUser.Id,
+                EventOptions = options,
+                // EF never hands back a null collection navigation; the mock must not either.
+                EventQuestions = new List<EventQuestion>(),
+                EventParticipants = new List<EventParticipant>()
             };
 
             _officeDbSet.SetDbSetDataForAsync(new List<Office> { new Office { Id = 1, Name = "Office", OrganizationId = 2 } });
-            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            SetEventDetailsData(@event);
 
             return eventId;
         }

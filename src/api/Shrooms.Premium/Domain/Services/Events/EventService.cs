@@ -46,6 +46,8 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
+        private readonly DbSet<EventQuestion> _eventQuestionsDbSet;
         private readonly DbSet<EventReminder> _eventRemindersDbSet;
         private readonly DbSet<Office> _officeDbSet;
 
@@ -65,6 +67,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
+            _eventParticipantsDbSet = uow.GetDbSet<EventParticipant>();
+            _eventQuestionsDbSet = uow.GetDbSet<EventQuestion>();
             _officeDbSet = uow.GetDbSet<Office>();
             _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
 
@@ -126,73 +130,195 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
+        // Five flat queries instead of one nested split projection. The nested version loaded every
+        // participant (name, picture, comment) once per option it picked plus once for the full list,
+        // and only then dropped what a caller without EventUsers may not see. Here the permission
+        // decides which participant rows are read at all, each visible participant is read once, and
+        // options carry only the ids of who picked them.
         public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
         {
-            var @event = await _eventsDbSet
-                .Include(e => e.ResponsibleUser)
-                .Include(e => e.EventParticipants).ThenInclude(v => v.EventOptions)
+            var userId = userOrg.UserId;
+
+            // Cached per user, so this rarely costs a round trip.
+            var canSeeAll = await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers, cancellationToken);
+
+            // Counts come from SQL over every participant, not from the list below, which is
+            // trimmed to the caller's own row when they cannot see everyone.
+            var header = await _eventsDbSet
+                .AsNoTracking()
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
-                .Select(MapToEventDetailsDto(id, userOrg.UserId))
-                .AsSplitQuery()
+                .Select(e => new
+                {
+                    Details = new EventDetailsDto
+                    {
+                        Id = e.Id,
+                        Description = e.Description,
+                        ImageName = e.ImageName,
+                        Name = e.Name,
+                        Offices = new EventOfficesDto { Value = e.Offices },
+                        IsPinned = e.IsPinned,
+                        Location = e.Place,
+                        RegistrationDeadlineDate = e.RegistrationDeadline,
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate,
+                        AllowMaybeGoing = e.AllowMaybeGoing,
+                        AllowNotGoing = e.AllowNotGoing,
+                        MaxParticipants = e.MaxParticipants,
+                        MaxVirtualParticipants = e.MaxVirtualParticipants,
+                        MaxOptions = e.MaxChoices,
+                        HostUserId = e.ResponsibleUserId,
+                        HostUserImageName = e.ResponsibleUser.PictureId,
+                        WallId = e.WallId,
+                        HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
+                        GoingCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending),
+                        VirtuallyGoingCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.AttendingVirtually),
+                        MaybeGoingCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending),
+                        NotGoingCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending)
+                    },
+                    MyStatus = e.EventParticipants
+                        .Where(p => p.ApplicationUserId == userId)
+                        .Select(p => (int?)p.AttendStatus)
+                        .FirstOrDefault()
+                })
                 .SingleOrDefaultAsync(cancellationToken);
-            _eventValidationService.CheckIfEventExists(@event);
+
+            _eventValidationService.CheckIfEventExists(header);
 
             // ReSharper disable once PossibleNullReferenceException
-            @event.Offices.OfficeNames = await _officeDbSet
-                .Where(p => @event.Offices.Value.Contains(p.Id.ToString()))
-                .Select(p => p.Name)
+            var @event = header.Details;
+            @event.IsFull = @event.GoingCount >= @event.MaxParticipants;
+            @event.ParticipatingStatus = (AttendingStatus?)header.MyStatus ?? AttendingStatus.Idle;
+
+            var participants = await _eventParticipantsDbSet
+                .AsNoTracking()
+                .Where(p => p.EventId == id && (canSeeAll || p.ApplicationUserId == userId))
+                .Select(p => new EventDetailsParticipantDto
+                {
+                    Id = p.Id,
+                    UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
+                    FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
+                    ImageName = p.ApplicationUser.PictureId,
+                    AttendStatus = p.AttendStatus,
+                    AttendComment = p.AttendComment
+                })
                 .ToListAsync(cancellationToken);
 
-            _eventValidationService.CheckIfEventExists(@event);
-            @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
+            // Legacy and question-owned options together, each with the ids of the visible people
+            // who picked it. One query: the rows repeat only the short option columns.
+            var options = await _eventOptionsDbSet
+                .AsNoTracking()
+                .Where(o => o.EventId == id)
+                .Select(o => new
+                {
+                    o.Id,
+                    o.Option,
+                    o.Order,
+                    o.QuestionId,
+                    // Any status, unlike the per-option lists: a Maybe participant must still see their answers.
+                    PickedByMe = o.EventParticipants.Any(p => p.ApplicationUserId == userId),
+                    PickedBy = o.EventParticipants
+                        .Where(p => canSeeAll || p.ApplicationUserId == userId)
+                        .Select(p => p.Id)
+                        .ToList()
+                })
+                .AsSingleQuery()
+                .ToListAsync(cancellationToken);
 
-            @event.GoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
-            @event.VirtuallyGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.AttendingVirtually);
-            @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
-            @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
+            var questions = await _eventQuestionsDbSet
+                .AsNoTracking()
+                .Where(q => q.EventId == id)
+                .Select(q => new EventDetailsQuestionDto
+                {
+                    Id = q.Id,
+                    Title = q.Title,
+                    Order = q.Order,
+                    SelectType = q.SelectType,
+                    IsRequired = q.IsRequired,
+                    ShowIfOptionId = q.ShowIfOptionId
+                })
+                .ToListAsync(cancellationToken);
 
-            var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
-            @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
+            // Gives both the event's office names and the total office count. The Select keeps the
+            // SQL to two columns: ToDictionaryAsync's selectors run only after materialization.
+            var allOffices = await _officeDbSet
+                .Select(office => new { office.Id, office.Name })
+                .ToDictionaryAsync(office => office.Id, office => office.Name, cancellationToken);
 
-            // If user has permissions - show all participants, otherwise show only current user and his own event options
-            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers, cancellationToken))
+            // Option lists name only people who are going, in person or virtually.
+            var goingById = participants
+                .Where(p => p.AttendStatus == (int)AttendingStatus.Attending ||
+                            p.AttendStatus == (int)AttendingStatus.AttendingVirtually)
+                .ToDictionary(p => p.Id);
+
+            List<EventDetailsParticipantDto> GoingPickers(IEnumerable<int> participantIds) =>
+                participantIds
+                    .Where(goingById.ContainsKey)
+                    .Select(participantId => goingById[participantId])
+                    .ToList();
+
+            @event.Participants = participants;
+            @event.MyChosenOptions = options.Where(o => o.PickedByMe).Select(o => o.Id).ToList();
+
+            // Legacy flat options only; question-owned options reach the client under Questions.
+            @event.Options = options
+                .Where(o => o.QuestionId == null)
+                .OrderBy(o => o.Id)
+                .Select(o => new EventDetailsOptionDto
+                {
+                    Id = o.Id,
+                    Name = o.Option,
+                    Participants = GoingPickers(o.PickedBy)
+                })
+                .ToList();
+
+            var optionsByQuestion = options
+                .Where(o => o.QuestionId != null)
+                .ToLookup(o => o.QuestionId.Value);
+
+            foreach (var question in questions)
             {
-                return @event;
-            }
-
-            @event.Participants = @event.Participants.Where(p => p.UserId == userOrg.UserId).ToList();
-
-            // Every option, not only the ones the caller picked. Rewriting just the caller's own
-            // picks left every other option carrying the full participant list — names, pictures
-            // and attend comments — for a caller without EventUsers.
-            var options = @event.Options.ToList();
-            foreach (var option in options)
-            {
-                option.Participants = option.Participants
-                    .Where(p => p.UserId == userOrg.UserId)
+                question.Options = optionsByQuestion[question.Id]
+                    .OrderBy(o => o.Order)
+                    .ThenBy(o => o.Id)
+                    .Select(o => new EventDetailsQuestionOptionDto
+                    {
+                        Id = o.Id,
+                        Name = o.Option,
+                        Order = o.Order,
+                        Participants = GoingPickers(o.PickedBy)
+                    })
                     .ToList();
             }
 
-            @event.Options = options;
+            @event.Questions = questions
+                .OrderBy(q => q.Order)
+                .ThenBy(q => q.Id)
+                .ToList();
 
-            // Each level is materialised: mutating a lazy projection is discarded on re-enumeration.
-            var trimmedQuestions = @event.Questions.ToList();
-            foreach (var question in trimmedQuestions)
-            {
-                var questionOptions = question.Options.ToList();
-                foreach (var option in questionOptions)
-                {
-                    option.Participants = option.Participants
-                        .Where(p => p.UserId == userOrg.UserId)
-                        .ToList();
-                }
+            // Parsed ids, not a substring match on the JSON: "1" is inside ["11"].
+            var officeNames = ParseOfficeIds(@event.Offices.Value)
+                .Where(allOffices.ContainsKey)
+                .Select(officeId => allOffices[officeId])
+                .ToList();
 
-                question.Options = questionOptions;
-            }
-
-            @event.Questions = trimmedQuestions;
+            @event.Offices.OfficeNames = officeNames;
+            @event.IsForAllOffices = officeNames.Count == allOffices.Count;
 
             return @event;
+        }
+
+        private static IEnumerable<int> ParseOfficeIds(string offices)
+        {
+            if (string.IsNullOrEmpty(offices))
+            {
+                return Enumerable.Empty<int>();
+            }
+
+            return JsonConvert.DeserializeObject<string[]>(offices)
+                .Select(officeId => int.TryParse(officeId, out var parsed) ? (int?)parsed : null)
+                .Where(officeId => officeId != null)
+                .Select(officeId => officeId.Value)
+                .Distinct();
         }
 
         public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
@@ -738,104 +864,6 @@ namespace Shrooms.Premium.Domain.Services.Events
         private static bool IsRegistrationDeadlineBeingRemoved(IEventArgsDto eventArgsDto, Event eventToUpdate)
         {
             return eventArgsDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventArgsDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
-        }
-
-        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId, string userId)
-        {
-            return e => new EventDetailsDto
-            {
-                Id = e.Id,
-                Description = e.Description,
-                ImageName = e.ImageName,
-                Name = e.Name,
-                Offices = new EventOfficesDto { Value = e.Offices },
-                IsPinned = e.IsPinned,
-                Location = e.Place,
-                RegistrationDeadlineDate = e.RegistrationDeadline,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate,
-                AllowMaybeGoing = e.AllowMaybeGoing,
-                AllowNotGoing = e.AllowNotGoing,
-                MaxParticipants = e.MaxParticipants,
-                MaxVirtualParticipants = e.MaxVirtualParticipants,
-                MaxOptions = e.MaxChoices,
-                HostUserId = e.ResponsibleUserId,
-                HostUserImageName = e.ResponsibleUser.PictureId,
-                WallId = e.WallId,
-                HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                // Legacy flat options only; question-owned options reach the client under Questions.
-                Options = e.EventOptions
-                    .Where(o => o.QuestionId == null)
-                    .Select(o => new EventDetailsOptionDto
-                    {
-                        Id = o.Id,
-                        Name = o.Option,
-                        Participants = o.EventParticipants
-                            .Where(x => x.EventId == eventId &&
-                                  (x.AttendStatus == (int)AttendingStatus.Attending ||
-                                   x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
-                            .Select(p => new EventDetailsParticipantDto
-                            {
-                                Id = p.Id,
-                                UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
-                                FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
-                                ImageName = p.ApplicationUser.PictureId,
-                                AttendStatus = p.AttendStatus,
-                                AttendComment = p.AttendComment
-                            })
-                    }),
-                // The only read endpoint carrying participants: /Events/Options feeds a client
-                // component, so its copy of this tree must stay participant-free.
-                Questions = e.EventQuestions
-                    .OrderBy(question => question.Order)
-                    .ThenBy(question => question.Id)
-                    .Select(question => new EventDetailsQuestionDto
-                    {
-                        Id = question.Id,
-                        Title = question.Title,
-                        Order = question.Order,
-                        SelectType = question.SelectType,
-                        IsRequired = question.IsRequired,
-                        ShowIfOptionId = question.ShowIfOptionId,
-                        Options = question.Options
-                            .OrderBy(option => option.Order)
-                                .ThenBy(option => option.Id)
-                            .Select(option => new EventDetailsQuestionOptionDto
-                            {
-                                Id = option.Id,
-                                Name = option.Option,
-                                Order = option.Order,
-                                Participants = option.EventParticipants
-                                    .Where(x => x.EventId == eventId &&
-                                          (x.AttendStatus == (int)AttendingStatus.Attending ||
-                                           x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
-                                    .Select(p => new EventDetailsParticipantDto
-                                    {
-                                        Id = p.Id,
-                                        UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
-                                        FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
-                                        ImageName = p.ApplicationUser.PictureId,
-                                        AttendStatus = p.AttendStatus,
-                                        AttendComment = p.AttendComment
-                                    })
-                            })
-                    }),
-                Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDto
-                {
-                    Id = p.Id,
-                    UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
-                    FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
-                    ImageName = p.ApplicationUser.PictureId,
-                    AttendStatus = p.AttendStatus,
-                    AttendComment = p.AttendComment
-                }),
-
-                // Not derivable from the option-level Participants lists above: those are scoped to
-                // people who are Going, so a Maybe participant would see none of their own answers.
-                MyChosenOptions = e.EventParticipants
-                    .Where(p => p.ApplicationUserId == userId)
-                    .SelectMany(p => p.EventOptions.Select(option => option.Id))
-            };
         }
     }
 }
