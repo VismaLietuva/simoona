@@ -11,5 +11,7 @@ namespace Shrooms.Contracts.ViewModels.Wall.Likes
         [Required]
         [EnumDataType(typeof(LikeTypeEnum))]
         public LikeTypeEnum Type { get; set; }
+
+        public string EmojiName { get; set; }
     }
 }

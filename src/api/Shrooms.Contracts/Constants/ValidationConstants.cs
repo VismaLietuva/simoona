@@ -23,5 +23,6 @@
 
         public const int CustomEmojiNameMaxLength = 50;
         public const string CustomEmojiNameRegexPattern = "^[a-z0-9_-]{1,50}$";
+        public const string ReactionEmojiNameRegexPattern = "^[a-z0-9_+-]{1,60}$";
     }
 }

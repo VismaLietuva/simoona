@@ -8,6 +8,7 @@
         Wow,
         Congrats,
         Sad,
-        GrumpyCat
+        GrumpyCat,
+        Emoji
     }
 }

@@ -16,6 +16,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Domain.Services.Wall.Likes;
 using Shrooms.Domain.Services.Wall.Mentions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 
@@ -28,6 +29,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly ICommentService _commentService;
         private readonly IWallService _wallService;
         private readonly IMentionResolver _mentionResolver;
+        private readonly ILikeToggleService _likeToggleService;
 
         private readonly IUnitOfWork2 _uow;
         private readonly DbSet<Post> _postsDbSet;
@@ -39,12 +41,14 @@ namespace Shrooms.Domain.Services.Wall.Posts
             IUnitOfWork2 uow,
             ICommentService commentService,
             IWallService wallService,
-            IMentionResolver mentionResolver)
+            IMentionResolver mentionResolver,
+            ILikeToggleService likeToggleService)
         {
             _uow = uow;
             _commentService = commentService;
             _wallService = wallService;
             _mentionResolver = mentionResolver;
+            _likeToggleService = likeToggleService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -125,15 +129,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     userOrg,
                     checkForAdministrationEventPermission: false);
 
-                var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId && x.Type == addLikeDto.Type);
-                if (like == null)
-                {
-                    post.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
-                }
-                else
-                {
-                    post.Likes.Remove(like);
-                }
+                await _likeToggleService.ToggleAsync(post.Likes, addLikeDto, userOrg);
 
                 await _uow.SaveChangesAsync(userOrg.UserId);
             }
