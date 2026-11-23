@@ -109,10 +109,10 @@ namespace Shrooms.EmailTemplates.Seeds
                 new(EmailPremiumTemplateCacheKeys.CoacheeLeftEvent, new CoacheeLeftEventEmailTemplateViewModel(
                     SettingsUrl, SampleAttendStatus(), "https://simoona.example.com/events/1")),
                 new(EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived, new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(
-                    SettingsUrl, 50.00m, "Loyalty Kudos", "Simoona", "Two years with the company.",
+                    SettingsUrl, 50.00m, "Loyalty Kudos", "Simoona", "<p>Two years with the <strong>company</strong>.</p>",
                     "https://simoona.example.com/kudos/profile/1")),
                 new(EmailPremiumTemplateCacheKeys.LoyaltyKudosDecreased, new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(
-                    SettingsUrl, 20.00m, "Loyalty Kudos", "Simoona", "Correcting a duplicate award.",
+                    SettingsUrl, 20.00m, "Loyalty Kudos", "Simoona", "<p>Correcting a duplicate award.</p>",
                     "https://simoona.example.com/kudos/profile/1")),
                 new(EmailPremiumTemplateCacheKeys.ServiceRequest, new ServiceRequestEmailTemplateViewModel(
                     SettingsUrl, "Broken monitor at desk 14", "Tomas Kazlauskas",

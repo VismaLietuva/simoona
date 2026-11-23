@@ -3,6 +3,8 @@ using Razor.Templating.Core;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 
 namespace Shrooms.EmailTemplates.Tests
 {
@@ -29,6 +31,14 @@ namespace Shrooms.EmailTemplates.Tests
                 EmailTemplateCacheKeys.KudosRejected,
                 new KudosRejectedEmailTemplateViewModel("https://x/settings", "Ada", 5, "Send", RenderedComment, "No", "https://x/kudos"))
                 .SetName("KudosRejected");
+            yield return new TestCaseData(
+                EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived,
+                new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel("https://x/settings", 5, "Loyalty", "Org", RenderedComment, "https://x/kudos"))
+                .SetName("LoyaltyKudosReceived");
+            yield return new TestCaseData(
+                EmailPremiumTemplateCacheKeys.LoyaltyKudosDecreased,
+                new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel("https://x/settings", 5, "Loyalty", "Org", RenderedComment, "https://x/kudos"))
+                .SetName("LoyaltyKudosDecreased");
         }
 
         [TestCaseSource(nameof(Templates))]
