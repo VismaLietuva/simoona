@@ -52,5 +52,17 @@ namespace Shrooms.EmailTemplates.Tests
                 Assert.That(html, Does.Not.Contain("onerror"));
             });
         }
+
+        [TestCaseSource(nameof(Templates))]
+        public async Task KeepsTheCommentFlushWithItsBox(string templateKey, BaseEmailTemplateViewModel model)
+        {
+            var html = await RazorTemplateEngine.RenderAsync(templateKey, model);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(html, Does.Contain("class=\"simoona-rich-text\""));
+                Assert.That(html, Does.Contain(".simoona-rich-text> :first-child"));
+            });
+        }
     }
 }
