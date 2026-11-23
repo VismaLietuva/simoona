@@ -46,16 +46,16 @@ namespace Shrooms.EmailTemplates.Seeds
                     },
                     SettingsUrl)),
                 new(EmailTemplateCacheKeys.KudosSent, new KudosSentEmailTemplateViewModel(
-                    SettingsUrl, "Rasa Petraitiene", 25.00m, "Thanks for covering the on-call shift.",
+                    SettingsUrl, "Rasa Petraitiene", 25.00m, "<p>Thanks for covering the <strong>on-call</strong> shift.</p>",
                     "https://simoona.example.com/kudos/profile/1")),
                 new(EmailTemplateCacheKeys.KudosReceived, new KudosReceivedDecreasedEmailTemplateViewModel(
-                    SettingsUrl, 25.00m, "Send a Smile", "Rasa Petraitiene", "Thanks for covering the on-call shift.",
+                    SettingsUrl, 25.00m, "Send a Smile", "Rasa Petraitiene", "<p>Thanks for covering the <strong>on-call</strong> shift.</p>",
                     "https://simoona.example.com/kudos/profile/1")),
                 new(EmailTemplateCacheKeys.KudosDecreased, new KudosReceivedDecreasedEmailTemplateViewModel(
-                    SettingsUrl, 15.00m, "Minus Kudos", "Rasa Petraitiene", "Correcting a duplicate award.",
+                    SettingsUrl, 15.00m, "Minus Kudos", "Rasa Petraitiene", "<p>Correcting a duplicate award.</p>",
                     "https://simoona.example.com/kudos/profile/1")),
                 new(EmailTemplateCacheKeys.KudosRejected, new KudosRejectedEmailTemplateViewModel(
-                    SettingsUrl, "Tomas Kazlauskas", 25.00m, "Send a Smile", "Thanks for covering the on-call shift.",
+                    SettingsUrl, "Tomas Kazlauskas", 25.00m, "Send a Smile", "<p>Thanks for covering the <strong>on-call</strong> shift.</p>",
                     "Kudos type does not match the described work.", "https://simoona.example.com/kudos/profile/1")),
                 new(EmailTemplateCacheKeys.UserConfirmation, new UserConfirmationEmailTemplateViewModel(
                     SettingsUrl, "https://simoona.example.com",
