@@ -15,6 +15,8 @@
     <mj-style>
       a { color: #006199; }
       .simoona-footer a { color: #737373; text-decoration: underline; }
+      .simoona-rich-text > :first-child { margin-top: 0; }
+      .simoona-rich-text > :last-child { margin-bottom: 0; }
     </mj-style>
   </mj-head>
 

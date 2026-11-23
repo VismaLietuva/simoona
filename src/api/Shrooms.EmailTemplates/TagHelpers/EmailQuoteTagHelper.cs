@@ -19,7 +19,7 @@ namespace Shrooms.EmailTemplates.TagHelpers
             output.Attributes.SetAttribute("width", "100%");
             output.Attributes.SetAttribute("style", "margin:12px 0;");
             output.Content.SetHtmlContent(
-                $"<tbody><tr><td style=\"background-color:{EmailDesign.Accent};" +
+                $"<tbody><tr><td class=\"simoona-rich-text\" style=\"background-color:{EmailDesign.Accent};" +
                 $"border-radius:{EmailDesign.RadiusMd};padding:12px 16px;" +
                 $"font-family:{EmailDesign.FontSans};font-size:{EmailDesign.SmallSize};" +
                 $"line-height:{EmailDesign.SmallLineHeight};color:{EmailDesign.AccentForeground};" +
