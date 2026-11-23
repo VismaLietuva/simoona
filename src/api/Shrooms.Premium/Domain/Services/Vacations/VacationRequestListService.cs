@@ -22,6 +22,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
         private readonly DbSet<VacationRequest> _requestDbSet;
         private readonly DbSet<VacationRequestEvent> _eventDbSet;
+        private readonly DbSet<ParentalEntitlement> _parentalDbSet;
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly DbSet<Organization> _organizationDbSet;
         private readonly IHolidayService _holidayService;
@@ -31,6 +32,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _holidayService = holidayService;
             _requestDbSet = uow.GetDbSet<VacationRequest>();
             _eventDbSet = uow.GetDbSet<VacationRequestEvent>();
+            _parentalDbSet = uow.GetDbSet<ParentalEntitlement>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationDbSet = uow.GetDbSet<Organization>();
         }
@@ -279,10 +281,17 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 ? await LoadLastEditsAsync(entities, organizationId)
                 : new Dictionary<int, VacationLastEditDto>();
 
+            var parentalByRequest = await LoadParentalBalancesAsync(entities, organizationId);
+
             for (var i = 0; i < entities.Count; i++)
             {
                 var entity = entities[i];
                 var row = rows[i];
+
+                if (parentalByRequest.TryGetValue(entity.Id, out var parental))
+                {
+                    row.Parental = parental;
+                }
 
                 if (!entitlementById.TryGetValue(entity.EmployeeId, out var entitlement))
                 {
@@ -388,6 +397,63 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             }
 
             return result;
+        }
+
+        private async Task<Dictionary<int, ParentalBalanceDto>> LoadParentalBalancesAsync(
+            IReadOnlyList<VacationRequest> entities,
+            int organizationId)
+        {
+            var parental = entities.Where(request => request.Type == VacationRequestType.Parental).ToList();
+            if (parental.Count == 0)
+            {
+                return new Dictionary<int, ParentalBalanceDto>();
+            }
+
+            var employeeIds = parental.Select(request => request.EmployeeId).Distinct().ToList();
+
+            var typeByEmployee = await _parentalDbSet
+                .AsNoTracking()
+                .Where(entitlement => entitlement.OrganizationId == organizationId
+                                      && employeeIds.Contains(entitlement.EmployeeId))
+                .ToDictionaryAsync(entitlement => entitlement.EmployeeId, entitlement => entitlement.Type);
+
+            // Each row is measured in its own period, so the bookings come from the
+            // span those periods cover. Hours are never booked; they need none.
+            var periods = parental
+                .Where(request => typeByEmployee.ContainsKey(request.EmployeeId))
+                .Select(request => (Rule: ParentalEntitlementRules.RuleFor(typeByEmployee[request.EmployeeId]), request.DateFrom))
+                .Where(item => item.Rule.Unit == ParentalUnit.Days)
+                .Select(item => ParentalEntitlementRules.PeriodContaining(item.Rule.Period, item.DateFrom))
+                .ToList();
+
+            var booked = new List<VacationRequest>();
+            if (periods.Count > 0)
+            {
+                var windowFrom = periods.Min(period => period.From);
+                var windowEnd = periods.Max(period => period.To).AddDays(1);
+
+                booked = await _requestDbSet
+                    .AsNoTracking()
+                    .Where(request => request.OrganizationId == organizationId
+                                      && employeeIds.Contains(request.EmployeeId)
+                                      && request.Type == VacationRequestType.Parental
+                                      && (request.Status == VacationRequestStatus.Pending
+                                          || request.Status == VacationRequestStatus.Approved)
+                                      && request.DateFrom >= windowFrom
+                                      && request.DateFrom < windowEnd)
+                    .ToListAsync();
+            }
+
+            var bookedByEmployee = booked
+                .GroupBy(request => request.EmployeeId)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            return parental.ToDictionary(
+                request => request.Id,
+                request => ParentalEntitlementRules.BalanceBefore(
+                    request,
+                    typeByEmployee.TryGetValue(request.EmployeeId, out var type) ? (ParentalEntitlementType?)type : null,
+                    bookedByEmployee.TryGetValue(request.EmployeeId, out var own) ? own : new List<VacationRequest>()));
         }
 
         private async Task<Dictionary<int, VacationLastEditDto>> LoadLastEditsAsync(
