@@ -46,22 +46,13 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 
             var today = await _organizationDbSet.TodayAsync(userOrg.OrganizationId);
             var rule = ParentalEntitlementRules.RuleFor(entitlement.Type);
-            var (from, to) = ParentalEntitlementRules.PeriodContaining(rule.Period, today);
-
-            var balance = new ParentalBalanceDto
-            {
-                Type = ParentalEntitlementRules.TypeToWire(entitlement.Type),
-                Unit = ParentalEntitlementRules.UnitToWire(rule.Unit),
-                Amount = rule.Amount,
-                Period = ParentalEntitlementRules.PeriodToWire(rule.Period),
-                PeriodFrom = VacationWireFormat.ToDay(from),
-                PeriodTo = VacationWireFormat.ToDay(to)
-            };
 
             if (rule.Unit == ParentalUnit.Hours)
             {
-                return balance;
+                return ParentalEntitlementRules.Balance(entitlement.Type, today, Array.Empty<VacationRequest>());
             }
+
+            var (from, to) = ParentalEntitlementRules.PeriodContaining(rule.Period, today);
 
             var requests = await _requestDbSet
                 .AsNoTracking()
@@ -72,11 +63,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                                   && request.DateFrom <= to)
                 .ToListAsync();
 
-            var booked = ParentalEntitlementRules.BookedDays(requests, rule, today);
-            balance.Booked = booked;
-            balance.Left = Math.Max(0, rule.Amount - booked);
-
-            return balance;
+            return ParentalEntitlementRules.Balance(entitlement.Type, today, requests);
         }
 
         public async Task<IList<ParentalEntitlementDto>> GetAllAsync(ParentalEntitlementListArgsDto args)

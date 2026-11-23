@@ -140,6 +140,98 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
             Assert.That(ParentalEntitlementRules.ParseType("fiveDaysPerWeek"), Is.Null);
         }
 
+        [Test]
+        public void Balance_IsEmptyWithoutAnEntitlement()
+        {
+            var balance = ParentalEntitlementRules.Balance(null, new DateTime(2026, 11, 23), new[] { ParentalDay(new DateTime(2026, 11, 2)) });
+
+            Assert.That(balance.Type, Is.Null);
+            Assert.That(balance.Amount, Is.Null);
+            Assert.That(balance.Booked, Is.Null);
+            Assert.That(balance.Left, Is.Null);
+        }
+
+        [Test]
+        public void Balance_CountsOnlyActiveDaysInThePeriod()
+        {
+            var balance = ParentalEntitlementRules.Balance(
+                ParentalEntitlementType.DayPerQuarter,
+                new DateTime(2026, 11, 23),
+                new[]
+                {
+                    ParentalDay(new DateTime(2026, 10, 9)),
+                    ParentalDay(new DateTime(2026, 9, 30)),
+                    ParentalDay(new DateTime(2026, 11, 20), VacationRequestStatus.Cancelled)
+                });
+
+            Assert.That(balance.Type, Is.EqualTo("dayPerQuarter"));
+            Assert.That(balance.Unit, Is.EqualTo("days"));
+            Assert.That(balance.Amount, Is.EqualTo(1));
+            Assert.That(balance.Period, Is.EqualTo("quarter"));
+            Assert.That(balance.PeriodFrom, Is.EqualTo("2026-10-01"));
+            Assert.That(balance.PeriodTo, Is.EqualTo("2026-12-31"));
+            Assert.That(balance.Booked, Is.EqualTo(1));
+            Assert.That(balance.Left, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Balance_NeverGoesBelowZeroLeft()
+        {
+            var balance = ParentalEntitlementRules.Balance(
+                ParentalEntitlementType.DayPerMonth,
+                new DateTime(2026, 11, 23),
+                new[] { ParentalDay(new DateTime(2026, 11, 2)), ParentalDay(new DateTime(2026, 11, 9)) });
+
+            Assert.That(balance.Booked, Is.EqualTo(2));
+            Assert.That(balance.Left, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Balance_HasNoBookedOrLeftForShorterHours()
+        {
+            var balance = ParentalEntitlementRules.Balance(
+                ParentalEntitlementType.Hours2PerWeek,
+                new DateTime(2026, 11, 23),
+                new[] { ParentalDay(new DateTime(2026, 11, 23)) });
+
+            Assert.That(balance.Unit, Is.EqualTo("hours"));
+            Assert.That(balance.Amount, Is.EqualTo(2));
+            Assert.That(balance.Period, Is.EqualTo("week"));
+            Assert.That(balance.Booked, Is.Null);
+            Assert.That(balance.Left, Is.Null);
+        }
+
+        [Test]
+        public void BalanceBefore_LeavesTheRequestItselfOut()
+        {
+            var request = ParentalDay(new DateTime(2026, 11, 10), VacationRequestStatus.Pending, id: 2);
+            var earlier = ParentalDay(new DateTime(2026, 11, 3), id: 1);
+
+            var balance = ParentalEntitlementRules.BalanceBefore(
+                request,
+                ParentalEntitlementType.TwoDaysPerMonth,
+                new[] { earlier, request });
+
+            Assert.That(balance.Booked, Is.EqualTo(1));
+            Assert.That(balance.Left, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void BalanceBefore_MeasuresThePeriodTheRequestStartsIn()
+        {
+            var request = ParentalDay(new DateTime(2026, 12, 1), VacationRequestStatus.Pending, id: 2);
+
+            var balance = ParentalEntitlementRules.BalanceBefore(
+                request,
+                ParentalEntitlementType.DayPerMonth,
+                new[] { ParentalDay(new DateTime(2026, 11, 30), id: 1), request });
+
+            Assert.That(balance.PeriodFrom, Is.EqualTo("2026-12-01"));
+            Assert.That(balance.PeriodTo, Is.EqualTo("2026-12-31"));
+            Assert.That(balance.Booked, Is.EqualTo(0));
+            Assert.That(balance.Left, Is.EqualTo(1));
+        }
+
         private static VacationValidationException Refused(
             ParentalEntitlementType? entitlement,
             DateTime day,
@@ -149,10 +241,11 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
                 ParentalEntitlementRules.EnsureAllowed(entitlement, day, 1, new List<VacationRequest>(ownRequests)));
         }
 
-        private static VacationRequest ParentalDay(DateTime day, VacationRequestStatus status = VacationRequestStatus.Approved)
+        private static VacationRequest ParentalDay(DateTime day, VacationRequestStatus status = VacationRequestStatus.Approved, int id = 0)
         {
             return new VacationRequest
             {
+                Id = id,
                 Type = VacationRequestType.Parental,
                 Status = status,
                 DateFrom = day,
