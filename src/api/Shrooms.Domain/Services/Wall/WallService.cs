@@ -35,6 +35,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IMapper _mapper;
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
+        private readonly ISharedEventSummaryService _sharedEventSummaryService;
 
         private readonly DbSet<Post> _postsDbSet;
         private readonly DbSet<Comment> _commentsDbSet;
@@ -45,11 +46,12 @@ namespace Shrooms.Domain.Services.Wall
         private readonly DbSet<PostWatcher> _postWatchers;
         private readonly DbSet<Event> _eventsDbSet;
 
-        public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService)
+        public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService, ISharedEventSummaryService sharedEventSummaryService)
         {
             _uow = uow;
             _mapper = mapper;
             _permissionService = permissionService;
+            _sharedEventSummaryService = sharedEventSummaryService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
@@ -282,6 +284,7 @@ namespace Shrooms.Domain.Services.Wall
             var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderatedWallIds, watchedPosts).ToList();
 
             await AssignEventIdsAsync(posts, userOrg);
+            await AssignSharedEventsAsync(posts, userOrg);
 
             return posts.FirstOrDefault();
         }
@@ -773,8 +776,35 @@ namespace Shrooms.Domain.Services.Wall
             var mappedPosts = MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderatedWallIds, watchedPosts).ToList();
 
             await AssignEventIdsAsync(mappedPosts, userOrg, cancellationToken);
+            await AssignSharedEventsAsync(mappedPosts, userOrg, cancellationToken);
 
             return mappedPosts;
+        }
+
+        // One query for every event shared on the page, so clients don't fetch each event's details per post.
+        private async Task AssignSharedEventsAsync(IList<PostDto> posts, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
+        {
+            var sharedEventIds = posts
+                .Select(post => Guid.TryParse(post.SharedEventId, out var eventId) ? eventId : (Guid?)null)
+                .Where(eventId => eventId.HasValue)
+                .Select(eventId => eventId.Value)
+                .Distinct()
+                .ToList();
+
+            if (sharedEventIds.Count == 0)
+            {
+                return;
+            }
+
+            var summaries = await _sharedEventSummaryService.GetSummariesAsync(sharedEventIds, userOrg, cancellationToken);
+
+            foreach (var post in posts)
+            {
+                if (Guid.TryParse(post.SharedEventId, out var eventId) && summaries.TryGetValue(eventId, out var summary))
+                {
+                    post.SharedEvent = summary;
+                }
+            }
         }
 
         // Event walls have no wall page, so posts from them carry the event id to

@@ -23,6 +23,9 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 
         public string SharedEventId { get; set; }
 
+        // Null when the post shares no event, the event is gone, or the viewer cannot see events.
+        public SharedEventSummaryDto SharedEvent { get; set; }
+
         public IEnumerable<CommentDto> Comments { get; set; }
 
         public IEnumerable<LikeDto> Likes { get; set; }

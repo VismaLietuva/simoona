@@ -20,6 +20,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<NewlyCreatedPostDto, WallPostViewModel>(MemberList.None);
             CreateMap<NewPostDto, WallPostViewModel>(MemberList.None);
             CreateMap<PostDto, WallPostViewModel>(MemberList.None);
+            CreateMap<SharedEventSummaryDto, SharedEventSummaryViewModel>(MemberList.None);
+            CreateMap<SharedEventAttendeeDto, SharedEventAttendeeViewModel>(MemberList.None);
         }
 
         private void CreateViewModelToDtoMappings()
