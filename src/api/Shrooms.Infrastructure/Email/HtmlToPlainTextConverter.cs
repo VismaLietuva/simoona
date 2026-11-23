@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Shrooms.Infrastructure.Email
 {
     // Derives the text/plain alternative from the rendered HTML. Targeted at our own generated
-    // markup rather than arbitrary HTML - the templates and Markdig output are the only input.
+    // markup rather than arbitrary HTML - the templates are the only input.
     public static class HtmlToPlainTextConverter
     {
         // Block ends become this first, so the markup's own newlines and indentation can collapse to

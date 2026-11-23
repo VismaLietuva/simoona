@@ -13,7 +13,6 @@ using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
-using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.ExcelGenerator;
 
 namespace Shrooms.Domain.Services.Kudos
@@ -24,15 +23,13 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly DbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilderFactory _excelBuilderFactory;
         private readonly ISystemClock _systemClock;
-        private readonly IMarkdownConverter _markdownConverter;
 
-        public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory, ISystemClock systemClock, IMarkdownConverter markdownConverter)
+        public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory, ISystemClock systemClock)
         {
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
             _excelBuilderFactory = excelBuilderFactory;
             _systemClock = systemClock;
-            _markdownConverter = markdownConverter;
         }
 
         public async Task<FileExportDto> ExportToExcelAsync(KudosLogsFilterDto filter)
@@ -52,10 +49,6 @@ namespace Shrooms.Domain.Services.Kudos
                 string.Concat(filter.SortBy, " ", filter.SortOrder, ", Id ", filter.SortOrder));
 
             var kudos = await sortedLogs.ToListAsync();
-            foreach (var log in kudos)
-            {
-                log.Comment = ToPlainText(log.Comment);
-            }
 
             var excelBuilder = _excelBuilderFactory.GetBuilder();
 
@@ -79,11 +72,6 @@ namespace Shrooms.Domain.Services.Kudos
                 "kudos",
                 ".xlsx");
             return new FileExportDto(excelBuilder.Build(), fileName);
-        }
-
-        private string ToPlainText(string markdown)
-        {
-            return HtmlToPlainTextConverter.Convert(_markdownConverter.ConvertToHtml(markdown)).Trim();
         }
 
         private static Expression<Func<MainKudosLogDto, IExcelRow>> MapKudosLogToExcelCell()

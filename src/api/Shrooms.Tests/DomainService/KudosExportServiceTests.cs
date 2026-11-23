@@ -12,7 +12,6 @@ using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Tests.Extensions;
@@ -44,8 +43,7 @@ namespace Shrooms.Tests.DomainService
             _kudosExportService = new KudosExportService(
                 _uow,
                 _excelBuilder,
-                Substitute.For<ISystemClock>(),
-                new MarkdigMarkdownConverter());
+                Substitute.For<ISystemClock>());
         }
 
         [Test]
@@ -159,40 +157,6 @@ namespace Shrooms.Tests.DomainService
 
                 excelReader.Close();
             }
-        }
-
-        [Test]
-        public async Task Kudos_Export_Writes_Comment_As_Plain_Text()
-        {
-            _kudosDbSet.SetDbSetDataForAsync(new List<KudosLog>
-            {
-                new()
-                {
-                    Status = KudosStatus.Approved,
-                    Id = 1,
-                    KudosTypeName = "Send",
-                    EmployeeId = "testUserId",
-                    Employee = new ApplicationUser { Id = "testUserId", FirstName = "name", LastName = "surname" },
-                    OrganizationId = 2,
-                    CreatedBy = "testUserId",
-                    Comments = "**Great** job"
-                }
-            });
-            var filter = new KudosLogsFilterDto
-            {
-                OrganizationId = 2,
-                Status = BusinessLayerConstants.KudosStatusAllFilter,
-                SortBy = "Created",
-                SortOrder = "desc"
-            };
-
-            var export = await _kudosExportService.ExportToExcelAsync(filter);
-
-            using var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(export.Content));
-            var excelData = excelReader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-            var commentColumn = excelData.Tables[0].Columns.IndexOf(Resources.Models.Kudos.Kudos.ExportColumnComment);
-
-            Assert.That(excelData.Tables[0].Rows[0].ItemArray[commentColumn], Is.EqualTo("Great job"));
         }
 
         private IQueryable<KudosLog> MockKudos()
