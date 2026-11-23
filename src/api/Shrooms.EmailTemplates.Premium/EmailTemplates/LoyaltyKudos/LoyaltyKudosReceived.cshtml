@@ -1,4 +1,5 @@
 ﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.LoyaltyKudosReceivedDecreasedEmailTemplateViewModel
+@using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
     var amount = Math.Round(Model.KudosAmount, MidpointRounding.AwayFromZero).ToString("0", System.Globalization.CultureInfo.InvariantCulture);
@@ -11,6 +12,6 @@
         <span style="color:@Shrooms.EmailTemplates.EmailDesign.Secondary;font-weight:600;">+@amount</span>
         for "@Model.KudosType", from <strong>@Model.KudosSenderName</strong>.
     </p>
-    <email-quote>@Model.Comment</email-quote>
+    <email-quote>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Comment))</email-quote>
     <email-button href="@Model.KudosProfileUrl">View your kudos</email-button>
 </email-card>

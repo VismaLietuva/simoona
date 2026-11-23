@@ -15,6 +15,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
     public class KudosPremiumNotificationService : NotificationServiceBase, IKudosPremiumNotificationService
     {
         private readonly IApplicationSettings _appSettings;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<Organization> _organizationsDbSet;
         private readonly DbSet<ApplicationUser> _employeeDbSet;
@@ -23,11 +24,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             IUnitOfWork2 uow,
             IMailingService mailingService,
             IApplicationSettings appSettings,
-            IMailTemplate mailTemplate)
+            IMailTemplate mailTemplate,
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _employeeDbSet = uow.GetDbSet<ApplicationUser>();
@@ -44,7 +47,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 organization.Name,
-                kudosLog.Comments,
+                await _emailMarkdownRenderer.RenderAsync(kudosLog.Comments, organization.Id, organization.ShortName),
                 kudosProfileUrl);
 
             await SendSingleEmailAsync(
