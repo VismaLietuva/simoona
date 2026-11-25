@@ -227,6 +227,17 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request does not exist");
             }
 
+            // The same people who may read the request and its comments.
+            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDto, AdministrationPermissions.ServiceRequest);
+            var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDto.UserId;
+
+            if (!isServiceRequestAdmin &&
+                !isServiceRequestCreator &&
+                !(await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDto.UserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var timestamp = DateTime.UtcNow;
 
             var serviceRequestComment = new ServiceRequestComment

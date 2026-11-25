@@ -78,18 +78,27 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
         [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id, string includeProperties = "", CancellationToken cancellationToken = default)
         {
             var model = await _serviceRequestRepository
                 .Get(f => f.Id == id, includeProperties: IncludableOnly(includeProperties))
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (model == null)
+            var access = model == null
+                ? RequestAccess.None
+                : await GetAccessAsync(model.EmployeeId, model.CategoryName, cancellationToken);
+
+            // A request the caller may not see answers the same as one that does not exist.
+            if (access == RequestAccess.None)
             {
-                return BadRequest(Resources.Common.NotFound);
+                return NotFound();
             }
 
-            return Ok(_mapper.Map<ServiceRequest, ServiceRequestViewModel>(model));
+            var viewModel = _mapper.Map<ServiceRequest, ServiceRequestViewModel>(model);
+            viewModel.IsCloseable = access == RequestAccess.Assignee;
+
+            return Ok(viewModel);
         }
 
         [HttpGet]
@@ -126,10 +135,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             var id = User.Identity.GetUserId();
-            var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync(cancellationToken))
-                    .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
-                    .Select(x => x.Name)
-                    .ToList();
+            var assigneeCategoriesNames = await GetAssignedCategoryNamesAsync(id, cancellationToken);
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
                 (u.EmployeeId == id &&
@@ -203,6 +209,44 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return string.Join(", ", includable);
         }
 
+        private enum RequestAccess
+        {
+            None,
+            Owner,
+            Assignee,
+            Admin
+        }
+
+        // The rule GetPagedFiltered applies to the list: admins see every request, anyone else
+        // the ones they created and the ones in categories they are assigned to. Assignees are
+        // also the ones who may close a request.
+        private async Task<RequestAccess> GetAccessAsync(string ownerId, string categoryName, CancellationToken cancellationToken)
+        {
+            var userAndOrganization = GetUserAndOrganization();
+
+            if (await _permissionService.UserHasPermissionAsync(userAndOrganization, AdministrationPermissions.ServiceRequest, cancellationToken))
+            {
+                return RequestAccess.Admin;
+            }
+
+            var assignedCategoryNames = await GetAssignedCategoryNamesAsync(userAndOrganization.UserId, cancellationToken);
+
+            if (assignedCategoryNames.Contains(categoryName))
+            {
+                return RequestAccess.Assignee;
+            }
+
+            return ownerId == userAndOrganization.UserId ? RequestAccess.Owner : RequestAccess.None;
+        }
+
+        private async Task<List<string>> GetAssignedCategoryNamesAsync(string userId, CancellationToken cancellationToken)
+        {
+            return (await _serviceRequestService.GetCategoriesAsync(cancellationToken))
+                .Where(category => category.Assignees.Any(assignee => assignee.Id == userId))
+                .Select(category => category.Name)
+                .ToList();
+        }
+
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
         public async Task<List<ServiceRequestCategory>> GetCategories()
@@ -244,9 +288,20 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IEnumerable<ServiceRequestCommentViewModel>> GetComments(int requestId)
+        public async Task<IEnumerable<ServiceRequestCommentViewModel>> GetComments(int requestId, CancellationToken cancellationToken = default)
         {
-            var model = await _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId).ToListAsync();
+            var request = await _serviceRequestRepository
+                .Get(r => r.Id == requestId)
+                .Select(r => new { r.EmployeeId, r.CategoryName })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            // Same answer as for a request that does not exist.
+            if (request == null || await GetAccessAsync(request.EmployeeId, request.CategoryName, cancellationToken) == RequestAccess.None)
+            {
+                return Enumerable.Empty<ServiceRequestCommentViewModel>();
+            }
+
+            var model = await _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId).ToListAsync(cancellationToken);
             return _mapper.Map<IEnumerable<ServiceRequestComment>, IEnumerable<ServiceRequestCommentViewModel>>(model);
         }
 
@@ -269,6 +324,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbidden();
             }
 
             return Ok();

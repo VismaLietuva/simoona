@@ -88,6 +88,25 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                     return new TestDbAsyncEnumerable<ServiceRequest>(_requests.Where(filter.Compile()));
                 });
 
+            var comments = new List<ServiceRequestComment>
+            {
+                new ServiceRequestComment { Id = 10, ServiceRequestId = 1, Content = "On it", Employee = new ApplicationUser { FirstName = "Bob" } }
+            };
+            var commentRepository = Substitute.For<IRepository<ServiceRequestComment>>();
+            unitOfWork.GetRepository<ServiceRequestComment>().Returns(commentRepository);
+            commentRepository
+                .Get(
+                    Arg.Any<Expression<Func<ServiceRequestComment, bool>>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<int?>())
+                .Returns(call =>
+                {
+                    var filter = call.Arg<Expression<Func<ServiceRequestComment, bool>>>();
+                    return new TestDbAsyncEnumerable<ServiceRequestComment>(comments.Where(filter.Compile()));
+                });
+
             _sut = new ServiceRequestsController(
                 ModelMapper.Create(),
                 unitOfWork,
@@ -321,6 +340,58 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             ClassicAssert.AreEqual("Priority, Status, Employee", _loadedIncludes);
         }
 
+        // Opening a request by id follows the list's rule: admins see every request,
+        // anyone else their own and those in categories they are assigned to. The
+        // edit page relies on IsCloseable to let an assignee in and change the status.
+        [TestCase(Caller.Owner, false)]
+        [TestCase(Caller.Assignee, true)]
+        [TestCase(Caller.Admin, false)]
+        public async Task Get_CallerMaySeeTheRequest_ReturnsItWithIsCloseable(Caller caller, bool isCloseable)
+        {
+            SignInAs(caller);
+
+            var request = (ServiceRequestViewModel)((OkObjectResult)await _sut.Get(1)).Value;
+
+            ClassicAssert.AreEqual(1, request.Id);
+            ClassicAssert.AreEqual(isCloseable, request.IsCloseable);
+        }
+
+        // Same answer as a request that does not exist, so ids reveal nothing.
+        [Test]
+        public async Task Get_CallerMayNotSeeTheRequest_AnswersNotFound()
+        {
+            SignInAs(Caller.Stranger);
+
+            ClassicAssert.IsInstanceOf<NotFoundResult>(await _sut.Get(1));
+        }
+
+        // The edit page shows its not-found page on 404.
+        [Test]
+        public async Task Get_RequestDoesNotExist_AnswersNotFound()
+        {
+            ClassicAssert.IsInstanceOf<NotFoundResult>(await _sut.Get(99));
+        }
+
+        [TestCase(Caller.Owner)]
+        [TestCase(Caller.Assignee)]
+        [TestCase(Caller.Admin)]
+        public async Task GetComments_CallerMaySeeTheRequest_ReturnsComments(Caller caller)
+        {
+            SignInAs(caller);
+
+            var comments = (await _sut.GetComments(1)).ToList();
+
+            ClassicAssert.AreEqual(new[] { "On it" }, comments.Select(c => c.Content).ToArray());
+        }
+
+        [Test]
+        public async Task GetComments_CallerMayNotSeeTheRequest_ReturnsNone()
+        {
+            SignInAs(Caller.Stranger);
+
+            ClassicAssert.IsEmpty(await _sut.GetComments(1));
+        }
+
         // A closed browser tab cancels the request; the query stops with it.
         [Test]
         public void Get_RequestAborted_StopsTheQuery()
@@ -511,6 +582,32 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                     Assignees = new[] { new ApplicationUserMinimalDto { Id = CurrentUserId } }
                 })
                 .ToList());
+        }
+
+        public enum Caller
+        {
+            Owner,
+            Assignee,
+            Admin,
+            Stranger
+        }
+
+        // Request 1 is Ann's, in the "Other" category. Admin is the fixture default.
+        private void SignInAs(Caller caller)
+        {
+            switch (caller)
+            {
+                case Caller.Owner:
+                    SignInAsRegularUser();
+                    _requests[0].EmployeeId = CurrentUserId;
+                    break;
+                case Caller.Assignee:
+                    SignInAsRegularUser("Other");
+                    break;
+                case Caller.Stranger:
+                    SignInAsRegularUser("Hardware");
+                    break;
+            }
         }
 
         private void SeedRequestsOwnedByCurrentUser()
