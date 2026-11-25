@@ -34,6 +34,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         private const int OrganizationId = 1;
         private const string EditedRoleId = "edited-role";
         private const string DisabledModulePermission = "LOTTERY_BASIC";
+        private const string MemberId = "member";
 
         private static readonly string[] EditedRolePermissions =
         {
@@ -46,6 +47,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         };
 
         private ShroomsDbContext _dbContext;
+        private ShroomsUserManager _userManager;
         private RolesController _rolesController;
 
         [SetUp]
@@ -83,6 +85,9 @@ namespace Shrooms.Tests.Controllers.WebApi
                 OrganizationId = OrganizationId,
                 Permissions = permissions.Where(permission => EditedRolePermissions.Contains(permission.Name)).ToList()
             });
+            var member = new ApplicationUser { Id = MemberId, UserName = MemberId, FirstName = "Role", LastName = "Member", OrganizationId = OrganizationId };
+            _dbContext.Users.Add(member);
+            _dbContext.UserRoles.Add(new IdentityUserRole<string> { UserId = MemberId, RoleId = EditedRoleId });
             await _dbContext.SaveChangesAsync(false);
             _dbContext.ChangeTracker.Clear();
 
@@ -92,8 +97,11 @@ namespace Shrooms.Tests.Controllers.WebApi
             var unitOfWork2 = new UnitOfWork2(_dbContext);
             var permissionService = new PermissionService(unitOfWork2, permissionsCache);
 
-            var userManager = MockIdentity.MockUserManager(MockIdentity.MockShroomsUserStore(_dbContext), _dbContext);
-            userManager.GetUsersInRoleAsync(Arg.Any<string>()).Returns(new List<ApplicationUser>());
+            _userManager = MockIdentity.MockUserManager(MockIdentity.MockShroomsUserStore(_dbContext), _dbContext);
+            _userManager.GetUsersInRoleAsync("Edited").Returns(new List<ApplicationUser> { member });
+            _userManager.GetUsersInRoleAsync(Arg.Is<string>(name => name != "Edited")).Returns(new List<ApplicationUser>());
+            _userManager.AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>()).Returns(IdentityResult.Success);
+            _userManager.RemoveFromRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>()).Returns(IdentityResult.Success);
             var roleManager = new ShroomsRoleManager(
                 new RoleStore<ApplicationRole>(_dbContext),
                 Array.Empty<IRoleValidator<ApplicationRole>>(),
@@ -107,7 +115,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 permissionService,
                 permissionsCache,
                 new RoleService(unitOfWork2, permissionService),
-                userManager,
+                _userManager,
                 roleManager);
             _rolesController.SetUpControllerForTesting();
         }
@@ -126,6 +134,8 @@ namespace Shrooms.Tests.Controllers.WebApi
             await _rolesController.Put(ToRequest(role));
 
             Assert.That(await GetRolePermissionNamesAsync(EditedRoleId), Is.EquivalentTo(EditedRolePermissions));
+            await _userManager.DidNotReceiveWithAnyArgs().AddToRoleAsync(default, default);
+            await _userManager.DidNotReceiveWithAnyArgs().RemoveFromRoleAsync(default, default);
         }
 
         [Test]
@@ -155,6 +165,23 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
+        public async Task Put_WithOnlyIdAndName_KeepsThePermissionsAndTheMembers()
+        {
+            await _rolesController.Put(new RoleMiniViewModel { Id = EditedRoleId, Name = "Edited" });
+
+            Assert.That(await GetRolePermissionNamesAsync(EditedRoleId), Is.EquivalentTo(EditedRolePermissions));
+            await _userManager.DidNotReceiveWithAnyArgs().RemoveFromRoleAsync(default, default);
+        }
+
+        [Test]
+        public async Task Put_WithEmptyUsers_RemovesTheMembers()
+        {
+            await _rolesController.Put(new RoleMiniViewModel { Id = EditedRoleId, Name = "Edited", Users = new List<ApplicationUserViewModel>() });
+
+            await _userManager.Received(1).RemoveFromRoleAsync(Arg.Is<ApplicationUser>(user => user.Id == MemberId), "Edited");
+        }
+
+        [Test]
         public async Task Post_GroupSetToAdmin_CreatesTheRoleWithTheWholeGroupOnly()
         {
             var result = await _rolesController.Post(new RoleMiniViewModel
@@ -176,13 +203,13 @@ namespace Shrooms.Tests.Controllers.WebApi
 
         private static RoleMiniViewModel ToRequest(RoleDetailsViewModel role)
         {
-            // The role editor sends back what Get returned, every group included.
+            // The role editor sends back what Get returned, every group and member included.
             return new RoleMiniViewModel
             {
                 Id = role.Id,
                 Name = role.Name,
                 Permissions = role.Permissions.Select(group => new PermissionGroupViewModel { Name = group.Name, ActiveScope = group.ActiveScope }).ToList(),
-                Users = new List<ApplicationUserViewModel>()
+                Users = role.Users.Select(user => new ApplicationUserViewModel { Id = user.Id }).ToList()
             };
         }
 

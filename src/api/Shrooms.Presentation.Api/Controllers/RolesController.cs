@@ -241,6 +241,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             // A request without permissions leaves them as they are, so a client that only renames a role
             // or changes its members cannot take every permission off it by leaving the field out.
+            // AssignUsersToRole treats a missing users list the same way.
             if (roleViewModel.Permissions != null)
             {
                 var currentPermissionIds = role.Permissions?.Select(p => p.Id).ToList() ?? new List<int>();
@@ -258,6 +259,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task AssignUsersToRole(RoleMiniViewModel roleViewModel)
         {
+            // Like permissions: a request without users leaves the members as they are. Mapping a missing list
+            // gives an empty one, which would take every member off the role.
+            if (roleViewModel.Users == null)
+            {
+                return;
+            }
+
             var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
             var existingUsersInRole = await _userManager.GetUsersInRoleAsync(roleViewModel.Name);
             var existingUserIds = existingUsersInRole.Select(u => u.Id).ToHashSet();
