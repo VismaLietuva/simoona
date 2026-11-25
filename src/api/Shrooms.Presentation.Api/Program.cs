@@ -318,13 +318,7 @@ builder.Services.AddHangfireServer();
 
 // MVC + API controllers
 builder.Services.AddControllers(options => options.Filters.Add<Shrooms.Presentation.Api.Filters.RequestAbortedExceptionFilter>())
-    .AddNewtonsoftJson(options =>
-    {
-        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        options.SerializerSettings.Converters.Add(new Shrooms.Presentation.Api.Helpers.EmptyToNullConverter());
-        options.SerializerSettings.Converters.Add(new Shrooms.Presentation.Api.Helpers.FormattedDecimalConverter());
-    });
+    .AddNewtonsoftJson(options => Shrooms.Presentation.Api.Helpers.ApiJsonSettings.Apply(options.SerializerSettings));
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
