@@ -129,7 +129,7 @@ namespace Shrooms.Domain.Helpers
 
         private static int RawLength(LeafBlock leaf)
         {
-            return leaf is CodeBlock or HtmlBlock ? Graphemes(leaf.Lines.ToString()) : 0;
+            return leaf is CodeBlock ? Graphemes(leaf.Lines.ToString()) : 0;
         }
 
         private static int Graphemes(string text)
