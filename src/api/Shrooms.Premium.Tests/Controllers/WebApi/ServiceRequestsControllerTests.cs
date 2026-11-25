@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -48,17 +49,19 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         [SetUp]
         public void TestInitializers()
         {
+            _loadedIncludes = null;
+
             var unitOfWork = Substitute.For<IUnitOfWork>();
             _serviceRequestRepository = Substitute.For<IRepository<ServiceRequest>>();
             unitOfWork.GetRepository<ServiceRequest>().Returns(_serviceRequestRepository);
 
             _permissionService = Substitute.For<IPermissionService>();
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(true);
 
             _serviceRequestService = Substitute.For<IServiceRequestService>();
-            _serviceRequestService.GetCategoriesAsync().Returns(new List<ServiceRequestCategoryDto>());
+            _serviceRequestService.GetCategoriesAsync(Arg.Any<CancellationToken>()).Returns(new List<ServiceRequestCategoryDto>());
 
             _requests = new List<ServiceRequest>
             {
@@ -235,11 +238,11 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         // stamp in the list.
 
         [Test]
-        public void Get_RequesterHasIdentityData_ResponseCarriesOnlyDisplayFields()
+        public async Task Get_RequesterHasIdentityData_ResponseCarriesOnlyDisplayFields()
         {
             _requests = new List<ServiceRequest> { RequestWithFullyLoadedRelations() };
 
-            var result = (OkObjectResult)_sut.Get(1, "Employee, KudosShopItem");
+            var result = (OkObjectResult)await _sut.Get(1, "Employee, KudosShopItem");
             var json = ToApiJson(result.Value);
 
             AssertNoIdentityFields(json);
@@ -285,6 +288,15 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             ClassicAssert.IsEmpty(identityTypes, string.Join(", ", identityTypes.Select(t => t.Name)));
         }
 
+        // The walk above must see users behind any member shape a view model can have.
+        [TestCase(typeof(ArrayOfUsers))]
+        [TestCase(typeof(ListOfUsers))]
+        [TestCase(typeof(NestedUser))]
+        public void ReachableTypes_UserBehindMember_IsFound(Type probe)
+        {
+            CollectionAssert.Contains(ReachableTypes(probe), typeof(ApplicationUser));
+        }
+
         // The include list is the client's, and the repository loads any path on
         // the entity. Only what the response shows may be loaded; a nested user
         // graph would pull a manager's whole team or everyone in a room.
@@ -302,11 +314,47 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         // What the edit page asks for. ServiceRequestCategory is not a navigation
         // on the entity, so the repository dropped it before this list existed too.
         [Test]
-        public void Get_FrontendIncludes_LoadsTheResponseNavigations()
+        public async Task Get_FrontendIncludes_LoadsTheResponseNavigations()
         {
-            _sut.Get(1, "Priority, Status, Employee, ServiceRequestCategory, Employee.Manager.ManagedUsers");
+            await _sut.Get(1, "Priority, Status, Employee, ServiceRequestCategory, Employee.Manager.ManagedUsers");
 
             ClassicAssert.AreEqual("Priority, Status, Employee", _loadedIncludes);
+        }
+
+        // A closed browser tab cancels the request; the query stops with it.
+        [Test]
+        public void Get_RequestAborted_StopsTheQuery()
+        {
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _sut.Get(1, cancellationToken: new CancellationToken(true)));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void GetPagedFiltered_RequestAborted_StopsTheQuery(bool isAdmin)
+        {
+            if (!isAdmin)
+            {
+                SignInAsRegularUser("Hardware");
+            }
+
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _sut.GetPagedFiltered(cancellationToken: new CancellationToken(true)));
+        }
+
+        [Test]
+        public async Task GetPagedFiltered_RegularUser_PassesTheTokenToItsLookups()
+        {
+            SignInAsRegularUser("Hardware");
+            using var source = new CancellationTokenSource();
+
+            await _sut.GetPagedFiltered(cancellationToken: source.Token);
+
+            await _permissionService.Received(1)
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.ServiceRequest, source.Token);
+            await _serviceRequestService.Received(1).GetCategoriesAsync(source.Token);
         }
 
         private static readonly string[] IdentityFieldNames =
@@ -414,7 +462,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         }
 
         // Types a serializer can reach from the root through public properties,
-        // looking through collections and nullables.
+        // looking through arrays, collections and nullables.
         private static HashSet<Type> ReachableTypes(Type root)
         {
             var seen = new HashSet<Type>();
@@ -423,6 +471,11 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             while (pending.Count > 0)
             {
                 var type = pending.Pop();
+                if (type.HasElementType)
+                {
+                    pending.Push(type.GetElementType());
+                }
+
                 if (type.IsGenericType)
                 {
                     foreach (var argument in type.GetGenericArguments())
@@ -448,10 +501,10 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         private void SignInAsRegularUser(params string[] assigneeCategories)
         {
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(false);
 
-            _serviceRequestService.GetCategoriesAsync().Returns(assigneeCategories
+            _serviceRequestService.GetCategoriesAsync(Arg.Any<CancellationToken>()).Returns(assigneeCategories
                 .Select(name => new ServiceRequestCategoryDto
                 {
                     Name = name,
@@ -487,6 +540,21 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             var page = await _sut.GetPagedFiltered(search: search);
             return page.PagedList.Select(request => request.Title).ToList();
+        }
+
+        private class ArrayOfUsers
+        {
+            public ApplicationUser[] Watchers { get; set; }
+        }
+
+        private class ListOfUsers
+        {
+            public List<ApplicationUser> Watchers { get; set; }
+        }
+
+        private class NestedUser
+        {
+            public ServiceRequestComment LastComment { get; set; }
         }
     }
 }

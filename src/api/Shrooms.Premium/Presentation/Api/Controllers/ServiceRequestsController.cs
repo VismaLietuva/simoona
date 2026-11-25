@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -77,9 +78,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
         [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
-        public IActionResult Get(int id, string includeProperties = "")
+        public async Task<IActionResult> Get(int id, string includeProperties = "", CancellationToken cancellationToken = default)
         {
-            var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: IncludableOnly(includeProperties)).FirstOrDefault();
+            var model = await _serviceRequestRepository
+                .Get(f => f.Id == id, includeProperties: IncludableOnly(includeProperties))
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (model == null)
             {
@@ -91,7 +94,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<PagedViewModel<ServiceRequestViewModel>> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "")
+        public async Task<PagedViewModel<ServiceRequestViewModel>> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "", CancellationToken cancellationToken = default)
         {
             search ??= string.Empty;
             priority ??= string.Empty;
@@ -108,7 +111,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 .ToArray();
             var hasSearch = searchWords.Length > 0;
 
-            if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest))
+            if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest, cancellationToken))
             {
                 Expression<Func<ServiceRequest, bool>> filter = u =>
                     (!hasSearch || searchWords.Count(word =>
@@ -119,11 +122,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     u.Status.Title.Contains(status) &&
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory);
 
-                return await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filter);
+                return await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filter, cancellationToken);
             }
 
             var id = User.Identity.GetUserId();
-            var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync())
+            var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync(cancellationToken))
                     .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
                     .Select(x => x.Name)
                     .ToList();
@@ -146,7 +149,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory) &&
                     assigneeCategoriesNames.Contains(u.CategoryName));
 
-            var serviceRequestPage = await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
+            var serviceRequestPage = await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser, cancellationToken);
 
             foreach (var serviceRequest in serviceRequestPage.PagedList)
             {
@@ -159,13 +162,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return serviceRequestPage;
         }
 
-        private async Task<PagedViewModel<ServiceRequestViewModel>> GetFilteredPagedAsync(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null)
+        private async Task<PagedViewModel<ServiceRequestViewModel>> GetFilteredPagedAsync(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null, CancellationToken cancellationToken = default)
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
             var models = await _serviceRequestRepository
                 .Get(includeProperties: IncludableOnly(includeProperties), filter: filter, orderBy: sortQuery ?? "Created")
-                .ToPagedListAsync(page, pageSize);
+                .ToPagedListAsync(page, pageSize, null, cancellationToken);
 
             var pagedModel = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 

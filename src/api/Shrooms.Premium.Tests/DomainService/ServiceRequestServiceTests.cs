@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -58,6 +59,17 @@ namespace Shrooms.Premium.Tests.DomainService
             _permissionService = Substitute.For<IPermissionService>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
             _serviceRequestService = new ServiceRequestService(_uow, _permissionService, asyncRunner);
+        }
+
+        // The service request list looks these up on every load.
+        [Test]
+        public void GetCategoriesAsync_RequestAborted_StopsTheQuery()
+        {
+            MockServiceRequestCategories();
+
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _serviceRequestService.GetCategoriesAsync(new CancellationToken(true)));
         }
 
         [Test]
