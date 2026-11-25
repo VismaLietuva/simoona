@@ -4,6 +4,7 @@ using System.Linq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Vacations;
+using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 using Resx = Shrooms.Resources.Models.Vacations.Vacations;
 
 namespace Shrooms.Premium.Domain.Services.Vacations
@@ -92,6 +93,59 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                                   && request.DateFrom.Date >= from
                                   && request.DateFrom.Date <= to)
                 .Sum(request => request.WorkingDays);
+        }
+
+        /// <summary>
+        /// The balance for the period containing <paramref name="day"/>. A null
+        /// entitlement is an empty balance; hours are taken as shorter working
+        /// time rather than booked, so they carry no booked or left figure.
+        /// </summary>
+        public static ParentalBalanceDto Balance(
+            ParentalEntitlementType? entitlement,
+            DateTime day,
+            IEnumerable<VacationRequest> ownRequests)
+        {
+            if (entitlement == null)
+            {
+                return new ParentalBalanceDto();
+            }
+
+            var rule = RuleFor(entitlement.Value);
+            var (from, to) = PeriodContaining(rule.Period, day);
+
+            var balance = new ParentalBalanceDto
+            {
+                Type = TypeToWire(entitlement.Value),
+                Unit = UnitToWire(rule.Unit),
+                Amount = rule.Amount,
+                Period = PeriodToWire(rule.Period),
+                PeriodFrom = VacationWireFormat.ToDay(from),
+                PeriodTo = VacationWireFormat.ToDay(to)
+            };
+
+            if (rule.Unit == ParentalUnit.Hours)
+            {
+                return balance;
+            }
+
+            var booked = BookedDays(ownRequests, rule, day);
+            balance.Booked = booked;
+            balance.Left = Math.Max(0, rule.Amount - booked);
+
+            return balance;
+        }
+
+        /// <summary>
+        /// The balance an approver weighs a parental request against: the period
+        /// it starts in, with the request itself left out — the same "before the
+        /// decision" view RemainingDays gives annual leave.
+        /// </summary>
+        public static ParentalBalanceDto BalanceBefore(
+            VacationRequest request,
+            ParentalEntitlementType? entitlement,
+            IEnumerable<VacationRequest> ownRequests)
+        {
+            return Balance(entitlement, request.DateFrom, ownRequests.Where(other => other.Id != request.Id));
         }
 
         public static void EnsureAllowed(
