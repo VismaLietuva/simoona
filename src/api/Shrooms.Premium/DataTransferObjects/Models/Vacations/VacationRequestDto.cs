@@ -74,6 +74,14 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Vacations
 
         public VacationShortfallDto BalanceShortfall { get; set; }
 
+        /// <summary>
+        /// Parental rows only (null otherwise): the employee's parental time off
+        /// in the period the request starts in, with this request left out of
+        /// Booked and Left, like RemainingDays. A null Type means no entitlement
+        /// is on record, so the annual figures above say nothing about it.
+        /// </summary>
+        public ParentalBalanceDto Parental { get; set; }
+
         public IList<VacationOverlapDto> Overlaps { get; set; }
 
         public VacationLastEditDto LastEdit { get; set; }

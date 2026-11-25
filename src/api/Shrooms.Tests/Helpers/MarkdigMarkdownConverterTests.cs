@@ -307,7 +307,6 @@ namespace Shrooms.Tests.Helpers
         [TestCase("see https://x.y.", "<p>see <a href=\"https://x.y\">https://x.y</a>.</p>\n")]
         [TestCase("(https://x.y)", "<p>(<a href=\"https://x.y\">https://x.y</a>)</p>\n")]
         [TestCase("[https://a.b](https://c.d)", "<p><a href=\"https://c.d\">https://a.b</a></p>\n")]
-        [TestCase("<a href=\"https://x.y\">https://x.y</a>", "<p><a href=\"https://x.y\">https://x.y</a></p>\n")]
         [TestCase("`https://a.b`", "<p><code>https://a.b</code></p>\n")]
         [TestCase("javascript:alert(1)", "<p>javascript:alert(1)</p>\n")]
         [TestCase("https://x.y/\"onmouseover=\"alert(1)", "<p><a href=\"https://x.y/%22onmouseover=%22alert(1)\">https://x.y/&quot;onmouseover=&quot;alert(1)</a></p>\n")]
@@ -422,20 +421,6 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_MaxTextLength_CutBeforeAnHtmlBlock_DropsIt()
-        {
-            Assert.That(Cut("intro\n\n<div>" + new string('x', 200) + "</div>", 10), Is.EqualTo("<p>intro...</p>\n"));
-        }
-
-        [Test]
-        public void ConvertToHtml_MaxTextLength_LeadingHtmlBlockLongerThanTheLimit_IsCutWithAnEllipsis()
-        {
-            var html = "<div>" + new string('x', 200) + "</div>";
-
-            Assert.That(Cut(html + "\n\nmore", 150), Is.EqualTo($"{html[..150]}\n<p>...</p>\n"));
-        }
-
-        [Test]
         public void ConvertToHtml_MaxTextLength_LeadingCodeBlockLongerThanTheLimit_IsCutWithAnEllipsis()
         {
             var code = new string('x', 200);
@@ -469,6 +454,30 @@ namespace Shrooms.Tests.Helpers
         public void ConvertToHtml_MaxTextLength_CutInsideAnEmailAutolink_KeepsTheMailtoHref()
         {
             Assert.That(Cut("<someone@example.com> wrote", 7), Is.EqualTo("<p><a href=\"mailto:someone@example.com\">someone</a>...</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmailPipeline_TagLikeText_IsShownAsTyped()
+        {
+            var result = _sut.ConvertToHtml("Great work on <Button> and the docs", Parrot);
+
+            Assert.That(result, Is.EqualTo("<p>Great work on &lt;Button&gt; and the docs</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmailPipeline_HtmlTag_IsShownAsTyped()
+        {
+            var result = _sut.ConvertToHtml("<a href=\"https://x\" style=\"color:red\">click</a>", Parrot);
+
+            Assert.That(result, Is.EqualTo("<p>&lt;a href=&quot;https://x&quot; style=&quot;color:red&quot;&gt;click&lt;/a&gt;</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmailPipeline_HtmlBlock_IsShownAsTyped()
+        {
+            var result = _sut.ConvertToHtml("<div>\nblock\n</div>", Parrot);
+
+            Assert.That(result, Is.EqualTo("<p>&lt;div&gt;<br />\nblock<br />\n&lt;/div&gt;</p>\n"));
         }
 
         private string Cut(string markdown, int maxTextLength)

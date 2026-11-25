@@ -15,6 +15,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
     public class KudosNotificationService : NotificationServiceBase, IKudosNotificationService
     {
         private readonly IApplicationSettings _appSettings;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<Organization> _organizationsDbSet;
@@ -23,11 +24,13 @@ namespace Shrooms.Domain.Services.Email.Kudos
             IUnitOfWork2 uow,
             IMailingService mailingService,
             IApplicationSettings appSettings,
-            IMailTemplate mailTemplate)
+            IMailTemplate mailTemplate,
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
             _appSettings = appSettings;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
@@ -48,7 +51,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Employee.FullName,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                kudosLog.Comments,
+                await RenderCommentAsync(kudosLog.Comments, organization),
                 kudosLog.RejectionMessage,
                 kudosProfileUrl);
 
@@ -77,7 +80,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var emailTemplateViewModel = new KudosSentEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosDto.SendingUser.FullName,
                 kudosDto.TotalKudosPointsInLog,
-                kudosDto.KudosLog.Comment,
+                await RenderCommentAsync(kudosDto.KudosLog.Comment, organization),
                 kudosProfileUrl);
 
             await SendSingleEmailAsync(
@@ -98,7 +101,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 sendingUserFullName,
-                kudosLog.Comments,
+                await RenderCommentAsync(kudosLog.Comments, organization),
                 kudosProfileUrl);
 
             await SendSingleEmailAsync(
@@ -119,7 +122,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 sendingUserFullName,
-                kudosLog.Comments,
+                await RenderCommentAsync(kudosLog.Comments, organization),
                 kudosProfileUrl);
 
             await SendSingleEmailAsync(
@@ -127,6 +130,11 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 Resources.Models.Kudos.Kudos.MinusKudosEmailSubject,
                 emailTemplateViewModel,
                 EmailTemplateCacheKeys.KudosDecreased);
+        }
+
+        private async Task<string> RenderCommentAsync(string comment, Organization organization)
+        {
+            return await _emailMarkdownRenderer.RenderAsync(comment, organization.Id, organization.ShortName);
         }
 
         private async Task<Organization> GetOrganizationAsync(int orgId)
