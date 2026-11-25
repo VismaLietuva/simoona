@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
@@ -135,15 +134,18 @@ namespace Shrooms.Domain.Services.Roles
                 .Select(x => new PermissionGroupDto
                 {
                     Name = x.Name,
-                    ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Administration)
-                                      ? PermissionScopes.Administration
-                                      : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Basic)
-                                             ? PermissionScopes.Basic
-                                             : string.Empty)
+                    ActiveScope = PermissionGroups.GetActiveScope(rolePermissions.Where(y => PermissionGroups.IsInGroup(y.Name, x.Name)))
                 })
                 .ToList();
 
             return groupNamesWithScopes;
+        }
+
+        public async Task<IReadOnlyCollection<int>> GetPermissionIdsToAssignAsync(int orgId, IEnumerable<int> currentPermissionIds, IEnumerable<PermissionGroupDto> requestedGroups)
+        {
+            var editablePermissions = await _permissionService.GetPermissionsAsync(orgId);
+
+            return PermissionGroups.ResolvePermissionIds(editablePermissions, currentPermissionIds, requestedGroups);
         }
     }
 }

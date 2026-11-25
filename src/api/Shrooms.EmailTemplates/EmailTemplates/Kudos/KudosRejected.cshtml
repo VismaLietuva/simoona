@@ -1,4 +1,5 @@
 ﻿@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.KudosRejectedEmailTemplateViewModel
+@using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
     var amount = Math.Round(Model.KudosAmount, MidpointRounding.AwayFromZero).ToString("0", System.Globalization.CultureInfo.InvariantCulture);
@@ -13,7 +14,7 @@
         kudos for "@Model.KudosType" was rejected.
     </p>
     <email-details>
-        <email-detail label="Your comment">@Model.Comment</email-detail>
+        <email-detail label="Your comment">@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Comment))</email-detail>
         <email-detail label="Rejection reason">@Model.RejectionReason</email-detail>
     </email-details>
     <email-button href="@Model.KudosProfileUrl">View the kudos profile</email-button>

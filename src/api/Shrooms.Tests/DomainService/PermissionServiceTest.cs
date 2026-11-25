@@ -58,6 +58,16 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public void GetPermissionsAsync_CancelledToken_StopsTheQuery()
+        {
+            _permissionsDbSet.SetDbSetDataForAsync(new List<Permission>());
+
+            Assert.That(
+                async () => await _permissionService.GetPermissionsAsync(1, new CancellationToken(true)),
+                Throws.InstanceOf<OperationCanceledException>());
+        }
+
+        [Test]
         public async Task Should_Get_Permissions_Separated_To_Groups()
         {
             MockPermissions();

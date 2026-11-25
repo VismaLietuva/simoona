@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -240,32 +239,33 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task AssignPermissionsToRoleAsync(RoleMiniViewModel roleViewModel, ApplicationRole role)
         {
-            var filteredPermissions = GetFilter(roleViewModel.Permissions.ToList());
-            role.Permissions = await _permissionRepository.Get(filteredPermissions).ToListAsync();
+            // A request without permissions leaves them as they are, so a client that only renames a role
+            // or changes its members cannot take every permission off it by leaving the field out.
+            // AssignUsersToRole treats a missing users list the same way.
+            if (roleViewModel.Permissions != null)
+            {
+                var currentPermissionIds = role.Permissions?.Select(p => p.Id).ToList() ?? new List<int>();
+                var requestedGroups = roleViewModel.Permissions
+                    .Select(p => new PermissionGroupDto { Name = p.Name, ActiveScope = p.ActiveScope })
+                    .ToList();
+
+                var permissionIds = (await _roleService.GetPermissionIdsToAssignAsync(GetUserAndOrganization().OrganizationId, currentPermissionIds, requestedGroups)).ToList();
+                role.Permissions = await _permissionRepository.Get(p => permissionIds.Contains(p.Id)).ToListAsync();
+            }
 
             _roleRepository.Update(role);
             await _unitOfWork.SaveAsync();
         }
 
-        private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
-        {
-            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name).ToList();
-            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name).ToList();
-
-            if (adminControllers.Count == 0 && basicControllers.Count == 0)
-                return p => false;
-
-            if (adminControllers.Count == 0)
-                return p => basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic;
-
-            if (basicControllers.Count == 0)
-                return p => adminControllers.Any(a => p.Name.StartsWith(a + "_"));
-
-            return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
-        }
-
         private async Task AssignUsersToRole(RoleMiniViewModel roleViewModel)
         {
+            // Like permissions: a request without users leaves the members as they are. Mapping a missing list
+            // gives an empty one, which would take every member off the role.
+            if (roleViewModel.Users == null)
+            {
+                return;
+            }
+
             var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
             var existingUsersInRole = await _userManager.GetUsersInRoleAsync(roleViewModel.Name);
             var existingUserIds = existingUsersInRole.Select(u => u.Id).ToHashSet();

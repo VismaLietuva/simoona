@@ -988,6 +988,34 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Return_Emoji_Name_Of_Post_And_Comment_Reactions()
+        {
+            MockPostsForFollowedFeed();
+            MockEventPermission(true);
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { new() { Id = FeedUserId, FirstName = "Feed", LastName = "User" } });
+            var post = _postsDbSet.First(p => p.Id == FollowedWallId);
+            post.Likes.Add(new Like(FeedUserId, LikeTypeEnum.Emoji, "party-parrot"));
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment>
+            {
+                new()
+                {
+                    Id = 1,
+                    PostId = post.Id,
+                    Post = post,
+                    AuthorId = FeedUserId,
+                    Likes = new LikesCollection { new Like(FeedUserId, LikeTypeEnum.Emoji, "tada") }
+                }
+            });
+
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            var returned = posts.First(p => p.WallId == FollowedWallId);
+            Assert.That(returned.Likes.Single().Type, Is.EqualTo(LikeTypeEnum.Emoji));
+            Assert.That(returned.Likes.Single().EmojiName, Is.EqualTo("party-parrot"));
+            Assert.That(returned.Comments.Single().Likes.Single().EmojiName, Is.EqualTo("tada"));
+        }
+
+        [Test]
         public async Task Should_Return_Event_Wall_Posts_With_Event_Id_In_Followed_Feed()
         {
             // Arrange

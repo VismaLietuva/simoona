@@ -36,8 +36,11 @@ namespace Shrooms.Premium.Tests.Mocks
             return _inner.Execute<TResult>(expression);
         }
 
+        // A cancelled token stops the query, as it does in EF.
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var expectedResultType = typeof(TResult).GetGenericArguments()[0];
             // Execute has a generic and a non-generic overload, so it cannot be
             // picked by name alone.
@@ -64,6 +67,8 @@ namespace Shrooms.Premium.Tests.Mocks
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return new TestDbAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
         }
     }
