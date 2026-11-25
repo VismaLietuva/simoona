@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
     [Authorize]
     public class ServiceRequestsController : BaseController
     {
+        private static readonly string[] IncludableNavigations =
+        {
+            nameof(ServiceRequest.Priority),
+            nameof(ServiceRequest.Status),
+            nameof(ServiceRequest.Employee),
+            nameof(ServiceRequest.KudosShopItem)
+        };
+
         private readonly IUnitOfWork _uow;
         private readonly IRepository<ServiceRequest> _serviceRequestRepository;
         private readonly IRepository<ServiceRequestCategory> _categoryRepository;
@@ -69,21 +78,32 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
         [ProducesResponseType(typeof(ServiceRequestViewModel), StatusCodes.Status200OK)]
-        public IActionResult Get(int id, string includeProperties = "")
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get(int id, string includeProperties = "", CancellationToken cancellationToken = default)
         {
-            var model = _serviceRequestRepository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
+            var model = await _serviceRequestRepository
+                .Get(f => f.Id == id, includeProperties: IncludableOnly(includeProperties))
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (model == null)
+            var access = model == null
+                ? RequestAccess.None
+                : await GetAccessAsync(model.EmployeeId, model.CategoryName, cancellationToken);
+
+            // A request the caller may not see answers the same as one that does not exist.
+            if (access == RequestAccess.None)
             {
-                return BadRequest(Resources.Common.NotFound);
+                return NotFound();
             }
 
-            return Ok(_mapper.Map<ServiceRequest, ServiceRequestViewModel>(model));
+            var viewModel = _mapper.Map<ServiceRequest, ServiceRequestViewModel>(model);
+            viewModel.IsCloseable = access == RequestAccess.Assignee;
+
+            return Ok(viewModel);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<PagedViewModel<ServiceRequestViewModel>> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "")
+        public async Task<PagedViewModel<ServiceRequestViewModel>> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "", CancellationToken cancellationToken = default)
         {
             search ??= string.Empty;
             priority ??= string.Empty;
@@ -100,7 +120,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 .ToArray();
             var hasSearch = searchWords.Length > 0;
 
-            if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest))
+            if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest, cancellationToken))
             {
                 Expression<Func<ServiceRequest, bool>> filter = u =>
                     (!hasSearch || searchWords.Count(word =>
@@ -111,14 +131,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     u.Status.Title.Contains(status) &&
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory);
 
-                return await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filter);
+                return await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filter, cancellationToken);
             }
 
             var id = User.Identity.GetUserId();
-            var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync())
-                    .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
-                    .Select(x => x.Name)
-                    .ToList();
+            var assigneeCategoriesNames = await GetAssignedCategoryNamesAsync(id, cancellationToken);
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
                 (u.EmployeeId == id &&
@@ -138,7 +155,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory) &&
                     assigneeCategoriesNames.Contains(u.CategoryName));
 
-            var serviceRequestPage = await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
+            var serviceRequestPage = await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser, cancellationToken);
 
             foreach (var serviceRequest in serviceRequestPage.PagedList)
             {
@@ -151,13 +168,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return serviceRequestPage;
         }
 
-        private async Task<PagedViewModel<ServiceRequestViewModel>> GetFilteredPagedAsync(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null)
+        private async Task<PagedViewModel<ServiceRequestViewModel>> GetFilteredPagedAsync(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null, CancellationToken cancellationToken = default)
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
             var models = await _serviceRequestRepository
-                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? "Created")
-                .ToPagedListAsync(page, pageSize);
+                .Get(includeProperties: IncludableOnly(includeProperties), filter: filter, orderBy: sortQuery ?? "Created")
+                .ToPagedListAsync(page, pageSize, null, cancellationToken);
 
             var pagedModel = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 
@@ -170,6 +187,64 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             };
 
             return result;
+        }
+
+        // The include list comes from the client, and the repository loads any
+        // navigation path on the entity, so Employee.Manager.ManagedUsers or
+        // Employee.Room.ApplicationUsers would pull whole teams of users into
+        // memory. Only what ServiceRequestViewModel shows is loaded; anything
+        // else is dropped, the way the repository already drops paths that do
+        // not exist.
+        private static string IncludableOnly(string includeProperties)
+        {
+            if (string.IsNullOrWhiteSpace(includeProperties))
+            {
+                return string.Empty;
+            }
+
+            var includable = includeProperties
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(path => IncludableNavigations.Contains(path, StringComparer.OrdinalIgnoreCase));
+
+            return string.Join(", ", includable);
+        }
+
+        private enum RequestAccess
+        {
+            None,
+            Owner,
+            Assignee,
+            Admin
+        }
+
+        // The rule GetPagedFiltered applies to the list: admins see every request, anyone else
+        // the ones they created and the ones in categories they are assigned to. Assignees are
+        // also the ones who may close a request.
+        private async Task<RequestAccess> GetAccessAsync(string ownerId, string categoryName, CancellationToken cancellationToken)
+        {
+            var userAndOrganization = GetUserAndOrganization();
+
+            if (await _permissionService.UserHasPermissionAsync(userAndOrganization, AdministrationPermissions.ServiceRequest, cancellationToken))
+            {
+                return RequestAccess.Admin;
+            }
+
+            var assignedCategoryNames = await GetAssignedCategoryNamesAsync(userAndOrganization.UserId, cancellationToken);
+
+            if (assignedCategoryNames.Contains(categoryName))
+            {
+                return RequestAccess.Assignee;
+            }
+
+            return ownerId == userAndOrganization.UserId ? RequestAccess.Owner : RequestAccess.None;
+        }
+
+        private async Task<List<string>> GetAssignedCategoryNamesAsync(string userId, CancellationToken cancellationToken)
+        {
+            return (await _serviceRequestService.GetCategoriesAsync(cancellationToken))
+                .Where(category => category.Assignees.Any(assignee => assignee.Id == userId))
+                .Select(category => category.Name)
+                .ToList();
         }
 
         [HttpGet]
@@ -213,9 +288,20 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public async Task<IEnumerable<ServiceRequestCommentViewModel>> GetComments(int requestId)
+        public async Task<IEnumerable<ServiceRequestCommentViewModel>> GetComments(int requestId, CancellationToken cancellationToken = default)
         {
-            var model = await _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId).ToListAsync();
+            var request = await _serviceRequestRepository
+                .Get(r => r.Id == requestId)
+                .Select(r => new { r.EmployeeId, r.CategoryName })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            // Same answer as for a request that does not exist.
+            if (request == null || await GetAccessAsync(request.EmployeeId, request.CategoryName, cancellationToken) == RequestAccess.None)
+            {
+                return Enumerable.Empty<ServiceRequestCommentViewModel>();
+            }
+
+            var model = await _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId).ToListAsync(cancellationToken);
             return _mapper.Map<IEnumerable<ServiceRequestComment>, IEnumerable<ServiceRequestCommentViewModel>>(model);
         }
 
@@ -238,6 +324,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbidden();
             }
 
             return Ok();

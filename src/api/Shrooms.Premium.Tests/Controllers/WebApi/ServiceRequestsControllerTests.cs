@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -11,13 +17,16 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Domain.Services.KudosShop;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
 using Shrooms.Premium.Presentation.Api.Controllers;
+using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 using Shrooms.Premium.Tests.Mocks;
 using Shrooms.Premium.Tests.ModelMappings;
+using Shrooms.Presentation.Api.Helpers;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
@@ -34,20 +43,25 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         private IRepository<ServiceRequest> _serviceRequestRepository;
         private List<ServiceRequest> _requests;
 
+        // The include list the controller handed the repository last.
+        private string _loadedIncludes;
+
         [SetUp]
         public void TestInitializers()
         {
+            _loadedIncludes = null;
+
             var unitOfWork = Substitute.For<IUnitOfWork>();
             _serviceRequestRepository = Substitute.For<IRepository<ServiceRequest>>();
             unitOfWork.GetRepository<ServiceRequest>().Returns(_serviceRequestRepository);
 
             _permissionService = Substitute.For<IPermissionService>();
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(true);
 
             _serviceRequestService = Substitute.For<IServiceRequestService>();
-            _serviceRequestService.GetCategoriesAsync().Returns(new List<ServiceRequestCategoryDto>());
+            _serviceRequestService.GetCategoriesAsync(Arg.Any<CancellationToken>()).Returns(new List<ServiceRequestCategoryDto>());
 
             _requests = new List<ServiceRequest>
             {
@@ -69,8 +83,28 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                     Arg.Any<int?>())
                 .Returns(call =>
                 {
+                    _loadedIncludes = call.ArgAt<string>(3);
                     var filter = call.Arg<Expression<Func<ServiceRequest, bool>>>();
                     return new TestDbAsyncEnumerable<ServiceRequest>(_requests.Where(filter.Compile()));
+                });
+
+            var comments = new List<ServiceRequestComment>
+            {
+                new ServiceRequestComment { Id = 10, ServiceRequestId = 1, Content = "On it", Employee = new ApplicationUser { FirstName = "Bob" } }
+            };
+            var commentRepository = Substitute.For<IRepository<ServiceRequestComment>>();
+            unitOfWork.GetRepository<ServiceRequestComment>().Returns(commentRepository);
+            commentRepository
+                .Get(
+                    Arg.Any<Expression<Func<ServiceRequestComment, bool>>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<int?>())
+                .Returns(call =>
+                {
+                    var filter = call.Arg<Expression<Func<ServiceRequestComment, bool>>>();
+                    return new TestDbAsyncEnumerable<ServiceRequestComment>(comments.Where(filter.Compile()));
                 });
 
             _sut = new ServiceRequestsController(
@@ -217,19 +251,363 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             ClassicAssert.IsEmpty(titles);
         }
 
+        // The responses below are serialized with the API's own settings, so they
+        // hold what a client gets. The requester used to be the ApplicationUser
+        // entity itself, which put every requester's password hash and security
+        // stamp in the list.
+
+        [Test]
+        public async Task Get_RequesterHasIdentityData_ResponseCarriesOnlyDisplayFields()
+        {
+            _requests = new List<ServiceRequest> { RequestWithFullyLoadedRelations() };
+
+            var result = (OkObjectResult)await _sut.Get(1, "Employee, KudosShopItem");
+            var json = ToApiJson(result.Value);
+
+            AssertNoIdentityFields(json);
+            AssertDisplayOnlyRequester(json["employee"]);
+            AssertShopItemWithoutOrganization(json["kudosShopItem"]);
+        }
+
+        [Test]
+        public async Task GetPagedFiltered_RequesterHasIdentityData_ResponseCarriesOnlyDisplayFields()
+        {
+            _requests = new List<ServiceRequest> { RequestWithFullyLoadedRelations() };
+
+            var page = await _sut.GetPagedFiltered("Employee, KudosShopItem");
+            var json = ToApiJson(page);
+
+            AssertNoIdentityFields(json);
+            var request = json["pagedList"].Single();
+            AssertDisplayOnlyRequester(request["employee"]);
+            AssertShopItemWithoutOrganization(request["kudosShopItem"]);
+        }
+
+        // The list shows "Deleted employee" when the requester is gone.
+        [Test]
+        public async Task GetPagedFiltered_RequesterIsMissing_EmployeeIsNull()
+        {
+            var request = RequestWithFullyLoadedRelations();
+            request.Employee = null;
+            _requests = new List<ServiceRequest> { request };
+
+            var json = ToApiJson(await _sut.GetPagedFiltered("Employee"));
+
+            ClassicAssert.AreEqual(JTokenType.Null, json["pagedList"].Single()["employee"].Type);
+        }
+
+        // The client chooses which navigations are loaded (includeProperties), so
+        // any Identity type reachable from the response type can end up in the
+        // JSON, whether or not a test happens to fill it.
+        [Test]
+        public void ServiceRequestViewModel_ReachesNoIdentityType()
+        {
+            var identityTypes = ReachableTypes(typeof(ServiceRequestViewModel)).Where(IsIdentityType).ToList();
+
+            ClassicAssert.IsEmpty(identityTypes, string.Join(", ", identityTypes.Select(t => t.Name)));
+        }
+
+        // The walk above must see users behind any member shape a view model can have.
+        [TestCase(typeof(ArrayOfUsers))]
+        [TestCase(typeof(ListOfUsers))]
+        [TestCase(typeof(NestedUser))]
+        public void ReachableTypes_UserBehindMember_IsFound(Type probe)
+        {
+            CollectionAssert.Contains(ReachableTypes(probe), typeof(ApplicationUser));
+        }
+
+        // The include list is the client's, and the repository loads any path on
+        // the entity. Only what the response shows may be loaded; a nested user
+        // graph would pull a manager's whole team or everyone in a room.
+        [TestCase("Priority, Status, Employee, KudosShopItem", "Priority, Status, Employee, KudosShopItem")]
+        [TestCase("Employee.Manager.ManagedUsers, Employee.JobPosition.Users, Employee.Room.ApplicationUsers", "")]
+        [TestCase("Employee, Employee.Organization, KudosShopItem.Organization", "Employee")]
+        [TestCase(null, "")]
+        public async Task GetPagedFiltered_ClientChoosesIncludes_LoadsOnlyWhatTheResponseShows(string requested, string loaded)
+        {
+            await _sut.GetPagedFiltered(requested);
+
+            ClassicAssert.AreEqual(loaded, _loadedIncludes);
+        }
+
+        // What the edit page asks for. ServiceRequestCategory is not a navigation
+        // on the entity, so the repository dropped it before this list existed too.
+        [Test]
+        public async Task Get_FrontendIncludes_LoadsTheResponseNavigations()
+        {
+            await _sut.Get(1, "Priority, Status, Employee, ServiceRequestCategory, Employee.Manager.ManagedUsers");
+
+            ClassicAssert.AreEqual("Priority, Status, Employee", _loadedIncludes);
+        }
+
+        // Opening a request by id follows the list's rule: admins see every request,
+        // anyone else their own and those in categories they are assigned to. The
+        // edit page relies on IsCloseable to let an assignee in and change the status.
+        [TestCase(Caller.Owner, false)]
+        [TestCase(Caller.Assignee, true)]
+        [TestCase(Caller.Admin, false)]
+        public async Task Get_CallerMaySeeTheRequest_ReturnsItWithIsCloseable(Caller caller, bool isCloseable)
+        {
+            SignInAs(caller);
+
+            var request = (ServiceRequestViewModel)((OkObjectResult)await _sut.Get(1)).Value;
+
+            ClassicAssert.AreEqual(1, request.Id);
+            ClassicAssert.AreEqual(isCloseable, request.IsCloseable);
+        }
+
+        // Same answer as a request that does not exist, so ids reveal nothing.
+        [Test]
+        public async Task Get_CallerMayNotSeeTheRequest_AnswersNotFound()
+        {
+            SignInAs(Caller.Stranger);
+
+            ClassicAssert.IsInstanceOf<NotFoundResult>(await _sut.Get(1));
+        }
+
+        // The edit page shows its not-found page on 404.
+        [Test]
+        public async Task Get_RequestDoesNotExist_AnswersNotFound()
+        {
+            ClassicAssert.IsInstanceOf<NotFoundResult>(await _sut.Get(99));
+        }
+
+        [TestCase(Caller.Owner)]
+        [TestCase(Caller.Assignee)]
+        [TestCase(Caller.Admin)]
+        public async Task GetComments_CallerMaySeeTheRequest_ReturnsComments(Caller caller)
+        {
+            SignInAs(caller);
+
+            var comments = (await _sut.GetComments(1)).ToList();
+
+            ClassicAssert.AreEqual(new[] { "On it" }, comments.Select(c => c.Content).ToArray());
+        }
+
+        [Test]
+        public async Task GetComments_CallerMayNotSeeTheRequest_ReturnsNone()
+        {
+            SignInAs(Caller.Stranger);
+
+            ClassicAssert.IsEmpty(await _sut.GetComments(1));
+        }
+
+        // A closed browser tab cancels the request; the query stops with it.
+        [Test]
+        public void Get_RequestAborted_StopsTheQuery()
+        {
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _sut.Get(1, cancellationToken: new CancellationToken(true)));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void GetPagedFiltered_RequestAborted_StopsTheQuery(bool isAdmin)
+        {
+            if (!isAdmin)
+            {
+                SignInAsRegularUser("Hardware");
+            }
+
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _sut.GetPagedFiltered(cancellationToken: new CancellationToken(true)));
+        }
+
+        [Test]
+        public async Task GetPagedFiltered_RegularUser_PassesTheTokenToItsLookups()
+        {
+            SignInAsRegularUser("Hardware");
+            using var source = new CancellationTokenSource();
+
+            await _sut.GetPagedFiltered(cancellationToken: source.Token);
+
+            await _permissionService.Received(1)
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.ServiceRequest, source.Token);
+            await _serviceRequestService.Received(1).GetCategoriesAsync(source.Token);
+        }
+
+        private static readonly string[] IdentityFieldNames =
+        {
+            "passwordHash", "securityStamp", "concurrencyStamp", "userName", "normalizedUserName", "email",
+            "normalizedEmail", "emailConfirmed", "phoneNumber", "phoneNumberConfirmed", "twoFactorEnabled",
+            "lockoutEnd", "lockoutEnabled", "accessFailedCount"
+        };
+
+        private static ServiceRequest RequestWithFullyLoadedRelations()
+        {
+            var organization = new Organization { Id = 2, Name = "Visma", BookAppAuthorizationGuid = "book-app-secret" };
+
+            return new ServiceRequest
+            {
+                Id = 1,
+                Title = "Broken laptop screen",
+                EmployeeId = "requester",
+                Employee = new ApplicationUser
+                {
+                    Id = "requester",
+                    FirstName = "Ann",
+                    LastName = "Smith",
+                    PictureId = "ann.jpg",
+                    UserName = "ann@example.com",
+                    NormalizedUserName = "ANN@EXAMPLE.COM",
+                    Email = "ann@example.com",
+                    NormalizedEmail = "ANN@EXAMPLE.COM",
+                    PhoneNumber = "+37060000000",
+                    PasswordHash = "AQAAAAEAACcQAAAAEPasswordHash",
+                    SecurityStamp = "SECURITYSTAMP",
+                    ConcurrencyStamp = "CONCURRENCYSTAMP",
+                    Organization = organization
+                },
+                Priority = new ServiceRequestPriority { Id = 1, Title = "Low" },
+                Status = new ServiceRequestStatus { Id = 1, Title = "Open" },
+                CategoryName = "Kudos",
+                KudosShopItemId = 7,
+                KudosShopItem = new KudosShopItem
+                {
+                    Id = 7,
+                    Name = "Mug",
+                    Price = 50,
+                    Description = "Ceramic",
+                    PictureId = "mug.jpg",
+                    OrganizationId = 2,
+                    Organization = organization
+                }
+            };
+        }
+
+        private static JObject ToApiJson(object value)
+        {
+            return JObject.FromObject(value, JsonSerializer.Create(ApiJsonSettings.Create()));
+        }
+
+        private static void AssertNoIdentityFields(JObject json)
+        {
+            var leaked = json.Descendants()
+                .OfType<JProperty>()
+                .Where(property => IdentityFieldNames.Contains(property.Name))
+                .Select(property => property.Path)
+                .ToList();
+
+            ClassicAssert.IsEmpty(leaked, string.Join(", ", leaked));
+            StringAssert.DoesNotContain("AQAAAAEAACcQAAAAEPasswordHash", json.ToString());
+            StringAssert.DoesNotContain("SECURITYSTAMP", json.ToString());
+            StringAssert.DoesNotContain("book-app-secret", json.ToString());
+        }
+
+        // The fields the requester had before, under the same names and values.
+        private static void AssertDisplayOnlyRequester(JToken employee)
+        {
+            ClassicAssert.AreEqual(
+                new[] { "firstName", "fullName", "id", "lastName", "pictureId" },
+                ((JObject)employee).Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal).ToArray());
+            ClassicAssert.AreEqual("requester", (string)employee["id"]);
+            ClassicAssert.AreEqual("Ann", (string)employee["firstName"]);
+            ClassicAssert.AreEqual("Smith", (string)employee["lastName"]);
+            ClassicAssert.AreEqual("Ann Smith", (string)employee["fullName"]);
+            ClassicAssert.AreEqual("ann.jpg", (string)employee["pictureId"]);
+        }
+
+        private static void AssertShopItemWithoutOrganization(JToken shopItem)
+        {
+            ClassicAssert.AreEqual(
+                new[] { "description", "id", "name", "pictureId", "price" },
+                ((JObject)shopItem).Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal).ToArray());
+            ClassicAssert.AreEqual(7, (int)shopItem["id"]);
+            ClassicAssert.AreEqual("Mug", (string)shopItem["name"]);
+            ClassicAssert.AreEqual(50, (int)shopItem["price"]);
+        }
+
+        private static bool IsIdentityType(Type type)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (current.Namespace == typeof(IdentityUser).Namespace)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Types a serializer can reach from the root through public properties,
+        // looking through arrays, collections and nullables.
+        private static HashSet<Type> ReachableTypes(Type root)
+        {
+            var seen = new HashSet<Type>();
+            var pending = new Stack<Type>(new[] { root });
+
+            while (pending.Count > 0)
+            {
+                var type = pending.Pop();
+                if (type.HasElementType)
+                {
+                    pending.Push(type.GetElementType());
+                }
+
+                if (type.IsGenericType)
+                {
+                    foreach (var argument in type.GetGenericArguments())
+                    {
+                        pending.Push(argument);
+                    }
+                }
+
+                if (type.IsPrimitive || type == typeof(string) || type.Namespace == "System" || !seen.Add(type))
+                {
+                    continue;
+                }
+
+                foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    pending.Push(property.PropertyType);
+                }
+            }
+
+            return seen;
+        }
+
         private void SignInAsRegularUser(params string[] assigneeCategories)
         {
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(false);
 
-            _serviceRequestService.GetCategoriesAsync().Returns(assigneeCategories
+            _serviceRequestService.GetCategoriesAsync(Arg.Any<CancellationToken>()).Returns(assigneeCategories
                 .Select(name => new ServiceRequestCategoryDto
                 {
                     Name = name,
                     Assignees = new[] { new ApplicationUserMinimalDto { Id = CurrentUserId } }
                 })
                 .ToList());
+        }
+
+        public enum Caller
+        {
+            Owner,
+            Assignee,
+            Admin,
+            Stranger
+        }
+
+        // Request 1 is Ann's, in the "Other" category. Admin is the fixture default.
+        private void SignInAs(Caller caller)
+        {
+            switch (caller)
+            {
+                case Caller.Owner:
+                    SignInAsRegularUser();
+                    _requests[0].EmployeeId = CurrentUserId;
+                    break;
+                case Caller.Assignee:
+                    SignInAsRegularUser("Other");
+                    break;
+                case Caller.Stranger:
+                    SignInAsRegularUser("Hardware");
+                    break;
+            }
         }
 
         private void SeedRequestsOwnedByCurrentUser()
@@ -259,6 +637,21 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             var page = await _sut.GetPagedFiltered(search: search);
             return page.PagedList.Select(request => request.Title).ToList();
+        }
+
+        private class ArrayOfUsers
+        {
+            public ApplicationUser[] Watchers { get; set; }
+        }
+
+        private class ListOfUsers
+        {
+            public List<ApplicationUser> Watchers { get; set; }
+        }
+
+        private class NestedUser
+        {
+            public ServiceRequestComment LastComment { get; set; }
         }
     }
 }
