@@ -8,7 +8,7 @@ namespace Shrooms.Domain.Helpers
     {
         private static readonly MarkdownPipeline Pipeline = BasePipeline().Build();
 
-        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().Build();
+        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().DisableHtml().Build();
 
         public string ConvertToHtml(string markdown)
         {
