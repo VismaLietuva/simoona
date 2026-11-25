@@ -106,7 +106,8 @@ namespace Shrooms.Domain.Services.Permissions
 
         private static bool IsBasic(PermissionDto permission)
         {
-            return permission.Scope == PermissionScopes.Basic;
+            // Compare the way SQL Server's default collation does, ignoring case and trailing spaces.
+            return string.Equals(permission.Scope?.Trim(), PermissionScopes.Basic, StringComparison.OrdinalIgnoreCase);
         }
 
         private static Dictionary<string, string> GetRequestedScopes(IEnumerable<PermissionGroupDto> requestedGroups)

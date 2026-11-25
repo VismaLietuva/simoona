@@ -11,7 +11,7 @@ namespace Shrooms.Domain.Services.Permissions
         Task<IEnumerable<PermissionGroupDto>> GetGroupNamesAsync(int organizationId);
         Task<IEnumerable<string>> GetUserPermissionsAsync(string userId, int organizationId, CancellationToken cancellationToken = default);
         Task<IEnumerable<PermissionDto>> GetRolePermissionsAsync(string roleId, int organizationId);
-        Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId);
+        Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, CancellationToken cancellationToken = default);
         void RemoveCache(string userId);
         bool UserHasPermission(UserAndOrganizationDto userAndOrg, string permissionName);
     }

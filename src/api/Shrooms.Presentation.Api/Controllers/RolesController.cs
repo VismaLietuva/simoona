@@ -239,13 +239,18 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task AssignPermissionsToRoleAsync(RoleMiniViewModel roleViewModel, ApplicationRole role)
         {
-            var currentPermissionIds = role.Permissions?.Select(p => p.Id).ToList() ?? new List<int>();
-            var requestedGroups = roleViewModel.Permissions?
-                .Select(p => new PermissionGroupDto { Name = p.Name, ActiveScope = p.ActiveScope })
-                .ToList();
+            // A request without permissions leaves them as they are, so a client that only renames a role
+            // or changes its members cannot take every permission off it by leaving the field out.
+            if (roleViewModel.Permissions != null)
+            {
+                var currentPermissionIds = role.Permissions?.Select(p => p.Id).ToList() ?? new List<int>();
+                var requestedGroups = roleViewModel.Permissions
+                    .Select(p => new PermissionGroupDto { Name = p.Name, ActiveScope = p.ActiveScope })
+                    .ToList();
 
-            var permissionIds = (await _roleService.GetPermissionIdsToAssignAsync(GetUserAndOrganization().OrganizationId, currentPermissionIds, requestedGroups)).ToList();
-            role.Permissions = await _permissionRepository.Get(p => permissionIds.Contains(p.Id)).ToListAsync();
+                var permissionIds = (await _roleService.GetPermissionIdsToAssignAsync(GetUserAndOrganization().OrganizationId, currentPermissionIds, requestedGroups)).ToList();
+                role.Permissions = await _permissionRepository.Get(p => permissionIds.Contains(p.Id)).ToListAsync();
+            }
 
             _roleRepository.Update(role);
             await _unitOfWork.SaveAsync();

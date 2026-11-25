@@ -111,12 +111,12 @@ namespace Shrooms.Domain.Services.Permissions
             return await GetPermissionsAsync(organizationId, roleFilter);
         }
 
-        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId)
+        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, CancellationToken cancellationToken = default)
         {
-            return await GetPermissionsAsync(organizationId, null);
+            return await GetPermissionsAsync(organizationId, null, cancellationToken);
         }
 
-        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter)
+        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter, CancellationToken cancellationToken = default)
         {
             return await _permissionsDbSet
                 .Include(x => x.Module.Organizations)
@@ -129,7 +129,7 @@ namespace Shrooms.Domain.Services.Permissions
                     Name = x.Name,
                     Scope = x.Scope
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         private static Expression<Func<Permission, bool>> FilterActiveModules(int organizationId)

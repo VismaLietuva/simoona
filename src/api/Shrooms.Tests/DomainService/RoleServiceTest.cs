@@ -192,6 +192,19 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task GetRoleByIdAsync_BasicScopeStoredInAnotherCase_ReportsBasicAndBasicGrantsIt()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync(BasicPermissions.Skill);
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+            var skill = role.Permissions.Single(group => group.Name == "skill");
+
+            var grantedIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, Array.Empty<int>(), new[] { skill });
+
+            Assert.That(skill.ActiveScope, Is.EqualTo(PermissionScopes.Basic));
+            Assert.That(await GetPermissionNamesAsync(dbContext, grantedIds), Is.EquivalentTo(new[] { BasicPermissions.Skill }));
+        }
+
+        [Test]
         public async Task GetPermissionIdsToAssignAsync_AdminOnlyGroupChangedToBasicAndBack_AdminImpliesBasic()
         {
             var (roleService, dbContext) = await CreateRoleEditorAsync(AdministrationPermissions.Kudos);
@@ -262,6 +275,8 @@ namespace Shrooms.Tests.DomainService
             (BasicPermissions.Poll, PermissionScopes.Basic),
             // The AddPolls migration stored this one with the scope "administration" rather than "admin".
             (PollAdministrationWithLongScope, "administration"),
+            // SQL Server's collation treats this as "basic", and so must the editor.
+            (BasicPermissions.Skill, "Basic "),
             (DisabledModulePermission, PermissionScopes.Basic)
         };
 
