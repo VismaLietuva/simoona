@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,24 @@ namespace Shrooms.Domain.Services.Search
         public const int MinSearchLength = 2;
         public const int MaxSearchLength = 50;
         public const int MaxLimit = 50;
+
+        /// <summary>
+        /// The names a caller uses to ask for specific sections; they match the response's property names.
+        /// </summary>
+        public static class Sections
+        {
+            public const string People = "people";
+            public const string Walls = "walls";
+            public const string Posts = "posts";
+            public const string Events = "events";
+            public const string Kudos = "kudos";
+            public const string Projects = "projects";
+            public const string Groups = "groups";
+            public const string Books = "books";
+            public const string Polls = "polls";
+            public const string Videos = "videos";
+            public const string ServiceRequests = "serviceRequests";
+        }
 
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
@@ -65,7 +84,7 @@ namespace Shrooms.Domain.Services.Search
             _serviceRequestCategoriesDbSet = uow.GetDbSet<ServiceRequestCategory>();
         }
 
-        public async Task<GlobalSearchResultsDto> SearchAsync(string search, int limit, UserAndOrganizationDto userOrg, CancellationToken cancellationToken = default)
+        public async Task<GlobalSearchResultsDto> SearchAsync(string search, int limit, UserAndOrganizationDto userOrg, IReadOnlyCollection<string> sections = null, CancellationToken cancellationToken = default)
         {
             var term = (search ?? string.Empty).Trim();
             if (term.Length > MaxSearchLength)
@@ -82,54 +101,62 @@ namespace Shrooms.Domain.Services.Search
             var permissions = (await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId, cancellationToken)).ToHashSet();
             var results = new GlobalSearchResultsDto();
 
+            // A caller that shows one section should not pay for the other ten.
+            bool Wants(string section) =>
+                sections == null || sections.Count == 0 || sections.Contains(section, StringComparer.OrdinalIgnoreCase);
+
             // One DbContext, so the lookups run one after another rather than in parallel.
-            if (permissions.Contains(BasicPermissions.EmployeeList))
+            if (Wants(Sections.People) && permissions.Contains(BasicPermissions.EmployeeList))
             {
                 results.People = await SearchPeopleAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Post))
+            if (Wants(Sections.Walls) && permissions.Contains(BasicPermissions.Post))
             {
                 results.Walls = await SearchWallsAsync(term, take, userOrg, cancellationToken);
+            }
+
+            if (Wants(Sections.Posts) && permissions.Contains(BasicPermissions.Post))
+            {
                 results.Posts = await SearchPostsAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Event))
+            if (Wants(Sections.Events) && permissions.Contains(BasicPermissions.Event))
             {
                 results.Events = await SearchEventsAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Kudos))
+            if (Wants(Sections.Kudos) && permissions.Contains(BasicPermissions.Kudos))
             {
                 results.Kudos = await SearchKudosAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Project))
+            if (Wants(Sections.Projects) && permissions.Contains(BasicPermissions.Project))
             {
                 results.Projects = await SearchProjectsAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Groups))
+            if (Wants(Sections.Groups) && permissions.Contains(BasicPermissions.Groups))
             {
                 results.Groups = await SearchGroupsAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Book))
+            if (Wants(Sections.Books) && permissions.Contains(BasicPermissions.Book))
             {
                 results.Books = await SearchBooksAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.Poll) || permissions.Contains(AdministrationPermissions.Poll))
+            if (Wants(Sections.Polls) && (permissions.Contains(BasicPermissions.Poll) || permissions.Contains(AdministrationPermissions.Poll)))
             {
                 results.Polls = await SearchPollsAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.VideoLibrary) || permissions.Contains(AdministrationPermissions.VideoLibrary))
+            if (Wants(Sections.Videos) && (permissions.Contains(BasicPermissions.VideoLibrary) || permissions.Contains(AdministrationPermissions.VideoLibrary)))
             {
                 results.Videos = await SearchVideosAsync(term, take, userOrg, cancellationToken);
             }
 
-            if (permissions.Contains(BasicPermissions.ServiceRequest))
+            if (Wants(Sections.ServiceRequests) && permissions.Contains(BasicPermissions.ServiceRequest))
             {
                 var seesAll = permissions.Contains(AdministrationPermissions.ServiceRequest);
                 results.ServiceRequests = await SearchServiceRequestsAsync(term, take, seesAll, userOrg, cancellationToken);

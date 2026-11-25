@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,7 @@ namespace Shrooms.Presentation.Api.Controllers
         /// </summary>
         /// <param name="s">What has been typed. Fewer than two characters returns empty groups.</param>
         /// <param name="limit">Most entries per group; capped at 50.</param>
+        /// <param name="sections">Comma-separated section names (people, walls, posts, events, kudos, projects, groups, books, polls, videos, serviceRequests) to search only those. Leave out to search every section.</param>
         /// <response code="200">Matches per group. A group the user has no permission for is empty.</response>
         [HttpGet]
         [Route("Quick")]
@@ -45,9 +47,11 @@ namespace Shrooms.Presentation.Api.Controllers
             AdministrationPermissions.VideoLibrary,
             BasicPermissions.ServiceRequest)]
         [ProducesResponseType(typeof(GlobalSearchResultsDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Quick(string s = null, int limit = DefaultLimit, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Quick(string s = null, int limit = DefaultLimit, string sections = null, CancellationToken cancellationToken = default)
         {
-            return Ok(await _globalSearchService.SearchAsync(s, limit, GetUserAndOrganization(), cancellationToken));
+            var only = sections?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            return Ok(await _globalSearchService.SearchAsync(s, limit, GetUserAndOrganization(), only, cancellationToken));
         }
     }
 }

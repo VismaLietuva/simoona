@@ -113,7 +113,7 @@ namespace Shrooms.Tests.DomainService
                     "Kudos",
                     8,
                     CurrentUser(),
-                    new CancellationToken(true)),
+                    cancellationToken: new CancellationToken(true)),
                 Throws.InstanceOf<OperationCanceledException>());
         }
 
@@ -565,6 +565,35 @@ namespace Shrooms.Tests.DomainService
             Assert.That(results.Polls, Is.Empty);
             Assert.That(results.Videos, Is.Empty);
             Assert.That(results.ServiceRequests, Is.Empty);
+        }
+
+        [Test]
+        public async Task Should_Search_Only_The_Sections_Asked_For()
+        {
+            GivenUsers(Person("u1", "Tomas", "Kudosas", "QA engineer"));
+            GivenWalls(UserWall(1, "Kudosas fan club"));
+            GivenEvents(EventAt("Kudosas birthday", "Vilnius", Now.AddDays(5)));
+            GivenPosts(new PostDto { Id = 7, MessageBody = "Kudosas wins" });
+
+            var results = await _searchService.SearchAsync("Kudosas", 8, CurrentUser(), new[] { "walls", "EVENTS" });
+
+            Assert.That(results.Walls.Count(), Is.EqualTo(1));
+            Assert.That(results.Events.Count(), Is.EqualTo(1));
+            Assert.That(results.People, Is.Empty);
+            Assert.That(results.Posts, Is.Empty);
+            await _wallService.DidNotReceiveWithAnyArgs().SearchWallAsync(default, default, default, default, default);
+        }
+
+        [Test]
+        public async Task Should_Search_Every_Section_When_None_Is_Named()
+        {
+            GivenUsers(Person("u1", "Tomas", "Kudosas", "QA engineer"));
+            GivenWalls(UserWall(1, "Kudosas fan club"));
+
+            var results = await _searchService.SearchAsync("Kudosas", 8, CurrentUser(), Array.Empty<string>());
+
+            Assert.That(results.People.Count(), Is.EqualTo(1));
+            Assert.That(results.Walls.Count(), Is.EqualTo(1));
         }
 
         private Task<GlobalSearchResultsDto> SearchAsync(string search)
