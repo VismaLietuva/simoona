@@ -17,7 +17,8 @@ namespace Shrooms.Domain.Services.Search
 
         // Found by its comment. As on the kudos page: approved only, no minus or refund
         // entries, no basket donations. A comment the receiver hid is never matched, so
-        // an entry with a hidden comment is not found at all.
+        // an entry with a hidden comment is not found at all. Neither is one whose receiver
+        // was deleted: there is no name to show and no profile left to open.
         private async Task<GlobalSearchItemDto[]> SearchKudosAsync(string term, int take, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
         {
             var rows = await _kudosLogsDbSet
@@ -27,6 +28,7 @@ namespace Shrooms.Domain.Services.Search
                               log.KudosSystemType != KudosTypeEnum.Refund &&
                               log.KudosBasketId == null)
                 .Where(log => !log.IsCommentHidden && log.Comments.Contains(term))
+                .Where(log => log.Employee != null)
                 .OrderByDescending(log => log.Created)
                 .Take(take)
                 .Select(log => new

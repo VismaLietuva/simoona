@@ -253,6 +253,23 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_List_The_Next_Upcoming_Event_First()
+        {
+            GivenEvents(
+                EventAt("Kudos next year", "Vilnius", Now.AddDays(300)),
+                EventAt("Kudos last month", "Vilnius", Now.AddDays(-30)),
+                EventAt("Kudos tomorrow", "Vilnius", Now.AddDays(1)),
+                EventAt("Kudos next month", "Vilnius", Now.AddDays(30)));
+
+            var results = await _searchService.SearchAsync("Kudos", 2, CurrentUser());
+
+            // With room for two, the soonest two are kept, not the furthest away.
+            Assert.That(
+                results.Events.Select(e => e.Name),
+                Is.EqualTo(new[] { "Kudos tomorrow", "Kudos next month" }));
+        }
+
+        [Test]
         public async Task Should_Find_An_Event_By_Its_Place()
         {
             GivenEvents(EventAt("Guild meetup", "Kaunas office", Now.AddDays(5)));
@@ -384,6 +401,20 @@ namespace Shrooms.Tests.DomainService
             Assert.That(found.Title, Is.EqualTo("Ona Petraite → Tomas Kudosas"));
             Assert.That(found.Description, Is.EqualTo("Teamwork · Great release"));
             Assert.That(found.LinkId, Is.EqualTo("receiver-1"));
+        }
+
+        // A deleted user is filtered out of every query, so the receiver comes back empty.
+        [Test]
+        public async Task Should_Not_Find_Kudos_Whose_Receiver_Was_Deleted()
+        {
+            GivenUsers(Person("sender", "Ona", "Petraite", "Developer"));
+            var orphan = Kudos(1, "sender", "Tomas", "Kudosas", "Teamwork", "Great release");
+            orphan.Employee = null;
+            GivenKudos(orphan, Kudos(2, "sender", "Rasa", "Jonaite", "Teamwork", "Smooth release"));
+
+            var results = await SearchAsync("release");
+
+            Assert.That(results.Kudos.Select(kudos => kudos.LinkId), Is.EqualTo(new[] { "receiver-2" }));
         }
 
         [Test]

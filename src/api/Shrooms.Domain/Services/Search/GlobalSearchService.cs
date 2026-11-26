@@ -266,7 +266,8 @@ namespace Shrooms.Domain.Services.Search
             return text != null && text.Contains(term, StringComparison.OrdinalIgnoreCase);
         }
 
-        // Events still to come are listed ahead of finished ones.
+        // Events still to come are listed ahead of finished ones: the next one first,
+        // so it is not the one cut off by the limit, then finished ones, latest first.
         private async Task<GlobalSearchEventDto[]> SearchEventsAsync(string term, int take, UserAndOrganizationDto userOrg, CancellationToken cancellationToken)
         {
             var now = _systemClock.UtcNow;
@@ -275,6 +276,7 @@ namespace Shrooms.Domain.Services.Search
                 .Where(e => e.OrganizationId == userOrg.OrganizationId &&
                             (e.Name.Contains(term) || e.Place.Contains(term)))
                 .OrderByDescending(e => e.EndDate >= now)
+                .ThenBy(e => e.EndDate >= now ? e.StartDate : (DateTime?)null)
                 .ThenByDescending(e => e.StartDate)
                 .Take(take)
                 .Select(e => new GlobalSearchEventDto
