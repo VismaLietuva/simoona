@@ -17,6 +17,8 @@ using Shrooms.Premium.Domain.Services.Email.Event;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Tests.DomainService.EventServices
 {
@@ -40,13 +42,18 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var mailTemplate = Substitute.For<IMailTemplate>();
             var organizationService = Substitute.For<IOrganizationService>();
 
+            var permissionService = Substitute.For<IPermissionService>();
+            permissionService.FilterEmailsByPermissionAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>())
+                .Returns(call => Task.FromResult<IList<string>>(call.Arg<IEnumerable<string>>().ToList()));
+
             _sut = new EventNotificationService(
                 uow,
                 mailTemplate,
                 _mailingService,
                 _applicationSettings,
                 organizationService,
-                _emailMarkdownRenderer);
+                _emailMarkdownRenderer,
+                permissionService);
         }
 
         [Test]
