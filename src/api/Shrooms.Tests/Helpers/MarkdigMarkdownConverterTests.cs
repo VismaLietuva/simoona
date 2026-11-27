@@ -317,10 +317,59 @@ namespace Shrooms.Tests.Helpers
 
         [TestCase("**bold** _em_ ~~del~~ `code`")]
         [TestCase("# title\nline\n\n- item\n> quote")]
-        [TestCase("[label](https://x.y) ![alt](https://x.y/i.png)")]
+        [TestCase("[label](https://x.y)")]
         public void ConvertToHtml_WithoutEmojiOrBareUrls_BothOverloadsAgree(string markdown)
         {
             Assert.That(Convert(markdown, Parrot), Is.EqualTo(_sut.ConvertToHtml(markdown)));
+        }
+
+        [TestCase("![alt](https://x.y/i.png)", "<p><a href=\"https://x.y/i.png\">alt</a></p>\n")]
+        [TestCase("![alt](https://x.y/i.png \"title\")", "<p><a href=\"https://x.y/i.png\" title=\"title\">alt</a></p>\n")]
+        [TestCase("![](https://x.y/i.png)", "<p><a href=\"https://x.y/i.png\">https://x.y/i.png</a></p>\n")]
+        [TestCase("[![alt](https://x.y/i.png)](https://x.y)", "<p><a href=\"https://x.y\">alt</a></p>\n")]
+        [TestCase("[**![alt](https://x.y/i.png)**](https://x.y)", "<p><a href=\"https://x.y\"><strong>alt</strong></a></p>\n")]
+        [TestCase("![][r]\n\n[r]: https://x.y/i.png", "<p><a href=\"https://x.y/i.png\">https://x.y/i.png</a></p>\n")]
+        [TestCase("![see [here](https://a.example)](https://b.example/i.png)", "<p><a href=\"https://b.example/i.png\">see here</a></p>\n")]
+        [TestCase("![a ![b](https://x.y/b.png) `c`](https://x.y/a.png)", "<p><a href=\"https://x.y/a.png\">a b c</a></p>\n")]
+        public void ConvertToHtml_EmojiOverload_RendersImagesAsLinks(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("[![](https://img.example/badge.svg)](https://ci.example)", "<p><a href=\"https://ci.example\">https://ci.example</a></p>\n")]
+        [TestCase("[Build ![](https://img.example/badge.svg)](https://ci.example)", "<p><a href=\"https://ci.example\">Build </a></p>\n")]
+        public void ConvertToHtml_EmojiOverload_ImageWithoutAltInsideLink_NeverShowsTheImageUrl(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("![](javascript:alert(1))", "<p></p>\n")]
+        [TestCase("![](data:image/png;base64,AAAA)", "<p></p>\n")]
+        [TestCase("![alt](javascript:alert(1))", "<p>alt</p>\n")]
+        [TestCase("![alt](/relative.png)", "<p>alt</p>\n")]
+        public void ConvertToHtml_EmojiOverload_ImageWithUnlinkableUrl_ShowsOnlyItsAltText(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmojiOverload_KeepsCustomEmojiAsImages()
+        {
+            Assert.That(Convert("![x](https://x.y/i.png) :shipit:", Parrot), Is.EqualTo($"<p><a href=\"https://x.y/i.png\">x</a> {ParrotImg}</p>\n"));
+        }
+
+        [TestCase("__under__", "<p><u>under</u></p>\n")]
+        [TestCase("**bold** __under__ _em_ *em* ~~del~~", "<p><strong>bold</strong> <u>under</u> <em>em</em> <em>em</em> <del>del</del></p>\n")]
+        public void ConvertToHtml_EmojiOverload_RendersDoubleUnderscoreAsUnderline(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("![alt](https://x.y/i.png)", "<p><img src=\"https://x.y/i.png\" alt=\"alt\" /></p>\n")]
+        [TestCase("__bold__", "<p><strong>bold</strong></p>\n")]
+        public void ConvertToHtml_OneArgumentOverload_KeepsImagesAndDoubleUnderscoreBold(string markdown, string html)
+        {
+            Assert.That(_sut.ConvertToHtml(markdown), Is.EqualTo(html));
         }
 
         [Test]
@@ -465,11 +514,19 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_EmailPipeline_HtmlBlock_IsShownAsTyped()
+        public void ConvertToHtml_EmailPipeline_HtmlTag_IsShownAsTyped()
         {
             var result = _sut.ConvertToHtml("<a href=\"https://x\" style=\"color:red\">click</a>", Parrot);
 
-            Assert.That(result, Does.Not.Contain("<a "));
+            Assert.That(result, Is.EqualTo("<p>&lt;a href=&quot;https://x&quot; style=&quot;color:red&quot;&gt;click&lt;/a&gt;</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmailPipeline_HtmlBlock_IsShownAsTyped()
+        {
+            var result = _sut.ConvertToHtml("<div>\nblock\n</div>", Parrot);
+
+            Assert.That(result, Is.EqualTo("<p>&lt;div&gt;<br />\nblock<br />\n&lt;/div&gt;</p>\n"));
         }
 
         private string Cut(string markdown, int maxTextLength)

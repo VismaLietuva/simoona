@@ -16,6 +16,8 @@ using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -35,9 +37,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IEmailMarkdownRenderer emailMarkdownRenderer)
+            IEmailMarkdownRenderer emailMarkdownRenderer,
+            IPermissionService permissionService)
             :
-            base(appSettings, mailTemplate, mailingService)
+            base(appSettings, mailTemplate, mailingService, permissionService, BasicPermissions.Event)
         {
             _appSettings = appSettings;
             _organizationService = organizationService;

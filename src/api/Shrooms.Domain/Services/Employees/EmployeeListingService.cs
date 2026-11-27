@@ -68,6 +68,7 @@ namespace Shrooms.Domain.Services.Employees
                 .Where(searchFilter)
                 .Where(blacklistFilter)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
+                .Where(_permissionService.OnlyUsersWithPermission(BasicPermissions.EmployeeList))
                 .Where(user => user.OrganizationId == userOrg.OrganizationId)
                 .Select(GetEmployeeProjection(hasApplicationUserPermission, hasBlacklistPermission))
                 .OrderByPropertyNames(GetSafeSortable(employeeArgsDto, hasBlacklistPermission));

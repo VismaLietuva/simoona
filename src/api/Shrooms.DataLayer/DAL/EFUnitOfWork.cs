@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 
@@ -11,13 +12,15 @@ namespace Shrooms.DataLayer.DAL
     {
         private readonly Dictionary<Type, object> _repositories;
         private readonly IApplicationSettings _appSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public IDbContext DbContext { get; }
 
-        public EfUnitOfWork(IDbContext context, IApplicationSettings appSettings)
+        public EfUnitOfWork(IDbContext context, IApplicationSettings appSettings, IHttpContextAccessor httpContextAccessor = null)
         {
             DbContext = context;
             _appSettings = appSettings;
+            _httpContextAccessor = httpContextAccessor;
             _repositories = new Dictionary<Type, object>();
         }
 
@@ -32,7 +35,7 @@ namespace Shrooms.DataLayer.DAL
                 return repository;
             }
 
-            repository = new EfRepository<TEntity>(DbContext, _appSettings);
+            repository = new EfRepository<TEntity>(DbContext, _appSettings, _httpContextAccessor);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }

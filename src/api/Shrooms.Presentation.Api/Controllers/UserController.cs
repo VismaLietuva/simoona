@@ -88,7 +88,6 @@ namespace Shrooms.Presentation.Api.Controllers
         /// <returns>List of languages and timezones</returns>
         [HttpGet]
         [Route("GeneralSettings")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(typeof(LocalizationSettingsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetLocalizationSettings()
         {
@@ -106,7 +105,6 @@ namespace Shrooms.Presentation.Api.Controllers
         /// <returns>HTTP OK</returns>
         [HttpPut]
         [Route("GeneralSettings")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
         {
@@ -131,7 +129,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Notifications")]
-        [PermissionAuthorize(BasicPermissions.ApplicationUser)]
         [ProducesResponseType(typeof(UserNotificationsSettingsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetWallNotifications()
         {
@@ -142,7 +139,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Notifications")]
-        [PermissionAuthorize(BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ChangeNotifications(UserNotificationsSettingsViewModel userNotificationsSettings)
         {
@@ -168,7 +164,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Logins")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(typeof(List<ProviderViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserLogins()
         {
@@ -195,7 +190,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("DeleteLogin")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginsUnlink(string providerName)
         {

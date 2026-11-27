@@ -17,7 +17,10 @@ using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Emails;
 using Shrooms.Resources.Models.Walls.Posts;
+using MultiwallPost = Shrooms.DataLayer.EntityModels.Models.Multiwall.Post;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
@@ -28,8 +31,10 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
+        private readonly IPermissionService _permissionService;
 
         private readonly DbSet<MultiwallWall> _wallsDbSet;
+        private readonly DbSet<MultiwallPost> _postsDbSet;
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Project> _projectsDbSet;
 
@@ -41,7 +46,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IEmailMarkdownRenderer emailMarkdownRenderer)
+            IEmailMarkdownRenderer emailMarkdownRenderer,
+            IPermissionService permissionService)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -50,8 +56,10 @@ namespace Shrooms.Domain.Services.Email.Posting
             _postService = postService;
             _organizationService = organizationService;
             _emailMarkdownRenderer = emailMarkdownRenderer;
+            _permissionService = permissionService;
 
             _wallsDbSet = uow.GetDbSet<MultiwallWall>();
+            _postsDbSet = uow.GetDbSet<MultiwallPost>();
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
         }
@@ -62,10 +70,11 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             var organization = await _organizationService.GetOrganizationByIdAsync(postAuthor.OrganizationId);
             var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
+            var readPermission = WallReadPermission.For(wall.Type);
 
-            var mentionedUsers = (await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds.Distinct())).ToList();
+            var mentionedUsers = await KeepUsersWithPermissionAsync(await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds.Distinct()), readPermission);
 
-            var wallUsersEmails = await _userService.GetWallUsersEmailsAsync(postAuthor.Email, wall);
+            var wallUsersEmails = await _permissionService.FilterEmailsByPermissionAsync(await _userService.GetWallUsersEmailsAsync(postAuthor.Email, wall), readPermission);
 
             var destinationEmails = wallUsersEmails.Except(mentionedUsers.Select(x => x.Email)).ToList();
 
@@ -89,7 +98,12 @@ namespace Shrooms.Domain.Services.Email.Posting
                 return;
             }
 
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(ids);
+            var wallType = await _postsDbSet
+                .Where(p => p.Id == editPostDto.Id)
+                .Select(p => p.Wall.Type)
+                .SingleAsync();
+
+            var mentionedUsers = await KeepUsersWithPermissionAsync(await _userService.GetUsersWithMentionNotificationsAsync(ids), WallReadPermission.For(wallType));
 
             if (!mentionedUsers.Any())
             {
@@ -158,6 +172,14 @@ namespace Shrooms.Domain.Services.Email.Posting
                 subject,
                 emailTemplateViewModel,
                 EmailTemplateCacheKeys.NewWallPost);
+        }
+
+        private async Task<List<ApplicationUser>> KeepUsersWithPermissionAsync(IEnumerable<ApplicationUser> users, string permissionName)
+        {
+            var userList = users.ToList();
+            var permittedIds = (await _permissionService.FilterUserIdsByPermissionAsync(userList.Select(u => u.Id), permissionName)).ToHashSet();
+
+            return userList.Where(u => permittedIds.Contains(u.Id)).ToList();
         }
 
         private async Task<string> GetPostLinkAsync(WallType wallType, int wallId, string orgName, int postId)
