@@ -20,6 +20,8 @@ using Shrooms.Resources.Models.Walls.Comments;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Resources.Emails;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
@@ -31,6 +33,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IOrganizationService _organizationService;
         private readonly IPostService _postService;
         private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
+        private readonly IPermissionService _permissionService;
 
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<Project> _projectsDbSet;
@@ -46,7 +49,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
             IPostService postService,
-            IEmailMarkdownRenderer emailMarkdownRenderer)
+            IEmailMarkdownRenderer emailMarkdownRenderer,
+            IPermissionService permissionService)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -56,6 +60,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _organizationService = organizationService;
             _postService = postService;
             _emailMarkdownRenderer = emailMarkdownRenderer;
+            _permissionService = permissionService;
 
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
@@ -68,9 +73,12 @@ namespace Shrooms.Domain.Services.Email.Posting
             var commentAuthor = await _userService.GetApplicationUserAsync(commentDto.CommentAuthor);
             var organization = await _organizationService.GetOrganizationByIdAsync(commentAuthor.OrganizationId);
 
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds.Distinct());
+            var readPermission = WallReadPermission.For(commentDto.WallType);
 
-            var destinationEmails = (await GetPostWatchersEmailsAsync(commentAuthor.Email, commentDto.PostId, commentAuthor.Id))
+            var mentionedUsers = await KeepUsersWithPermissionAsync(await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds.Distinct()), readPermission);
+
+            var postWatchersEmails = await GetPostWatchersEmailsAsync(commentAuthor.Email, commentDto.PostId, commentAuthor.Id);
+            var destinationEmails = (await _permissionService.FilterEmailsByPermissionAsync(postWatchersEmails, readPermission))
                 .Except(mentionedUsers.Select(x => x.Email))
                 .ToList();
 
@@ -99,7 +107,12 @@ namespace Shrooms.Domain.Services.Email.Posting
                 return;
             }
 
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(ids);
+            var wallType = await _commentsDbSet
+                .Where(c => c.Id == editCommentDto.Id)
+                .Select(c => c.Post.Wall.Type)
+                .SingleAsync();
+
+            var mentionedUsers = await KeepUsersWithPermissionAsync(await _userService.GetUsersWithMentionNotificationsAsync(ids), WallReadPermission.For(wallType));
 
             if (!mentionedUsers.Any())
             {
@@ -168,6 +181,14 @@ namespace Shrooms.Domain.Services.Email.Posting
                 WallEmailPresentation.GetActionButtonTitle(wall));
 
             await SendMultipleEmailsAsync(emails, subject, emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
+        }
+
+        private async Task<List<ApplicationUser>> KeepUsersWithPermissionAsync(IEnumerable<ApplicationUser> users, string permissionName)
+        {
+            var userList = users.ToList();
+            var permittedIds = (await _permissionService.FilterUserIdsByPermissionAsync(userList.Select(u => u.Id), permissionName)).ToHashSet();
+
+            return userList.Where(u => permittedIds.Contains(u.Id)).ToList();
         }
 
         private async Task<IList<string>> GetPostWatchersEmailsAsync(string senderEmail, int postId, string commentAuthorId)
