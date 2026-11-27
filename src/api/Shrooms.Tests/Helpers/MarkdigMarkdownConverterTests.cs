@@ -465,11 +465,19 @@ namespace Shrooms.Tests.Helpers
         }
 
         [Test]
-        public void ConvertToHtml_EmailPipeline_HtmlBlock_IsShownAsTyped()
+        public void ConvertToHtml_EmailPipeline_HtmlTag_IsShownAsTyped()
         {
             var result = _sut.ConvertToHtml("<a href=\"https://x\" style=\"color:red\">click</a>", Parrot);
 
-            Assert.That(result, Does.Not.Contain("<a "));
+            Assert.That(result, Is.EqualTo("<p>&lt;a href=&quot;https://x&quot; style=&quot;color:red&quot;&gt;click&lt;/a&gt;</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmailPipeline_HtmlBlock_IsShownAsTyped()
+        {
+            var result = _sut.ConvertToHtml("<div>\nblock\n</div>", Parrot);
+
+            Assert.That(result, Is.EqualTo("<p>&lt;div&gt;<br />\nblock<br />\n&lt;/div&gt;</p>\n"));
         }
 
         private string Cut(string markdown, int maxTextLength)

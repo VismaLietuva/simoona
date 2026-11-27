@@ -6,7 +6,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MoreLinq;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
@@ -78,7 +77,7 @@ namespace Shrooms.Domain.Services.Permissions
             return allPermissions
                 .Select(x => new PermissionGroupDto
                 {
-                    Name = x.Name.Split(DataLayerConstants.PermissionSplitter).First().ToLower()
+                    Name = PermissionGroups.GetGroupName(x.Name)
                 })
                 .DistinctBy(x => x.Name)
                 .OrderBy(x => x.Name)
@@ -112,7 +111,12 @@ namespace Shrooms.Domain.Services.Permissions
             return await GetPermissionsAsync(organizationId, roleFilter);
         }
 
-        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter = null)
+        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, CancellationToken cancellationToken = default)
+        {
+            return await GetPermissionsAsync(organizationId, null, cancellationToken);
+        }
+
+        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter, CancellationToken cancellationToken = default)
         {
             return await _permissionsDbSet
                 .Include(x => x.Module.Organizations)
@@ -125,7 +129,7 @@ namespace Shrooms.Domain.Services.Permissions
                     Name = x.Name,
                     Scope = x.Scope
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         private static Expression<Func<Permission, bool>> FilterActiveModules(int organizationId)

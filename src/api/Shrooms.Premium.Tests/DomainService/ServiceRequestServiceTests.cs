@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -60,10 +61,26 @@ namespace Shrooms.Premium.Tests.DomainService
             _serviceRequestService = new ServiceRequestService(_uow, _permissionService, asyncRunner);
         }
 
+        // The service request list looks these up on every load.
         [Test]
-        public async Task Should_Return_Successfully_Created_Service_Request_Comment()
+        public void GetCategoriesAsync_RequestAborted_StopsTheQuery()
+        {
+            MockServiceRequestCategories();
+
+            Assert.ThrowsAsync(
+                Is.InstanceOf<OperationCanceledException>(),
+                async () => await _serviceRequestService.GetCategoriesAsync(new CancellationToken(true)));
+        }
+
+        // The request's creator, an assignee of its category and an admin may comment.
+        [TestCase("UserId")]
+        [TestCase("AssigneeId")]
+        [TestCase("AdminId")]
+        public async Task Should_Return_Successfully_Created_Service_Request_Comment(string userId)
         {
             MockServiceRequests();
+            MockCategoryWithAssignee();
+            MockPermissioService();
 
             var comment = new ServiceRequestCommentDto
             {
@@ -74,12 +91,26 @@ namespace Shrooms.Premium.Tests.DomainService
             var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
-                UserId = "UserId"
+                UserId = userId
             };
 
             await _serviceRequestService.CreateCommentAsync(comment, userAndOrg);
             _serviceRequestCommentsDbSet.Received(1).Add(Arg.Any<ServiceRequestComment>());
             await _uow.Received(1).SaveChangesAsync(false);
+        }
+
+        [Test]
+        public void CreateCommentAsync_CallerCannotSeeTheRequest_Throws()
+        {
+            MockServiceRequests();
+            MockCategoryWithAssignee();
+            MockPermissioService();
+
+            var comment = new ServiceRequestCommentDto { Content = "test content", ServiceRequestId = 1 };
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = "AnotherUserId" };
+
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _serviceRequestService.CreateCommentAsync(comment, userAndOrg));
+            _serviceRequestCommentsDbSet.DidNotReceive().Add(Arg.Any<ServiceRequestComment>());
         }
 
         [Test]
@@ -643,11 +674,28 @@ namespace Shrooms.Premium.Tests.DomainService
                 new ServiceRequest
                 {
                     Id = 1,
-                    OrganizationId = 1
+                    OrganizationId = 1,
+                    EmployeeId = "UserId",
+                    CategoryName = "test1"
                 }
             }.AsQueryable();
 
             _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
+        }
+
+        private void MockCategoryWithAssignee()
+        {
+            var serviceRequestCategories = new List<ServiceRequestCategory>
+            {
+                new ServiceRequestCategory
+                {
+                    Id = 1,
+                    Name = "test1",
+                    Assignees = new List<ApplicationUser> { new ApplicationUser { Id = "AssigneeId" } }
+                }
+            }.AsQueryable();
+
+            _serviceRequestCategoryDbSet.SetDbSetDataForAsync(serviceRequestCategories);
         }
 
         private void MockServiceRequestCategories()
