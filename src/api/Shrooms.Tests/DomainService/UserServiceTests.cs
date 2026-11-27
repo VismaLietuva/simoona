@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -183,6 +183,19 @@ namespace Shrooms.Tests.DomainService
             Assert.That(result, Is.InstanceOf<LocalizationSettingsDto>());
             Assert.That(result.Languages.First(x => x.IsSelected).DisplayName, Is.EqualTo(CultureInfo.GetCultureInfo("en-US").DisplayName));
             Assert.That(result.TimeZones.First(x => x.IsSelected).DisplayName, Is.EqualTo(TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time").DisplayName));
+        }
+
+        [Test]
+        public async Task Should_Select_The_Default_Time_Zone_For_A_User_Without_One()
+        {
+            // The mocked query runs in memory, where a missing settings row would throw instead of reading as NULL.
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { new() { Id = "user1", OrganizationId = 2, Settings = new UserSettings() } });
+
+            var result = await _userService.GetUserLocalizationSettingsAsync(new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            // The default is a Windows id; the list holds the host's own ids (IANA on Linux).
+            var defaultTimeZone = TimeZoneConverter.TZConvert.GetTimeZoneInfo(DataLayerConstants.DefaultTimeZone);
+            Assert.That(result.TimeZones.Single(x => x.IsSelected).Id, Is.EqualTo(defaultTimeZone.Id));
         }
 
         [Test]

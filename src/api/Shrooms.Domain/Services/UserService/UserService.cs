@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using TimeZoneConverter;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
@@ -131,6 +132,10 @@ namespace Shrooms.Domain.Services.UserService
 
             var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture);
 
+            // The list below holds the host's own ids, which are IANA ids on Linux, while the
+            // default is a Windows id: resolve it to the id this host lists it under.
+            var selectedTimeZoneId = userSettings.TimeZone ?? TZConvert.GetTimeZoneInfo(DataLayerConstants.DefaultTimeZone).Id;
+
             var settingsDto = new LocalizationSettingsDto
             {
                 Languages = BusinessLayerConstants.SupportedLanguages
@@ -143,7 +148,7 @@ namespace Shrooms.Domain.Services.UserService
                     {
                         Id = tz.Id,
                         DisplayName = tz.DisplayName,
-                        IsSelected = string.Equals(tz.Id, userSettings.TimeZone ?? DataLayerConstants.DefaultTimeZone, StringComparison.InvariantCultureIgnoreCase)
+                        IsSelected = string.Equals(tz.Id, selectedTimeZoneId, StringComparison.InvariantCultureIgnoreCase)
                     })
                     .ToList()
             };

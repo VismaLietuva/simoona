@@ -100,9 +100,22 @@ CREATE TABLE dbo.AspNetUsers (
 
             Run(new AddUserSettings().UpOperations);
 
-            // UserSettingsCatchUp finds the backfill by MIN(Created) and an untouched row by Modified = Created.
+            // UserSettingsCatchUp tells a backfill row the new code never touched by Modified = Created.
             Assert.That(Scalar<int>("SELECT COUNT(*) FROM dbo.UserSettings WHERE [Modified] <> [Created]"), Is.Zero);
             Assert.That(Scalar<int>("SELECT COUNT(DISTINCT [Created]) FROM dbo.UserSettings"), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Up_Marks_The_Backfill_Rows()
+        {
+            AddUser("user", culture: "en-US");
+            AddUser("anonymized", anonymized: true);
+
+            Run(new AddUserSettings().UpOperations);
+
+            // UserSettingsCatchUp finds the backfill rows by this marker.
+            Assert.That(Scalar<int>($"SELECT COUNT(*) FROM dbo.UserSettings WHERE [CreatedBy] = N'{UserSettingsCatchUp.BackfillMarker}'"), Is.EqualTo(2));
+            Assert.That(UserSettingsCatchUp.Sql, Does.Contain($"N'{UserSettingsCatchUp.BackfillMarker}'"));
         }
 
         [Test]
@@ -121,7 +134,7 @@ CREATE TABLE dbo.AspNetUsers (
         {
             AddUser("user", culture: "en-US", timeZone: "UTC");
             Run(new AddUserSettings().UpOperations);
-            Execute("UPDATE dbo.UserSettings SET [CultureCode] = 'lt-LT', [IsTutorialComplete] = 1, [Preferences] = '[9]' WHERE [UserId] = 'user'");
+            Execute("UPDATE dbo.UserSettings SET [CultureCode] = 'lt-LT', [IsTutorialComplete] = 1, [Preferences] = '[9]', [Modified] = DATEADD(minute, 1, [Modified]) WHERE [UserId] = 'user'");
 
             Run(new AddUserSettings().DownOperations);
 
@@ -129,6 +142,24 @@ CREATE TABLE dbo.AspNetUsers (
             Assert.That(Scalar<bool>("SELECT [IsTutorialComplete] FROM dbo.AspNetUsers WHERE [Id] = 'user'"), Is.True);
             Assert.That(OldPreferences("user"), Is.EqualTo("[9]"));
             Assert.That(Scalar<object>("SELECT OBJECT_ID('dbo.UserSettings')"), Is.EqualTo(DBNull.Value));
+        }
+
+        [Test]
+        public void Down_Keeps_What_An_Old_Instance_Wrote_After_Up()
+        {
+            AddUser("edited", culture: "en-US", timeZone: "UTC");
+            Run(new AddUserSettings().UpOperations);
+            Execute("UPDATE dbo.AspNetUsers SET [TimeZone] = 'FLE Standard Time', [WallWidgetPreferences] = '[5]' WHERE [Id] = 'edited'");
+            AddUser("created", culture: "lt-LT", timeZone: "FLE Standard Time", mailingHour: TimeSpan.FromHours(7));
+            AddRowTheNewCodeCreated("created", culture: "en-GB");
+
+            Run(new AddUserSettings().DownOperations);
+
+            Assert.That(Scalar<string>("SELECT [TimeZone] FROM dbo.AspNetUsers WHERE [Id] = 'edited'"), Is.EqualTo("FLE Standard Time"));
+            Assert.That(OldPreferences("edited"), Is.EqualTo("[5]"));
+            Assert.That(Scalar<string>("SELECT [CultureCode] FROM dbo.AspNetUsers WHERE [Id] = 'created'"), Is.EqualTo("en-GB"), "the new code's value wins");
+            Assert.That(Scalar<string>("SELECT [TimeZone] FROM dbo.AspNetUsers WHERE [Id] = 'created'"), Is.EqualTo("FLE Standard Time"), "an on-demand row must not blank what the old instance wrote");
+            Assert.That(Scalar<TimeSpan>("SELECT [DailyMailingHour] FROM dbo.AspNetUsers WHERE [Id] = 'created'"), Is.EqualTo(TimeSpan.FromHours(7)));
         }
 
         [Test]
@@ -220,6 +251,23 @@ CREATE TABLE dbo.AspNetUsers (
         }
 
         [Test]
+        public void CatchUp_Leaves_The_First_User_Of_A_Database_That_Had_None_Alone()
+        {
+            // A new tenant or a fresh database: the backfill wrote nothing, so the
+            // earliest row is one the new code created and never changed since.
+            Run(new AddUserSettings().UpOperations);
+            AddUser("first");
+            AddRowTheNewCodeCreated("first", culture: "lt-LT", timeZone: "FLE Standard Time");
+            AddUser("second");
+            AddRowTheNewCodeCreated("second", culture: "en-US");
+
+            RunCatchUp();
+
+            Assert.That(Settings("first"), Is.EqualTo(new SettingsRow("lt-LT", "FLE Standard Time", null, false, null)));
+            Assert.That(Settings("second"), Is.EqualTo(new SettingsRow("en-US", null, null, false, null)));
+        }
+
+        [Test]
         public void CatchUp_Does_Nothing_More_When_Run_Again()
         {
             AddUser("untouched", culture: "en-US", timeZone: "UTC");
@@ -259,12 +307,14 @@ CREATE TABLE dbo.AspNetUsers (
                 ("@id", id), ("@culture", culture), ("@timeZone", timeZone), ("@mailingHour", mailingHour), ("@tutorial", tutorial), ("@preferences", preferences), ("@anonymized", anonymized));
         }
 
-        // A row added after the backfill, the way GetOrCreateSettings or user creation adds one.
+        // A row added after the backfill, the way GetOrCreateSettings or user creation adds one:
+        // Created and Modified equal, CreatedBy without the backfill marker.
         private void AddRowTheNewCodeCreated(string userId, string culture = null, string timeZone = null, string preferences = null)
         {
             Execute(
                 @"INSERT dbo.UserSettings ([UserId], [CultureCode], [TimeZone], [IsTutorialComplete], [Preferences], [Created], [Modified])
-                  SELECT @userId, @culture, @timeZone, 0, @preferences, DATEADD(minute, 1, MIN([Created])), DATEADD(minute, 1, MIN([Created]))
+                  SELECT @userId, @culture, @timeZone, 0, @preferences,
+                         COALESCE(DATEADD(minute, 1, MAX([Created])), '2026-01-01'), COALESCE(DATEADD(minute, 1, MAX([Created])), '2026-01-01')
                   FROM dbo.UserSettings",
                 ("@userId", userId), ("@culture", culture), ("@timeZone", timeZone), ("@preferences", preferences));
         }

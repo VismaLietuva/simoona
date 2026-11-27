@@ -49,16 +49,17 @@ IF EXISTS (SELECT 1 FROM dbo.AspNetUsers WHERE LEN([CultureCode]) > 20 OR LEN([T
             // UserSettingsCatchUp.Sql for what old instances wrote after this ran. Users anonymized before this
             // migration kept their preferences (the old anonymization never cleared
             // them) and are never anonymized again, so clear both copies here.
-            // The clock is read once: UserSettingsCatchUp tells a backfill row the new
-            // code never touched by Modified = Created, and two SYSUTCDATETIME() calls
-            // in one statement are evaluated separately and can differ.
+            // CreatedBy marks the rows as the backfill's (UserSettingsCatchUp.BackfillMarker):
+            // UserSettingsCatchUp finds them by it, and tells one the new code never
+            // touched by Modified = Created. The clock is read once for that: two
+            // SYSUTCDATETIME() calls in one statement are evaluated separately and can differ.
             migrationBuilder.Sql(@"
 DECLARE @now datetime2 = SYSUTCDATETIME();
 
 INSERT dbo.UserSettings ([UserId], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete], [Preferences], [Created], [CreatedBy], [Modified], [ModifiedBy])
 SELECT [Id], [CultureCode], [TimeZone], [DailyMailingHour], [IsTutorialComplete],
        CASE WHEN [IsAnonymized] = 1 THEN NULL ELSE [WallWidgetPreferences] END,
-       @now, NULL, @now, NULL
+       @now, N'AddUserSettings', @now, NULL
 FROM dbo.AspNetUsers;
 
 UPDATE dbo.AspNetUsers SET [WallWidgetPreferences] = NULL WHERE [IsAnonymized] = 1 AND [WallWidgetPreferences] IS NOT NULL;
@@ -68,7 +69,12 @@ UPDATE dbo.AspNetUsers SET [WallWidgetPreferences] = NULL WHERE [IsAnonymized] =
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Only UserSettings has been written since Up, so copy it back first.
+            // Old instances may have kept writing the AspNetUsers columns after Up (a
+            // rollback usually happens while they are still running), so bring
+            // UserSettings up to date with them first. Then every row holds the value
+            // to keep, the new code's where both changed, and can be copied back.
+            migrationBuilder.Sql(UserSettingsCatchUp.Sql);
+
             migrationBuilder.Sql(@"
 UPDATE u
 SET u.[CultureCode] = s.[CultureCode],
