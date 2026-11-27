@@ -8,7 +8,8 @@ namespace Shrooms.EmailTemplates.Tests
     [TestFixture]
     public class ServiceRequestCommentHtmlTests
     {
-        private const string RenderedComment = "<p><strong>On</strong> the way</p><img src=\"x\" onerror=\"alert(1)\">";
+        private const string RenderedComment =
+            "<p><strong>On</strong> the way, ask <a href=\"mailto:jonas@example.com\">jonas@example.com</a></p><img src=\"x\" onerror=\"alert(1)\">";
 
         [Test]
         public async Task RendersTheCommentAsSanitizedHtml()
@@ -21,6 +22,7 @@ namespace Shrooms.EmailTemplates.Tests
             Assert.Multiple(() =>
             {
                 Assert.That(html, Does.Contain("<strong>On</strong> the way"));
+                Assert.That(html, Does.Contain("<a href=\"mailto:jonas@example.com\">jonas@example.com</a>"));
                 Assert.That(html, Does.Not.Contain("onerror"));
                 Assert.That(html, Does.Contain("class=\"simoona-rich-text\""));
             });
