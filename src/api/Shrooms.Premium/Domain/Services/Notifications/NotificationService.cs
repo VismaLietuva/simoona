@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Notification;
@@ -11,6 +12,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
@@ -24,6 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
         private readonly DbSet<Wall> _wallDbSet;
 
         private readonly IWallService _wallService;
+        private readonly IPermissionService _permissionService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IMapper _mapper;
 
@@ -31,7 +34,8 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             IUnitOfWork2 uow,
             IMapper mapper,
             IWallService wallService,
-            IMarkdownConverter markdownConverter)
+            IMarkdownConverter markdownConverter,
+            IPermissionService permissionService)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _wallDbSet = uow.GetDbSet<Wall>();
@@ -40,13 +44,14 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             _mapper = mapper;
             _wallService = wallService;
             _markdownConverter = markdownConverter;
+            _permissionService = permissionService;
         }
 
         public async Task<NotificationDto> CreateForEventAsync(UserAndOrganizationDto userOrg, CreateEventDto eventDto)
         {
             var mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
 
-            var membersToNotify = await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg);
+            var membersToNotify = await _permissionService.FilterUserIdsByPermissionAsync(await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg), BasicPermissions.Event);
 
             var sourceIds = new Sources { EventId = eventDto.Id };
             var htmlDescription = _markdownConverter.ConvertToHtml(eventDto.Description);
@@ -61,6 +66,13 @@ namespace Shrooms.Premium.Domain.Services.Notifications
 
         public async Task CreateForEventJoinReminderAsync(IEnumerable<string> usersToNotify, int orgId)
         {
+            var eventReaders = await _permissionService.FilterUserIdsByPermissionAsync(usersToNotify, BasicPermissions.Event);
+
+            if (!eventReaders.Any())
+            {
+                return;
+            }
+
             var newNotification = new Notification
             {
                 Title = $"Weekly event reminder",
@@ -68,7 +80,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
                 Type = NotificationType.EventReminder,
                 OrganizationId = orgId,
                 Sources = new Sources(),
-                NotificationUsers = MapNotificationUsersFromIds(usersToNotify),
+                NotificationUsers = MapNotificationUsersFromIds(eventReaders),
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow
             };

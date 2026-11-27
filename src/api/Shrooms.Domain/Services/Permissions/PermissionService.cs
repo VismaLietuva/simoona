@@ -6,7 +6,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MoreLinq;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
@@ -17,14 +16,18 @@ namespace Shrooms.Domain.Services.Permissions
 {
     public class PermissionService : IPermissionService
     {
+        private const int LookupBatchSize = 500;
+
         private readonly DbSet<Permission> _permissionsDbSet;
         private readonly DbSet<IdentityUserRole<string>> _userRolesDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
 
         public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IEnumerable<string>> permissionsCache)
         {
             _permissionsDbSet = unitOfWork.GetDbSet<Permission>();
             _userRolesDbSet = unitOfWork.GetDbSet<IdentityUserRole<string>>();
+            _usersDbSet = unitOfWork.GetDbSet<ApplicationUser>();
             _permissionsCache = permissionsCache;
         }
 
@@ -78,7 +81,7 @@ namespace Shrooms.Domain.Services.Permissions
             return allPermissions
                 .Select(x => new PermissionGroupDto
                 {
-                    Name = x.Name.Split(DataLayerConstants.PermissionSplitter).First().ToLower()
+                    Name = PermissionGroups.GetGroupName(x.Name)
                 })
                 .DistinctBy(x => x.Name)
                 .OrderBy(x => x.Name)
@@ -105,6 +108,53 @@ namespace Shrooms.Domain.Services.Permissions
             return permissions;
         }
 
+        public Expression<Func<ApplicationUser, bool>> OnlyUsersWithPermission(string permissionName)
+        {
+            return user => _userRolesDbSet.Any(userRole =>
+                userRole.UserId == user.Id &&
+                _permissionsDbSet.Any(permission =>
+                    permission.Name == permissionName &&
+                    permission.Roles.Any(role => role.Id == userRole.RoleId) &&
+                    (!permission.ModuleId.HasValue || permission.Module.Organizations.Any(organization => organization.Id == user.OrganizationId))));
+        }
+
+        public Task<IList<string>> FilterEmailsByPermissionAsync(IEnumerable<string> emails, string permissionName)
+        {
+            return KeepPermittedAsync(emails, batch => _usersDbSet
+                .Where(OnlyUsersWithPermission(permissionName))
+                .Where(user => batch.Contains(user.Email))
+                .Select(user => user.Email)
+                .ToListAsync());
+        }
+
+        public Task<IList<string>> FilterUserIdsByPermissionAsync(IEnumerable<string> userIds, string permissionName)
+        {
+            return KeepPermittedAsync(userIds, batch => _usersDbSet
+                .Where(OnlyUsersWithPermission(permissionName))
+                .Where(user => batch.Contains(user.Id))
+                .Select(user => user.Id)
+                .ToListAsync());
+        }
+
+        private static async Task<IList<string>> KeepPermittedAsync(IEnumerable<string> values, Func<string[], Task<List<string>>> loadPermitted)
+        {
+            var requested = values.ToList();
+            var permitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var candidates = requested
+                .Where(value => !string.IsNullOrEmpty(value))
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var batch in candidates.Chunk(LookupBatchSize))
+            {
+                permitted.UnionWith(await loadPermitted(batch));
+            }
+
+            return requested
+                .Where(value => !string.IsNullOrEmpty(value) && permitted.Contains(value))
+                .ToList();
+        }
+
         public async Task<IEnumerable<PermissionDto>> GetRolePermissionsAsync(string roleId, int organizationId)
         {
             Expression<Func<Permission, bool>> roleFilter = x => x.Roles.Any(y => y.Id == roleId);
@@ -112,7 +162,12 @@ namespace Shrooms.Domain.Services.Permissions
             return await GetPermissionsAsync(organizationId, roleFilter);
         }
 
-        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter = null)
+        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, CancellationToken cancellationToken = default)
+        {
+            return await GetPermissionsAsync(organizationId, null, cancellationToken);
+        }
+
+        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter, CancellationToken cancellationToken = default)
         {
             return await _permissionsDbSet
                 .Include(x => x.Module.Organizations)
@@ -125,7 +180,7 @@ namespace Shrooms.Domain.Services.Permissions
                     Name = x.Name,
                     Scope = x.Scope
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         private static Expression<Func<Permission, bool>> FilterActiveModules(int organizationId)

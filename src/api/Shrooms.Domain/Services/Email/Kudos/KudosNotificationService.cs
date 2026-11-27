@@ -9,6 +9,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Domain.Services.Email.Kudos
 {
@@ -25,9 +26,10 @@ namespace Shrooms.Domain.Services.Email.Kudos
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IMailTemplate mailTemplate,
-            IEmailMarkdownRenderer emailMarkdownRenderer)
+            IEmailMarkdownRenderer emailMarkdownRenderer,
+            IPermissionService permissionService)
             :
-            base(appSettings, mailTemplate, mailingService)
+            base(appSettings, mailTemplate, mailingService, permissionService, BasicPermissions.Kudos)
         {
             _appSettings = appSettings;
             _emailMarkdownRenderer = emailMarkdownRenderer;

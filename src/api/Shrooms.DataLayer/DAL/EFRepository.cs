@@ -1,9 +1,11 @@
 using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -19,19 +21,37 @@ namespace Shrooms.DataLayer.DAL
 
         private readonly IDbContext _context;
         private readonly IApplicationSettings _appSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly DbSet<TEntity> _dbSet;
 
+        // The signed-in user's organization: one API serves tenants whose organizations
+        // have different ids. Work without a request user keeps the configured default.
         public int OrganizationId
         {
-            get => _appSettings.DefaultOrganizationId;
+            get => SignedInOrganizationId() ?? _appSettings.DefaultOrganizationId;
             set { }
         }
 
-        public EfRepository(IDbContext context, IApplicationSettings appSettings)
+        public EfRepository(IDbContext context, IApplicationSettings appSettings, IHttpContextAccessor httpContextAccessor = null)
         {
             _context = context;
             _dbSet = _context.Set<TEntity>();
             _appSettings = appSettings;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? SignedInOrganizationId()
+        {
+            try
+            {
+                var claim = _httpContextAccessor?.HttpContext?.User?.FindFirst(WebApiConstants.ClaimOrganizationId)?.Value;
+                return int.TryParse(claim, out var organizationId) ? organizationId : null;
+            }
+            catch (ObjectDisposedException)
+            {
+                // Fire-and-forget work can outlive the request whose context it inherited.
+                return null;
+            }
         }
 
         public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, string orderBy = null, string includeProperties = "",

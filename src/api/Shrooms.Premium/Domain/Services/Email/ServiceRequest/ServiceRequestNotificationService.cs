@@ -26,11 +26,13 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
         private readonly DbSet<ServiceRequestModel> _serviceRequestDbSet;
 
         private readonly IApplicationSettings _appSettings;
+        private readonly IEmailMarkdownRenderer _emailMarkdownRenderer;
 
         public ServiceRequestNotificationService(IUnitOfWork2 uow,
             IMailingService mailingService,
             IMailTemplate mailTemplate,
-            IApplicationSettings appSettings)
+            IApplicationSettings appSettings,
+            IEmailMarkdownRenderer emailMarkdownRenderer)
             :
             base(appSettings, mailTemplate, mailingService)
         {
@@ -41,6 +43,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             _serviceRequestStatusDbSet = uow.GetDbSet<ServiceRequestStatus>();
             _serviceRequestDbSet = uow.GetDbSet<ServiceRequestModel>();
             _appSettings = appSettings;
+            _emailMarkdownRenderer = emailMarkdownRenderer;
         }
 
         public async Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDto createdServiceRequest)
@@ -89,7 +92,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 userNotificationSettingsUrl,
                 serviceRequest.Title,
                 await GetUserFullNameAsync(createdComment.CommentedEmployeeId),
-                createdComment.CommentContent,
+                await _emailMarkdownRenderer.RenderAsync(createdComment.CommentContent, serviceRequest.OrganizationId, organizationName),
                 serviceRequestUrl);
 
             await SendMultipleEmailsAsync(

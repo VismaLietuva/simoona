@@ -16,6 +16,8 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Services.Email;
 using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Tests.Extensions;
+using System.Linq;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -46,12 +48,17 @@ namespace Shrooms.Tests.DomainService
             _emailMarkdownRenderer = Substitute.For<IEmailMarkdownRenderer>();
             _emailMarkdownRenderer.RenderAsync(Markdown, OrganizationId, OrganizationShortName).Returns(Html);
 
+            var permissionService = Substitute.For<IPermissionService>();
+            permissionService.FilterEmailsByPermissionAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>())
+                .Returns(call => Task.FromResult<IList<string>>(call.Arg<IEnumerable<string>>().ToList()));
+
             _sut = new KudosNotificationService(
                 uow,
                 Substitute.For<IMailingService>(),
                 Substitute.For<IApplicationSettings>(),
                 _mailTemplate,
-                _emailMarkdownRenderer);
+                _emailMarkdownRenderer,
+                permissionService);
         }
 
         [Test]

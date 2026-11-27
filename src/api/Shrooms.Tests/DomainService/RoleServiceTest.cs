@@ -11,6 +11,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
@@ -124,6 +125,218 @@ namespace Shrooms.Tests.DomainService
             Assert.That(roles.Users.Count(), Is.EqualTo(2));
             Assert.That(roles.Users.ToArray()[0].FullName, Is.EqualTo("first1 last1"));
             Assert.That(roles.Users.ToArray()[1].FullName, Is.EqualTo("first2 last2"));
+        }
+
+        [Test]
+        public async Task GetRoleByIdAsync_RoleWithOnlyKudosShopAdministration_ReportsOnlyKudosShop()
+        {
+            var (roleService, _) = await CreateRoleEditorAsync(AdministrationPermissions.KudosShop);
+
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+
+            var scopes = role.Permissions.ToDictionary(group => group.Name, group => group.ActiveScope);
+            Assert.That(scopes["kudosshop"], Is.EqualTo(PermissionScopes.Administration));
+            Assert.That(scopes["kudos"], Is.Empty);
+            Assert.That(scopes["kudosbasket"], Is.Empty);
+        }
+
+        [TestCase(BasicPermissions.EventUsers, "eventusers", "event")]
+        [TestCase(BasicPermissions.OfficeUsers, "officeusers", "office")]
+        [TestCase(BasicPermissions.OrganizationalStructure, "organizationalstructure", "organization")]
+        [TestCase(AdministrationPermissions.RoomType, "roomtype", "room")]
+        [TestCase(BasicPermissions.KudosBasket, "kudosbasket", "kudos")]
+        public async Task GetRoleByIdAsync_PermissionWhoseGroupStartsLikeAnother_ReportsOnlyItsOwnGroup(string permission, string ownGroup, string otherGroup)
+        {
+            var (roleService, _) = await CreateRoleEditorAsync(permission);
+
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+
+            var scopes = role.Permissions.ToDictionary(group => group.Name, group => group.ActiveScope);
+            Assert.That(scopes[ownGroup], Is.Not.Empty);
+            Assert.That(scopes[otherGroup], Is.Empty);
+        }
+
+        [TestCaseSource(nameof(RoundTripRoles))]
+        public async Task GetPermissionIdsToAssignAsync_SavingWhatGetReturned_KeepsTheRolePermissions(string[] rolePermissions)
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync(rolePermissions);
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+
+            var savedIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, await GetRolePermissionIdsAsync(dbContext), role.Permissions);
+
+            Assert.That(await GetPermissionNamesAsync(dbContext, savedIds), Is.EquivalentTo(rolePermissions));
+        }
+
+        [Test]
+        public async Task GetPermissionIdsToAssignAsync_GroupSetToAdmin_GrantsTheWholeGroupAndNothingFromSimilarlyNamedGroups()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync();
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+            role.Permissions.Single(group => group.Name == "kudos").ActiveScope = PermissionScopes.Administration;
+
+            var savedIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, Array.Empty<int>(), role.Permissions);
+
+            Assert.That(await GetPermissionNamesAsync(dbContext, savedIds), Is.EquivalentTo(new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos }));
+        }
+
+        [Test]
+        public async Task GetPermissionIdsToAssignAsync_GroupSetToBasic_GrantsOnlyTheGroupBasicPermissions()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync();
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+            role.Permissions.Single(group => group.Name == "event").ActiveScope = PermissionScopes.Basic;
+
+            var savedIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, Array.Empty<int>(), role.Permissions);
+
+            Assert.That(await GetPermissionNamesAsync(dbContext, savedIds), Is.EquivalentTo(new[] { BasicPermissions.Event }));
+        }
+
+        [Test]
+        public async Task GetRoleByIdAsync_BasicScopeStoredInAnotherCase_ReportsBasicAndBasicGrantsIt()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync(BasicPermissions.Skill);
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+            var skill = role.Permissions.Single(group => group.Name == "skill");
+
+            var grantedIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, Array.Empty<int>(), new[] { skill });
+
+            Assert.That(skill.ActiveScope, Is.EqualTo(PermissionScopes.Basic));
+            Assert.That(await GetPermissionNamesAsync(dbContext, grantedIds), Is.EquivalentTo(new[] { BasicPermissions.Skill }));
+        }
+
+        [Test]
+        public async Task GetPermissionIdsToAssignAsync_AdminOnlyGroupChangedToBasicAndBack_AdminImpliesBasic()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync(AdministrationPermissions.Kudos);
+            var kudos = new PermissionGroupDto { Name = "kudos", ActiveScope = PermissionScopes.Basic };
+
+            var basicIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, await GetRolePermissionIdsAsync(dbContext), new[] { kudos });
+            kudos.ActiveScope = PermissionScopes.Administration;
+            var adminIds = await roleService.GetPermissionIdsToAssignAsync(EditorOrganization.OrganizationId, basicIds, new[] { kudos });
+
+            Assert.That(await GetPermissionNamesAsync(dbContext, basicIds), Is.EquivalentTo(new[] { BasicPermissions.Kudos }));
+            Assert.That(await GetPermissionNamesAsync(dbContext, adminIds), Is.EquivalentTo(new[] { BasicPermissions.Kudos, AdministrationPermissions.Kudos }));
+        }
+
+        [Test]
+        public async Task GetPermissionIdsToAssignAsync_GroupLeftOut_RemovesItsPermissions()
+        {
+            var (roleService, dbContext) = await CreateRoleEditorAsync(BasicPermissions.Kudos, AdministrationPermissions.KudosShop);
+            var role = await roleService.GetRoleByIdAsync(EditorOrganization, EditedRoleId);
+
+            var savedIds = await roleService.GetPermissionIdsToAssignAsync(
+                EditorOrganization.OrganizationId,
+                await GetRolePermissionIdsAsync(dbContext),
+                role.Permissions.Where(group => group.Name != "kudosshop"));
+
+            Assert.That(await GetPermissionNamesAsync(dbContext, savedIds), Is.EquivalentTo(new[] { BasicPermissions.Kudos }));
+        }
+
+        private static readonly UserAndOrganizationDto EditorOrganization = new() { OrganizationId = 1, UserId = "editor" };
+
+        private const string EditedRoleId = "edited-role";
+
+        private const string PollAdministrationWithLongScope = AdministrationPermissions.Poll;
+
+        private const string DisabledModulePermission = "LOTTERY_BASIC";
+
+        private static IEnumerable<TestCaseData> RoundTripRoles()
+        {
+            yield return new TestCaseData((object)Array.Empty<string>()).SetName("RoundTrip_NoPermissions");
+            yield return new TestCaseData((object)new[] { AdministrationPermissions.KudosShop }).SetName("RoundTrip_OnlyKudosShopAdministration");
+            yield return new TestCaseData((object)new[] { BasicPermissions.KudosBasket, AdministrationPermissions.KudosBasket }).SetName("RoundTrip_KudosBasketWithoutKudos");
+            yield return new TestCaseData((object)new[] { BasicPermissions.EventUsers, BasicPermissions.OfficeUsers, BasicPermissions.OrganizationalStructure, AdministrationPermissions.RoomType })
+                .SetName("RoundTrip_GroupsThatStartLikeOtherGroups");
+            yield return new TestCaseData((object)new[] { AdministrationPermissions.Kudos, AdministrationPermissions.Event }).SetName("RoundTrip_AdministrationWithoutBasic");
+            yield return new TestCaseData((object)new[] { BasicPermissions.Poll, PollAdministrationWithLongScope }).SetName("RoundTrip_PollAdministrationStoredWithLongScopeName");
+            yield return new TestCaseData((object)new[] { BasicPermissions.Kudos, DisabledModulePermission }).SetName("RoundTrip_PermissionOfModuleTheOrganizationDoesNotUse");
+            yield return new TestCaseData((object)EditorPermissions.Select(permission => permission.Name).ToArray()).SetName("RoundTrip_EveryPermission");
+        }
+
+        private static readonly (string Name, string Scope)[] EditorPermissions =
+        {
+            (BasicPermissions.Kudos, PermissionScopes.Basic),
+            (AdministrationPermissions.Kudos, PermissionScopes.Administration),
+            (BasicPermissions.KudosBasket, PermissionScopes.Basic),
+            (AdministrationPermissions.KudosBasket, PermissionScopes.Administration),
+            (AdministrationPermissions.KudosShop, PermissionScopes.Administration),
+            (BasicPermissions.Event, PermissionScopes.Basic),
+            (AdministrationPermissions.Event, PermissionScopes.Administration),
+            (BasicPermissions.EventUsers, PermissionScopes.Basic),
+            (BasicPermissions.Office, PermissionScopes.Basic),
+            (AdministrationPermissions.Office, PermissionScopes.Administration),
+            (BasicPermissions.OfficeUsers, PermissionScopes.Basic),
+            (BasicPermissions.Organization, PermissionScopes.Basic),
+            (AdministrationPermissions.Organization, PermissionScopes.Administration),
+            (BasicPermissions.OrganizationalStructure, PermissionScopes.Basic),
+            (BasicPermissions.Room, PermissionScopes.Basic),
+            (AdministrationPermissions.Room, PermissionScopes.Administration),
+            (AdministrationPermissions.RoomType, PermissionScopes.Administration),
+            (BasicPermissions.Poll, PermissionScopes.Basic),
+            // The AddPolls migration stored this one with the scope "administration" rather than "admin".
+            (PollAdministrationWithLongScope, "administration"),
+            // SQL Server's collation treats this as "basic", and so must the editor.
+            (BasicPermissions.Skill, "Basic "),
+            (DisabledModulePermission, PermissionScopes.Basic)
+        };
+
+        /// <summary>
+        /// An in-memory database with <see cref="EditorPermissions"/> and a role holding <paramref name="rolePermissions"/>,
+        /// read through the real <see cref="PermissionService"/> so the test sees the groups the editor sees.
+        /// <see cref="DisabledModulePermission"/> belongs to a module the organization does not use, so the editor does not show it.
+        /// </summary>
+        private async Task<(RoleService RoleService, ShroomsDbContext DbContext)> CreateRoleEditorAsync(params string[] rolePermissions)
+        {
+            var options = new DbContextOptionsBuilder<ShroomsDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+            var dbContext = new ShroomsDbContext(options);
+
+            var disabledModule = new Module { Id = 1, Name = "Lottery", Organizations = new List<Organization>() };
+            var permissions = EditorPermissions
+                .Select((permission, index) => new Permission
+                {
+                    Id = index + 1,
+                    Name = permission.Name,
+                    Scope = permission.Scope,
+                    Module = permission.Name == DisabledModulePermission ? disabledModule : null
+                })
+                .ToList();
+
+            dbContext.Modules.Add(disabledModule);
+            dbContext.Permissions.AddRange(permissions);
+            dbContext.Roles.Add(new ApplicationRole
+            {
+                Id = EditedRoleId,
+                Name = "Edited",
+                OrganizationId = EditorOrganization.OrganizationId,
+                Permissions = permissions.Where(permission => rolePermissions.Contains(permission.Name)).ToList()
+            });
+            await dbContext.SaveChangesAsync(false);
+            dbContext.ChangeTracker.Clear();
+
+            var uow = new UnitOfWork2(dbContext);
+            var permissionService = new PermissionService(uow, Substitute.For<ICustomCache<string, IEnumerable<string>>>());
+
+            return (new RoleService(uow, permissionService), dbContext);
+        }
+
+        private static async Task<List<int>> GetRolePermissionIdsAsync(ShroomsDbContext dbContext)
+        {
+            return await dbContext.Permissions
+                .Where(permission => permission.Roles.Any(role => role.Id == EditedRoleId))
+                .Select(permission => permission.Id)
+                .ToListAsync();
+        }
+
+        private static async Task<List<string>> GetPermissionNamesAsync(ShroomsDbContext dbContext, IEnumerable<int> permissionIds)
+        {
+            var ids = permissionIds.ToList();
+
+            return await dbContext.Permissions
+                .Where(permission => ids.Contains(permission.Id))
+                .Select(permission => permission.Name)
+                .ToListAsync();
         }
 
         private void MockRoles()
