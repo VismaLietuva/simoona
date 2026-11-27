@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -226,6 +227,17 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request does not exist");
             }
 
+            // The same people who may read the request and its comments.
+            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDto, AdministrationPermissions.ServiceRequest);
+            var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDto.UserId;
+
+            if (!isServiceRequestAdmin &&
+                !isServiceRequestCreator &&
+                !(await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDto.UserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var timestamp = DateTime.UtcNow;
 
             var serviceRequestComment = new ServiceRequestComment
@@ -253,7 +265,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutNewCommentAsync(createdComment), _uow.ConnectionName);
         }
 
-        public async Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync()
+        public async Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
         {
             var categories = await _serviceRequestCategoryDbSet
                 .Include(x => x.Assignees)
@@ -270,7 +282,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                         PictureId = u.PictureId
                     })
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return categories;
         }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
@@ -13,7 +14,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
         Task UpdateServiceRequestAsync(ServiceRequestDto serviceRequestDto, UserAndOrganizationDto userAndOrganizationDto);
 
-        Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync();
+        Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default);
 
         Task CreateCategoryAsync(ServiceRequestCategoryDto category, string userId);
 
