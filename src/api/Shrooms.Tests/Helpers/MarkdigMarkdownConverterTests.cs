@@ -317,10 +317,32 @@ namespace Shrooms.Tests.Helpers
 
         [TestCase("**bold** _em_ ~~del~~ `code`")]
         [TestCase("# title\nline\n\n- item\n> quote")]
-        [TestCase("[label](https://x.y) ![alt](https://x.y/i.png)")]
+        [TestCase("[label](https://x.y)")]
         public void ConvertToHtml_WithoutEmojiOrBareUrls_BothOverloadsAgree(string markdown)
         {
             Assert.That(Convert(markdown, Parrot), Is.EqualTo(_sut.ConvertToHtml(markdown)));
+        }
+
+        [TestCase("![alt](https://x.y/i.png)", "<p><a href=\"https://x.y/i.png\">alt</a></p>\n")]
+        [TestCase("![alt](https://x.y/i.png \"title\")", "<p><a href=\"https://x.y/i.png\" title=\"title\">alt</a></p>\n")]
+        [TestCase("![](https://x.y/i.png)", "<p><a href=\"https://x.y/i.png\">https://x.y/i.png</a></p>\n")]
+        [TestCase("[![alt](https://x.y/i.png)](https://x.y)", "<p><a href=\"https://x.y\">alt</a></p>\n")]
+        [TestCase("[**![alt](https://x.y/i.png)**](https://x.y)", "<p><a href=\"https://x.y\"><strong>alt</strong></a></p>\n")]
+        public void ConvertToHtml_EmojiOverload_RendersImagesAsLinks(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [Test]
+        public void ConvertToHtml_EmojiOverload_KeepsCustomEmojiAsImages()
+        {
+            Assert.That(Convert("![x](https://x.y/i.png) :shipit:", Parrot), Is.EqualTo($"<p><a href=\"https://x.y/i.png\">x</a> {ParrotImg}</p>\n"));
+        }
+
+        [Test]
+        public void ConvertToHtml_OneArgumentOverload_KeepsImages()
+        {
+            Assert.That(_sut.ConvertToHtml("![alt](https://x.y/i.png)"), Is.EqualTo("<p><img src=\"https://x.y/i.png\" alt=\"alt\" /></p>\n"));
         }
 
         [Test]
