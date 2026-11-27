@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.UserPreferences;
 
 namespace Shrooms.Domain.Services.Wall.Widgets
@@ -28,7 +29,7 @@ namespace Shrooms.Domain.Services.Wall.Widgets
         {
             var stored = await _usersDbSet
                 .Where(user => user.Id == userOrg.UserId && user.OrganizationId == userOrg.OrganizationId)
-                .Select(user => user.WallWidgetPreferences)
+                .Select(user => user.Settings.Preferences)
                 .FirstOrDefaultAsync();
 
             return UserPreferencesDocument.GetSection(stored, UserPreferencesDocument.WidgetsSection);
@@ -39,6 +40,7 @@ namespace Shrooms.Domain.Services.Wall.Widgets
             ValidatePreferences(preferences);
 
             var user = await _usersDbSet
+                .Include(u => u.Settings)
                 .FirstOrDefaultAsync(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId);
 
             if (user == null)
@@ -46,14 +48,15 @@ namespace Shrooms.Domain.Services.Wall.Widgets
                 throw new ValidationException(ErrorCodes.UserNotFound, "User not found");
             }
 
-            // The column is shared with other UI preferences (see
+            // The document is shared with other UI preferences (see
             // UserPreferencesDocument), so replace only the widgets section.
-            user.WallWidgetPreferences = UserPreferencesDocument.SetSection(
-                user.WallWidgetPreferences,
+            var settings = user.GetOrCreateSettings();
+            settings.Preferences = UserPreferencesDocument.SetSection(
+                settings.Preferences,
                 UserPreferencesDocument.WidgetsSection,
                 preferences);
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userOrg.UserId);
         }
 
         private static void ValidatePreferences(string preferences)

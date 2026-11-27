@@ -24,6 +24,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
@@ -184,7 +185,9 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDto userAndOrg)
         {
-            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
+            var applicationUser = await _usersDbSet
+                .Include(user => user.Settings)
+                .FirstAsync(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
             var hasRole = await _userManager.IsInRoleAsync(applicationUser, Contracts.Constants.Roles.FirstLogin);
@@ -204,16 +207,14 @@ namespace Shrooms.Domain.Services.Administration
             await SetWelcomeKudosAsync(applicationUser);
 
             await AddWallsToNewUser(applicationUser, userAndOrg);
-            await _uow.SaveChangesAsync(userAndOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userAndOrg.UserId);
         }
 
         public async Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization)
         {
             // EF6: info.ExternalIdentity → EF Core: info.Principal
             var externalIdentity = info.Principal;
-            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .FirstAsync();
+            var settings = await CreateSettingsFromOrganizationDefaultsAsync(requestedOrganization);
 
             var user = new ApplicationUser
             {
@@ -223,8 +224,7 @@ namespace Shrooms.Domain.Services.Administration
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
                 OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id,
                 EmploymentDate = DateTime.UtcNow,
-                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
-                TimeZone = userSettings.TimeZone,
+                Settings = settings,
                 NotificationsSettings = null
             };
 
@@ -248,14 +248,11 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization)
         {
-            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .FirstAsync();
+            var settings = await CreateSettingsFromOrganizationDefaultsAsync(requestedOrganization);
 
             user.OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id;
             user.EmploymentDate = DateTime.UtcNow;
-            user.CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture;
-            user.TimeZone = userSettings.TimeZone;
+            user.Settings = settings;
             user.NotificationsSettings = null;
 
             var result = await _userManager.CreateAsync(user, password);
@@ -326,14 +323,23 @@ namespace Shrooms.Domain.Services.Administration
 
         public async Task SetUserTutorialStatusToCompleteAsync(string userId)
         {
-            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
+            var applicationUser = await _usersDbSet
+                .Include(user => user.Settings)
+                .FirstAsync(user => user.Id == userId);
             SetTutorialStatus(applicationUser, true);
-            await _uow.SaveChangesAsync(userId);
+            await _uow.SaveUserSettingsAsync(userId);
         }
 
         public async Task<bool> GetUserTutorialStatusAsync(string userId)
         {
-            return (await _usersDbSet.FirstAsync(user => user.Id == userId)).IsTutorialComplete;
+            // Nullable so a user without a settings row reads as "not complete"
+            // instead of failing to materialize NULL from the LEFT JOIN.
+            var isTutorialComplete = await _usersDbSet
+                .Where(user => user.Id == userId)
+                .Select(user => (bool?)user.Settings.IsTutorialComplete)
+                .FirstAsync();
+
+            return isTutorialComplete ?? false;
         }
 
         public async Task AddProviderEmailAsync(string userId, string provider, string email)
@@ -470,9 +476,24 @@ namespace Shrooms.Domain.Services.Administration
             return number;
         }
 
+        // Every way of creating a user starts them on the organization's culture and time zone.
+        private async Task<UserSettings> CreateSettingsFromOrganizationDefaultsAsync(string organizationName)
+        {
+            var defaults = await _organizationDbSet
+                .Where(o => o.ShortName == organizationName)
+                .Select(o => new { o.CultureCode, o.TimeZone })
+                .FirstAsync();
+
+            return new UserSettings
+            {
+                CultureCode = defaults.CultureCode ?? BusinessLayerConstants.DefaultCulture,
+                TimeZone = defaults.TimeZone
+            };
+        }
+
         private static void SetTutorialStatus(ApplicationUser user, bool tutorialStatus)
         {
-            user.IsTutorialComplete = tutorialStatus;
+            user.GetOrCreateSettings().IsTutorialComplete = tutorialStatus;
         }
 
         private async Task AddNewUserRolesAsync(string id)

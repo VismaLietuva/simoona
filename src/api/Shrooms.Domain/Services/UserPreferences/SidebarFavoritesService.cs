@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 
 namespace Shrooms.Domain.Services.UserPreferences
 {
@@ -32,7 +33,7 @@ namespace Shrooms.Domain.Services.UserPreferences
         {
             var stored = await _usersDbSet
                 .Where(user => user.Id == userOrg.UserId && user.OrganizationId == userOrg.OrganizationId)
-                .Select(user => user.WallWidgetPreferences)
+                .Select(user => user.Settings.Preferences)
                 .FirstOrDefaultAsync();
 
             return UserPreferencesDocument.GetSection(stored, UserPreferencesDocument.SidebarFavoritesSection);
@@ -43,6 +44,7 @@ namespace Shrooms.Domain.Services.UserPreferences
             ValidateFavorites(favorites);
 
             var user = await _usersDbSet
+                .Include(u => u.Settings)
                 .FirstOrDefaultAsync(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId);
 
             if (user == null)
@@ -50,12 +52,13 @@ namespace Shrooms.Domain.Services.UserPreferences
                 throw new ValidationException(ErrorCodes.UserNotFound, "User not found");
             }
 
-            user.WallWidgetPreferences = UserPreferencesDocument.SetSection(
-                user.WallWidgetPreferences,
+            var settings = user.GetOrCreateSettings();
+            settings.Preferences = UserPreferencesDocument.SetSection(
+                settings.Preferences,
                 UserPreferencesDocument.SidebarFavoritesSection,
                 favorites);
 
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            await _uow.SaveUserSettingsAsync(userOrg.UserId);
         }
 
         // Which keys are real navigation items is the client's business (it drops

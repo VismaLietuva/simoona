@@ -81,8 +81,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Id = "user1",
                     OrganizationId = 2,
-                    CultureCode = "en-US",
-                    TimeZone = "FLE Standard Time"
+                    Settings = new UserSettings { CultureCode = "en-US", TimeZone = "FLE Standard Time" }
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -94,8 +93,20 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             var result = _usersDbSet.First();
-            Assert.That(result.CultureCode, Is.EqualTo("lt-LT"));
-            Assert.That(result.TimeZone, Is.EqualTo("Pacific Standard Time"));
+            Assert.That(result.Settings.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(result.Settings.TimeZone, Is.EqualTo("Pacific Standard Time"));
+        }
+
+        [Test]
+        public async Task Should_Create_Settings_When_The_User_Has_None()
+        {
+            var user = new ApplicationUser { Id = "user1", OrganizationId = 2 };
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user });
+
+            await _userService.ChangeUserLocalizationSettingsAsync(new ChangeUserLocalizationSettingsDto { UserId = "user1", OrganizationId = 2, LanguageCode = "lt-LT", TimeZoneId = "Pacific Standard Time" });
+
+            Assert.That(user.Settings.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(user.Settings.TimeZone, Is.EqualTo("Pacific Standard Time"));
         }
 
         [Test]
@@ -108,8 +119,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Id = "user1",
                     OrganizationId = 2,
-                    CultureCode = "en-US",
-                    TimeZone = "FLE Standard Time"
+                    Settings = new UserSettings { CultureCode = "en-US", TimeZone = "FLE Standard Time" }
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -120,8 +130,8 @@ namespace Shrooms.Tests.DomainService
             var result = _usersDbSet.First();
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.CultureUnsupported));
-            Assert.That(result.CultureCode, Is.EqualTo("en-US"));
-            Assert.That(result.TimeZone, Is.EqualTo("FLE Standard Time"));
+            Assert.That(result.Settings.CultureCode, Is.EqualTo("en-US"));
+            Assert.That(result.Settings.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         [Test]
@@ -134,8 +144,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Id = "user1",
                     OrganizationId = 2,
-                    CultureCode = "en-US",
-                    TimeZone = "FLE Standard Time"
+                    Settings = new UserSettings { CultureCode = "en-US", TimeZone = "FLE Standard Time" }
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -146,8 +155,8 @@ namespace Shrooms.Tests.DomainService
             var result = _usersDbSet.First();
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.TimezoneUnsupported));
-            Assert.That(result.CultureCode, Is.EqualTo("en-US"));
-            Assert.That(result.TimeZone, Is.EqualTo("FLE Standard Time"));
+            Assert.That(result.Settings.CultureCode, Is.EqualTo("en-US"));
+            Assert.That(result.Settings.TimeZone, Is.EqualTo("FLE Standard Time"));
         }
 
         [Test]
@@ -160,8 +169,7 @@ namespace Shrooms.Tests.DomainService
                 {
                     Id = "user1",
                     OrganizationId = 2,
-                    CultureCode = "en-US",
-                    TimeZone = "Pacific Standard Time"
+                    Settings = new UserSettings { CultureCode = "en-US", TimeZone = "Pacific Standard Time" }
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(users);
@@ -175,6 +183,19 @@ namespace Shrooms.Tests.DomainService
             Assert.That(result, Is.InstanceOf<LocalizationSettingsDto>());
             Assert.That(result.Languages.First(x => x.IsSelected).DisplayName, Is.EqualTo(CultureInfo.GetCultureInfo("en-US").DisplayName));
             Assert.That(result.TimeZones.First(x => x.IsSelected).DisplayName, Is.EqualTo(TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time").DisplayName));
+        }
+
+        [Test]
+        public async Task Should_Select_The_Default_Time_Zone_For_A_User_Without_One()
+        {
+            // The mocked query runs in memory, where a missing settings row would throw instead of reading as NULL.
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { new() { Id = "user1", OrganizationId = 2, Settings = new UserSettings() } });
+
+            var result = await _userService.GetUserLocalizationSettingsAsync(new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            // The default is a Windows id; the list holds the host's own ids (IANA on Linux).
+            var defaultTimeZone = TimeZoneConverter.TZConvert.GetTimeZoneInfo(DataLayerConstants.DefaultTimeZone);
+            Assert.That(result.TimeZones.Single(x => x.IsSelected).Id, Is.EqualTo(defaultTimeZone.Id));
         }
 
         [Test]
@@ -316,6 +337,7 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     OrganizationId = organizationId,
+                    Settings = new UserSettings(),
                     NotificationsSettings = new NotificationsSettings
                     {
                         EventsEmailNotifications = true
@@ -324,6 +346,7 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     OrganizationId = organizationId,
+                    Settings = new UserSettings(),
                     NotificationsSettings = new NotificationsSettings
                     {
                         EventsEmailNotifications = false
@@ -349,11 +372,13 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     OrganizationId = organizationId,
+                    Settings = new UserSettings(),
                     NotificationsSettings = null
                 },
                 new()
                 {
                     OrganizationId = organizationId,
+                    Settings = new UserSettings(),
                     NotificationsSettings = new NotificationsSettings
                     {
                         EventsEmailNotifications = false
@@ -379,6 +404,7 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     OrganizationId = organizationId,
+                    Settings = new UserSettings(),
                     NotificationsSettings = new NotificationsSettings
                     {
                         EventsEmailNotifications = true
@@ -387,6 +413,7 @@ namespace Shrooms.Tests.DomainService
                 new()
                 {
                     OrganizationId = 2,
+                    Settings = new UserSettings(),
                     NotificationsSettings = new NotificationsSettings
                     {
                         EventsEmailNotifications = true

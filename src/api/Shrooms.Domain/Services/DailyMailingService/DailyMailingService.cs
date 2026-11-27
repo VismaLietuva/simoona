@@ -40,7 +40,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
             var usersToEmail = await _applicationUserDbSeb
                 .Include(u => u.Organization)
                 .Include(u => u.WallUsers).ThenInclude(y => y.Wall)
-                .Where(u => u.DailyMailingHour.HasValue && u.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
+                .Where(u => u.Settings.DailyMailingHour.HasValue && u.Settings.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
                 .ToListAsync();
 
             var wallReaderEmails = (await _permissionService.FilterEmailsByPermissionAsync(usersToEmail.Select(u => u.Email), BasicPermissions.Wall))

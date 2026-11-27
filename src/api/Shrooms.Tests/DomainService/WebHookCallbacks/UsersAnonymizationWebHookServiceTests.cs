@@ -81,6 +81,28 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         }
 
         [Test]
+        public async Task Should_Clear_Ui_Preferences_But_Keep_Culture_And_Time_Zone()
+        {
+            var organization = _mockDbContext.Organizations.First();
+            var settings = new UserSettings { CultureCode = "lt-LT", TimeZone = "FLE Standard Time", Preferences = "{\"sidebarFavorites\":[\"wall-7\"]}" };
+#pragma warning disable CS0618
+            var user = new ApplicationUser
+            {
+                Id = "d1", OrganizationId = organization.Id, IsDeleted = true, Modified = DateTime.UtcNow.AddDays(-30), Settings = settings,
+                WallWidgetPreferences = "{\"sidebarFavorites\":[\"wall-7\"]}"
+            };
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user });
+
+            await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
+
+            Assert.That(user.WallWidgetPreferences, Is.Null, "the pre-migration copy in AspNetUsers is cleared too");
+#pragma warning restore CS0618
+            Assert.That(settings.Preferences, Is.Null);
+            Assert.That(settings.CultureCode, Is.EqualTo("lt-LT"));
+            Assert.That(settings.TimeZone, Is.EqualTo("FLE Standard Time"));
+        }
+
+        [Test]
         public async Task Should_Delete_The_Photo_Even_When_Other_Records_Reference_It()
         {
             var organization = _mockDbContext.Organizations.First();
