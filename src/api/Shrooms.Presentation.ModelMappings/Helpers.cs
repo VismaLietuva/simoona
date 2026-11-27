@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using AutoMapper;
+using Mapster;
 using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Presentation.ModelMappings
@@ -18,6 +19,12 @@ namespace Shrooms.Presentation.ModelMappings
             return expr
                 .ForMember(x => x.OrganizationId, opt => opt.Ignore())
                 .ForMember(x => x.UserId, opt => opt.Ignore());
+        }
+
+        public static TypeAdapterSetter<TSrc, TDest> IgnoreUserOrgDto<TSrc, TDest>(this TypeAdapterSetter<TSrc, TDest> setter)
+            where TDest : UserAndOrganizationDto
+        {
+            return setter.Ignore(x => x.OrganizationId, x => x.UserId);
         }
     }
 }
