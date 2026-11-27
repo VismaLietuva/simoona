@@ -43,6 +43,7 @@ namespace Shrooms.Tests.DomainService
         [TestCase("party-parrot")]
         [TestCase("smile_2")]
         [TestCase("a")]
+        [TestCase("+1-parrot")]
         public void Should_Not_Throw_For_Valid_Name(string name)
         {
             Assert.DoesNotThrow(() => _validator.CheckNameFormat(name));

@@ -128,6 +128,30 @@ namespace Shrooms.Tests.DomainService
             });
         }
 
+        [TestCase("+1")]
+        [TestCase("smile")]
+        [TestCase("skin-tone-2")]
+        [TestCase("skin-tone-6")]
+        public void Should_Reject_A_Standard_Emoji_Name_Before_Uploading(string name)
+        {
+            using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
+
+            var newEmojiDto = new NewCustomEmojiDto
+            {
+                Name = name,
+                Content = stream,
+                MimeType = "image/png",
+                FileName = "parrot.png"
+            };
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _customEmojiService.CreateAsync(newEmojiDto, _userOrg, "Visma"));
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
+            _pictureService.DidNotReceive().UploadOriginalAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+            _customEmojisDbSet.DidNotReceive().Add(Arg.Any<CustomEmoji>());
+        }
+
         [Test]
         public async Task Should_Return_All_Organization_Emojis_With_Urls()
         {
