@@ -339,10 +339,18 @@ namespace Shrooms.Tests.Helpers
             Assert.That(Convert("![x](https://x.y/i.png) :shipit:", Parrot), Is.EqualTo($"<p><a href=\"https://x.y/i.png\">x</a> {ParrotImg}</p>\n"));
         }
 
-        [Test]
-        public void ConvertToHtml_OneArgumentOverload_KeepsImages()
+        [TestCase("__under__", "<p><u>under</u></p>\n")]
+        [TestCase("**bold** __under__ _em_ *em* ~~del~~", "<p><strong>bold</strong> <u>under</u> <em>em</em> <em>em</em> <del>del</del></p>\n")]
+        public void ConvertToHtml_EmojiOverload_RendersDoubleUnderscoreAsUnderline(string markdown, string html)
         {
-            Assert.That(_sut.ConvertToHtml("![alt](https://x.y/i.png)"), Is.EqualTo("<p><img src=\"https://x.y/i.png\" alt=\"alt\" /></p>\n"));
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("![alt](https://x.y/i.png)", "<p><img src=\"https://x.y/i.png\" alt=\"alt\" /></p>\n")]
+        [TestCase("__bold__", "<p><strong>bold</strong></p>\n")]
+        public void ConvertToHtml_OneArgumentOverload_KeepsImagesAndDoubleUnderscoreBold(string markdown, string html)
+        {
+            Assert.That(_sut.ConvertToHtml(markdown), Is.EqualTo(html));
         }
 
         [Test]
