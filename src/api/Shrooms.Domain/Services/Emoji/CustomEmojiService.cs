@@ -7,6 +7,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.ServiceValidators.Validators.Emoji;
@@ -89,9 +90,18 @@ namespace Shrooms.Domain.Services.Emoji
             return result;
         }
 
+        private static void CheckNameIsNotStandardEmoji(string name)
+        {
+            if (StandardEmojiTable.TryGet(name, out _))
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Emoji name is taken by a standard emoji");
+            }
+        }
+
         public async Task<CustomEmojiDto> CreateAsync(NewCustomEmojiDto emojiDto, UserAndOrganizationDto userOrg, string tenantName)
         {
             _validator.CheckNameFormat(emojiDto.Name);
+            CheckNameIsNotStandardEmoji(emojiDto.Name);
             await _validator.CheckIfNameIsTakenAsync(emojiDto.Name, userOrg.OrganizationId);
             await _validator.CheckImageAsync(emojiDto.Content);
 
