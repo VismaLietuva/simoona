@@ -1,5 +1,7 @@
 using Markdig;
 using Markdig.Extensions.EmphasisExtras;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using Shrooms.Domain.Services.Wall.Mentions;
 
 namespace Shrooms.Domain.Helpers
@@ -8,7 +10,7 @@ namespace Shrooms.Domain.Helpers
     {
         private static readonly MarkdownPipeline Pipeline = BasePipeline().Build();
 
-        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().DisableHtml().Build();
+        private static readonly MarkdownPipeline EmailPipeline = BasePipeline().UseAutoLinks().DisableHtml().Use<UnderlineExtension>().Build();
 
         public string ConvertToHtml(string markdown)
         {
@@ -28,6 +30,7 @@ namespace Shrooms.Domain.Helpers
             }
 
             var document = Markdown.Parse(ExpandMentions(markdown), EmailPipeline);
+            ImageLinkRewriter.Apply(document);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
             if (maxTextLength.HasValue)
             {
