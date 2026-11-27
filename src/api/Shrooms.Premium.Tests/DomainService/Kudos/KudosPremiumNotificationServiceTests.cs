@@ -12,6 +12,8 @@ using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Domain.Services.Email.Kudos;
 using Shrooms.Tests.Extensions;
+using System.Linq;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Tests.DomainService.Kudos
 {
@@ -32,12 +34,17 @@ namespace Shrooms.Premium.Tests.DomainService.Kudos
             var mailTemplate = Substitute.For<IMailTemplate>();
             var emailMarkdownRenderer = Substitute.For<IEmailMarkdownRenderer>();
             emailMarkdownRenderer.RenderAsync(Markdown, OrganizationId, OrganizationShortName).Returns(Html);
+            var permissionService = Substitute.For<IPermissionService>();
+            permissionService.FilterEmailsByPermissionAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>())
+                .Returns(call => Task.FromResult<IList<string>>(call.Arg<IEnumerable<string>>().ToList()));
+
             var sut = new KudosPremiumNotificationService(
                 uow,
                 Substitute.For<IMailingService>(),
                 Substitute.For<IApplicationSettings>(),
                 mailTemplate,
-                emailMarkdownRenderer);
+                emailMarkdownRenderer,
+                permissionService);
 
             await sut.SendLoyaltyBotNotificationAsync(new List<AwardedKudosEmployeeDto>
             {

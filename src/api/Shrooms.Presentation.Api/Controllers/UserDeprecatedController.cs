@@ -298,7 +298,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetDetails/{id}")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserDetailsViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDetails(string id)
         {
@@ -384,7 +384,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetUserProfile/{id}")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserProfileViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserProfile(string id)
         {
@@ -415,7 +415,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetUserProfile/{id}/Personal")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserPersonalInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserPersonalInfo(string id)
         {
@@ -436,7 +436,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetUserProfile/{id}/Job")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserJobInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserJobInfo(string id)
         {
@@ -469,7 +469,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetUserProfile/{id}/Office")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserOfficeInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserOfficeInfo(string id)
         {
@@ -489,7 +489,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("GetUserProfile/{id}/Shrooms")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "id")]
         [ProducesResponseType(typeof(ApplicationUserShroomsInfoViewModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserShroomsInfo(string id)
         {
@@ -550,7 +550,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("PutExams")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutExams(ApplicationUserExamsPostModel userExams)
         {
@@ -583,7 +582,6 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [Route("PutJobInfo")]
         [HttpPut]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutJobInfo(ApplicationUserPutJobInfoViewModel model)
         {
@@ -672,7 +670,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("PutPersonalInfo")]
         [ValidationFilter]
         [HttpPut]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]        public async Task<IActionResult> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
+        public async Task<IActionResult> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
         {
             var validatedModel = await ValidateModelAsync(model);
             if (validatedModel != null)
@@ -768,7 +766,6 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("PutOfficeInfo")]
         [ValidationFilter]
         [HttpPut]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PutOfficeInfo(ApplicationUserPutOfficeInfoViewModel model)
         {
@@ -866,7 +863,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("GetManagersForAutoComplete")]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser, OwnUserIdParameter = "userId")]
         public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(s))

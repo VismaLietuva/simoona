@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Resources.Models.Lotteries;
 using Shrooms.Domain.Services.Email;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
@@ -26,9 +28,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
             IMailTemplate mailTemplate,
             IUnitOfWork2 uow,
             IOrganizationService organizationService,
-            IApplicationSettings applicationSettings)
+            IApplicationSettings applicationSettings,
+            IPermissionService permissionService)
             :
-            base(applicationSettings, mailTemplate, mailingService)
+            base(applicationSettings, mailTemplate, mailingService, permissionService, BasicPermissions.Lottery)
         {
             _organizationService = organizationService;
             _applicationSettings = applicationSettings;

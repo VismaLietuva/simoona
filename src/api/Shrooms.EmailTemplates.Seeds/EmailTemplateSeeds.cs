@@ -119,7 +119,7 @@ namespace Shrooms.EmailTemplates.Seeds
                     "https://simoona.example.com/service-requests/1")),
                 new(EmailPremiumTemplateCacheKeys.ServiceRequestComment, new ServiceRequestCommentEmailTemplateViewModel(
                     SettingsUrl, "Broken monitor at desk 14", "Rasa Petraitiene",
-                    "A replacement is on the way.", "https://simoona.example.com/service-requests/1")),
+                    "<p>A <strong>replacement</strong> is on the way.</p>", "https://simoona.example.com/service-requests/1")),
                 new(EmailPremiumTemplateCacheKeys.ServiceRequestUpdate, new ServiceRequestUpdateEmailTemplateViewModel(
                     SettingsUrl, "Broken monitor at desk 14", "Rasa Petraitiene", "Done",
                     "https://simoona.example.com/service-requests/1")),

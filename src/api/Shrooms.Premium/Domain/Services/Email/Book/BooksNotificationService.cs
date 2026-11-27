@@ -9,6 +9,8 @@ using Shrooms.Domain.Services.Email;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Domain.Services.Email.Book
 {
@@ -23,9 +25,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             IUnitOfWork2 uow,
             IMailingService mailingService,
             IApplicationSettings appSettings,
-            IMailTemplate mailTemplate)
+            IMailTemplate mailTemplate,
+            IPermissionService permissionService)
             :
-            base(appSettings, mailTemplate, mailingService)
+            base(appSettings, mailTemplate, mailingService, permissionService, BasicPermissions.Book)
         {
             _appSettings = appSettings;
 

@@ -10,6 +10,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Domain.Services.DailyMailingService
 {
@@ -19,13 +20,15 @@ namespace Shrooms.Domain.Services.DailyMailingService
         private readonly DbSet<Post> _postDbSet;
         private readonly IMailingService _emailService;
         private readonly ISystemClock _systemClock;
+        private readonly IPermissionService _permissionService;
 
-        public DailyMailingService(IUnitOfWork2 unitOfWork, ISystemClock systemClock, IMailingService emailService)
+        public DailyMailingService(IUnitOfWork2 unitOfWork, ISystemClock systemClock, IMailingService emailService, IPermissionService permissionService)
         {
             _applicationUserDbSeb = unitOfWork.GetDbSet<ApplicationUser>();
             _postDbSet = unitOfWork.GetDbSet<Post>();
             _systemClock = systemClock;
             _emailService = emailService;
+            _permissionService = permissionService;
         }
 
         public async Task SendDigestedWallPostsAsync()
@@ -39,6 +42,11 @@ namespace Shrooms.Domain.Services.DailyMailingService
                 .Include(u => u.WallUsers).ThenInclude(y => y.Wall)
                 .Where(u => u.Settings.DailyMailingHour.HasValue && u.Settings.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
                 .ToListAsync();
+
+            var wallReaderEmails = (await _permissionService.FilterEmailsByPermissionAsync(usersToEmail.Select(u => u.Email), BasicPermissions.Wall))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            usersToEmail = usersToEmail.Where(u => u.Email != null && wallReaderEmails.Contains(u.Email)).ToList();
 
             if (!usersToEmail.Any())
             {
