@@ -42,6 +42,11 @@ namespace Shrooms.Presentation.Common.Filters
         // AdministrationPermissions.Kudos).
         public string[] AnyOf { get; set; }
 
+        // Route value or query parameter holding a user id. A caller acting on
+        // their own record by it passes without the permissions, so a role that
+        // leaves a module out still lets people see and edit themselves.
+        public string OwnUserIdParameter { get; set; }
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             if (!context.HttpContext.User.Identity.IsAuthenticated)
@@ -64,6 +69,12 @@ namespace Shrooms.Presentation.Common.Filters
                 OrganizationId = context.HttpContext.User.Identity.GetOrganizationId(),
             };
 
+            if (this.OwnUserIdParameter != null && !string.IsNullOrEmpty(userAndOrg.UserId) &&
+                string.Equals(this.OwnUserId(context), userAndOrg.UserId, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var isPermitted = this.permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
                 && (this.Permission == null || permissionService.UserHasPermission(userAndOrg, this.Permission))
                 && (this.AnyOf == null || this.AnyOf.Length == 0 || this.AnyOf.Any(p => permissionService.UserHasPermission(userAndOrg, p)));
@@ -72,6 +83,16 @@ namespace Shrooms.Presentation.Common.Filters
             {
                 context.Result = new ObjectResult("Missing permission") { StatusCode = 403 };
             }
+        }
+
+        private string OwnUserId(AuthorizationFilterContext context)
+        {
+            if (context.RouteData.Values.TryGetValue(this.OwnUserIdParameter, out var routeValue))
+            {
+                return routeValue?.ToString();
+            }
+
+            return context.HttpContext.Request.Query[this.OwnUserIdParameter].FirstOrDefault();
         }
     }
 }

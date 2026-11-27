@@ -2,7 +2,9 @@
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Infrastructure.Email.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +16,8 @@ namespace Shrooms.Domain.Services.Email
         private readonly IApplicationSettings _settings;
         private readonly IMailTemplate _mailTemplate;
         private readonly IMailingService _mailingService;
+        private readonly IPermissionService _permissionService;
+        private readonly string _receiverPermission;
 
         protected NotificationServiceBase(
             IApplicationSettings settings,
@@ -23,6 +27,22 @@ namespace Shrooms.Domain.Services.Email
             _settings = settings;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
+        }
+
+        /// <param name="receiverPermission">
+        /// Only users holding this permission get this service's emails, so a role that leaves a module out
+        /// also leaves out that module's emails.
+        /// </param>
+        protected NotificationServiceBase(
+            IApplicationSettings settings,
+            IMailTemplate mailTemplate,
+            IMailingService mailingService,
+            IPermissionService permissionService,
+            string receiverPermission)
+            : this(settings, mailTemplate, mailingService)
+        {
+            _permissionService = permissionService;
+            _receiverPermission = receiverPermission;
         }
 
         protected virtual async Task SendSingleEmailAsync<TEmailTemplate>(
@@ -52,12 +72,22 @@ namespace Shrooms.Domain.Services.Email
             string templateCacheKey)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            if (!receivers.Any())
+            var receiverList = receivers.ToList();
+
+            if (_receiverPermission != null && receiverList.Any())
+            {
+                var permittedEmails = (await _permissionService.FilterEmailsByPermissionAsync(receiverList.Select(r => r.Email), _receiverPermission))
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                receiverList = receiverList.Where(r => r.Email != null && permittedEmails.Contains(r.Email)).ToList();
+            }
+
+            if (!receiverList.Any())
             {
                 return;
             }
 
-            var receiverTimeZoneGroup = receivers.CreateTimeZoneGroup();
+            var receiverTimeZoneGroup = receiverList.CreateTimeZoneGroup();
             var emailTimeZoneGroup = await _mailTemplate.GenerateAsync(template, templateCacheKey, receiverTimeZoneGroup.GetTimeZoneKeys());
             await _mailingService.SendEmailsAsync(emailTimeZoneGroup.CreateEmails(receiverTimeZoneGroup, subject));
         }
@@ -89,13 +119,17 @@ namespace Shrooms.Domain.Services.Email
             string templateCacheKey)
             where TEmailTemplate : BaseEmailTemplateViewModel
         {
-            if (!emails.Any())
+            var receivers = _receiverPermission == null
+                ? emails.ToList()
+                : await _permissionService.FilterEmailsByPermissionAsync(emails, _receiverPermission);
+
+            if (!receivers.Any())
             {
                 return;
             }
 
             var body = await _mailTemplate.GenerateAsync(template, templateCacheKey);
-            await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(receivers, subject, body));
         }
 
         private string GetNotificationSettingsUrlInternal(string organizationShortName)

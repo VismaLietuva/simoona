@@ -39,6 +39,9 @@ namespace Shrooms.Tests.DomainService
 
             _roleService = Substitute.For<IRoleService>();
             _permissionService = Substitute.For<IPermissionService>();
+            _permissionService
+                .OnlyUsersWithPermission(Arg.Any<string>())
+                .Returns(user => true);
 
             _employeeListingService = new EmployeeListingService(
                 uow,
