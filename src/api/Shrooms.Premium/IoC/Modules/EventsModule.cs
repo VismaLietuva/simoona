@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events;
@@ -25,6 +26,7 @@ namespace Shrooms.Premium.IoC.Modules
             services.AddScoped<IEventQuestionWriter, EventQuestionWriter>();
             services.AddScoped<IEventQuestionStructureValidator, EventQuestionStructureValidator>();
             services.AddScoped<IEventAnswerValidator, EventAnswerValidator>();
+            services.AddScoped<ISharedEventSummaryService, SharedEventSummaryService>();
             return services;
         }
     }

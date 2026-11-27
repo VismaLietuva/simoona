@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -49,6 +50,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<Event> _eventsDbSet;
         private WallService _wallService;
         private IPermissionService _permissionService;
+        private ISharedEventSummaryService _sharedEventSummaryService;
         private IUnitOfWork2 _uow;
 
         [SetUp]
@@ -72,7 +74,12 @@ namespace Shrooms.Tests.DomainService
 
             _uow.GetDbSet<WallModerator>().Returns(_wallModeratorDbSet);
 
-            _wallService = new WallService(ModelMapper.Create(), _uow, _permissionService);
+            _sharedEventSummaryService = Substitute.For<ISharedEventSummaryService>();
+            _sharedEventSummaryService
+                .GetSummariesAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<CancellationToken>())
+                .Returns(new Dictionary<Guid, SharedEventSummaryDto>());
+
+            _wallService = new WallService(ModelMapper.Create(), _uow, _permissionService, _sharedEventSummaryService);
         }
 
         [Test]
@@ -1153,6 +1160,78 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
+        public async Task Should_Attach_Shared_Event_Summaries_With_One_Lookup_Per_Page()
+        {
+            // Arrange
+            var sharedEventId = Guid.NewGuid();
+            var summary = new SharedEventSummaryDto { Id = sharedEventId, Name = "Pizza Friday" };
+            MockPostsForFollowedFeed(sharedEventId: sharedEventId.ToString());
+            MockEventPermission(true);
+            _sharedEventSummaryService
+                .GetSummariesAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<CancellationToken>())
+                .Returns(new Dictionary<Guid, SharedEventSummaryDto> { [sharedEventId] = summary });
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts, Has.Count.EqualTo(2));
+            Assert.That(posts.Select(p => p.SharedEvent), Is.All.SameAs(summary));
+            await _sharedEventSummaryService.Received(1).GetSummariesAsync(
+                Arg.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(new[] { sharedEventId })),
+                Arg.Is<UserAndOrganizationDto>(u => u.UserId == FeedUserId),
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task Should_Leave_The_Summary_Empty_When_The_Shared_Event_Is_Not_Returned()
+        {
+            // Arrange
+            MockPostsForFollowedFeed(sharedEventId: Guid.NewGuid().ToString());
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Select(p => p.SharedEvent), Is.All.Null);
+        }
+
+        [TestCase(null)]
+        [TestCase("not-a-guid")]
+        public async Task Should_Not_Look_Up_Shared_Events_When_No_Post_Shares_One(string sharedEventId)
+        {
+            // Arrange
+            MockPostsForFollowedFeed(sharedEventId: sharedEventId);
+            MockEventPermission(true);
+
+            // Act
+            var posts = (await _wallService.GetAllPostsAsync(1, 10, FeedUser(), WallsListFilter.Followed)).ToList();
+
+            // Assert
+            Assert.That(posts.Select(p => p.SharedEvent), Is.All.Null);
+            await _sharedEventSummaryService.DidNotReceiveWithAnyArgs().GetSummariesAsync(default, default, default);
+        }
+
+        [Test]
+        public async Task Should_Attach_The_Shared_Event_Summary_To_A_Single_Post()
+        {
+            // Arrange
+            var sharedEventId = Guid.NewGuid();
+            var summary = new SharedEventSummaryDto { Id = sharedEventId };
+            MockPostsForFollowedFeed(sharedEventId: sharedEventId.ToString());
+            _sharedEventSummaryService
+                .GetSummariesAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<UserAndOrganizationDto>(), Arg.Any<CancellationToken>())
+                .Returns(new Dictionary<Guid, SharedEventSummaryDto> { [sharedEventId] = summary });
+
+            // Act
+            var post = await _wallService.GetWallPostAsync(FeedUser(), FollowedWallId);
+
+            // Assert
+            Assert.That(post.SharedEvent, Is.SameAs(summary));
+        }
+
+        [Test]
         public async Task Should_Not_Return_Main_Wall_Of_Another_Organization_In_Followed_Walls_List()
         {
             // Arrange
@@ -1242,7 +1321,8 @@ namespace Shrooms.Tests.DomainService
             bool isEventWallMember = true,
             int eventOrganizationId = 2,
             DateTime? eventPostLastActivity = null,
-            DateTime? eventEndDate = null)
+            DateTime? eventEndDate = null,
+            string sharedEventId = null)
         {
             var followedWallMember = new WallMember { Id = 1, UserId = FeedUserId, WallId = FollowedWallId };
             var eventWallMembers = isEventWallMember
@@ -1278,6 +1358,7 @@ namespace Shrooms.Tests.DomainService
                 Wall = followedWall,
                 AuthorId = FeedUserId,
                 MessageBody = PostBody,
+                SharedEventId = sharedEventId,
                 LastActivity = DateTime.UtcNow,
                 Comments = new List<Comment>(),
                 Likes = new LikesCollection()
@@ -1290,6 +1371,7 @@ namespace Shrooms.Tests.DomainService
                 Wall = eventWall,
                 AuthorId = FeedUserId,
                 MessageBody = PostBody,
+                SharedEventId = sharedEventId,
                 LastActivity = eventPostLastActivity ?? DateTime.UtcNow.AddMinutes(-1),
                 Comments = new List<Comment>(),
                 Likes = new LikesCollection()

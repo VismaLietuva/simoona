@@ -27,6 +27,9 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public string SharedEventId { get; set; }
 
+        // Null when the post shares no event, the event is gone, or the viewer cannot see events.
+        public SharedEventSummaryViewModel SharedEvent { get; set; }
+
         public int WallId { get; set; }
 
         public string WallName { get; set; }
