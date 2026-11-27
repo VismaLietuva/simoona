@@ -328,7 +328,26 @@ namespace Shrooms.Tests.Helpers
         [TestCase("![](https://x.y/i.png)", "<p><a href=\"https://x.y/i.png\">https://x.y/i.png</a></p>\n")]
         [TestCase("[![alt](https://x.y/i.png)](https://x.y)", "<p><a href=\"https://x.y\">alt</a></p>\n")]
         [TestCase("[**![alt](https://x.y/i.png)**](https://x.y)", "<p><a href=\"https://x.y\"><strong>alt</strong></a></p>\n")]
+        [TestCase("![][r]\n\n[r]: https://x.y/i.png", "<p><a href=\"https://x.y/i.png\">https://x.y/i.png</a></p>\n")]
+        [TestCase("![see [here](https://a.example)](https://b.example/i.png)", "<p><a href=\"https://b.example/i.png\">see here</a></p>\n")]
+        [TestCase("![a ![b](https://x.y/b.png) `c`](https://x.y/a.png)", "<p><a href=\"https://x.y/a.png\">a b c</a></p>\n")]
         public void ConvertToHtml_EmojiOverload_RendersImagesAsLinks(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("[![](https://img.example/badge.svg)](https://ci.example)", "<p><a href=\"https://ci.example\">https://ci.example</a></p>\n")]
+        [TestCase("[Build ![](https://img.example/badge.svg)](https://ci.example)", "<p><a href=\"https://ci.example\">Build </a></p>\n")]
+        public void ConvertToHtml_EmojiOverload_ImageWithoutAltInsideLink_NeverShowsTheImageUrl(string markdown, string html)
+        {
+            Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
+        }
+
+        [TestCase("![](javascript:alert(1))", "<p></p>\n")]
+        [TestCase("![](data:image/png;base64,AAAA)", "<p></p>\n")]
+        [TestCase("![alt](javascript:alert(1))", "<p>alt</p>\n")]
+        [TestCase("![alt](/relative.png)", "<p>alt</p>\n")]
+        public void ConvertToHtml_EmojiOverload_ImageWithUnlinkableUrl_ShowsOnlyItsAltText(string markdown, string html)
         {
             Assert.That(Convert(markdown, Parrot), Is.EqualTo(html));
         }

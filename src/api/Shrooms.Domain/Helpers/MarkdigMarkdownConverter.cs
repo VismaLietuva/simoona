@@ -30,7 +30,7 @@ namespace Shrooms.Domain.Helpers
             }
 
             var document = Markdown.Parse(ExpandMentions(markdown), EmailPipeline);
-            RenderImagesAsLinks(document);
+            ImageLinkRewriter.Apply(document);
             EmojiInlineRewriter.Apply(document, customEmojiImages);
             if (maxTextLength.HasValue)
             {
@@ -45,26 +45,6 @@ namespace Shrooms.Domain.Helpers
             return new MarkdownPipelineBuilder()
                 .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
                 .UseSoftlineBreakAsHardlineBreak();
-        }
-
-        private static void RenderImagesAsLinks(MarkdownDocument document)
-        {
-            foreach (var image in document.Descendants<LinkInline>().Where(link => link.IsImage).ToList())
-            {
-                if (image.FirstChild == null)
-                {
-                    image.AppendChild(new LiteralInline(image.Url));
-                }
-
-                if (image.Parent.FirstParentOfType<LinkInline>() == null)
-                {
-                    image.IsImage = false;
-                }
-                else
-                {
-                    image.ReplaceBy(new ContainerInline());
-                }
-            }
         }
 
         private static string ExpandMentions(string markdown)
