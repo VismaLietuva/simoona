@@ -12,11 +12,12 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.ServiceValidators.Validators.Emoji;
 using System;
+using System.Text.RegularExpressions;
 using CustomEmojiEntity = Shrooms.DataLayer.EntityModels.Models.Emoji.CustomEmoji;
 
 namespace Shrooms.Domain.Services.Emoji
 {
-    public class CustomEmojiService : ICustomEmojiService
+    public partial class CustomEmojiService : ICustomEmojiService
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
@@ -90,9 +91,12 @@ namespace Shrooms.Domain.Services.Emoji
             return result;
         }
 
+        [GeneratedRegex("^skin-tone-[2-6]$")]
+        private static partial Regex SkinToneName();
+
         private static void CheckNameIsNotStandardEmoji(string name)
         {
-            if (StandardEmojiTable.TryGet(name, out _))
+            if (StandardEmojiTable.TryGet(name, out _) || SkinToneName().IsMatch(name))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Emoji name is taken by a standard emoji");
             }

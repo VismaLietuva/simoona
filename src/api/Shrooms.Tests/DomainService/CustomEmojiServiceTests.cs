@@ -130,6 +130,8 @@ namespace Shrooms.Tests.DomainService
 
         [TestCase("+1")]
         [TestCase("smile")]
+        [TestCase("skin-tone-2")]
+        [TestCase("skin-tone-6")]
         public void Should_Reject_A_Standard_Emoji_Name_Before_Uploading(string name)
         {
             using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
