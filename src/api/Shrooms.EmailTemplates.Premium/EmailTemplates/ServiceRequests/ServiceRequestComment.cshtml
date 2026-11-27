@@ -1,4 +1,5 @@
 ﻿@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.ServiceRequestCommentEmailTemplateViewModel
+@using Shrooms.Domain.Helpers
 @{
     Layout = "/EmailTemplates/HeaderFooter.cshtml";
     ViewData["Preheader"] = $"{Model.FullName} commented on {Model.ServiceRequestTitle}.";
@@ -8,6 +9,6 @@
 <email-card>
     <p style="margin:0;">"<strong>@Model.ServiceRequestTitle</strong>"</p>
     <p style="margin:12px 0 0;">@Model.FullName commented:</p>
-    <email-quote>@Model.Comment</email-quote>
+    <email-quote>@Html.Raw(HtmlSanitizerHelper.Sanitize(Model.Comment))</email-quote>
     <email-button href="@Model.Url">Open the request</email-button>
 </email-card>

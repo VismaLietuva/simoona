@@ -13,6 +13,8 @@ using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
 using CommitteeEntity = Shrooms.DataLayer.EntityModels.Models.Committee.Committee;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Premium.Domain.Services.Email.Committee
 {
@@ -28,9 +30,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
             IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IApplicationSettings appSettings,
-            IMailingService mailingService)
+            IMailingService mailingService,
+            IPermissionService permissionService)
             :
-            base(appSettings, mailTemplate, mailingService)
+            base(appSettings, mailTemplate, mailingService, permissionService, BasicPermissions.Committees)
         {
             _organizationDbSet = uow.GetDbSet<Organization>();
             _appSettings = appSettings;

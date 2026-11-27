@@ -15,6 +15,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 
 namespace Shrooms.Domain.Services.Notifications
@@ -29,6 +30,7 @@ namespace Shrooms.Domain.Services.Notifications
         private readonly DbSet<Project> _projectDbSet;
 
         private readonly IWallService _wallService;
+        private readonly IPermissionService _permissionService;
 
         private readonly IMapper _mapper;
 
@@ -36,7 +38,7 @@ namespace Shrooms.Domain.Services.Notifications
 
         private readonly ISystemClock _systemClock;
 
-        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService, ISystemClock systemClock)
+        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService, ISystemClock systemClock, IPermissionService permissionService)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _notificationUserDbSet = uow.GetDbSet<NotificationUser>();
@@ -49,6 +51,7 @@ namespace Shrooms.Domain.Services.Notifications
             _mapper = mapper;
 
             _wallService = wallService;
+            _permissionService = permissionService;
 
             _systemClock = systemClock;
         }
@@ -80,7 +83,8 @@ namespace Shrooms.Domain.Services.Notifications
                                .Select(s => s.Name)
                                .SingleAsync();
 
-            var newNotification = Notification.Create(post.User.FullName, wallName, post.User.PictureId, sources, postType, userOrg.OrganizationId, membersToNotify);
+            var readers = await _permissionService.FilterUserIdsByPermissionAsync(membersToNotify, WallReadPermission.For(post.WallType));
+            var newNotification = Notification.Create(post.User.FullName, wallName, post.User.PictureId, sources, postType, userOrg.OrganizationId, readers);
 
             _notificationDbSet.Add(newNotification);
 
@@ -109,7 +113,8 @@ namespace Shrooms.Domain.Services.Notifications
                 PictureId = commentCreator.PictureId
             };
 
-            var newNotification = Notification.Create(commentCreatorApplicationUser.FullName, wallName, commentCreatorApplicationUser.PictureId, sources, type, userOrg.OrganizationId, membersToNotify);
+            var readers = await _permissionService.FilterUserIdsByPermissionAsync(membersToNotify, WallReadPermission.For(comment.WallType));
+            var newNotification = Notification.Create(commentCreatorApplicationUser.FullName, wallName, commentCreatorApplicationUser.PictureId, sources, type, userOrg.OrganizationId, readers);
 
             _notificationDbSet.Add(newNotification);
 
@@ -121,7 +126,7 @@ namespace Shrooms.Domain.Services.Notifications
         public async Task<NotificationDto> CreateForWallAsync(UserAndOrganizationDto userOrg, CreateWallDto wallDto, int wallId)
         {
             var mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
-            var membersToNotify = await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg);
+            var membersToNotify = await _permissionService.FilterUserIdsByPermissionAsync(await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg), BasicPermissions.Wall);
             var newNotification = Notification.Create(wallDto.Name, wallDto.Description, wallDto.Logo, new Sources { WallId = wallId }, NotificationType.NewWall, userOrg.OrganizationId, membersToNotify);
 
             _notificationDbSet.Add(newNotification);
